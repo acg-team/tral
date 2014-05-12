@@ -12,7 +12,7 @@ import numpy as np
 import scipy as sp
 import scipy.stats, scipy.special, scipy.linalg
 
-from repeat.paths import *
+from tandemrepeats.paths import *
 
 logger = logging.getLogger(__name__)
 

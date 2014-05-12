@@ -11,7 +11,7 @@ import scipy.stats, scipy.special
 
 logger = logging.getLogger(__name__)
 
-from repeat.paths import *
+from tandemrepeats.paths import *
 
 path_score = join(DATAROOT, 'pvalue')
 
@@ -22,9 +22,9 @@ path_score = join(DATAROOT, 'pvalue')
 def empiricalList(l,n, sequence_type = 'AA', score = 'phylo'):
 
     ''' loads and returns a numpy list with 10,000 empirical values
-        of the user defined distribution from memory. 
+        of the user defined distribution from memory.
         If no values are known for l and n, the closest values for l and n are chosen instead.'''
-        
+
     lMax = 99
     nMax = 49
     if score == 'entropy':
@@ -42,33 +42,33 @@ def empiricalList(l,n, sequence_type = 'AA', score = 'phylo'):
                 l -= 1
             else:
                 n -= 1
-    
+
     file = join(path_score, sequence_type, score, str(l) + '_' + str(n) + '.npz')
     if not os.path.isfile(file):
-        raise ValueError("complete pdf file %s does not exist!" % file)  
-    
+        raise ValueError("complete pdf file %s does not exist!" % file)
+
     myEmpiricalList = np.load(file)
     ## It is absolutely necessary to close the numpy filehandle.
     ## Otherwise, you will have too many open operating system filehandles
     ## if you run this function many times (more than ulimit -n allows, that is)
     empiricalList = myEmpiricalList['arr_0']
-    myEmpiricalList.close()    
-    
+    myEmpiricalList.close()
+
     return empiricalList
 
 def pValueFromEmpiricialList(myTR, score = 'phylo', myScore = None, empirical = []):
-    
-    '''  Calculates the p-Value of a score for the given myTR. The p-Value is the number of 
+
+    '''  Calculates the p-Value of a score for the given myTR. The p-Value is the number of
     scores for comparable tandem repeats, i.e. of same repeat unit length and repeat unit copy number
-    that are as good or better. 
-    '''    
-    
+    that are as good or better.
+    '''
+
     if myScore == None:
         myScore = myTR.score[score]
-        
+
     if len(empirical) == 0:
-        empirical = empiricalList(myTR.lD, myTR.n, myTR.sequence_type, score)   
-    
+        empirical = empiricalList(myTR.lD, myTR.n, myTR.sequence_type, score)
+
     if score in ['entropy']: # A smaller score is a better score for all scores in this list.
         if myScore == -1:
             return 1
@@ -76,8 +76,8 @@ def pValueFromEmpiricialList(myTR, score = 'phylo', myScore = None, empirical = 
             return bisect.bisect_right(empirical, myScore)/len(empirical)
     else:
         return 1 - bisect.bisect_left(empirical, myScore)/len(empirical)
-  
-    
+
+
 
 ########################### pSim & parsimony: read in PDF ###########################
 
@@ -112,7 +112,7 @@ def calculate_repeat_structure(myTR):
     # the parsimony and the pSim score.
     # Therefore, calculate the structure of the TR before you calculate the null distribution
     # of tandem repeat scores of tandem repeats with the same gap distribution.
-    
+
     repeatStructure = [
             len(column.replace("-",""))
             for column in myTR.msaTD if (2*column.count('-') < len(column))
@@ -122,16 +122,16 @@ def calculate_repeat_structure(myTR):
         repeatStructure.count(i) for i in nRepeatStructure
     ]
     return lRepeatStructure,nRepeatStructure
-    
+
 
 
 def dAverageMultipleMaxMultinom(myTR, precision = 10000.): # python 2: precision must be float
     # if precision higher than max(uint32) use uint64 instead
     # CHECK: http://docs.scipy.org/doc/numpy/user/basics.types.html
-    
+
 
     lRepeatStructure,nRepeatStructure = calculate_repeat_structure(myTR)
-    
+
     p = dAverageMultinom(
         lRepeatStructure[0], nRepeatStructure[0],
         myTR.sequence_type, score = 'psim'
@@ -194,7 +194,7 @@ def dAverageMultipleParsMultinom(myTR, precision = 10000.): # python 2: precisio
     # if precision higher than max(uint32) use uint64 instead
     # CHECK: http://docs.scipy.org/doc/numpy/user/basics.types.html
 
-    lRepeatStructure,nRepeatStructure = calculate_repeat_structure(myTR)    
+    lRepeatStructure,nRepeatStructure = calculate_repeat_structure(myTR)
 
     p = dAverageMultinom(
         lRepeatStructure[0], nRepeatStructure[0],
@@ -266,14 +266,14 @@ def pValuePars(myTR):
 ####################################### gap penalty #####################################
 
 def gapPenalty(myTR, mu):
-    return ((mu/(1-mu)) ** myTR.nGapStructure) * myTR.pGapStructure   
-    
+    return ((mu/(1-mu)) ** myTR.nGapStructure) * myTR.pGapStructure
+
 ############################### pValue distribution ######################################
 
 def calc_pValues(repeats, resultFilePath, fileName, scoreslist=['phylo','phylo_gap'], gappy_data = False):
 
     ''' save distribution of p-Values '''
-    
+
     # If the repeats are not gappy, than you can use always the same distribution of scores
     # on random data to calculate the p-Value. Otherwise, there might be deletion columns
     # and the distribution should be loaded each time 'pValueFromEmpiricialList' is called.
@@ -282,7 +282,7 @@ def calc_pValues(repeats, resultFilePath, fileName, scoreslist=['phylo','phylo_g
     for iScore in scoreslist:
         if 'parsimony' == iScore:
             testStatistic = [pValuePars(iRepeat) if iRepeat.lD != 0 else 1 for iRepeat in repeats]
-        elif 'pSim' == iScore: 
+        elif 'pSim' == iScore:
             testStatistic = [pValuePSim(iRepeat) if iRepeat.lD != 0 else 1 for iRepeat in repeats]
         else:
             if not gappy_data:
@@ -291,6 +291,6 @@ def calc_pValues(repeats, resultFilePath, fileName, scoreslist=['phylo','phylo_g
         score_path = os.path.join(resultFilePath,iScore)
         if not os.path.isdir(score_path):
                 os.makedirs(score_path)
-        print(os.path.join(score_path,fileName))        
-        np.savez(os.path.join(score_path,fileName) , np.sort(testStatistic))        
+        print(os.path.join(score_path,fileName))
+        np.savez(os.path.join(score_path,fileName) , np.sort(testStatistic))
 

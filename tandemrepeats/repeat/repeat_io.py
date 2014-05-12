@@ -1,11 +1,16 @@
 import Bio.Seq
 import random
 import logging
-import itertools, os, re, shutil, tempfile, subprocess
+import itertools
+import os
+import re
+import shutil
+import tempfile
+import subprocess
 import numpy as np
 
-from . import repeat_info
-from repeat.paths import *
+from tandemrepeats.repeat import repeat_info
+from tandemrepeats.paths import *
 
 logger = logging.getLogger('root')
 
@@ -22,10 +27,10 @@ def read_from_file(seq_filename, start, number, sequence_type = 'AA'):
     for seq_record in list(SeqIO.parse(seq_filename, "fasta"))[start:start+number]:
         seq_record.seq.alphabet = sequence_type
         yield seq_record
-     
-     
-############################## SAVE SEQUENCE #############################################       
-        
+
+
+############################## SAVE SEQUENCE #############################################
+
 def save_sequence(sequence, type, sequence_file, sequence_id):
     ''' save the sequence in fasta format in specified <sequence_file> '''
 
@@ -37,89 +42,89 @@ def save_sequence(sequence, type, sequence_file, sequence_id):
         else: #type == 'repeat':
             for i in sequence.msa:
                 fastafile.write(i + '\n')
-                
+
 
 
 def save_repeat_fasta(tandem_repeats, file):
-    ''' save multiple <tandem_repeats> in Fasta format in specified <file> 
+    ''' save multiple <tandem_repeats> in Fasta format in specified <file>
 
         At current, only one TR per sequence can be defined, as the identifiers in
         the dict <tandem_repeats> must be unique.
 
-        Parameters: Dict of tandem repeats and identifiers. 
+        Parameters: Dict of tandem repeats and identifiers.
             e.g. {'ENSP00012': msa1, 'ENSP00013': msa2}
-            
+
             >ID
             GHKI
             GHKI
             GH--
     '''
-    
+
     with open(file, 'w', newline = '\n') as f:
         for identifier,msa in tandem_repeats.items():
             f.write(">{0}\n".format(identifier))
             f.write("\n".join(msa)+"\n\n")
-    
+
 def save_repeat_stockholm(tandem_repeat, file):
     ''' save <tandem_repeat> in STOCKHOLM format in specified <file>
-        
+
         Parameters: Tandem repeat MSA.
             e.g. ["ACDEF-", "ACCDEF"]
-            
+
             More information in ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf
             STOCKHOLM Format Example:
-            
+
             # STOCKHOLM 1.0
             seq1 ACDEF...GHIKL
             seq2 ACDEF...GHIKL
             seq3 ...EFMNRGHIKL
-            
+
             seq1 MNPQTVWY
             seq2 MNPQTVWY
             seq3 MNPQT...
             //
-            
+
     '''
 
-    with open(file, 'w', newline = '\n') as f:  
+    with open(file, 'w', newline = '\n') as f:
         f.write("# STOCKHOLM 1.0\n")
         for i,iMSA in enumerate(tandem_repeat):
             f.write("{} {}\n".format(str(i), iMSA))
         f.write("//")
-    
+
 
 def save_repeat_treks(tandem_repeats, file):
-    ''' save multiple <tandem_repeats> in T-REKS format in specified <file> 
+    ''' save multiple <tandem_repeats> in T-REKS format in specified <file>
 
         At current, only one TR per sequence can be defined, as the identifiers in
         the dict <tandem_repeats> must be unique.
 
-        Parameters: Dict of tandem repeats and identifiers. 
+        Parameters: Dict of tandem repeats and identifiers.
             e.g. {'ENSP00012': [msa1, begin1], 'ENSP00013': [msa2, begin2]}
-            
+
             T-REKS Format Example:
-            
+
             >a
-            Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8076923076923077 region Length:42 
+            Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8076923076923077 region Length:42
             GHKI
             GHKI
             GH--
             **********************
-            
-            Length: 3 residues - nb: 2  from  21 to 27 - Psim:0.7857142857142857 region Length:22 
+
+            Length: 3 residues - nb: 2  from  21 to 27 - Psim:0.7857142857142857 region Length:22
             GHKI
             GH--
             **********************
-            
+
             >b
-            Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8095238095238095 region Length:20 
+            Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8095238095238095 region Length:20
             UIR
             UIR
             UIR
     '''
-    
+
     with open(file, 'w', newline = '\n') as f:
-        
+
         for identifier,info in tandem_repeats.items():
             f.write(">{0}\n".format(identifier))
             f.write("Length: from {0} to\n".format(str(info[1])))
@@ -135,7 +140,7 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
     '''Read repeat from file.
         Repeat needs to be saved as if it was a fasta object.
        Return a repeat_info.Repeat object '''
-    
+
     pat_start = re.compile(r">(.*)")
     pat_repeat_unit = re.compile(r"([\w\.\-]+)")
 
@@ -143,14 +148,14 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
     #
     # 1: searching for sequence name
     # 2: searching for repeat units
-    
+
     repeats = {}
     state = 1
     with open(seq_filename, "rt") as infile:
-        
+
         for i, line in enumerate(infile):
             logging.debug("Line {0}: {1}".format(i, line[0:-1]))
-            if 1 == state:    
+            if 1 == state:
                 match = pat_start.match(line)
                 if match:
                     logging.debug(" * (1->2) Found start")
@@ -158,21 +163,21 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
                     name = match.group(1)
                     repeats[name] = []
                     state = 2
-                
+
             elif 2 == state:
                 match = pat_repeat_unit.match(line)
                 if match:
                     logging.debug(" * (2->2) Found Repeat unit")
                     logging.debug("Repeat Unit: %s",  match.group(1))
                     repeat_unit = match.group(1)
-                    repeats[name].append(repeat_unit.replace(".", "-").upper()) 
+                    repeats[name].append(repeat_unit.replace(".", "-").upper())
                 else:
                     logging.debug(" * (2->1) Found NO further Repeat unit")
                     state = 1
-    
+
     for iName, iR in repeats.items():
-        repeats[iName] = repeat_info.Repeat(begin=0, msa = iR , sequence_type = sequence_type) 
-    return repeats      
+        repeats[iName] = repeat_info.Repeat(begin=0, msa = iR , sequence_type = sequence_type)
+    return repeats
 
 
 ################################### SIMULATE SEQUENCE ####################################
@@ -340,14 +345,14 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
 
         if equilibrium_frequencies == 'human':
             file = os.path.join(DATAROOT,'Random',"_".join([sequence_type,equilibrium_frequencies,'3']) + '.txt')
-        
+
         with open(file,'r') as f:
             a = f.readline()[:-1]
         b = [i.split(' ') for i in a.split('  ')]
         count = 0
         frequencies = {i[0]:int(i[1]) for i in b}
         alphabet = np.unique(i[0] for i in frequencies.keys())
-        
+
         for iSample in range(n_samples):
             seed_int = random.randint(1,sum(frequencies.values()))
             for key,value in frequencies.items():
@@ -355,11 +360,11 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
                 if seed_int <= 0:
                     seed = key
                     break
-                
-            
+
+
             dimer = [''.join(i) for i in itertools.product(alphabet, repeat=2)]
             third_letter_frequencies = {iD: {iA: frequencies[iD+iA] for iA in alphabet} for iD in dimer}
-                
+
             sequence = seed
             for i in range(sequence_length-3):
                 next_int = random.randint(1,sum(third_letter_frequencies[sequence[-2:]].values()))
@@ -368,7 +373,7 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
                     if next_int <= 0:
                         sequence += key
                         break
-                                
+
             if return_type == 'repeat' and not l == 0 and not n == 0: # return Repeat instances
                 yield repeat_info.Repeat(begin = 0, msa = [sequence[i*l:(i+1)*l] for i in range(n)], sequence_type = sequence_type)
             elif return_type == 'list':
