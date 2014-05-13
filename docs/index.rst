@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    hmm
+   repeat
 
 
 Indices and tables
