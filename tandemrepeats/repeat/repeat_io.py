@@ -184,11 +184,12 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
 
 def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutationRate = 50, tree = 'star', indelRatePerSite = False, return_type = 'repeat'):
 
-    '''Evolve sequence with Alf.
-     If return_type == 'repeat':
+    """Evolve sequence with Alf.
+    If return_type == 'repeat':
         Return a repeat_info.Repeat object
-     Else:
-        Return a Bio.Seq.Seq object '''
+    Else:
+        Return a Bio.Seq.Seq object
+    """
 
     runfile_template = os.path.join(DATAROOT, "ALF",  "template.drw")
     alf_exec = os.path.join(EXECROOT, "alfsim")
@@ -331,11 +332,12 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
 
 def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equilibrium_frequencies = 'human', l = 0, n = 0, sequence_length = 0):
 
-    '''Simulate random sequence locally.
-         If return_type == 'repeat':
+    """Simulate random sequence locally.
+    If return_type == 'repeat':
         Return a repeat_info.Repeat object
-     Else:
-        Return a Bio.Seq.Seq object '''
+    Else:
+        Return a Bio.Seq.Seq object
+    """
 
     if sequence_length == 0 and (l == 0 or n == 0):
         logger.error('The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')

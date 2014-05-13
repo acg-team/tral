@@ -5,25 +5,25 @@ from Bio import AlignIO
 
 logger = logging.getLogger('root')
 
-from . import repeat_info
-from repeat.paths import *
+from tandemrepeats.repeat import repeat_info
+from tandemrepeats.paths import *
 
 SCORESLIST = ['phylo_gap01']
 
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
 def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None):
-    
+
     # Create temporary working directory
     working_dir = tempfile.mkdtemp()
     logger.debug("evolvedTR: Created temp directory: %s", working_dir)
-    
+
     # Save my_TR to temp directory:
     msa_file = os.path.join(working_dir, 'msa_temp.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i,iMSA in enumerate(my_msa):
             msa_filehandle.write('> {0}\n{1}\n'.format(i, iMSA))
-        
+
     if aligner == 'mafft':
         # Run Mafft
         # See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.
@@ -46,17 +46,17 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
             print("\n".join(my_msa))
             print('*'*3)
             print("\n".join(msa))
-            return None            
-        
+            return None
+
     elif aligner == 'prograph':
         print('Haha, not yet.')
 
 
-########################################### MAIN #########################################   
-        
+########################################### MAIN #########################################
+
 if __name__=="__main__":
 
     msa = ["MGKGYL---------------------------------------ALCSYNCKEA-INILSHLPSHHYN","TG--------------------------------------------------------------WVLCQ","IGRAYF---------------------------------------ELSEYMQAER-IFSEVRRIENYRV","EGMEIYSTTLWHLQK------------------------------DVALSVLSKDLTDMDKNSPEAWCA","AGNCFS---------LQREH-------------------------DIAIKFFQRA-IQVDPNYAYAYTL","LGHEFV--------------LTEEL--------------------DKALACFRNA-IRVNPRHYNAWYG","LGMIYY-------------------KQEKF---------------SLAEMHFQKA-LDINPQSSVLLCH","IGVVQH------------------------ALKKS----------EKALDTLNKA-IVIDPKNPLCKFH","RASVLF-----------------------------ANEKY-----KSALQELEEL-KQIVPKESLVYFL","IGKVYK----------------------------------KLGQTHLALMNFSWA-MDLDPKGAN----"]
     realign_repeat(msa = msa)
-    
-    
+
+
