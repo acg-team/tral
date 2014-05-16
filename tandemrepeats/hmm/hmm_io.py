@@ -3,78 +3,24 @@ import os, re
 
 logger = logging.getLogger(__name__)
 
-
 ################################## READ HMMMER3  #########################################
 
-def split_HMMER_file(hmm_filename, resultdir):
-    
-    pat_start_HMMER3 = re.compile(r"HMMER3")
-    pat_accession = re.compile(r"ACC\s+([\w\.]+)")
-    tmp_file = os.path.join(resultdir, "tmp.hmm")
-    state = 0
-    fh = None
-    
-    with open(hmm_filename, "rt") as infile:
-        
-        for i, line in enumerate(infile):
-            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
-            if 0 == state:    
-                match = pat_start_HMMER3.match(line)
-                if match:
-                    if fh:
-                        fh.close()
-                        os.rename(tmp_file, os.path.join(resultdir, acc+".hmm"))
-                    logging.debug(" * (0->1) Found HMM start")
-                    state = 1
-                    fh = open(tmp_file, "w")
-                fh.write(line)        
-            elif 1 == state:
-                fh.write(line)
-                match = pat_accession.match(line)
-                if match:
-                    acc = match.group(1).split(".")[0]
-                    logging.debug(" * (1->0) Found accession")
-                    state = 0
 
-def read_HMMER_acc_lengths(hmm_filename):
-    
-    '''Read HMM file in HMMER3 format. (See definition further down)
-        Return the PFAM ID and the lengths of each model.
-    '''
-    
-    pat_accession = re.compile(r"ACC\s+([\w\.]+)")
-    pat_length = re.compile(r"LENG\s+([\w\.]+)")
-    state = 0
-    d = {}
-    
-    with open(hmm_filename, "rt") as infile:
-        
-        for i, line in enumerate(infile):
-            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
-            if 0 == state:      
-                match = pat_accession.match(line)
-                if match:
-                    acc = match.group(1)
-                    logging.debug(" * (0->1) Found name")
-                    state = 1
-            elif 1 == state:
-                match = pat_length.match(line)
-                if match:
-                    d[acc] = int(match.group(1))
-                    logging.debug(" * (1->0) Found length")
-                    state = 0
-    
-    return d
+def read(hmm_filename, id = None, type = "ACC"):
 
-def read_HMMER(hmm_filename, id = None, type = "ACC"):
-    
     '''Read HMM file in HMMER3 format.
-       Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf // 8.File formats 
-       
+       Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf // 8.File formats
+
        If <id> is defined, return only HMM with an accession tag that matches <id>. <type> identifies the type of accession.
-       
+        Store probabilities as log10arithms. [???]
+
+        Parameters:
+            <hmm_file> = 'path/to/file.hmm'
+            <id> = 'PF00560'
+
+
        The general format is:
-       
+
         HMMER3/b [3.0b2 | June 2009]
         NAME fn3
         ACC PF00041.12
@@ -99,12 +45,12 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                 2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
                 0.00227 6.08723 * 0.61958 0.77255 0.00000 *
         //
-       
-       
+
+
        Important! The probabilities are stored as negative natural log probabilities. E.g. -ln(0.25) = 1.38629
-       
+
      '''
-    
+
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"{}\s+([\w\.]+)".format(type))
     pat_name = re.compile(r"NAME\s+([\w\.]+)")
@@ -114,7 +60,7 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
     pat_insertions = re.compile(r"[\d\.]+")
     pat_transition = re.compile(r"[\d\.\*]+")
     pat_end_HMM = re.compile(r"//")
-    
+
     # Our possible parser states:
     #
     # 0: searching for HMMER3 Tag
@@ -124,15 +70,15 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
     # 3: searching for emission probabilities OR end of HMM
     # 4: searching for insertion emission probabilities
     # 5: searching for transition probabilities
-    
+
     lHMM = []
-    
+
     state = 0
     with open(hmm_filename, "rt") as infile:
-        
+
         for i, line in enumerate(infile):
             logging.debug("Line {0}: {1}".format(i, line[0:-1]))
-            if 0 == state:    
+            if 0 == state:
                 match = pat_start_HMMER3.match(line)
                 if match:
                     if id:
@@ -140,8 +86,8 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                         state = 0.1
                     else:
                         logging.debug(" * (0->1) Found start")
-                        state = 1                       
-            elif 0.1 == state:   
+                        state = 1
+            elif 0.1 == state:
                 match = pat_accession.match(line)
                 if match:
                     iID = match.group(1)
@@ -150,8 +96,8 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                         state = 1
                     else:
                         logging.debug(" * (0.1->0) Found accession. Did not match lID.")
-                        state = 0                            
-            elif 1 == state:    
+                        state = 0
+            elif 1 == state:
                 match = pat_HMM.match(line)
                 if match:
                     letters = pat_letters.findall(line[3:])
@@ -160,9 +106,9 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                     hmm = {'letters': letters}
                     state = 2
             elif 2 == state:
-                logging.debug(" * (2->3) Skipping line") 
+                logging.debug(" * (2->3) Skipping line")
                 state = 3
-            
+
             elif 3 == state:
                 findall = pat_emissions.findall(line)
                 if findall:
@@ -187,7 +133,7 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                 else:
                     logging.debug(" * (3->0) Error: No emission line")
                     state = 0
-            
+
             elif 4 == state:
                 findall = pat_insertions.findall(line)
                 if findall:
@@ -198,7 +144,7 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                 else:
                     logging.debug(" * (4->0) Error: No insertion emission line")
                     state = 0
-                    
+
             elif 5 == state:
                 findall = pat_transition.findall(line)
                 if findall:
@@ -209,27 +155,88 @@ def read_HMMER(hmm_filename, id = None, type = "ACC"):
                 else:
                     logging.debug(" * (5->0) Error: No transition line")
                     state = 0
-             
+
+    logging.debug(lHMM)
     return lHMM
-    
+
+def split_HMMER_file(hmm_filename, resultdir):
+
+    pat_start_HMMER3 = re.compile(r"HMMER3")
+    pat_accession = re.compile(r"ACC\s+([\w\.]+)")
+    tmp_file = os.path.join(resultdir, "tmp.hmm")
+    state = 0
+    fh = None
+
+    with open(hmm_filename, "rt") as infile:
+
+        for i, line in enumerate(infile):
+            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            if 0 == state:
+                match = pat_start_HMMER3.match(line)
+                if match:
+                    if fh:
+                        fh.close()
+                        os.rename(tmp_file, os.path.join(resultdir, acc+".hmm"))
+                    logging.debug(" * (0->1) Found HMM start")
+                    state = 1
+                    fh = open(tmp_file, "w")
+                fh.write(line)
+            elif 1 == state:
+                fh.write(line)
+                match = pat_accession.match(line)
+                if match:
+                    acc = match.group(1).split(".")[0]
+                    logging.debug(" * (1->0) Found accession")
+                    state = 0
+
+def read_HMMER_acc_lengths(hmm_filename):
+
+    '''Read HMM file in HMMER3 format. (See definition further down)
+        Return the PFAM ID and the lengths of each model.
+    '''
+
+    pat_accession = re.compile(r"ACC\s+([\w\.]+)")
+    pat_length = re.compile(r"LENG\s+([\w\.]+)")
+    state = 0
+    d = {}
+
+    with open(hmm_filename, "rt") as infile:
+
+        for i, line in enumerate(infile):
+            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            if 0 == state:
+                match = pat_accession.match(line)
+                if match:
+                    acc = match.group(1)
+                    logging.debug(" * (0->1) Found name")
+                    state = 1
+            elif 1 == state:
+                match = pat_length.match(line)
+                if match:
+                    d[acc] = int(match.group(1))
+                    logging.debug(" * (1->0) Found length")
+                    state = 0
+
+    return d
+
 # def write_HMMER(hmm, hmm_filename):
-# 
+#
 #     ''' Write <hmm> too <hmm_filename> in HMMER3 format.
 #        Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf // 8.File formats '''
-#        
-#        
-#        
-#  
+#
+#
+#
+#
 # def read_HMM_smart(hmm_filename, id = None, type = "ACC"):
-#  
+#
 #     ''' Write <hmm> too <hmm_filename> in smart format. '''
 #     # Format not decided yet.
- 
- 
+
+
 ##################################### Main ###############################################
 
 def main():
     lHMM = read_HMMER('you/favourite/path')
-    
-if __name__ == "__main__":  
-    main()   
+
+if __name__ == "__main__":
+    main()

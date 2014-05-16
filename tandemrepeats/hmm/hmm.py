@@ -15,6 +15,7 @@ logger = logging.getLogger('root')
 
 from tandemrepeats.hmm import hmm_io
 from tandemrepeats.repeat import repeat_io
+from tandemrepeats.repeat.repeat import Repeat
 from tandemrepeats.repeat.repeat_score import loadModel
 
 ################################### HMM class #########################################
@@ -75,94 +76,21 @@ class HMM:
         p_e (dict of dict of float): A dictionary of emission probabilities for every state and every letter in `alphabet`: {`states[0]`: {`alphabet[0]`: emission probability, ...}, ...}
         hmmer (dict of dict of float): A dictionary of all information extracted from a Hmmer model.
     """
+    # Use functions defined in other methods as class functions.
+    # @static ??
+    read = hmm_io.read
 
+    def __init__(self, hmmer_probabilities):
 
-    def __init__(self, tandem_repeat=None, hmm_file = None, accession = None, hmm_file_copy = None, id = None):
-
-        if id:
-            self.id = id
-        else:
-            self.id = "unnamed"
-
-        if hmm_file and accession:
-            hmmer_probabilities = hmm_io.read_HMMER(hmm_file, id = accession)
-            if not hmmer_probabilities:
-                print("<hmmer_probabilities> were not found :(")
-            else:
-                self.HMM_from_model(hmmer_probabilities)
-        elif tandem_repeat:
-            self.HMM_from_TR(tandem_repeat, hmm_file_copy = hmm_file_copy)
-        else:
-            self.HMM_example()
-
-    def HMM_example(self):
-        #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
-        self.states = ["N", "M1", "M2", "C"]
-
-        ## Initialisation
-        self.p_t = { iS: { iS2: 0  for iS2 in self.states}  for iS in self.states[:-1]}
-        self.p_0 = { iS: 1/3  for iS in self.states }
-
-        ## Transition probabilities
-        # Feed Values to p_t
-        self.p_t["N"] = {"N": 0.5, "M1": 0.5}
-        self.p_t["M1"] = {"M2": 0.5, "C": 0.5}
-        self.p_t["M2"] = {"M1": 0.5, "C": 0.5}
-        self.p_t["C"] = {"C": 1}
-
-        # emissions
-        self.emissions = ["A", "C", "G", "T"]
-
-        # emission probabilities
-        self.p_e = { iS: { iE: 0.25  for iE in self.emissions  }  for iS in self.states }
-        self.p_e['M1'] = {"A": 0.9, "C": 0.025, "G": 0.025, "T": 0.025}
-        self.p_e['M2'] = {"A": 0.025, "C": 0.9, "G": 0.025, "T": 0.025}
-
-    def HMM_from_TR(self, tandem_repeat, hmm_file_copy = None):
-
-        """Create an ``HMM`` instance from a ``TR`` instance.
-
-            HMM parameters are created from `tandem_repeat` using `hmmbuild`.
-            An ``HMM`` instance is created from these HMM parameters.
-
-            Args:
-                tandem_repeat (TR):  A TR instance.
-                hmm_file_copy (str): If set to a path, a copy of the `hmmer` model.
         """
+            BLABLABLA
 
-        # Create a temporary directory
-        tmp_dir = tempfile.mkdtemp()
-
-        # Save TR as Stockholm file
-        stockholm_file = os.path.join(tmp_dir, self.id+".sto")
-        repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
-
-        # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen(["hmmbuild", "--amino", "tmp.hmm", self.id+".sto"], stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
-        p.wait()
-
-        hmm_file = os.path.join(tmp_dir, "tmp.hmm")
-        if hmm_file_copy:
-            shutil.copy(hmm_file, hmm_file_copy)
-        hmmer_probabilities = hmm_io.read_HMMER(hmm_file, id = self.id, type = "NAME")
-
-        shutil.rmtree(tmp_dir)
-
-        self.HMM_from_model(hmmer_probabilities)
-
-    def HMM_from_model(self, hmmer_probabilities):
-
-        """ Load a HMM from hmm_file
-            Store probabilities as log10arithms.
-
-            Parameters:
-            <hmm_file> = 'path/to/file.hmm'
-            <accession> = 'PF00560'
+            Unused:
             <prior_indel_insertion> = {'mu': 0.5, 'sigma_squared': 0.81}
 
+            # Former: def HMM_from_model(self, hmmer_probabilities):
 
         """
-
         self.hmmer = hmmer_probabilities
         self.alphabet = self.hmmer['letters']
 
@@ -216,6 +144,84 @@ class HMM:
         self.p_t = {iState: {i:j for i,j in self.p_t[iState].items() if not i in self.deletion_states} for iState in self.states}
 
         del self.deletion_states
+
+
+    def create(*args, **kwargs):
+
+        # Read in HMMER model
+        # Read in TR
+        # Read in ...
+
+        # WARNING! ONLY ONE HMM INSTANCE IS CREATED, BUT SOMETIMES ALL MODELS FROM THE FILE MIGHT BE READ IN.
+
+        if isinstance(args[0],  int):
+            hmmer_probabilities = HMM.create_from_repeat(args[0])[0]
+        elif os.path.exists(args[0]):
+            hmmer_probabilities = HMM.read(args[0])[0]
+        else:
+            raise Exception("The first argument is neither a Repeat instance, nor a (HMMER) file!")
+
+        print(hmmer_probabilities)
+        return HMM(hmmer_probabilities)
+
+    def create_from_repeat(self, tandem_repeat, hmm_file_copy = None, id = "FUCK"):
+
+        """Create an ``HMM`` instance from a ``TR`` instance.
+
+            HMM parameters are created from `tandem_repeat` using `hmmbuild`.
+            An ``HMM`` instance is created from these HMM parameters.
+
+            Args:
+                tandem_repeat (TR):  A TR instance.
+                hmm_file_copy (str): If set to a path, a copy of the `hmmer` model.
+        """
+
+        # Create a temporary directory
+        tmp_dir = tempfile.mkdtemp()
+
+        # Save TR as Stockholm file
+        stockholm_file = os.path.join(tmp_dir, id+".sto")
+
+        #O repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
+        tandem_repeat.write(format = "Stockholm")
+
+        # Run HMMbuild to build a HMM model, and read model
+        p = subprocess.Popen(["hmmbuild", "--amino", "tmp.hmm", id+".sto"], stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
+        p.wait()
+
+        hmm_file = os.path.join(tmp_dir, "tmp.hmm")
+        if hmm_file_copy:
+            shutil.copy(hmm_file, hmm_file_copy)
+        hmmer_probabilities = self.read(hmm_file, id = id, type = "NAME")
+
+        shutil.rmtree(tmp_dir)
+
+        return hmmer_probabilities
+
+
+    def HMM_example(self):
+        #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
+        self.states = ["N", "M1", "M2", "C"]
+
+        ## Initialisation
+        self.p_t = { iS: { iS2: 0  for iS2 in self.states}  for iS in self.states[:-1]}
+        self.p_0 = { iS: 1/3  for iS in self.states }
+
+        ## Transition probabilities
+        # Feed Values to p_t
+        self.p_t["N"] = {"N": 0.5, "M1": 0.5}
+        self.p_t["M1"] = {"M2": 0.5, "C": 0.5}
+        self.p_t["M2"] = {"M1": 0.5, "C": 0.5}
+        self.p_t["C"] = {"C": 1}
+
+        # emissions
+        self.emissions = ["A", "C", "G", "T"]
+
+        # emission probabilities
+        self.p_e = { iS: { iE: 0.25  for iE in self.emissions  }  for iS in self.states }
+        self.p_e['M1'] = {"A": 0.9, "C": 0.025, "G": 0.025, "T": 0.025}
+        self.p_e['M2'] = {"A": 0.025, "C": 0.9, "G": 0.025, "T": 0.025}
+
 
 
     def initialise_HMM_structure(self,lD):
@@ -368,6 +374,9 @@ class HMM:
             p_Deletion_State += self.p_t[iDeleted_state][self.deletion_states[iGoal_state_index]]
 
         return transition
+
+
+
 
 
 ############################### External parameters ######################################
