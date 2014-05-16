@@ -1,7 +1,7 @@
 # (C) 2012-2013 Elke Schaper
 """
 
-    :synopsis: The HMM module
+    :synopsis: A cyclic hidden Markov model that describes sequence tandem repeats.
 
     .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
 
@@ -20,7 +20,63 @@ from tandemrepeats.repeat.repeat_score import loadModel
 ################################### HMM class #########################################
 
 class HMM:
-    #""" A cyclic HMM applicable to describe sequence Tandem Repeats """
+
+    """
+    Sequence profile hidden Markov models (HMMs) are used to model genomic sequence
+    containing a tandem repeat.
+
+    Note:
+        The HMM implemented here is described in detail in
+
+        Schaper, E., Gascuel, O. & Anisimova, M. Deep conservation of human protein tandem
+        repeats within the eukaryotes. Molecular Biology and Evolution (2014).
+
+
+        All notations used here are based on the notations introduced in
+
+        Eddy, S. R. Profile hidden Markov models. Bioinformatics 14, 755–763 (1998).
+
+    The HMM contains flanking states ("N",  "C"), match states ("M1", "M2", ...) and
+    insertion states ("I1", "I2", ..). As deletion states are non-emitting, they are
+    merged with the other states.
+
+    The HMM state "N" emits the sequence before the tandem repeat.
+    The HMM state "C" emits the residual sequence after the tandem repeat.
+    The HMM states "M1", "M2", ... can emit sequence within the tandem repeat. "M1"
+    describes the first amino acid/nucleotide in the repeat unit, "M2" the second, and so on.
+    The HMM states "I1", "I2", can emit sequence representing insertions within the tandem repeat.
+
+    The transition probabilities between states are stored in ``p_t``.
+    The emission probabilities of every state are stored in ``p_e``.
+    The probabilities for any state to be the null state are stored in ``p_0``.
+
+    The structure and probabilities defining standard sequence profile HMMs can be
+
+    * taken from HMM databases such as PFAM,
+
+    * calculated from sequence alignments (here: an alignment of TR units) using for example the HMMER suite,
+
+    * defined in house.
+
+    All three ways are implemented here.
+
+    The HMM is used to detect the maximum likelihood occurrence of a TR modeled by the HMM on a sequence.
+    The Viterbi algorithm is implemented to do this detection.
+
+    Attributes:
+        id (str): The id describes the origin of the HMM. For example, if may be the PFAMID "PF00069".
+        states (list of str): The names of all states that the HMM contains. E.g. ["N", "M1", "I1", "M2", "I2", "C"]
+        insertion_states (list of str): The names of all insertion states that the HMM contains. E.g. ["I1", "I2"]
+        match_states (list of str): The names of all match states that the HMM contains. E.g. ["M1", "M2"]
+        lD (int): The number of states in the HMM. E.g. lD = 4
+        alphabet (list of str): The letters that the HMM states can emit. E.g. all amino acids in the LG matrix. ["A", "C", ...]
+        p_t (dict of dict of float): A dictionary {state0: {state1: transition probability, ...}, ...} between all `states` as log10.
+        p_0 (dict of dict of float): A dictionary of the null probabilities to be in any of the `states`: {`states[0]`: 0.1, `states[1]`: 0.2, ...}
+        p_e (dict of dict of float): A dictionary of emission probabilities for every state and every letter in `alphabet`: {`states[0]`: {`alphabet[0]`: emission probability, ...}, ...}
+        hmmer (dict of dict of float): A dictionary of all information extracted from a Hmmer model.
+    """
+
+
     def __init__(self, tandem_repeat=None, hmm_file = None, accession = None, hmm_file_copy = None, id = None):
 
         if id:
@@ -63,8 +119,16 @@ class HMM:
         self.p_e['M2'] = {"A": 0.025, "C": 0.9, "G": 0.025, "T": 0.025}
 
     def HMM_from_TR(self, tandem_repeat, hmm_file_copy = None):
-        """ Let HMMbuild build the HMM from <tandem_repeat>
-            Next, create circular HMM_from_model(). """
+
+        """Create an ``HMM`` instance from a ``TR`` instance.
+
+            HMM parameters are created from `tandem_repeat` using `hmmbuild`.
+            An ``HMM`` instance is created from these HMM parameters.
+
+            Args:
+                tandem_repeat (TR):  A TR instance.
+                hmm_file_copy (str): If set to a path, a copy of the `hmmer` model.
+        """
 
         # Create a temporary directory
         tmp_dir = tempfile.mkdtemp()
