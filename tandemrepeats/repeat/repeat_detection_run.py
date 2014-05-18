@@ -9,15 +9,15 @@ import subprocess
 from collections import OrderedDict
 from Bio import SeqIO
 
-from . import repeat_detection_io
-from repeat.paths import *
+from tandemrepeats.repeat import repeat_detection_io
+from tandemrepeats.paths import *
 
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-class BinaryExecutable: 
+class BinaryExecutable:
     def __init__(self, binary=None):
         """Construct a BinaryExecutable object.
 
@@ -181,7 +181,7 @@ class TRFFinder(object):
         )
 
         __process.wait()
-        
+
         __stdout_file.close()
         __stderr_file.close()
 
@@ -193,7 +193,7 @@ class FinderDarwinTRF(TRFFinder):
     displayname = "darwinTRF"
 
     """ darwin is executed via:
-            darwin -i darwinTRF.drw    
+            darwin -i darwinTRF.drw
             OR pipe the file into darwin:
             (echo 'a:=3;', cat file1 file2) | darwin """
 
@@ -204,43 +204,43 @@ class FinderDarwinTRF(TRFFinder):
             }
 
             self.valopts = {
-            }  
-            
+            }
+
             self.scriptopts = {
-                "database"              : 'Bogus.db',  
+                "database"              : 'Bogus.db',
                 "templatefile"          : 'template_TRF.drw',
                 "darwin_TRF_script"     : 'ShowRepeats.drw',
                 "darwininput"           : 'darwinTRF.drw',
-                "outputfile"            : 'darwinTRF.o',  
+                "outputfile"            : 'darwinTRF.o',
                 "sequence_type"         : 'AA',
                 "substitution_model"    : 'LG', # if '', the Darwin default is used
                 "pam_distance"          : '80',
                 "FixedDel"              : None, # e.g. '-2'
                 "IncDel"                : None # e.g. '-1'
-                
-            } 
-        
+
+            }
+
         def set_working_dir(self, working_dir):
             self.scriptopts['darwininput'] = os.path.join(working_dir,self.scriptopts['darwininput'])
             self.scriptopts['outputfile'] = os.path.join(working_dir,self.scriptopts['outputfile'])
             if not os.path.isdir(working_dir):
                 os.makedirs(working_dir)
-        
+
         def set_data_dir(self):
             self.scriptopts['database'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['database'])
             self.scriptopts['templatefile'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['templatefile'])
             self.scriptopts['darwin_TRF_script'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['darwin_TRF_script'])
-            
+
         def tokens(self, infile=None):
             """Generate command line tokens based on this configuration.
             Arguments:
 
             infile -- generate tokens to pass infile as input file to finder"""
-            
+
             ## write out input file
-            
+
             with open(self.scriptopts['darwininput'], "w") as myDarwinInput:
-                
+
                 myDarwinInput.write("Set( printgc = false );\nSet( gc=1e7 );")
                 # Insert options into darwin input file
                 myDarwinInput.write("\nReadProgram( '%s' );"%self.scriptopts['darwin_TRF_script'])
@@ -249,23 +249,23 @@ class FinderDarwinTRF(TRFFinder):
                 myDarwinInput.write("\nOpenWriting( '%s' );"%self.scriptopts['outputfile'])
                 if self.scriptopts['sequence_type'] == 'AA':
                     myDarwinInput.write("\nCreateDayMatrices(%s);"%self.scriptopts['substitution_model']) # default: Gonnet, a rate matrix or an array of frequences can be provided as input.
-                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1 , %s);"%self.scriptopts['pam_distance']) 
+                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1 , %s);"%self.scriptopts['pam_distance'])
                 elif self.scriptopts['sequence_type'] == 'DNA':
                     # See function in /home/darwin/v2/source/lib/NucleotideMatrix
                     # Do something smart for nucleotide frequency input
                     # Do something smart for parameters (number depending on the chosen model)
-                    myDarwinInput.write("\nCreateNucleotideMatrices('%s', [0.1, 0.2, 0.4, 0.3], [2,3]);"%self.scriptopts['substitution_model']) 
-                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1, %s );"%self.scriptopts['pam_distance'])                   
+                    myDarwinInput.write("\nCreateNucleotideMatrices('%s', [0.1, 0.2, 0.4, 0.3], [2,3]);"%self.scriptopts['substitution_model'])
+                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1, %s );"%self.scriptopts['pam_distance'])
                 else: ## self.scriptopts['sequence_type'] == 'CODON'
                     myDarwinInput.write("\nCreateCodonMatrices(%s);"%self.scriptopts['substitution_model']) # Default: Adrian Schneider. Options: ECM
                     ##  CHECK: ?CreateCodonModelMatrices
                     myDarwinInput.write("\nmyDay := CreateDayMatrix( CodonLogPAM1, %s );"%self.scriptopts['pam_distance'])
-                
+
                 if not self.scriptopts['darwin_TRF_script'] == None:
                     myDarwinInput.write("\nmyDay[FixedDel] := %s;"%self.scriptopts['FixedDel'])
                 if not self.scriptopts['darwin_TRF_script'] == None:
                     myDarwinInput.write("\nmyDay[IncDel] := %s;"%self.scriptopts['IncDel'])
-                
+
                 # Append template file
                 with open(self.scriptopts['templatefile'], "r") as myTemplate:
                     myTemplateStream = myTemplate.read()
@@ -306,12 +306,12 @@ class FinderDarwinTRF(TRFFinder):
             super().run_process(wd, *prog_args) ##
 
         ## CHECK WHETHER outfile exists, else give warning and return empty list.
-        
+
         # Process output file, return results
         if os.path.isfile(self.config.scriptopts['outputfile']):
             with open(self.config.scriptopts['outputfile'], "r") as resultfilehandle:
                 tmp = list(repeat_detection_io.darwintrf_get_repeats(resultfilehandle))
-            return tmp    
+            return tmp
         else:
             logger.warning("Did not find DarwinTRF result file in %s", self.config.scriptopts['outputfile'])
             return []
@@ -396,13 +396,13 @@ class FinderHHrepID(TRFFinder):
             super().run_process(wd, *prog_args) ##
 
         ## CHECK WHETHER outfile exists, else give warning and return empty list.
-        
+
         # Process output file, return results
         resultfile = os.path.join(wd, self.config.valopts["-o"])
         if os.path.isfile(resultfile):
             with open(resultfile, "r") as infilehandle:
                 tmp = list(repeat_detection_io.hhpredid_get_repeats(infilehandle))
-            return tmp    
+            return tmp
         else:
             return []
 
@@ -423,8 +423,8 @@ class FinderPhobos(TRFFinder):
             }
 
             self.scriptopts = {
-                "outputfile"            : 'phobos.o',  
-            } 
+                "outputfile"            : 'phobos.o',
+            }
 
             self.valopts = {
                 "--reportUnit" :  None, # <int> Display of TR. 0: asIs, 1: Alphabetical normal form, 2: Alphabetical normal form also considering the reverse complement. Default: 2
@@ -447,8 +447,8 @@ class FinderPhobos(TRFFinder):
                 "--indelScore": None, # <int> Score for indels - must be negative. Default: -5. Match score is fixed to one.
                 "--searchMode": 'imperfect' # ['exact','extendExact','imperfect']
             }
-            
-            
+
+
         def set_working_dir(self, working_dir):
             self.scriptopts['outputfile'] = os.path.join(working_dir,self.scriptopts['outputfile'])
             if not os.path.isdir(working_dir):
@@ -469,7 +469,7 @@ class FinderPhobos(TRFFinder):
 
             if infile:
                 toks.append(infile)
-            toks.append(self.scriptopts['outputfile'])    
+            toks.append(self.scriptopts['outputfile'])
             return toks
 
     def __init__(self,
@@ -482,7 +482,7 @@ class FinderPhobos(TRFFinder):
         executable -- Use this executable object instead of default-constructed one
         config -- Use this configuration object instead of default-constructed one
         """
-        
+
         super(FinderPhobos, self).__init__(executable)
         if config == None:
             self.config = FinderPhobos.Configuration()
@@ -493,7 +493,7 @@ class FinderPhobos(TRFFinder):
         """Run finder process on infile in working_dir and return all repeats found"""
         wd = os.path.join(working_dir, FinderPhobos.name)
         self.config.set_working_dir(working_dir=wd)
-        
+
         # execute finder process
         retcode, stdoutfname, stderrfname = \
                super(FinderPhobos, self).run_process(wd, *self.config.tokens(infile))
@@ -505,11 +505,11 @@ class FinderPhobos(TRFFinder):
         if os.path.isfile(self.config.scriptopts['outputfile']):
             with open(self.config.scriptopts['outputfile'], "r") as resultfilehandle:
                 tmp = list(repeat_detection_io.phobos_get_repeats(resultfilehandle))
-            return tmp    
+            return tmp
         else:
             logger.warning("Did not find Phobos result file in %s", self.config.scriptopts['outputfile'])
             return []
-            
+
 
 class FinderTRED(TRFFinder):
     name = 'tred'
@@ -517,7 +517,7 @@ class FinderTRED(TRFFinder):
 
     """ tred is a shell script executing:
             tred1 myDNA.faa intermediate_output
-            tred2 myDNA.faa intermediate_output output1 output2 
+            tred2 myDNA.faa intermediate_output output1 output2
         At the moment, we do not know how to add parameters to TRED    """
 
     class Configuration:
@@ -527,8 +527,8 @@ class FinderTRED(TRFFinder):
             }
 
             self.valopts = {
-            }  
-        
+            }
+
         def set_result_file(self, result_file=None):
             self.result_file = result_file
 
@@ -540,7 +540,7 @@ class FinderTRED(TRFFinder):
             toks = []
             if infile:
                 toks = [infile]
-            toks.append(self.result_file)    
+            toks.append(self.result_file)
 
             return toks
 
@@ -566,7 +566,7 @@ class FinderTRED(TRFFinder):
         wd = os.path.join(working_dir, FinderTRED.name)
 
         self.result_file = os.path.join(wd, 'tred.o')
-        
+
         self.config.set_result_file(result_file=self.result_file)
         prog_args = self.config.tokens(infile=infile)
 
@@ -575,12 +575,12 @@ class FinderTRED(TRFFinder):
             super().run_process(wd, *prog_args) ##
 
         ## CHECK WHETHER outfile exists, else give warning and return empty list.
-        
+
         # Process output file, return results
         if os.path.isfile(self.result_file):
             with open(self.result_file, "r") as infilehandle:
                 tmp = list(repeat_detection_io.tred_get_repeats(infilehandle))
-            return tmp    
+            return tmp
         else:
             logger.warning("Did not find TRED result file in %s", self.result_file)
             return []
@@ -757,7 +757,7 @@ class FinderTRF(TRFFinder):
         # Process output file, return results
         with open(os.path.join(wd, result_file_name), "r") as outfile:
             tmp = list(repeat_detection_io.trf_get_repeats(outfile))
-        return tmp    
+        return tmp
 
 
 
@@ -776,7 +776,7 @@ class FinderTrust(TRFFinder):
                 "-matrix" : os.path.join(EXECROOT, "trust", "BLOSUM50"),
                 "-gapo" : "8",
                 "-gapx" : "2",
-                "-procTotal": "1", 
+                "-procTotal": "1",
             } # procTotal: When running on a cluster, specify the amount of processors used  # procNr cpu_number:  When running on a cluster, specify 0-based CPU-number and amount of processors used
 
         def tokens(self, infile=None):
@@ -799,7 +799,7 @@ class FinderTrust(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'], 
+        executable=JavaExecutable(javaopts = ['-mx512m'],
             javaclass='nl.vu.cs.align.SelfSimilarity',
             classpaths=[os.path.join(EXECROOT,"trust")]
         ),
@@ -935,10 +935,10 @@ class FinderXStream(TRFFinder):
             return []
 
         # Find output file, cry about it if not found
-        
+
         #shutil.rmtree(os.path.join(EXECROOT, '..', 'spielwiese'))
         #shutil.copytree(working_dir, os.path.join(EXECROOT, '..', 'spielwiese'))
-        
+
         chartfilename = self.find_chartfile(wd)
         if not chartfilename:
             logger.error("No XSTREAM output chart file found in %s!", wd)
@@ -1100,7 +1100,7 @@ def run_finders(seq_records, working_dir=None, num_threads=1):
     ]
 
     result_lock = threading.Lock()
-    
+
     # A queue for all jobs we have to run
     job_queue = queue.Queue()
 
@@ -1236,7 +1236,7 @@ if __name__ == "__main__":
 
 
 ######## SET OPEN CONFIGS #########
-      
+
 def set_hhrepid_config_open():
     # construct open configuration for HHrepid
     config = FinderHHrepID.Configuration()
@@ -1245,9 +1245,9 @@ def set_hhrepid_config_open():
     config.valopts["-T"] = 0.2  # <float> max total repeat p-value (def=0.001)
     config.valopts["-lmin"] = 0  # [0,inf[  minimal length of repeats to be identified (def=7)
     logger.debug("%s config tokens: %s", finders['hhrepid'].displayname,
-                        ", ".join(finders['hhrepid'].config.tokens()))  
-    return config       
-    
+                        ", ".join(finders['hhrepid'].config.tokens()))
+    return config
+
 def set_phobos_config_open():
     # construct open configuration for Phobos
     config = FinderPhobos.Configuration()
@@ -1260,48 +1260,48 @@ def set_phobos_config_open():
 def set_treks_config_DNA():
     # construct DNA configuration for T-Reks
     config = FinderTReks.Configuration()
-    config.valopts["-type"] = 1 
+    config.valopts["-type"] = 1
     logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
-                        ", ".join(finders['t-reks'].config.tokens()))  
-    return config    
-    
+                        ", ".join(finders['t-reks'].config.tokens()))
+    return config
+
 def set_treks_config_open():
     # construct open configuration for T-Reks
     config = FinderTReks.Configuration()
-    config.valopts["-similarity"] = 0.2 
+    config.valopts["-similarity"] = 0.2
     logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
-                        ", ".join(finders['t-reks'].config.tokens()))  
+                        ", ".join(finders['t-reks'].config.tokens()))
     return config
-    
+
 def set_trf_config_open():
     # construct open configuration for TRF
     config = FinderTRF.Configuration()
-    config.valopts["Minscore"] = 20 
+    config.valopts["Minscore"] = 20
     logger.debug("%s config tokens: %s", finders['trf'].displayname,
-                        ", ".join(finders['trf'].config.tokens()))  
-    return config  
-    
+                        ", ".join(finders['trf'].config.tokens()))
+    return config
+
 def set_trust_config_open():
     # construct open configuration for Trust
     config = FinderTrust.Configuration()
     config.boolopts['-force'] = True
     logger.debug("%s config tokens: %s", finders['trust'].displayname,
-                        ", ".join(finders['trust'].config.tokens()))  
-    return config    
-   
+                        ", ".join(finders['trust'].config.tokens()))
+    return config
+
 
 def set_xstream_config_open():
     # construct open configuration for XStream
     config = FinderXStream.Configuration()
     #config.boolopts[optname] = True
-    config.valopts["-I"] = 0.2 
-    config.valopts["-i"] = 0.1 
-    config.valopts["-g"] = 100 
+    config.valopts["-I"] = 0.2
+    config.valopts["-i"] = 0.1
+    config.valopts["-g"] = 100
     logger.debug("%s config tokens: %s", finders['xstream'].displayname,
-                        ", ".join(finders['xstream'].config.tokens()))  
+                        ", ".join(finders['xstream'].config.tokens()))
     return config
-    
-    
+
+
 ######## RUN A SET OF TRD #########
 
 
@@ -1316,7 +1316,7 @@ def run_TRD(sequence_records, sequence_type = 'AA', default = True):
 
     # Initialise Finders
     Finders(sequence_type)
-    
+
     ## Adjust TRD parameters:
     if not default:
         if sequence_type == 'AA':
@@ -1327,21 +1327,21 @@ def run_TRD(sequence_records, sequence_type = 'AA', default = True):
             finders['phobos'].config = set_phobos_config_open()
         finders['t-reks'].config = set_treks_config_open()
         finders['xstream'].config = set_xstream_config_open()
-    
+
     if sequence_type == 'DNA':
         finders['t-reks'].config = set_treks_config_DNA()
 
     # start finder. <repeat_detections> has type list(dict("TRD": list(TR)))
     predicted_repeats = run_finders(sequence_records, working_dir=working_dir, num_threads=1)  # [0]  if only the first element is of interest
-   
+
     #shutil.rmtree(os.path.join(EXECROOT, '..', 'spielwiese'))
     #shutil.copytree(working_dir, os.path.join(EXECROOT, '..', 'spielwiese'))
-   
+
     # delete temporary directory
     try:
         shutil.rmtree(working_dir)
     except: # I guess the error type is known, and you could be more precise :)
         logging.error("Unexpected error: {0}".format(sys.exc_info()[0]))
         raise
-    
+
     return predicted_repeats

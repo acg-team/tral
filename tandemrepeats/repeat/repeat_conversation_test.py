@@ -7,7 +7,7 @@ from Bio import AlignIO
 
 logger = logging.getLogger('root')
 
-from tandemrepeats.repeat import repeat_info
+from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
 ''' Implement a range of tests on the conversation of TR units between homologous TRs.

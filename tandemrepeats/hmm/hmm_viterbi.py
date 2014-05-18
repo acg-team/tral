@@ -8,7 +8,7 @@ import re
 from collections import defaultdict
 
 from tandemrepeats.hmm import hmm
-from tandemrepeats.repeat import repeat_info
+from tandemrepeats.repeat import repeat
 
 lStandard_amino_acid = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 dAmbiguous_amino_acid = {"B": {"D":0,"N": 0}, "Z": {"E":0,"Q":0}, "X": {i:0 for i in lStandard_amino_acid}}
