@@ -23,7 +23,7 @@ hmm_test
 .. automodule:: tandemrepeats.hmm.hmm_test
     :members:
 
-viterbi
+hmm_viterbi
 =============================
-.. automodule:: tandemrepeats.hmm.viterbi
+.. automodule:: tandemrepeats.hmm.hmm_viterbi
     :members:

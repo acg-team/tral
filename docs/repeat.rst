@@ -13,9 +13,9 @@ repeat_exon
 .. automodule:: tandemrepeats.repeat.repeat_exon
     :members:
 
-repeat_info
+repeat
 =============================
-.. automodule:: tandemrepeats.repeat.repeat_info
+.. automodule:: tandemrepeats.repeat.repeat
     :members:
 
 repeat_io
