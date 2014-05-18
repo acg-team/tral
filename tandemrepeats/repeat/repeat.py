@@ -9,7 +9,7 @@ import scipy.special
 from collections import defaultdict
 from copy import deepcopy
 
-from tandemrepeat.repeat import repeat_score, repeat_pvalue
+from tandemrepeats.repeat import repeat_score, repeat_pvalue
 
 logger = logging.getLogger(__name__)
 
