@@ -19,7 +19,7 @@ def read(hmm_filename, id = None, type = "ACC"):
             <id> = 'PF00560'
 
 
-       The general format is:
+       The general format is::
 
         HMMER3/b [3.0b2 | June 2009]
         NAME fn3
@@ -47,7 +47,7 @@ def read(hmm_filename, id = None, type = "ACC"):
         //
 
 
-       Important! The probabilities are stored as negative natural log probabilities. E.g. -ln(0.25) = 1.38629
+       .. important:: The probabilities are stored as negative natural log probabilities. E.g. -ln(0.25) = 1.38629
 
      '''
 
