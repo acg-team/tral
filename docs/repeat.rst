@@ -18,9 +18,9 @@ repeat_detection_io
 .. automodule:: tandemrepeats.repeat.repeat_detection_io
     :members:
 
-repeat_detection_run
+repeat
 =============================
-.. automodule:: tandemrepeats.repeat.repeat_detection_run
+.. automodule:: tandemrepeats.repeat.repeat
     :members:
 
 repeat_exon

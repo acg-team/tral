@@ -82,19 +82,18 @@ class HMM:
 
     def __init__(self, hmmer_probabilities):
 
-        """
-            BLABLABLA
+        """ HMM class __init_ module.
 
-            Unused:
-            <prior_indel_insertion> = {'mu': 0.5, 'sigma_squared': 0.81}
+            __init__ takes HMM parameters (including the alphabet, emission probabilities
+            and transition probabilities) as input, and assigns them to class attributes.
 
-            # Former: def HMM_from_model(self, hmmer_probabilities):
-
+        Args:
+            hmmer_probabilities (dict): A dictionary with HMM parameters.
         """
         self.hmmer = hmmer_probabilities
         self.alphabet = self.hmmer['letters']
 
-        # Warning! The following line is only appropriate, if there are only "letters", "COMPO", and the match state keys in <hmmer_probabilities>
+        # Warning! The following line is only appropriate, if there are only "letters", "COMPO", and the match state keys in `hmmer_probabilities`
         self.lD = len(hmmer_probabilities.keys()) - 2
 
         # Assume: sequence_type = 'AA'
@@ -148,9 +147,20 @@ class HMM:
 
     def create(*args, **kwargs):
 
-        # Read in HMMER model
-        # Read in TR
-        # Read in ...
+        """ Creates a HMM instance from several possible input formats.
+
+        A `HMM` instance is create from several possible input formats. E.g. from
+            *   HMMER3 model
+            *   `Repeat` instance
+
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            `HMM`: An instance of the `HMM` class.
+        """
 
         # WARNING! ONLY ONE HMM INSTANCE IS CREATED, BUT SOMETIMES ALL MODELS FROM THE FILE MIGHT BE READ IN.
 
@@ -166,14 +176,21 @@ class HMM:
 
     def create_from_repeat(self, tandem_repeat, hmm_file_copy = None, id = "FUCK"):
 
-        """Create an ``HMM`` instance from a ``TR`` instance.
+        """ Get HMM parameters (including the alphabet, emission probabilities and
+                transition probabilities) from a tandem repeat.
 
-            HMM parameters are created from `tandem_repeat` using `hmmbuild`.
-            An ``HMM`` instance is created from these HMM parameters.
+            A HMM save in HMMER3 format is created from `tandem_repeat` using `hmmbuild`.
+            Next, HMM parameters are retrieved from the HMMER3 file, and returned.
 
             Args:
                 tandem_repeat (TR):  A TR instance.
                 hmm_file_copy (str): If set to a path, a copy of the `hmmer` model.
+                id (str): ID for temporarily created HMM file. Of interest if a copy of
+                    the HMM is created.
+
+            Returns:
+                {complex stuff}: HMM parameters (including the alphabet, emission
+                    probabilities and transition probabilities)
         """
 
         # Create a temporary directory
@@ -200,6 +217,9 @@ class HMM:
 
 
     def HMM_example(self):
+
+        """ Hi Jewels! Do we want such a function?
+        """
         #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
         self.states = ["N", "M1", "M2", "C"]
 
@@ -226,11 +246,17 @@ class HMM:
 
     def initialise_HMM_structure(self,lD):
 
-        '''
+        """ Initialise the HMM with all states and standard values for transition and
+            emission probabilities.
+
         Initialise all states
         Set transition probabilities to None/0
         Set initial probability for all states equal.
-        '''
+
+        Args:
+          lD (int): The number of match states in the HMM.
+
+        """
 
         ## Build a HMM from these likelihoods.
         self.match_states = ["M{0}".format(str(i+1)) for i in range(lD)]
@@ -251,7 +277,7 @@ class HMM:
         # First, mark which transitions are not penalised, e.g. bear a 'probability of np.log10(1)=0':
         # - Transitions from "N" to any "M_k"
         # - Transitions from any "M_k" to "C"
-        # - Transitions from "M_k" to "M_k+1" (for k<n) and "M_k" to "M_0" (for k==n)
+        # - Transitions from "M_k" to "M_k+1" (for k`n) and "M_k" to "M_0" (for k==n)
         # - Transitions from "N" to "N"
         # - Transitions from "C" to "C"
         for i in range(lD):
@@ -264,26 +290,34 @@ class HMM:
         self.p_e = {}
 
     def set_emission_probability_hmmer3(self, state, lEmission_Probabilities):
-        '''
-        Set p_e of states to <lEmission_Probabilities> for <state> given <self.alphabet>
+
+        """ Convert and set emission probabilities from HMMER3 file to class attribute.
+
+        Set p_e of states to `lEmission_Probabilities` for `state` given `self.alphabet`
         In HMMER3 data, emission probabilities are -ln(p).
+
+        It is e.g. self.alphabet =
+        ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+
         Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)
 
-        Parameters (e.g.):
-        state = 'M4'
-        lEmission_Probabilities = ['3.27687', '2.31397', '3.32252', '3.12746', '2.89175', '3.34719', '2.28730', '3.54139', '2.53154', '2.64774', '3.75733', '3.23860', '3.57894', '3.26290', '2.66343', '2.61544', '2.91770', '3.26739', '5.09378', '3.16816']
-        self.alphabet = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+        Args:
+            state (str): The state of the HMM. E.g. the fourth match state 'M4'.
+            lEmission_Probabilities (list of float): E.g.
+                ['3.27687', '2.31397', '3.32252', '3.12746', '2.89175', '3.34719', '2.28730', '3.54139', '2.53154', '2.64774', '3.75733', '3.23860', '3.57894', '3.26290', '2.66343', '2.61544', '2.91770', '3.26739', '5.09378', '3.16816']
 
-        Return format (pseudo code):
-        [{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in lMatch]
+        """
 
-        '''
         lEmission_Probabilities = [-float(i)*np.log10(np.exp(1)) for i in lEmission_Probabilities]
         self.p_e[state] = {iL: iEP for iL,iEP in zip(self.alphabet, lEmission_Probabilities)}
 
 
     def set_circle_transition_probability_hmmer3(self, lTransition_Probabilities, final_state):
-        ''' In HMMER3 models, no transition in circle from the last match state to the first
+
+        """ Calculate transition probabilites between states that exist due to the
+            circularity of the tandem repeat HMM.
+
+        In HMMER3 models, no transition in circle from the last match state to the first
         match state are included.
 
         Values need to be found for the following transitions:
@@ -292,7 +326,16 @@ class HMM:
         Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf pp.84-85.
 
         Input: -ln(p) Output: Also -ln(p')
-        '''
+
+
+        Args:
+          lTransition_Probabilities (list of float): The first parameter.
+          final_state (str): The second parameter.
+
+        Returns:
+          list of float: transition probabilities
+
+        """
 
         # M->M, M->I, M->D: Use an average from all other transitions from match states.
         mean_M_M = np.mean([np.exp(-float(iP["transition"][0])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
@@ -316,16 +359,21 @@ class HMM:
         return lTransition_Probabilities
 
     def set_transition_probability_hmmer3(self, state_index, lTransition_Probabilities):
-        '''
-        Set p_t of states to <lTransition_Probabilities> for the <state_index>th state
+
+        """ Convert and assign transition probabilities from a HMMER3 file to HMM attribute `p_t`
+
+        Set `p_t` of states to `lTransition_Probabilities` for the `state_index` th state
         In HMMER3 data, transition probabilities are -ln(p).
         Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)
 
-        Parameters (e.g.):
-        state = 4
-        lTransition_Probabilities = ['0.00021', '8.85487', '9.57722', '0.61958', '0.77255', '0.48576', '0.95510']
+        Args:
+            state_index (int): E.g. 4
+            lTransition_Probabilities (list of float): A list of transition probabilities
+                as found in a single row for a certain state in HMMER3 files. E.g.
+                ['0.00021', '8.85487', '9.57722', '0.61958', '0.77255', '0.48576', '0.95510']
 
-        '''
+        """
+
         lTransition_Probabilities = [-float(i)*np.log10(np.exp(1)) for i in lTransition_Probabilities]
 
         # Match state state_index -> Match state state_index + 1
@@ -356,12 +404,27 @@ class HMM:
         self.p_t[iD][iD_1] = lTransition_Probabilities[6]
 
     def get_direct_transition_probabilities_for_deletions(self,state_index,state):
-        ''' Translate all deletions following <state> with <state_index>
-            into direct match state to match state transitions.
-            Probabilities need to be multiplied along the edges (log(p) need to be summed).
 
-            Return transition probabilities
-        '''
+        """ Calculate updated transition probabilities for HMMs without deletion states.
+
+        Deletion states are non-emitting states. Therefore, they can be merged into the
+        remaining emitting states. E.g. M -> D -> I would be equivalent to M -> I.
+        The total transition probability from M to I would then be the product of the
+        transition probabilities from M to D and from D to I (equivalent to the sum of
+        the log10 probabilities.).
+
+        This method translates all deletions following `state` with `state_index` into
+        direct match state to match state transitions, and returns the new transition
+        probabilities.
+
+        Args:
+            state_index (int): The first parameter.
+            state (str): The second parameter.
+
+        Returns:
+            {state1: float}: The transition probability from `state` with `state_index` to
+            `state1` is calculated for all (?) possible `state1`.
+        """
 
         transition = {}
         p_Deletion_State = self.p_t[state][self.deletion_states[(state_index + 1)%self.lD]]
@@ -374,9 +437,6 @@ class HMM:
             p_Deletion_State += self.p_t[iDeleted_state][self.deletion_states[iGoal_state_index]]
 
         return transition
-
-
-
 
 
 ############################### External parameters ######################################
@@ -402,7 +462,7 @@ def hmmer3_emission_probabilities(hmmer_probabilities, letters, lMatch):
         print('Match states HMMER: {0} Match states local: {1}'.format(len(hmmer_probabilities.keys())-2, len(lMatch)))
         raise ValueError('The number of match states in HMMer model and local model does not match')
 
-    # Test: Are all <letters> represented in the HMMER HMM?
+    # Test: Are all `letters` represented in the HMMER HMM?
     if any( iL not in hmmer_probabilities['letters'] for iL in letters ):
         missing = [iL for iL in letters if iL not in hmmer_probabilities['letters']]
         print('Missing representation in Hmmer File: {0}'.format(missing))
