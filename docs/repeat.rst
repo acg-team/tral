@@ -3,19 +3,29 @@ Repeat code documentation
 
 Initial version of the repeat submodule documentation.
 
+repeat
+=============================
+.. automodule:: tandemrepeats.repeat.repeat
+    :members:
+
 repeat_conversation_test
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_conversation_test
     :members:
 
+repeat_detection_io
+=============================
+.. automodule:: tandemrepeats.repeat.repeat_detection_io
+    :members:
+
+repeat_detection_run
+=============================
+.. automodule:: tandemrepeats.repeat.repeat_detection_run
+    :members:
+
 repeat_exon
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_exon
-    :members:
-
-repeat_info
-=============================
-.. automodule:: tandemrepeats.repeat.repeat_info
     :members:
 
 repeat_io
@@ -31,11 +41,6 @@ repeat_main
 repeat_pvalue
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_pvalue
-    :members:
-
-repeat_realign
-=============================
-.. automodule:: tandemrepeats.repeat.repeat_realign
     :members:
 
 repeat_score
