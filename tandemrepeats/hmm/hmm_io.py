@@ -1,6 +1,7 @@
 import logging
 import os, re
 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 ################################## READ HMMMER3  #########################################
@@ -77,36 +78,36 @@ def read(hmm_filename, id = None, type = "ACC"):
     with open(hmm_filename, "rt") as infile:
 
         for i, line in enumerate(infile):
-            logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            logger.debug("Line {0}: {1}".format(i, line[0:-1]))
             if 0 == state:
                 match = pat_start_HMMER3.match(line)
                 if match:
                     if id:
-                        logging.debug(" * (0->0.1) Found start")
+                        logger.debug(" * (0->0.1) Found start")
                         state = 0.1
                     else:
-                        logging.debug(" * (0->1) Found start")
+                        logger.debug(" * (0->1) Found start")
                         state = 1
             elif 0.1 == state:
                 match = pat_accession.match(line)
                 if match:
                     iID = match.group(1)
                     if id in iID:
-                        logging.debug(" * (0.1->1) Found matching accession.")
+                        logger.debug(" * (0.1->1) Found matching accession.")
                         state = 1
                     else:
-                        logging.debug(" * (0.1->0) Found accession. Did not match lID.")
+                        logger.debug(" * (0.1->0) Found accession. Did not match lID.")
                         state = 0
             elif 1 == state:
                 match = pat_HMM.match(line)
                 if match:
                     letters = pat_letters.findall(line[3:])
-                    logging.debug(" * (1->2) Found HMM start")
-                    logging.debug("Letters: {0}".format(letters))
+                    logger.debug(" * (1->2) Found HMM start")
+                    logger.debug("Letters: {0}".format(letters))
                     hmm = {'letters': letters}
                     state = 2
             elif 2 == state:
-                logging.debug(" * (2->3) Skipping line")
+                logger.debug(" * (2->3) Skipping line")
                 state = 3
 
             elif 3 == state:
@@ -117,46 +118,46 @@ def read(hmm_filename, id = None, type = "ACC"):
                         emissions = findall[1:]
                     else:
                         emissions = findall[1:-1]
-                    logging.debug(" * (3->4) Found emission probabilities")
-                    logging.debug("Current HMM state: {0}".format(current_hmm_state))
-                    logging.debug("Emission probabilities: {0}".format(emissions))
+                    logger.debug(" * (3->4) Found emission probabilities")
+                    logger.debug("Current HMM state: {0}".format(current_hmm_state))
+                    logger.debug("Emission probabilities: {0}".format(emissions))
                     hmm[current_hmm_state] = {'emissions': emissions}
                     state = 4
                 elif pat_end_HMM.match(line):
                     if id:
-                        logging.debug(" * (3->TERMINAL) HMM Found and compiled, return HMM.")
+                        logger.debug(" * (3->TERMINAL) HMM Found and compiled, return HMM.")
                         return hmm
                     else:
-                        logging.debug(" * (3->0) Finished HMM compilation")
+                        logger.debug(" * (3->0) Finished HMM compilation")
                         lHMM.append(hmm)
                         state = 0
                 else:
-                    logging.debug(" * (3->0) Error: No emission line")
+                    logger.debug(" * (3->0) Error: No emission line")
                     state = 0
 
             elif 4 == state:
                 findall = pat_insertions.findall(line)
                 if findall:
-                    logging.debug(" * (4->5) Found insertion emission probabilities")
-                    logging.debug("Insertion emission probabilities: {0}".format(findall))
+                    logger.debug(" * (4->5) Found insertion emission probabilities")
+                    logger.debug("Insertion emission probabilities: {0}".format(findall))
                     hmm[current_hmm_state]['insertion_emissions'] = findall
                     state = 5
                 else:
-                    logging.debug(" * (4->0) Error: No insertion emission line")
+                    logger.debug(" * (4->0) Error: No insertion emission line")
                     state = 0
 
             elif 5 == state:
                 findall = pat_transition.findall(line)
                 if findall:
-                    logging.debug(" * (5->3) Found transition probabilities")
-                    logging.debug("Transition probabilities: {0}".format(findall))
+                    logger.debug(" * (5->3) Found transition probabilities")
+                    logger.debug("Transition probabilities: {0}".format(findall))
                     hmm[current_hmm_state]['transition'] = findall
                     state = 3
                 else:
-                    logging.debug(" * (5->0) Error: No transition line")
+                    logger.debug(" * (5->0) Error: No transition line")
                     state = 0
 
-    logging.debug(lHMM)
+    logger.debug(lHMM)
     return lHMM
 
 def split_HMMER_file(hmm_filename, resultdir):
@@ -170,14 +171,14 @@ def split_HMMER_file(hmm_filename, resultdir):
     with open(hmm_filename, "rt") as infile:
 
         for i, line in enumerate(infile):
-            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            #logger.debug("Line {0}: {1}".format(i, line[0:-1]))
             if 0 == state:
                 match = pat_start_HMMER3.match(line)
                 if match:
                     if fh:
                         fh.close()
                         os.rename(tmp_file, os.path.join(resultdir, acc+".hmm"))
-                    logging.debug(" * (0->1) Found HMM start")
+                    logger.debug(" * (0->1) Found HMM start")
                     state = 1
                     fh = open(tmp_file, "w")
                 fh.write(line)
@@ -186,7 +187,7 @@ def split_HMMER_file(hmm_filename, resultdir):
                 match = pat_accession.match(line)
                 if match:
                     acc = match.group(1).split(".")[0]
-                    logging.debug(" * (1->0) Found accession")
+                    logger.debug(" * (1->0) Found accession")
                     state = 0
 
 def read_HMMER_acc_lengths(hmm_filename):
@@ -203,18 +204,18 @@ def read_HMMER_acc_lengths(hmm_filename):
     with open(hmm_filename, "rt") as infile:
 
         for i, line in enumerate(infile):
-            #logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            #logger.debug("Line {0}: {1}".format(i, line[0:-1]))
             if 0 == state:
                 match = pat_accession.match(line)
                 if match:
                     acc = match.group(1)
-                    logging.debug(" * (0->1) Found name")
+                    logger.debug(" * (0->1) Found name")
                     state = 1
             elif 1 == state:
                 match = pat_length.match(line)
                 if match:
                     d[acc] = int(match.group(1))
-                    logging.debug(" * (1->0) Found length")
+                    logger.debug(" * (1->0) Found length")
                     state = 0
 
     return d
