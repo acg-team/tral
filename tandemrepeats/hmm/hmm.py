@@ -7,24 +7,28 @@
 
 """
 
-
-import os, shutil, subprocess, tempfile
-import numpy as np
+import datetime
 import logging
-logger = logging.getLogger('root')
+import numpy as np
+import os
+import shutil
+import subprocess
+import tempfile
 
 from tandemrepeats.hmm import hmm_io
 from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
 from tandemrepeats.repeat.repeat_score import loadModel
 
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+
 ################################### HMM class #########################################
 
 class HMM:
 
-    """
-    Sequence profile hidden Markov models (HMMs) are used to model genomic sequence
-    containing a tandem repeat.
+    """ Sequence profile hidden Markov models (HMMs) are used to model genomic
+    sequence containing a tandem repeat.
 
     Note:
         The HMM implemented here is described in detail in
@@ -153,6 +157,7 @@ class HMM:
             *   HMMER3 model
             *   `Repeat` instance
 
+        .. todo:: Julia: Fix the arguments list to include more detail for easy usage.
 
         Args:
             *args: Variable length argument list.
@@ -160,6 +165,7 @@ class HMM:
 
         Returns:
             `HMM`: An instance of the `HMM` class.
+
         """
 
         # WARNING! ONLY ONE HMM INSTANCE IS CREATED, BUT SOMETIMES ALL MODELS FROM THE FILE MIGHT BE READ IN.
@@ -174,42 +180,86 @@ class HMM:
         print(hmmer_probabilities)
         return HMM(hmmer_probabilities)
 
-    def create_from_repeat(self, tandem_repeat, hmm_file_copy = None, id = "FUCK"):
+    def create_from_repeat(self, tandem_repeat, hmm_copy_path = None,
+                           hmm_copy_id = None):
 
-        """ Get HMM parameters (including the alphabet, emission probabilities and
-                transition probabilities) from a tandem repeat.
+        """ Get HMM parameters (including the alphabet, emission probabilities
+        and transition probabilities) from a tandem repeat.
 
-            A HMM save in HMMER3 format is created from `tandem_repeat` using `hmmbuild`.
-            Next, HMM parameters are retrieved from the HMMER3 file, and returned.
+        An HMM is created from ``tandem_repeat`` using :command:`hmmbuild`
+        and is saven in the HMMER3 file format.
+        Next, HMM parameters are retrieved from the HMMER3 file and returned.
 
-            Args:
-                tandem_repeat (TR):  A TR instance.
-                hmm_file_copy (str): If set to a path, a copy of the `hmmer` model.
-                id (str): ID for temporarily created HMM file. Of interest if a copy of
-                    the HMM is created.
+        Args:
+            tandem_repeat (TR):  A Repeat class instance of the TR to be
+                transformed into an HMM.
+            hmm_copy_path (str): Path to where a copy of the created HMM
+                will be stored.
+                If None, no copies are saved.
+            hmm_copy_id (str): HMM id which will serve as the filename in case
+                a copy should be saved.
+                If None and ``hmm_copy_path`` is specified the name is
+                generated from current date and time combination.
 
-            Returns:
-                {complex stuff}: HMM parameters (including the alphabet, emission
-                    probabilities and transition probabilities)
+        Returns:
+            HMM parameters (including the id, alphabet, emission
+            probabilities and transition probabilities) in the form of a
+            dictionary, for example an HMM with 8 states for carcinustatin::
+
+                {
+                    'id': 'PF08261.7',
+                    'letters': ['A', 'C', 'D', ..., 'Y'],
+                    'COMPO':
+                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
+                         'emissions': ['2.28205', '5.14899', ..., '1.92022'],
+                         'transitions': [0.01467, '4.62483', ..., '*']},
+                    '1':
+                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
+                        'emissions': ['1.00089', '4.54999', ..., '5.23581'],
+                        'transitions': ['0.01467', '4.62483', ..., '0.95510']},
+                    ...
+                    '8':
+                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
+                        'emissions': ['4.12723', '5.39816', ..., '4.58094'],
+                        'transitions': ['0.00990', '4.62006', ..., '*']}
+                }
+
+        .. todo:: Julia: Has to be tested and fixed!
+        .. todo:: Julia: Resolve the id question for read.
+
         """
+        timestamp = datetime.now()
+        tmp_id = timestamp.strftime('%Y:%m:%d:%H:%M:%S:%f')
 
         # Create a temporary directory
         tmp_dir = tempfile.mkdtemp()
 
         # Save TR as Stockholm file
-        stockholm_file = os.path.join(tmp_dir, id+".sto")
+        stockholm_file = os.path.join(tmp_dir, tmp_id + ".sto")
 
         #O repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
-        tandem_repeat.write(format = "Stockholm")
+        tandem_repeat.write(file=stockholm_file, format = "Stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen(["hmmbuild", "--amino", "tmp.hmm", id+".sto"], stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
+        p = subprocess.Popen(["hmmbuild", "--amino", tmp_id + ".hmm",
+                              tmp_id + ".sto"],
+                             stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
         p.wait()
 
-        hmm_file = os.path.join(tmp_dir, "tmp.hmm")
-        if hmm_file_copy:
-            shutil.copy(hmm_file, hmm_file_copy)
-        hmmer_probabilities = self.read(hmm_file, id = id, type = "NAME")
+        hmm_file = os.path.join(tmp_dir, tmp_id + ".hmm")
+        if hmm_copy_path:
+            if not os.path.exists(hmm_copy_path):
+                logger.critical('Specified path for the file copy does not '
+                                'exist, not saving copy: %s.', hmm_copy_path)
+            else:
+                if hmm_copy_id:
+                    shutil.copy(hmm_file, os.path.join(hmm_file_copy,
+                                                       hmm_copy_id + ".hmm"))
+                else:
+                    shutil.copy(hmm_file, hmm_copy_path)
+
+        hmmer_probabilities = self.read(hmm_file, id = hmm_copy_id,
+                                        type = "NAME")
 
         shutil.rmtree(tmp_dir)
 
