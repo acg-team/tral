@@ -18,11 +18,6 @@ repeat_detection_io
 .. automodule:: tandemrepeats.repeat.repeat_detection_io
     :members:
 
-repeat
-=============================
-.. automodule:: tandemrepeats.repeat.repeat
-    :members:
-
 repeat_exon
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_exon
