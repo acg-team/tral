@@ -97,8 +97,9 @@ class HMM:
         self.hmmer = hmmer_probabilities
         self.alphabet = self.hmmer['letters']
 
-        # Warning! The following line is only appropriate, if there are only "letters", "COMPO", and the match state keys in `hmmer_probabilities`
-        self.lD = len(hmmer_probabilities.keys()) - 2
+        self.lD = max([int(key) for key in hmmer_probabilities.keys()
+                       if key.isdigit()])
+
 
         # Assume: sequence_type = 'AA'
         #Q,null_model_emission_p,alphabet = loadModel('lg')
@@ -149,35 +150,47 @@ class HMM:
         del self.deletion_states
 
 
-    def create(*args, **kwargs):
+    def create(hmmer_file = None, repeat = None):
+        """ Creates a HMM instance from 2 possible input formats.
 
-        """ Creates a HMM instance from several possible input formats.
-
-        A `HMM` instance is create from several possible input formats. E.g. from
-            *   HMMER3 model
-            *   `Repeat` instance
-
-        .. todo:: Julia: Fix the arguments list to include more detail for easy usage.
+        A `HMM` instance is created from one of the two possible inputs:
+        *   HMMER3 model
+        *   `Repeat` instance
 
         Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
+            hmmer_file (str): Path to the file containing the HMM parameters
+                encoded in the HMMER3 format.
+            repeat (Repeat): A Repeat object with an MSA that can be
+                transformed into an HMM.
 
         Returns:
-            `HMM`: An instance of the `HMM` class.
+            `HMM`: An initialized instance of the `HMM` class.
+
+        Raises:
+            Exception: if the HMMER3 file provided does not exist.
+            Exception: if the repeat value provided is not an instance of the
+                Repeat class.
+            Exception: if no parameters are provided to create the HMM from.
+
+        .. warning:: Will initialize all HMM's in a file but will only return
+            the first one.
+        .. todo:: Fix the previous warning (agree on the way how it should be
+            done first)
 
         """
 
-        # WARNING! ONLY ONE HMM INSTANCE IS CREATED, BUT SOMETIMES ALL MODELS FROM THE FILE MIGHT BE READ IN.
-
-        if isinstance(args[0],  int):
-            hmmer_probabilities = HMM.create_from_repeat(args[0])[0]
-        elif os.path.exists(args[0]):
-            hmmer_probabilities = HMM.read(args[0])[0]
+        if hmmer_file:
+            if not os.path.exists(hmmer_file):
+                raise Exception('HMMER3 file does not exist.')
+            hmmer_probabilities = HMM.read(hmmer_file)[0]
+        elif repeat:
+            if not isinstance(repeat, Repeat):
+                raise Exception('The repeat value is not a valid instance of '
+                                'the Repeat class.')
+            hmmer_probabilities = HMM.create_from_repeat(repeat)[0]
         else:
-            raise Exception("The first argument is neither a Repeat instance, nor a (HMMER) file!")
+            raise Exception("Neither of the required inputs provided!")
 
-        print(hmmer_probabilities)
         return HMM(hmmer_probabilities)
 
     def create_from_repeat(self, tandem_repeat, hmm_copy_path = None,
