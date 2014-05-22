@@ -81,8 +81,12 @@ class HMM:
         hmmer (dict of dict of float): A dictionary of all information extracted from a Hmmer model.
     """
     # Use functions defined in other methods as class functions.
-    # @static ??
+    # Static function (declare as @static ?):
     read = hmm_io.read
+
+    # Function that take the HMM instance as argument:
+    def viterbi(self, *args):
+        hmm_viterbi.viterbi(self, *args)
 
     def __init__(self, hmmer_probabilities):
 
