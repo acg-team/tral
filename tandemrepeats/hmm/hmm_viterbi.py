@@ -45,6 +45,8 @@ def viterbi(hmm, emission):
     .. todo:: read in global variables (lStandard_amino_acid, dAmbiguous_amino_acid,
             lAll_amino_acid) from data folder.
     .. todo:: Check: Do you need local copies of all variables?
+    .. todo:: Do the functions related to viterbi need to be summarized (e.g. in one
+         class?) How do they relate to the Sequence class, or the HMM class?
     """
 
     emission = emission.replace("U", "C").replace("O", "K")
@@ -168,36 +170,35 @@ def distance_index(i, j, length):
 
 def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha = None):
 
-        """ Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
+    """ Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
 
-        Be ungreedy: Start from the last index in the cluster of all start state and end state indices.
+    Be ungreedy: Start from the last index in the cluster of all start state and end state indices.
 
-        Only integrate repeat units that are at least alpha complete (be it before of after)
-        If you prefer absolute number of characters to filter which repeat units are used, and which not,
-        change this in two occurrences of alpha.
+    Only integrate repeat units that are at least alpha complete (be it before of after)
+    If you prefer absolute number of characters to filter which repeat units are used, and which not,
+    change this in two occurrences of alpha.
 
-        Assume that all states are counted starting on 1.
+    Assume that all states are counted starting on 1.
 
-        Args:
-            lSequence (list of str): A list of sequences.
-            lPath (list of list of str): A list of Viterbi paths
-            lD (int): length of the HMM used to create the Viterbi paths.
+    Args:
+        lSequence (list of str): A list of sequences.
+        lPath (list of list of str): A list of Viterbi paths
+        lD (int): length of the HMM used to create the Viterbi paths.
 
-        Kwargs:
-            alpha (Float): alpha element [0,1].
+    Kwargs:
+        alpha (Float): alpha element [0,1].
 
-        Returns:
-            `lMSA`: A list of multiple sequence alignments (MSAs), that is
-                (list of (list of str))
+    Returns:
+        `lMSA`: A list of multiple sequence alignments (MSAs), that is
+            (list of (list of str))
 
-        Raises:
-            Exception: If alpha is not in [0,1].
+    Raises:
+        Exception: If alpha is not in [0,1].
 
-        .. warning:: [None].
-        .. todo:: Summarize functions related to viterbi in one class. Discuss how!
-        .. todo:: Should the sequences be sequence instances instead of just strings?
+    .. warning:: [None].
+    .. todo:: Should the sequences be sequence instances instead of just strings?
 
-        """
+    """
 
     if not alpha:
         alpha = 0.6
@@ -276,10 +277,30 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
 
 
 def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
-    '''
-        Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat
-        Assume that all states are counted starting on 1.
-    '''
+
+    """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat
+
+    Extract the tandem repeat alignment from a sequence given a Viterbi path.
+    Ignore the alignment information in the Viterbi path. For example, all emissions
+    labelled with M1 (match state 1) align according to the HMM. However, this method does
+    not use this information. Therefore, for example the first characters in the repeat
+    units do not necessarily align, and the repeat units are not necessarily of same length.
+
+    Assume that all states are counted starting on 1.
+
+    Args:
+        sequence (str): A sequence as a string.
+        lPath (list of list of str): A list of Viterbi paths
+        lD (int): length of the HMM used to create the Viterbi paths.
+
+    Returns:
+        `repeat_msa`: A multiple sequence alignments (MSA), that is (list of str).
+
+    .. warning:: [None].
+    .. todo:: Should the sequence be a sequence instance instead of just a string?
+
+    """
+
     begin = path.count('N')
     # If no repeat was found, return None.
     if begin == len(sequence) or path.count('C') == len(sequence):
@@ -310,8 +331,36 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
 
 def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False):
 
-    ''' convert a viterbi path of a hmm on sequence into the corresponding tandem repeat
-        Assume that all states are counted starting on 0.'''
+
+    """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat.
+
+    Extract the tandem repeat alignment from a sequence given a Viterbi path.
+    USE alignment information in the Viterbi path. For example, all emissions
+    labelled with M1 (match state 1) align according to the HMM. Insert gaps for
+    insertions and deletions accordingly.
+    Thus, for example the first characters in the repeat units do necessarily align,
+    albeit some of them may be gaps. Also, all repeat units are necessarily of same length.
+
+    Assume that all states are counted starting on 0.
+
+    Args:
+        sequence (str): A sequence as a string.
+        lPath (list of list of str): A list of Viterbi paths
+        lD (int): length of the HMM used to create the Viterbi paths.
+
+    Kwargs:
+        alpha (float): alpha element [0,1].
+        translate (bool): This function assumes that HMM states are enumerated starting on 0.
+            If the HMM states are enumerated starting on 1, set this flag for transformation.
+
+    Returns:
+        `tandem_repeat`: A repeat instance.
+
+    .. warning:: [None].
+    .. todo:: Should the sequence be a sequence instance instead of just a string?
+    .. todo:: The MSA should be returned directly, not a Repeat instance.
+    .. todo:: Can we update this function?
+    """
 
     begin = most_likely_path.count('N')
     # If no repeat was found, return None.
