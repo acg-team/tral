@@ -17,7 +17,6 @@ dAmbiguous_amino_acid = {"B": {"D":0,"N": 0}, "Z": {"E":0,"Q":0}, "X": {i:0 for 
 lAll_amino_acid = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y'] + list(dAmbiguous_amino_acid.keys())
 
 
-
 def viterbi(hmm, emission):
 
     """ Calculate the most probable sequence of states given a sequence of emissions
@@ -329,7 +328,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     return repeat_msa
 
 
-def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False):
+def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD, translate = False):
 
 
     """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat.
@@ -341,7 +340,7 @@ def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False)
     Thus, for example the first characters in the repeat units do necessarily align,
     albeit some of them may be gaps. Also, all repeat units are necessarily of same length.
 
-    Assume that all states are counted starting on 0.
+    Assume that all states are counted starting on 0, unless the `translate` flag is set.
 
     Args:
         sequence (str): A sequence as a string.
@@ -354,12 +353,17 @@ def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False)
             If the HMM states are enumerated starting on 1, set this flag for transformation.
 
     Returns:
-        `tandem_repeat`: A repeat instance.
+        `msa`: A repeat instance.
+        `begin`: The start index of the repeat on the sequence.
+        `shift`: The index of the HMM where the cut between repeat units is set.
+
+msa, begin, shift
 
     .. warning:: [None].
     .. todo:: Should the sequence be a sequence instance instead of just a string?
-    .. todo:: The MSA should be returned directly, not a Repeat instance.
-    .. todo:: Can we update this function?
+    .. todo:: Check: How is the returned `begin` defined? Starting counting on 0 or 1?
+        Is it the index of the last flanking character, or the first repeat character?
+    .. todo:: Can we update this function, e.g. to not assume that HMM states start on 0?
     """
 
     begin = most_likely_path.count('N')
@@ -435,8 +439,4 @@ def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False)
                     msaTemp.append("-"*j + iS + "-"*(n-j-1))
     msa = ["".join(c) for c in zip(*msaTemp)]
 
-    tandem_repeat = repeat_info.Repeat(begin = begin, msa = msa)
-    tandem_repeat.shift = shift
-
-    return tandem_repeat
-
+    return msa, begin, shift
