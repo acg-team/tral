@@ -28,7 +28,7 @@ class Viterbi:
 
     def viterbi(self):
 
-        """ What do I do?
+        """ ??? What do I do?
 
         Get local copies of all variables.
         All probabilities must be given as logarithms
@@ -150,47 +150,6 @@ class Viterbi:
         return None
 
 
-    def viterbi_no_log(self):
-
-        emission = self.emission
-        states = self.hmm.states
-        p_0 = self.hmm.p_0
-        p_e = self.hmm.p_e
-        p_t = self.hmm.p_t
-
-        path = {}
-
-        # Initialisation
-        path = { iS: {'probability': p_0[iS]*p_e[iS][emission[0]] , 'path': iS} for iS in states}
-        logging.debug("Path: {0}".format(path))
-
-        # Viterbi
-        for iE in emission[1:]:
-            logging.debug("Emitted: {0}".format(iE))
-
-            # Determine next most probable state and its probability ...
-            for iS in states:
-                p = {}
-                for iFormer in states:
-                    p[iFormer] = path[iFormer]['probability'] * p_t[iFormer][iS] * p_e[iS][iE]
-                #print(p)
-                next_state, p_next_state = max(p.items(), key=operator.itemgetter(1))
-                path[iS]['probability_next'] = p_next_state
-                path[iS]['path_next'] = path[next_state]['path'] + iS
-
-            # .. and update the path accordingly
-            for iV in path.values():
-                iV['path'] = iV['path_next']
-                iV['probability'] = iV['probability_next']
-            logging.debug("Path: {0}".format(path))
-
-        # Which overall path is the most likely?
-        path_summary = {iS: path[iS]['probability'] for iS in states}
-        last_letter, p_most_likely_path = max(path_summary.items(), key=operator.itemgetter(1))
-        most_likely_path = path[last_letter]['path']
-        logging.debug("The most likely path is {0}. It has a probability of {1}.".format(most_likely_path, p_most_likely_path))
-
-        return(most_likely_path)
 
 def distance_index(i, j, length):
     if j > i:
