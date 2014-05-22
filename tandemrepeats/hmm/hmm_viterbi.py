@@ -1,14 +1,16 @@
-# (C) 2012-2013 Elke Schaper
+# (C) 2012-2014 Elke Schaper
 
 import operator
 import numpy as np
 import logging
-logging.basicConfig(level=logging.DEBUG)
 import re
 from collections import defaultdict
 
 from tandemrepeats.hmm import hmm
 from tandemrepeats.repeat import repeat
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 lStandard_amino_acid = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 dAmbiguous_amino_acid = {"B": {"D":0,"N": 0}, "Z": {"E":0,"Q":0}, "X": {i:0 for i in lStandard_amino_acid}}
@@ -26,9 +28,30 @@ class Viterbi:
 
     def viterbi(self):
 
-        # Get local copies of all variables.
-        # All probabilities must be given as logarithms
-        # Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K) [Reason: Seldom AAs that are not part of standard amino acid substitution models.]
+        """ What do I do?
+
+        Get local copies of all variables.
+        All probabilities must be given as logarithms
+        Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K)
+        [Reason: Seldom AAs that are not part of standard amino acid substitution models.]
+
+        Args:
+            self (viterbi instance)
+
+        Returns:
+            `most_likely_path` (list of str): The most likely sequence of HMM states to
+            emit the sequence.
+
+        Raises:
+            Exception: [None]
+
+        .. warning:: [None]
+        .. todo:: Refactor Viterbi class; adapt docstrings accordingly.
+        .. todo:: read in global variables (lStandard_amino_acid, dAmbiguous_amino_acid,
+                lAll_amino_acid) from data folder.
+
+        """
+
         emission = self.emission.replace("U", "C").replace("O", "K")
 
         states = self.hmm.states
@@ -264,9 +287,10 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
     return lMSA
 
 
-def hmm_path_to_maximal_complete_tandem_repeat_units_old(lSequence, lPath, lD, alpha = None, translate = False):
+def hmm_path_to_maximal_complete_tandem_repeat_units_old(lSequence, lPath, lD, alpha = 0.4, translate = False):
 
-    ''' Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
+        """ Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
+
         Be ungreedy: Start from the last index in the cluster of all start state indices.
 
         Only integrate repeat units that are at least (1-alpha) complete (be it before of after)
@@ -274,14 +298,36 @@ def hmm_path_to_maximal_complete_tandem_repeat_units_old(lSequence, lPath, lD, a
         change this in two occurrences of alpha.
 
         Assume that all states are counted starting on 0.
-    '''
+
+        Args:
+            lSequence (list of str): A list of sequences.
+            lPath (list of list of str): A list of Viterbi paths
+            lD (int): length of the HMM used to create the Viterbi paths.
+
+        Kwargs:
+            alpha (Float): alpha element [0,1].
+            translate (): This function assumes that HMM states are enumerated starting on 0.
+                If the HMM states are enumerated starting on 1, set this flag for transformation.
+
+        Returns:
+            `lMSA`: A list of multiple sequence alignments (MSAs), that is
+                (list of (list of str))
+
+        Raises:
+            Exception: If alpha is not in [0,1].
+
+        .. warning:: [None].
+        .. todo:: Summarize functions related to viterbi in one class. Discuss how!
+        .. todo:: Should the sequences be sequence instances instead of just strings?
+
+        """
+
+    if not (alpha >=0 and alpha <= 1):
+                raise Exception('alpha must be in [0,1].')
 
     if translate:
         # In the input data, the states are counted starting on 1. Subtract 1.
         lPath = [[i if i in ["C","N"] else i[0]+str(int(i[1:])-1) for i in iPath] for iPath in lPath]
-
-    if not alpha:
-        alpha = 0.4
 
     # Find the first match state index used by all paths (add None if None)
     first_indices = []
@@ -468,66 +514,3 @@ def hmm_path_to_tandem_repeat(sequence, most_likely_path, lD, translate = False)
 
     return tandem_repeat
 
-
-def test_conversion():
-
-    #most_likely_path = ['M1', 'M2', 'M0', 'M1', 'M2','I0','M0','I1','I2','M2']
-    #sequence = 'CGACGXAJKG'
-    hmm_path_to_tandem_repeat(sequence,most_likely_path,3)
-
-    most_likely_path = ['M1', 'M0','M1','I0','M0']
-    sequence = 'ABAXB'
-
-
-def test_conversion_mutliple():
-
-    ''' Test <hmm_path_to_maximal_complete_tandem_repeat_units>.
-        However, no positive set is defined right now.'''
-
-    lD = 3
-    lPaths = [['N','N','N', 'M0','M1','M2','M0','I1','M1','M2','M0','M1','M2','N','N','N'],
-            ['N','N','N','M1','M2','M0','M1','M2','M0','M1','M2', 'M0', 'N','N','N'],
-            ['N','N','N','M2','M0','M1','M2','M0','M1','M2','M0','M1', 'N','N','N']]
-    lSequence = ['XXXABCADBCABCXXX','XXXBCABCABCAXXX','XXXCABCABCABXXX']
-    lMSA = hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPaths, 3)
-
-def test():
-
-
-    my_hmm = hmm.HMM()
-    my_hmm.states = ['H', 'F']
-
-    # Initialisation
-    my_hmm.p_0 = {"H": 0.6, "F": 0.4}
-
-    # Feed Values to p_t
-    #my_hmm.p_t["START"] = {"H": 0.6, "F": 0.4}
-    my_hmm.p_t["H"] = {"H": 0.7, "F": 0.3}
-    my_hmm.p_t["F"] = {"H": 0.4, "F": 0.6}
-
-    # emissions
-    my_hmm.emissions = ["D", "C", "N"]
-
-    # emission probabilities
-    my_hmm.p_e['H'] = {"D":0.1, "C":0.4, "N":0.5}
-    my_hmm.p_e['F'] = {"D":0.6, "C":0.3, "N":0.1}
-
-    my_viterbi = Viterbi(my_hmm, "NCD")
-    if my_viterbi.viterbi() == "HHF":
-        print("Test SUCCESSFUL")
-    else:
-        print("Test FAILED")
-
-def main():
-    my_TR = repeat_info.Repeat(begin = 0, msa = ['A-G', 'ACG', 'ACG'], sequence_type = 'DNA')
-    my_hmm = hmm.HMM(my_TR, divergence = 0.01)
-    from . import sequence
-    my_sequence = sequence.Sequence()
-    my_viterbi = Viterbi(my_hmm, my_sequence.sequence)
-    v = my_viterbi.viterbi()
-    "".join(v)
-
-    #test_conversion()
-
-if __name__ == "__main__":
-    main()
