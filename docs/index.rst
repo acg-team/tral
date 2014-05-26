@@ -13,7 +13,7 @@ Contents:
 
    hmm
    repeat
-
+   repeat_list
 
 Indices and tables
 ==================
