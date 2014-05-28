@@ -308,7 +308,7 @@ class HMM:
         self.deletion_states = ["D{0}".format(str(i+1)) for i in range(lD)]
         self.terminal_states = ["N","C"]
         self.states = [self.terminal_states[0]] + self.match_states + self.insertion_states + self.deletion_states + [self.terminal_states[1]]
-        logger.debug("HMM states: {0}".format(self.states))
+        logger.debug("HMM states: %s", self.states)
 
         ## Initialisation
         # The transition probability is initially set to None for all states.
