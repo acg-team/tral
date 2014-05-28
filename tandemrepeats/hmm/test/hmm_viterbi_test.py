@@ -1,27 +1,22 @@
 import logging
 import os
+import pytest
 
 from tandemrepeats.hmm.hmm import HMM
+from tandemrepeats.hmm.hmm_viterbi import *
+from tandemrepeats.repeat.repeat import Repeat
 
 # These test functions were copy-pasted from hmm_viterbi.py. They need to be either
 # strongly adapted, or - if not useful - erased.
 
+notfixed = pytest.mark.notfixed
 
-def test_conversion():
-
-    #most_likely_path = ['M1', 'M2', 'M0', 'M1', 'M2','I0','M0','I1','I2','M2']
-    #sequence = 'CGACGXAJKG'
-    hmm_path_to_tandem_repeat(sequence,most_likely_path,3)
-
-    most_likely_path = ['M1', 'M0','M1','I0','M0']
-    sequence = 'ABAXB'
-
-
+@notfixed
 def test_conversion_mutliple():
-
-    ''' Test <hmm_path_to_maximal_complete_tandem_repeat_units>.
-        However, no positive set is defined right now.'''
-
+    """ Test <hmm_path_to_maximal_complete_tandem_repeat_units>.
+        However, no positive set is defined right now.
+    """
+    assert 0, "Test not fixed"
     lD = 3
     lPaths = [['N','N','N', 'M0','M1','M2','M0','I1','M1','M2','M0','M1','M2','N','N','N'],
             ['N','N','N','M1','M2','M0','M1','M2','M0','M1','M2', 'M0', 'N','N','N'],
@@ -29,10 +24,12 @@ def test_conversion_mutliple():
     lSequence = ['XXXABCADBCABCXXX','XXXBCABCABCAXXX','XXXCABCABCABXXX']
     lMSA = hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPaths, 3)
 
+@notfixed
 def test_create_viterbi():
-
-
-    my_hmm = hmm.HMM()
+    """ This test needs to be fixed, the HMM cannot be initialised in this way.
+    """
+    assert 0, "Test not fixed"
+    my_hmm = HMM()
     my_hmm.states = ['H', 'F']
 
     # Initialisation
@@ -56,9 +53,13 @@ def test_create_viterbi():
     else:
         print("Test FAILED")
 
-def test():
-    my_TR = repeat_info.Repeat(begin = 0, msa = ['A-G', 'ACG', 'ACG'], sequence_type = 'DNA')
-    my_hmm = hmm.HMM(my_TR, divergence = 0.01)
+@notfixed
+def test_init_with_repeat():
+    """ This test needs to be fixed.
+    """
+    assert 0, "Test not fixed"
+    my_TR = Repeat(begin = 0, msa = ['A-G', 'ACG', 'ACG'], sequence_type = 'DNA')
+    my_hmm = HMM.create(repeat=my_TR)
     from . import sequence
     my_sequence = sequence.Sequence()
     my_viterbi = Viterbi(my_hmm, my_sequence.sequence)
