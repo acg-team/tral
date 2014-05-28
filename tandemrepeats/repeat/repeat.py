@@ -1,5 +1,5 @@
 # (C) 2011, Alexander Korsunsky
-# (C) 2011-2013 Elke Schaper
+# (C) 2011-2014 Elke Schaper
 
 from os.path import join
 import re
@@ -18,9 +18,43 @@ SCORESLIST = ['phylo', 'phylo_gap01', 'phylo_gap001']
 
 ################################### Repeat class #########################################
 
-
-
 class Repeat:
+
+    """ Tandem repeats are consecutive copies of genomic sequence.
+
+    A tandem repeat is stored in terms of a multiple sequence alignment of its
+    tandem repeat units. For example, the amino acid tandem repeat
+    KLMKLMKLKLM
+    can be displayed as a multiple sequence alignment (here: "multiple repeat unit alignment")
+    KLM
+    KLM
+    KL-
+    KLM
+    and can be stored as
+    ["KLM", "KLM", "KL-", "KLM"].
+    The - char stands for a gap: It indicates that either, there used to be a char at the
+    same position, but it got deleted. Or, all other chars in the same column got inserted
+    at some point.
+
+    For research on tandem repeats, many different statistics need to be calculated on
+    the multiple sequence alignment of the tandem repeat.
+
+    [Description of these statistics]
+
+    Attributes:
+        msa_original (list of str): The original alignment of repeat units.
+        msa (list of str):  The alignment of repeat units without rare chars.
+        msaT (list of str): The transposed alignment of repeat units. E.g.
+            ["KKKK", "LLLL", "MM-M].
+        sequence_type (str): "AA" or "DNA"
+        n (int): The number of repeat units in the original msa. E.g. 4.
+        l (int): The length of the repeat units in the original msa. E.g. 3.
+        nD (int):  [Needs explanation]
+        lD (float): [Needs explanation]
+        text (str): [Needs explanation]
+        nGap (int): The number of gaps in `msa`
+        sequence_length (int): [Needs explanation]
+    """
 
     def __str__(self):
         if hasattr(self, 'pValue'):
@@ -91,8 +125,17 @@ class Repeat:
         self.msaIT = [[i for i in c if i != '-'] for c in zip(*msaI)]
         self.msaIT = [i for i in self.msaIT if len(i) > 0]
 
-    def calculate_scores(self, scoreslist=SCORESLIST,
-        job_prefix=""):
+    def calculate_scores(self, scoreslist=SCORESLIST):
+
+        """ Calculate scores on a Repeat instances for all scores in `scoreslist`.
+
+        Args:
+            self (Repeat): An instance of the repeat class.
+
+        Kwargs:
+            scoreslist(list of str): A list of the names of the scores (e.g. ["phylo_gap01"])
+                that are calculated on the Repeat instance `self`
+        """
 
         if not hasattr(self,'score'):
             self.score = defaultdict(int)
@@ -134,6 +177,16 @@ class Repeat:
 
     def calculate_pValues(self, scoreslist=SCORESLIST):
 
+        """ Calculate pValues on a Repeat instances for all scores in `scoreslist`.
+
+        Args:
+            self (Repeat): An instance of the repeat class.
+
+        Kwargs:
+            scoreslist(list of Str): A list of the names of the scores (e.g. ["phylo_gap01"])
+                for which p-Values are calculated on the Repeat instance `self`
+        """
+
         if not hasattr(self,'pValue'):
             self.pValue = defaultdict(int)
 
@@ -165,10 +218,20 @@ class Repeat:
 
 
     def deleteInsertionColumns(self):
-        ''' Create the MSA and the transposed MSA for this tandem repeat lacking insertion columns.'''
 
-        ## By definition, insertion columns are columns were there are more or
-        ## equal gaps compared to amino acids.
+        """ Create the tandem repeat attributes `msa`, `masT`, `l` and `n` without
+            insertion columns.
+
+        We define insertion columns as columns where there are more or equal gaps
+        compared to chars.
+        These columns are removed from both `msa` to create `msaD` and `msaT` to create
+        `msaTD`.
+
+        todo:: Check: is `totD` needed anywhere else? Is `textD` needed?
+        """
+
+        ## We define insertion columns as columns where there are more or equal gaps
+        ## compared to chars.
         self.msaTD = [column
             for column in self.msaT if (2*column.count('-') < len(column))
         ]
@@ -249,10 +312,17 @@ class Repeat:
 
     def gap_structure_HMM(self):
 
-        ''' calculate for each column in self.msaTD
-        - how many deletions of what length begin in this column?: <deletion_lengths>[<iColumn>] = list of deletion lengths
-        - how many insertions of what length begin in potential insertion columns before this column?: <insertion_lengths>[<iColumn>] = list of insertion lengths
-        '''
+        """ Calculate for each column in the transposed multiple repeat unit alignment
+            `msaTD`
+
+            *   how many deletions of what length begin in this column?:
+                 `deletion_lengths`[`iColumn`] = list of deletion lengths
+            *   how many insertions of what length begin in potential insertion columns
+                 before this column?: `insertion_lengths`[`iColumn`] = list of insertion lengths
+
+        Args:
+            self (Repeat): An instance of the repeat class.
+        """
 
         ## Insertions: In which column (with reference to self.msaTD) do how many insertions of what length start?
         # In which columns are insertions?
@@ -359,11 +429,21 @@ class Repeat:
 
     def repeat_in_sequence(self,sequence, save_original_msa = False):
 
-        ''' SANITY CHECK whether the predicted TR truly is part of the string <sequence>
-        in which it was detected.
+        """ Sanity check whether the `repeat` is part of the `sequence` (in which it
+            was detected). In case, calculate the position of the `repeat` within the `sequence`.
 
-        If yes: Return True, set self.begin to corrected value if necessary.
-        If no: Return False. '''
+            If yes: Return True, set self.begin to corrected value if necessary.
+            If no: Return False.
+
+        Args:
+            sequence (sequence): A sequence instance.
+            save_original_msa (bool): A boolean to decide on saving the original msa
+                (without changed chars) as an attribute of the Repeat instance.
+
+        todo:: None-straight forward replaces such as "U" -> "C" are implemented. These
+            need generalisation.
+        todo:: save_original_msa is needed here?
+        """
 
         repeat_sequence = "".join(self.msa).upper().replace("_", "").replace("-", "")
         starts = [m.start()+1 for m in re.finditer(repeat_sequence,sequence.replace("U", "C").replace("O", "K"))] # The first letter in the sequence is counted as 1 (not 0, as in python).
