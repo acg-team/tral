@@ -215,27 +215,8 @@ class HMM:
                 generated from current date and time combination.
 
         Returns:
-            HMM parameters (including the id, alphabet, emission
-            probabilities and transition probabilities) in the form of a
-            dictionary, for example an HMM with 8 states for carcinustatin::
-
-                {
-                    'id': 'PF08261.7',
-                    'letters': ['A', 'C', 'D', ..., 'Y'],
-                    'COMPO':
-                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
-                         'emissions': ['2.28205', '5.14899', ..., '1.92022'],
-                         'transitions': [0.01467, '4.62483', ..., '*']},
-                    '1':
-                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
-                        'emissions': ['1.00089', '4.54999', ..., '5.23581'],
-                        'transitions': ['0.01467', '4.62483', ..., '0.95510']},
-                    ...
-                    '8':
-                        {'insertion_emissions': ['2.68618', '4.42225', ..., '3.61503'],
-                        'emissions': ['4.12723', '5.39816', ..., '4.58094'],
-                        'transitions': ['0.00990', '4.62006', ..., '*']}
-                }
+            HMM parameters (dict): For a sample structure please refer to
+            :py:hmm_io.read:.
 
         .. todo:: Julia: Has to be tested and fixed!
         .. todo:: Julia: Resolve the id question for read.
@@ -371,7 +352,7 @@ class HMM:
 
         """
 
-        lEmission_Probabilities = [-float(i)*np.log10(np.exp(1)) for i in lEmission_Probabilities]
+        lEmission_Probabilities = [-(i)*np.log10(np.exp(1)) for i in lEmission_Probabilities]
         self.p_e[state] = {iL: iEP for iL,iEP in zip(self.alphabet, lEmission_Probabilities)}
 
 
@@ -400,22 +381,24 @@ class HMM:
 
         """
 
+        skip_states = ['COMPO', 'letters', final_state, 'id']
+
         # M->M, M->I, M->D: Use an average from all other transitions from match states.
-        mean_M_M = np.mean([np.exp(-float(iP["transition"][0])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
-        mean_M_I = np.mean([np.exp(-float(iP["transition"][1])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
-        mean_M_D = np.mean([np.exp(-float(iP["transition"][2])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
+        mean_M_M = np.mean([np.exp(-iP["transition"][0]) for iState, iP in self.hmmer.items() if iState not in skip_states])
+        mean_M_I = np.mean([np.exp(-iP["transition"][1]) for iState, iP in self.hmmer.items() if iState not in skip_states])
+        mean_M_D = np.mean([np.exp(-iP["transition"][2]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         sum_p = np.sum([mean_M_M,mean_M_I,mean_M_D])
         lTransition_Probabilities[:3] = [-np.log(i/sum_p) for i in [mean_M_M,mean_M_I,mean_M_D]]
 
         # I->M and I->I: Use an average from all other transitions from insertion states.
-        mean_I_M = np.mean([np.exp(-float(iP["transition"][3])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
-        mean_I_I = np.mean([np.exp(-float(iP["transition"][4])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
+        mean_I_M = np.mean([np.exp(-iP["transition"][3]) for iState, iP in self.hmmer.items() if iState not in skip_states])
+        mean_I_I = np.mean([np.exp(-iP["transition"][4]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         sum_p = np.sum([mean_I_M,mean_I_I])
         lTransition_Probabilities[3:5] = [-np.log(i/sum_p) for i in [mean_I_M,mean_I_I]]
 
         # D->M and D->D: Use an average from all other transitions from deletion states.
-        mean_D_M = np.mean([np.exp(-float(iP["transition"][5])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
-        mean_D_D = np.mean([np.exp(-float(iP["transition"][6])) for iState, iP in self.hmmer.items() if iState not in ['COMPO', 'letters', final_state]])
+        mean_D_M = np.mean([np.exp(-iP["transition"][5]) for iState, iP in self.hmmer.items() if iState not in skip_states])
+        mean_D_D = np.mean([np.exp(-iP["transition"][6]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         sum_p = np.sum([mean_D_M,mean_D_D])
         lTransition_Probabilities[5:] = [-np.log(i/sum_p) for i in [mean_D_M,mean_D_D]]
 
@@ -437,7 +420,7 @@ class HMM:
 
         """
 
-        lTransition_Probabilities = [-float(i)*np.log10(np.exp(1)) for i in lTransition_Probabilities]
+        lTransition_Probabilities = [-(i)*np.log10(np.exp(1)) for i in lTransition_Probabilities]
 
         # Match state state_index -> Match state state_index + 1
         iM = self.match_states[state_index]
@@ -531,7 +514,7 @@ def hmmer3_emission_probabilities(hmmer_probabilities, letters, lMatch):
         print('Missing representation in Hmmer File: {0}'.format(missing))
         raise ValueError('Some letters in the local HMM are not represented in the HMMER HMM.')
 
-    return [{iL: -float(iP)*np.log10(np.exp(1)) for iL,iP in zip(hmmer_probabilities['letters'], data['emissions']) if iL in letters} for key,data in hmmer_probabilities.items() if key not in ['letters','COMPO']]
+    return [{iL: -(iP)*np.log10(np.exp(1)) for iL,iP in zip(hmmer_probabilities['letters'], data['emissions']) if iL in letters} for key,data in hmmer_probabilities.items() if key not in ['letters','COMPO']]
 
 
 ##################################### Tests ##############################################
