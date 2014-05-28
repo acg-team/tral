@@ -197,7 +197,7 @@ class HMM:
 
         return HMM(hmmer_probabilities)
 
-    def create_from_repeat(self, tandem_repeat, hmm_copy_path = None,
+    def create_from_repeat(tandem_repeat, hmm_copy_path = None,
                            hmm_copy_id = None):
 
         """ Get HMM parameters (including the alphabet, emission probabilities
@@ -226,7 +226,7 @@ class HMM:
         .. todo:: Julia: Resolve the id question for read.
 
         """
-        timestamp = datetime.now()
+        timestamp = datetime.datetime.now()
         tmp_id = timestamp.strftime('%Y:%m:%d:%H:%M:%S:%f')
 
         # Create a temporary directory
