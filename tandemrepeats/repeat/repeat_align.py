@@ -1,11 +1,11 @@
-# (C) 2013 Elke Schaper
+# (C) 2014 Elke Schaper
 
 import logging, os, subprocess, tempfile
 from Bio import AlignIO
 
 logger = logging.getLogger('root')
 
-from tandemrepeats.repeat import repeat_info
+from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
 SCORESLIST = ['phylo_gap01']
