@@ -59,30 +59,31 @@ def read(hmm_filename, id = None):
             an identifier to check against, it is skipped.
 
     Returns:
-        HMM parameters (dict): A dictionary of parameters required to
-        initialise the HMM including the id, alphabet, emission probabilities
-        and transition probabilities.
+        dict: A dictionary of parameters required to initialise the HMM
+        including the id, alphabet, emission probabilities and transition
+        probabilities.
 
-        Example::
-           {
-               'id': 'PF08261.7',
-               'letters': ['A', 'C', 'D', ..., 'Y'],
-               'COMPO':
-                   {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
-                    'emissions': [2.28205, 5.14899, ..., 1.92022],
-                    'transitions': [0.01467, 4.62483, ..., -inf]},
-               '1':
-                   {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
-                   'emissions': [1.00089, 4.54999, ..., 5.23581],
-                   'transitions': [0.01467, 4.62483, ..., 0.95510]},
-               ...
-               '8':
-                   {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
-                   'emissions': [4.12723, 5.39816, ..., 4.58094],
-                   'transitions': [0.00990, 4.62006, ..., -inf]}
-           }
+        Output format::
 
-     """
+            {
+                'id': 'PF08261.7',
+                'letters': ['A', 'C', 'D', ..., 'Y'],
+                'COMPO':
+                    {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                      'emissions': [2.28205, 5.14899, ..., 1.92022],
+                      'transitions': [0.01467, 4.62483, ..., -inf]},
+                '1':
+                    {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                     'emissions': [1.00089, 4.54999, ..., 5.23581],
+                     'transitions': [0.01467, 4.62483, ..., 0.95510]},
+                ...
+                '8':
+                    {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                     'emissions': [4.12723, 5.39816, ..., 4.58094],
+                     'transitions': [0.00990, 4.62006, ..., -inf]}
+            }
+
+    """
 
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
@@ -256,10 +257,11 @@ def split_HMMER_file(hmm_filename, resultdir):
                     state = 0
 
 def read_HMMER_acc_lengths(hmm_filename):
-    '''Read HMM file in HMMER3 format. (See definition further down)
+    """Read HMM file in HMMER3 format. (See definition further down)
         Return the PFAM ID and the lengths of each model.
+
     ..  todo:: Is this function needed?
-    '''
+    """
 
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_length = re.compile(r"LENG\s+([\w\.]+)")

@@ -58,9 +58,7 @@ class HMM:
     The structure and probabilities defining standard sequence profile HMMs can be
 
     * taken from HMM databases such as PFAM,
-
     * calculated from sequence alignments (here: an alignment of TR units) using for example the HMMER suite,
-
     * defined in house.
 
     All three ways are implemented here.
@@ -92,8 +90,8 @@ class HMM:
 
         """ HMM class __init_ module.
 
-            __init__ takes HMM parameters (including the alphabet, emission probabilities
-            and transition probabilities) as input, and assigns them to class attributes.
+        __init__ takes HMM parameters (including the alphabet, emission probabilities
+        and transition probabilities) as input, and assigns them to class attributes.
 
         Args:
             hmmer_probabilities (dict): A dictionary with HMM parameters.
@@ -158,8 +156,9 @@ class HMM:
         """ Creates a HMM instance from 2 possible input formats.
 
         A `HMM` instance is created from one of the two possible inputs:
-        *   HMMER3 model
-        *   `Repeat` instance
+
+        * HMMER3 model
+        * ``Repeat`` instance
 
         Args:
             hmmer_file (str): Path to the file containing the HMM parameters

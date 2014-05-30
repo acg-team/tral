@@ -32,13 +32,9 @@ def viterbi(hmm, emission):
         emission (sequence): An instance of the Sequence class.
 
     Returns:
-        `most_likely_path` (list of str): The most likely sequence of `hmm` states to
-        emit the sequence.
+        The most likely sequence of hmm states to emit the sequence in the
+        form of a list of str.
 
-    Raises:
-        Exception: [None]
-
-    .. warning:: [None]
     .. todo:: Adapt docstrings to refactored Viterbi -> Viterbi_path classes.
     .. todo:: This line of code should be standardized and commented: emission.replace("U", "C").replace("O", "K")
     .. todo:: read in global variables (lStandard_amino_acid, dAmbiguous_amino_acid,
@@ -149,17 +145,18 @@ def probability_of_the_former_state(iFormer, iS, iE, p_e, p_t, path, p):
 def distance_index(i, j, length):
     """ Helper function to calculate the distance between two indices in a circular HMM.
 
-        Args:
-            i (int): index i
-            j (int): index j
-            length (int): length of the HMM
+    Args:
+        i (int): first index
+        j (int): second index
+        length (int): length of the HMM
 
-        Returns:
-            (int): The distance between the indices `i` and `j`: As the HMM is circular,
-                 `j` may have a smaller value than `i`, even though `j` is ahead of `i`.
+    Returns:
+        int: The distance between the indices ``i`` and ``j``: As the HMM
+        is circular ``j`` may have a smaller value than ``i``, even though
+        ``j`` is ahead of ``i``.
 
-        .. todo:: May be replaced by a simple mod, as distance_index is used only once in
-            the code at current.
+    .. todo:: May be replaced by a simple mod, as distance_index is used only once in
+        the code at current.
     """
     if j > i:
         return j-i
@@ -183,19 +180,17 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
         lSequence (list of str): A list of sequences.
         lPath (list of list of str): A list of Viterbi paths
         lD (int): length of the HMM used to create the Viterbi paths.
-
-    Kwargs:
         alpha (Float): alpha element [0,1].
 
     Returns:
-        `lMSA`: A list of multiple sequence alignments (MSAs), that is
-            (list of (list of str))
+        A list of multiple sequence alignments (MSAs) in the form of a list of
+        list of str, e.g. ``[['ATAILC', 'ATAILC', 'ACALKG'], ...]``.
 
     Raises:
         Exception: If alpha is not in [0,1].
 
-    .. warning:: [None].
     .. todo:: Should the sequences be sequence instances instead of just strings?
+    .. todo:: Check example for returns.
 
     """
 
@@ -293,7 +288,8 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
         lD (int): length of the HMM used to create the Viterbi paths.
 
     Returns:
-        `repeat_msa`: A multiple sequence alignments (MSA), that is (list of str).
+        A multiple sequence alignment (MSA) created from the most likely path
+        along the hmm in the form of a list of str.
 
     .. warning:: [None].
     .. todo:: Should the sequence be a sequence instance instead of just a string?
@@ -328,42 +324,46 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     return repeat_msa
 
 
-def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD, translate = False):
-
-
-    """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat.
+def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
+                                            translate = False):
+    """Convert a viterbi path in an hmm of length ``lD`` on the sequence into a
+    corresponding tandem repeat.
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
-    USE alignment information in the Viterbi path. For example, all emissions
-    labelled with M1 (match state 1) align according to the HMM. Insert gaps for
-    insertions and deletions accordingly.
-    Thus, for example the first characters in the repeat units do necessarily align,
-    albeit some of them may be gaps. Also, all repeat units are necessarily of same length.
+    Use alignment information in the Viterbi path. For example, all emissions
+    labelled with M1 (match state 1) align according to the HMM. Insert gaps
+    for insertions and deletions accordingly.
+    Thus, for example the first characters in the repeat units do necessarily
+    align, albeit some of them may be gaps. Also, all repeat units are
+    necessarily of same length.
 
-    Assume that all states are counted starting on 0, unless the `translate` flag is set.
+    Assume that all states are counted starting on 0, unless the ``translate``
+    flag is set.
 
     Args:
         sequence (str): A sequence as a string.
-        lPath (list of list of str): A list of Viterbi paths
+        most_likely_path (list of str): a Viterbi path.
         lD (int): length of the HMM used to create the Viterbi paths.
-
-    Kwargs:
-        alpha (float): alpha element [0,1].
-        translate (bool): This function assumes that HMM states are enumerated starting on 0.
-            If the HMM states are enumerated starting on 1, set this flag for transformation.
+        translate (bool): This function assumes that HMM states are enumerated
+            starting on 0.
+            If the HMM states are enumerated starting on 1, set this flag for
+            transformation.
 
     Returns:
-        `msa`: A repeat instance.
-        `begin`: The start index of the repeat on the sequence.
-        `shift`: The index of the HMM where the cut between repeat units is set.
+        The function returns a tuple consisting of 3 values.
+        The tuple contains:
 
-msa, begin, shift
+        * ``msa``: A repeat instance.
+        * ``begin``: The start index of the repeat on the sequence.
+        * ``shift``: The index of the HMM where the cut between repeat units is set.
+
 
     .. warning:: [None].
     .. todo:: Should the sequence be a sequence instance instead of just a string?
     .. todo:: Check: How is the returned `begin` defined? Starting counting on 0 or 1?
         Is it the index of the last flanking character, or the first repeat character?
     .. todo:: Can we update this function, e.g. to not assume that HMM states start on 0?
+    .. todo:: Check the docstring, reformat returns.
     """
 
     begin = most_likely_path.count('N')
