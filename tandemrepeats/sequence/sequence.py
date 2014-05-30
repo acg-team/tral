@@ -1,5 +1,5 @@
 
-from tandemrepeats.repeat import repeat, repeat_realign
+from tandemrepeats.repeat import repeat, repeat_align
 from tandemrepeats.hmm import hmm, hmm_viterbi
 
 
