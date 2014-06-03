@@ -9,7 +9,7 @@ import scipy.special
 from collections import defaultdict
 from copy import deepcopy
 
-from tandemrepeats.repeat import repeat_score, repeat_pvalue
+from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
 
 logger = logging.getLogger(__name__)
 
@@ -45,16 +45,40 @@ class Repeat:
         msa_original (list of str): The original alignment of repeat units.
         msa (list of str):  The alignment of repeat units without rare chars.
         msaT (list of str): The transposed alignment of repeat units. E.g.
-            ["KKKK", "LLLL", "MM-M].
+            ["KKKK", "LLLL", "MM-M"].
         sequence_type (str): "AA" or "DNA"
         n (int): The number of repeat units in the original msa. E.g. 4.
         l (int): The length of the repeat units in the original msa. E.g. 3.
         nD (int):  [Needs explanation]
         lD (float): [Needs explanation]
         text (str): [Needs explanation]
-        nGap (int): The number of gaps in `msa`
+        nGap (int): The number of gaps in ``msa``
         sequence_length (int): [Needs explanation]
     """
+
+
+    def write(self, format, file, *args):
+
+        """ Write tandem repeat to file.
+
+        Write tandem repeat to file using one of two formats.
+
+        Args:
+            format (str):  Either "stockholm" or "fasta"
+            file (str): Path to output file
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+
+        if format == 'stockholm':
+            repeat_io.save_repeat_stockholm(self.msa, file)
+        elif format == 'fasta':
+            repeat_io.save_repeat_fasta(self.msa, file)
+        else:
+            raise Exception('format is unknown.')
+
 
     def __str__(self):
         if hasattr(self, 'pValue'):

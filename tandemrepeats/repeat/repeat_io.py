@@ -9,7 +9,7 @@ import tempfile
 import subprocess
 import numpy as np
 
-from tandemrepeats.repeat import repeat
+#from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
 logger = logging.getLogger('root')
