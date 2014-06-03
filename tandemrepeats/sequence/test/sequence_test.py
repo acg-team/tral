@@ -4,12 +4,21 @@ import pytest
 
 from tandemrepeats.hmm.hmm import HMM
 from tandemrepeats.sequence import sequence
+from tandemrepeats.repeat import repeat
 
-TEST_SEQUENCE = "GYEDEDEDRPFYALGLGKRPRTYSFGL"
+TEST_SEQUENCE = "FFAAAAAAFF"
+
+TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
+TEST_RESULT_REPEAT_MSA_SINGLE = ["A","A","A","A","A","A"]
+
+TEST_REPEAT_MSA_DOUBLE = ["AA","AA"]
+TEST_RESULT_REPEAT_MSA_DOUBLE = ["AA","AA","AA"]
 
 
 # Test file names
 TEST_FILE_WITH_ID = 'carcinustatin.hmm'
+
+notfixed = pytest.mark.notfixed
 
 @pytest.fixture
 def path():
@@ -18,14 +27,33 @@ def path():
     return os.path.join(os.path.abspath('.'), 'hmm', 'test')
 
 
-def test_initialise_sequence(sequence):
+def test_initialise_sequence():
 
-    test_seq = seq.Seq(sequence)
+    test_seq = sequence.Sequence(TEST_SEQUENCE)
+    assert test_seq.seq == TEST_SEQUENCE
 
-
-def test_detect_repeats_with_hmm(path):
-    test_hmm = HMM.create(hmmer_file = os.path.join(path, TEST_FILE_WITH_ID))
-    test_seq = seq.Seq(sequence)
-    test_optimized_repeat = test_seq.detect(test_hmm)
+def test_detect_repeats_with_hmm():
+    test_hmm = HMM.create(hmmer_file = os.path.join(path(), TEST_FILE_WITH_ID))
+    test_seq = sequence.Sequence(TEST_SEQUENCE)
+    test_optimized_repeat = test_seq.detect([test_hmm])
 
     #assert
+
+#@notfixed
+def test_detect_repeats_with_repeat():
+
+    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
+    test_hmm = HMM.create(repeat = test_repeat)
+    test_seq = sequence.Sequence(TEST_SEQUENCE)
+    test_optimized_repeat = test_seq.detect([test_hmm])
+    assert type(test_optimized_repeat) == list
+    assert len(test_optimized_repeat) == 1
+    assert test_optimized_repeat[0].msa == TEST_RESULT_REPEAT_MSA_DOUBLE
+
+
+    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_SINGLE)
+    test_hmm = HMM.create(repeat = test_repeat)
+    test_optimized_repeat = test_seq.detect([test_hmm])
+    assert type(test_optimized_repeat) == list
+    assert len(test_optimized_repeat) == 1
+    assert test_optimized_repeat[0].msa == TEST_RESULT_REPEAT_MSA_SINGLE

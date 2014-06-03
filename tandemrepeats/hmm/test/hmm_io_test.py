@@ -3,6 +3,8 @@ import os
 import pytest
 
 from tandemrepeats.hmm.hmm import HMM
+from tandemrepeats.repeat.repeat import Repeat
+
 
 NUM_STATES = 8
 AMINOACIDS = list('ACDEFGHIKLMNPQRSTVWY')
@@ -24,6 +26,11 @@ ID_KEY_NAME = 'id'
 # Test file names
 TEST_FILE_WITH_ID = 'carcinustatin.hmm'
 TEST_FILE_WITHOUT_ID = 'carcinustatin_no_id.hmm'
+
+
+TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
+
+notfixed = pytest.mark.notfixed
 
 @pytest.fixture
 def path():
