@@ -6,7 +6,7 @@ import logging
 import re
 from collections import defaultdict
 
-from tandemrepeats.hmm import hmm
+#from tandemrepeats.hmm import hmm
 from tandemrepeats.repeat import repeat
 
 logging.basicConfig()
@@ -303,6 +303,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
 
     splitter = re.compile("(\w)(\d+)")
     mapping = [((splitter.match(iP).group(1),int(splitter.match(iP).group(2))),iS) for iS,iP in zip(sequence[begin:],path[begin:]) if iP != 'C']
+
     shift = mapping[0][0][1]
     index_shift = ["Empty"]+[(i+lD+1-shift)%lD  for i in range(lD)]
     logging.debug("The tandem repeat is shifted by: {0}".format(str(shift)))
@@ -311,14 +312,24 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     repeat_unit = mapping[0][1]
     last_used_index = 0
 
-    for iM,iS in mapping[1:]:
-        #print("{} {}".format(iM,iS))
-        if index_shift[iM[1]] >= last_used_index:
-            repeat_unit += iS
-        else:
-            repeat_msa.append(repeat_unit)
-            repeat_unit = iS
-        last_used_index = index_shift[iM[1]]
+    if lD == 1:
+        for iM,iS in mapping[1:]:
+            if iM[0] == "I":
+                repeat_unit += iS
+            else:
+                repeat_msa.append(repeat_unit)
+                repeat_unit = iS
+
+    else:
+        for iM,iS in mapping[1:]:
+            #print("{} {}".format(iM,iS))
+            if index_shift[iM[1]] >= last_used_index:
+                repeat_unit += iS
+            else:
+                repeat_msa.append(repeat_unit)
+                repeat_unit = iS
+            last_used_index = index_shift[iM[1]]
+
     repeat_msa.append(repeat_unit)
 
     return repeat_msa
