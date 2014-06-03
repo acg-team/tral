@@ -1,4 +1,6 @@
-# (C) 2012-2013 Elke Schaper
+# (C) 2012-2014 Elke Schaper
+# (C) 2014 Julia Pecerska
+
 """
 
     :synopsis: A cyclic hidden Markov model that describes sequence tandem repeats.
@@ -15,12 +17,14 @@ import shutil
 import subprocess
 import tempfile
 
-from tandemrepeats.hmm import hmm_io
+from tandemrepeats.hmm import hmm_io, hmm_viterbi
 from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
 from tandemrepeats.repeat.repeat_score import loadModel
 
+
 logging.basicConfig()
+
 logger = logging.getLogger(__name__)
 
 ################################### HMM class #########################################
@@ -84,7 +88,7 @@ class HMM:
 
     # Function that take the HMM instance as argument:
     def viterbi(self, *args):
-        hmm_viterbi.viterbi(self, *args)
+        return hmm_viterbi.viterbi(self, *args)
 
     def __init__(self, hmmer_probabilities):
 
@@ -129,18 +133,27 @@ class HMM:
             # Completing the circle of the HMM.
             if i == self.lD - 1:
                 iTransition_Probabilities = self.set_circle_transition_probability_hmmer3(iTransition_Probabilities, dTranslate_States[iState])
+            logger.debug("iState: %s", iState)
+            logger.debug("set_circle_transition_probability_hmmer3: %s", iTransition_Probabilities)
             self.set_transition_probability_hmmer3(i, iTransition_Probabilities)
 
+        logger.debug("p_t before deletion: %s", self.p_t)
+
         # Translate deletion states into direct transitions from match to match states.
-        p_t_d = {}
-        for i,iMatch_state in enumerate(self.match_states):
-             p_t_d[iMatch_state] = self.get_direct_transition_probabilities_for_deletions(i,iMatch_state)
-             #print(iMatch_state)
-             #print('M' + str(((i+1)%self.lD)+1))
-             #print(p_t_d[iMatch_state]['M' + str(((i+1)%self.lD)+1)])
-        for iMatch_state in self.match_states:
-            for iGoal_state, iP in p_t_d[iMatch_state].items():
-                self.p_t[iMatch_state][iGoal_state] = iP
+        if self.lD > 1:
+            p_t_d = {}
+            for i,iMatch_state in enumerate(self.match_states):
+                 p_t_d[iMatch_state] = self.get_direct_transition_probabilities_for_deletions(i,iMatch_state)
+                 #print(iMatch_state)
+                 #print('M' + str(((i+1)%self.lD)+1))
+                 #print(p_t_d[iMatch_state]['M' + str(((i+1)%self.lD)+1)])
+            for iMatch_state in self.match_states:
+                for iGoal_state, iP in p_t_d[iMatch_state].items():
+                    self.p_t[iMatch_state][iGoal_state] = iP
+        else:
+            print(self.p_t)
+
+        logger.debug("p_t after deletion: %s", self.p_t)
 
         # As it is never likely to got from a terminal state to a deletion state or vice versa, this transition probabilities can be ignored.
         # Thus, you may advance and:
@@ -148,6 +161,7 @@ class HMM:
 
         self.states = [self.terminal_states[0]] + self.match_states + self.insertion_states + [self.terminal_states[1]]
         self.p_t = {iState: {i:j for i,j in self.p_t[iState].items() if not i in self.deletion_states} for iState in self.states}
+        self.p_0 = { i:j  for i,j in self.p_0.items() if i not in self.deletion_states}
 
         del self.deletion_states
 
@@ -194,6 +208,7 @@ class HMM:
         else:
             raise Exception("Neither of the required inputs provided!")
 
+        logger.debug(hmmer_probabilities)
         return HMM(hmmer_probabilities)
 
     def create_from_repeat(tandem_repeat, hmm_copy_path = None,
@@ -235,7 +250,7 @@ class HMM:
         stockholm_file = os.path.join(tmp_dir, tmp_id + ".sto")
 
         #O repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
-        tandem_repeat.write(file=stockholm_file, format = "Stockholm")
+        tandem_repeat.write(file=stockholm_file, format = "stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
         p = subprocess.Popen(["hmmbuild", "--amino", tmp_id + ".hmm",
@@ -255,8 +270,7 @@ class HMM:
                 else:
                     shutil.copy(hmm_file, hmm_copy_path)
 
-        hmmer_probabilities = self.read(hmm_file, id = hmm_copy_id,
-                                        type = "NAME")
+        hmmer_probabilities = HMM.read(hmm_filename = hmm_file, id = hmm_copy_id)
 
         shutil.rmtree(tmp_dir)
 
@@ -374,6 +388,10 @@ class HMM:
 
         Input: -ln(p) Output: Also -ln(p')
 
+        When the HMM only has a single match state, i.e. lD == 1, the final match state
+        equals the only match state, and no transition probabilities can be calculated
+        via averaging over all other states. Therefore, the its transition probabilities
+        remain unchanged.
 
         Args:
           lTransition_Probabilities (list of float): The first parameter.
@@ -384,12 +402,23 @@ class HMM:
 
         """
 
+        if self.lD == 1:
+            return lTransition_Probabilities
+
+        # In self.hmmer, besides the probabilities for states 1, 2, 3, ... data for
+        # "COMPO", 'letters', and 'id' are saved and should be ignored in the following.
+        # Also, we ignore the transition probabilities for final_state, as our goal here
+        # is to recalculate these based on the averages of the transition probabilities
+        # from all other states.
         skip_states = ['COMPO', 'letters', final_state, 'id']
 
         # M->M, M->I, M->D: Use an average from all other transitions from match states.
+        logger.debug("self.hmmer.keys(): %s", self.hmmer.items())
+        logger.debug("self.hmmer.items(): %s", self.hmmer.items())
         mean_M_M = np.mean([np.exp(-iP["transition"][0]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         mean_M_I = np.mean([np.exp(-iP["transition"][1]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         mean_M_D = np.mean([np.exp(-iP["transition"][2]) for iState, iP in self.hmmer.items() if iState not in skip_states])
+
         sum_p = np.sum([mean_M_M,mean_M_I,mean_M_D])
         lTransition_Probabilities[:3] = [-np.log(i/sum_p) for i in [mean_M_M,mean_M_I,mean_M_D]]
 
@@ -411,7 +440,9 @@ class HMM:
 
         """ Convert and assign transition probabilities from a HMMER3 file to HMM attribute `p_t`
 
-        Set `p_t` of states to `lTransition_Probabilities` for the `state_index` th state
+        Set ``p_t`` of states to ``lTransition_Probabilities`` for the
+        ``state_index`` th state
+
         In HMMER3 data, transition probabilities are -ln(p).
         Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)
 
