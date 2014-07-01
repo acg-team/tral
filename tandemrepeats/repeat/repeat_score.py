@@ -24,10 +24,15 @@ INDEL_ZIPF = 1.821
 
 def load_equilibrium_freq(filename):
     """ Load equilibrium frequencies from a substitution matrix file.
-    Returns a dictionary of one letter amino acid codes and float value
 
-    Note that with minor changes, the whole amino acid substitution matrix could
-    be returned.
+    Load equilibrium frequencies from a substitution matrix file. Note that with minor
+     changes, the whole amino acid substitution matrix could be returned.
+
+    Args:
+        filename (str): Path to substitution matrix file, E.g. LG.dat.
+
+    Returns:
+        (Dict of str,float): Dictionary of one letter amino acid codes and float value
     """
     patstr_freqline = r"[+-]?\d+(?:\.\d+)?\s*"
     with open(filename,"r") as f:
@@ -70,10 +75,18 @@ def load_equilibrium_freq(filename):
 
 
 def meanSimilarity(repeat, measureOfSimilarity, ignoreGaps = True):
-    """
-    repeat is of class repeat;
-    measureOfSimilarity is element {entropy, parsimony, pSim};
-    ignoreGaps is of type "boolean"
+    """ Calculate the mean similarity of all columns in the multiple sequence alignment
+    in ``repeat`` according to a ``measureOfSimilarity``.
+
+    Args:
+        repeat (Repeat): An instance of the Repeat class.
+        measureOfSimilarity (str): Either "entropy", "parsimony", or "pSim".
+        ignoreGaps (boolean): Are gaps, "-" treated as chars (False) or ignored (True).
+
+    Returns:
+        float: A similarity measure for the repeat units in ``repeat``.
+
+    ..  todo:: Is ``rep_and_meas`` used at current.
     """
 
     if not ignoreGaps:
@@ -87,13 +100,50 @@ def meanSimilarity(repeat, measureOfSimilarity, ignoreGaps = True):
                 repeat.msaTD)) / repeat.lD  ## python 2: integer division
 
 def entropy(column):
-    """Calulate entropy of single sequence,
-    assuming the sequence to reflect a probability density estimator."""
+    """ Calculate the entropy of a list.
+
+     Calculate the entropy of list. Assume that the frequency of elements in the list
+     reflects a probability density estimator.
+
+    For an exact description see:
+
+    Schaper, E., Kajava, A., Hauser, A., & Anisimova, M. Repeat or not repeat?
+    --Statistical validation of tandem repeat prediction in genomic sequences.
+    Nucleic Acids Research (2012).
+
+    Args:
+      column (list of str): List of elements that can be ordered in a set, e.g. str or int.
+
+    Returns:
+        float: The entropy of ``column``.
+    """
+
     estimatedP = [(column.count(a)/float(len(column))) for a in set(column)]
     return sum([-p*np.log2(p) for p in estimatedP if p > 0])
 
 def parsimony(column):
-    # Count the number of changes in a column and divide by the maximally possible number of change
+    """ Calculate the parsimony score of a list.
+
+    Calculate the parsimony score on ``column``:  Count the number of changes in a
+    ``column`` of a multiple sequence alignment and divide by the maximally possible
+    number of changes.
+
+    For an exact description see:
+
+    Schaper, E., Kajava, A., Hauser, A., & Anisimova, M. Repeat or not repeat?
+    --Statistical validation of tandem repeat prediction in genomic sequences.
+    Nucleic Acids Research (2012).
+
+    Args:
+      column (list of str): A ``list`` of two or more elements that can be ordered in a ``set``, e.g.
+       ``str`` or ``int``
+
+    Returns:
+        float: The parsimony score of ``column``.
+
+    ..  todo:: At which step should we assert that the length of ``column`` > 1?
+    """
+
     if len(column) > 1:
         # Here, 0 means no changes and 1 only changes # python 2: integer division
         return (len(set(column))-1)/(len(column)-1)
@@ -103,7 +153,24 @@ def parsimony(column):
         return 1
 
 def pSim(column):
-    """calculate frequency of most frequent element in a column"""
+    """ Calculate the pSim score of a list.
+
+    Calculate the pSim score on ``column``:  Count the frequency of the most frequent
+    element in a ``column`` of a multiple sequence alignment.
+
+    For an exact description see:
+
+    Schaper, E., Kajava, A., Hauser, A., & Anisimova, M. Repeat or not repeat?
+    --Statistical validation of tandem repeat prediction in genomic sequences.
+    Nucleic Acids Research (2012).
+
+    Args:
+      column (list of str): A list of elements.
+
+    Returns:
+        float: The pSim score of ``column``.
+    """
+
     return collections.Counter(column).most_common(1)[0][1]/float(len(column))
 
 
@@ -112,10 +179,33 @@ def pSim(column):
 
 
 def optimisation(function, args, start_min = 0.5, start_max = 1.5, nIteration = 14):
-    '''perform a binary one dimensional optimisation of parameter t on function with
-    the additional list of arguments/parameters args.
-    Start on a given range of start, and iterate nIteration times.
-    Return the maximum of the function, together with the maximum parameter t as a tuple.'''
+
+    """Binary one-dimensional optimisation of ``function``.
+
+    Perform a binary one dimensional optimisation of parameter ``t`` on ``function`` with
+    the additional list of arguments/parameters ``args``. Start on a given range of start,
+    and iterate ``nIteration`` times. Return the maximum of the function, together with
+     the maximum parameter ``t`` as a tuple.
+
+    In addition to ``start_min`` and ``start_max``, additional hard boundaries
+    on the optimisation parameter ``t`` are hard-coded: t E [0.0000000001, 100]
+
+    Args:
+      function (method): Method with input (float, ``args``) and output float.
+      args (list of items): List of arguments for ``function``.
+
+    Kwargs:
+        start_min (float): Minimum value of function parameter ``t``.
+        start_max (float): Maximum value of function parameter ``t``.
+        nIteration (int): Number of iterations until optimisation results are returned.
+
+    Returns:
+        tuple (Maximum of function: float, Corresponding function parameter: float)
+
+      ..  todo:: Check why ``regionBounded`` is hardcoded at current.
+      ..  todo:: Check why ``stepsize`` is hardcoded at current.
+      ..  todo:: Generalise hard-coded optimisation parameter boundaries.
+    """
 
     t = [[start_min], [(start_min+start_max)/2], [start_max]]
     stepsize = 2
@@ -202,16 +292,49 @@ def LG():
     [[-16.060388, 0.425093, 0.276818, 0.395144, 2.489084, 0.969894, 1.038545, 2.06604, 0.358858, 0.14983, 0.395337, 0.536518, 1.124035, 0.253701, 1.177651, 4.727182, 2.139501, 0.180717, 0.218959, 2.54787], [0.425093, -21.193959, 0.751878, 0.123954, 0.534551, 2.807908, 0.36397, 0.390192, 2.426601, 0.126991, 0.301848, 6.326067, 0.484133, 0.052722, 0.332533, 0.858151, 0.578987, 0.593607, 0.31444, 0.170887], [0.276818, 0.751878, -17.692284, 5.076149, 0.528768, 1.695752, 0.541712, 1.437645, 4.509238, 0.191503, 0.068427, 2.145078, 0.371004, 0.089525, 0.161787, 4.008358, 2.000679, 0.045376, 0.612025, 0.083688], [0.395144, 0.123954, 5.076149, -24.184967999999994, 0.062556, 0.523386, 5.24387, 0.844926, 0.927114, 0.01069, 0.015076, 0.282959, 0.025548, 0.017416, 0.394456, 1.240275, 0.42586, 0.02989, 0.135107, 0.037967], [2.489084, 0.534551, 0.528768, 0.062556, -13.058626, 0.084808, 0.003499, 0.569265, 0.640543, 0.320627, 0.594007, 0.013266, 0.89368, 1.105251, 0.075382, 2.784478, 1.14348, 0.670128, 1.165532, 1.959291], [0.969894, 2.807908, 1.695752, 0.523386, 0.084808, -18.724285999999996, 4.128591, 0.267959, 4.813505, 0.072854, 0.582457, 3.234294, 1.672569, 0.035855, 0.624294, 1.223828, 1.080136, 0.236199, 0.257336, 0.210332], [1.038545, 0.36397, 0.541712, 5.24387, 0.003499, 4.128591, -23.8339, 0.348847, 0.423881, 0.044265, 0.069673, 1.807177, 0.173735, 0.018811, 0.419409, 0.611973, 0.604545, 0.077852, 0.120037, 0.245034], [2.06604, 0.390192, 1.437645, 0.844926, 0.569265, 0.267959, 0.348847, -16.613733, 0.311484, 0.008705, 0.044261, 0.296636, 0.139538, 0.089586, 0.196961, 1.73999, 0.129836, 0.268491, 0.054679, 0.076701], [0.358858, 2.426601, 4.509238, 0.927114, 0.640543, 4.813505, 0.423881, 0.311484, -6.179003, 0.108882, 0.366317, 0.697264, 0.442472, 0.682139, 0.508851, 0.990012, 0.584262, 0.597054, 5.306834, 0.119013], [0.14983, 0.126991, 0.191503, 0.01069, 0.320627, 0.072854, 0.044265, 0.008705, 0.108882, -22.217359, 4.145067, 0.159069, 4.273607, 1.112727, 0.078281, 0.064105, 1.033739, 0.11166, 0.232523, 10.649107], [0.395337, 0.301848, 0.068427, 0.015076, 0.594007, 0.582457, 0.069673, 0.044261, 0.366317, 4.145067, -31.146227, 0.1375, 6.312358, 2.592692, 0.24906, 0.182287, 0.302936, 0.619632, 0.299648, 1.702745], [0.536518, 6.326067, 2.145078, 0.282959, 0.013266, 3.234294, 1.807177, 0.296636, 0.697264, 0.159069, 0.1375, -19.90551, 0.656604, 0.023918, 0.390322, 0.748683, 1.136863, 0.049906, 0.131932, 0.185202], [1.124035, 0.484133, 0.371004, 0.025548, 0.89368, 1.672569, 0.173735, 0.139538, 0.442472, 4.273607, 6.312358, 0.656604, -24.724051, 1.798853, 0.099849, 0.34696, 2.020366, 0.696175, 0.481306, 1.898718], [0.253701, 0.052722, 0.089525, 0.017416, 1.105251, 0.035855, 0.018811, 0.089586, 0.682139, 1.112727, 2.592692, 0.023918, 1.798853, -23.599417, 0.094464, 0.361819, 0.165001, 2.457121, 7.803902, 0.654683], [1.177651, 0.332533, 0.161787, 0.394456, 0.075382, 0.624294, 0.419409, 0.196961, 0.508851, 0.078281, 0.24906, 0.390322, 0.099849, 0.094464, -16.74927, 1.338132, 0.571468, 0.095131, 0.089613, 0.296501], [4.727182, 0.858151, 4.008358, 1.240275, 2.784478, 1.223828, 0.611973, 1.73999, 0.990012, 0.064105, 0.182287, 0.748683, 0.34696, 0.361819, 1.338132, -12.953694999999998, 6.472279, 0.248862, 0.400547, 0.098369], [2.139501, 0.578987, 2.000679, 0.42586, 1.14348, 1.080136, 0.604545, 0.129836, 0.584262, 1.033739, 0.302936, 1.136863, 2.020366, 0.165001, 0.571468, 6.472279, -20.294897, 0.140825, 0.245841, 2.188158], [0.180717, 0.593607, 0.045376, 0.02989, 0.670128, 0.236199, 0.077852, 0.268491, 0.597054, 0.11166, 0.619632, 0.049906, 0.696175, 2.457121, 0.095131, 0.248862, 0.140825, -19.666723, 3.151815, 0.18951], [0.218959, 0.31444, 0.612025, 0.135107, 1.165532, 0.257336, 0.120037, 0.054679, 5.306834, 0.232523, 0.299648, 0.131932, 0.481306, 7.803902, 0.089613, 0.400547, 0.245841, 3.151815, -20.084989000000004, 0.249313], [2.54787, 0.170887, 0.083688, 0.037967, 1.959291, 0.210332, 0.245034, 0.076701, 0.119013, 10.649107, 1.702745, 0.185202, 1.898718, 0.654683, 0.296501, 0.098369, 2.188158, 0.18951, 0.249313, -18.608258]]\
     )
 
-def get_value(symbol, alphabet):
+def get_value(char, alphabet):
+
+    """ Return character in ``alphabet`` that is closest related to  ``char``.
+
+    Return character in ``alphabet`` that is closest related to  ``char``. In most cases,
+    ``char`` is expected to be part of ``alphabet``.
+
+    Args:
+        char (str): A sequence character.
+        alphabet (dict of str,?):  An alphabet from a substitution matrix.
+
+    Returns:
+        str: A character in ``alphabet``.
+
+    ..  todo:: Ambiguous parameters should not be hard-coded in this method. Refactor to
+        more general parameter file.
+    """
+
     ambiguous = {'Z': ['Q', 'E'], 'B': ['N', 'D'], 'J': ['L', 'I']}
-    if symbol not in ambiguous.keys():
-        return alphabet[symbol]
+    if char not in ambiguous.keys():
+        return alphabet[char]
     else:
-        return alphabet[ambiguous[symbol][0]]
+        return alphabet[ambiguous[char][0]]
 
 def loglikelihood_substitution(t,Q,eqFreq,alphabet,tandem_repeat):
-    ''' calculate the likelihood of a repeat assuming a star tree and a sequence model
-        defined by Q, t, eqFreq and alphabet. '''
+
+    """ Calculate the likelihood of a repeat assuming a star tree and a sequence model
+        defined by ``Q``, ``t``, ``eqFreq`` and ``alphabet``.
+
+    Args:
+        t (float): The divergence of the ``tandem_repeat`` units.
+        Q (dict ?): A substitution matrix.
+        eqFreq (dict ?): Equilibrium frequencies of all chars.
+        alphabet (dict of str,?):  An alphabet from a substitution matrix.
+        tandem_repeat (Repeat): An instance of the ``Repeat`` class.
+
+    Returns:
+        float: The loglikelihood value for the tandem repeat.
+
+    ..  todo:: Possibly calculate ``msaTDN_temp`` once in beforehand, instead of
+        recalculating it each time that this method is called?
+    """
+
     P = scipy.linalg.expm(Q*t)
 
     # msaTDN is a list of tandem_repeat.n numpy arrays.
@@ -235,13 +358,31 @@ def loglikelihood_substitution(t,Q,eqFreq,alphabet,tandem_repeat):
     return likelihood
 
 def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat, indelRatePerSite = 0.01, gaps = 'row_wise', indelZipf =INDEL_ZIPF):
-    '''calculate the log-likelihood of the gap structure in a tandem repeat tandem_repeat
-    given a star tree (i.e. repeat unit correlations are not modeled.)
-    The gap length model is a zipfian distribution with parameter indelZipf.
-    The gap generation model is a simple poisson model with rate parameter indelRatePerSite.'''
-    # FUTURE: USE LOG EARLIER, NOT JUST IN RETURN STATEMENT
 
-    # three possibilities of gap handling: row_wise, ignore_coherent_deletions, ignore_trailing_gaps, ignore_trailing_gaps_and_coherent_deletions
+    """ Calculate the log-likelihood of the gap structure in a ``tandem repeat`` assuming
+     a star tree.
+
+    Calculate the log-likelihood of the gap structure in a ``tandem repeat`` assuming a
+    star tree (i.e. repeat unit correlations are not modeled). The gap length model is a
+    zipfian distribution with parameter ``indelZipf``. The gap generation model is a
+    simple poisson model with rate parameter ``indelRatePerSite``.
+
+    Args:
+        t (float): The divergence of the ``tandem_repeat`` units.
+        tandem_repeat (Repeat): An instance of the ``Repeat`` class.
+        indelRatePerSite (float): The mutation rate of insertions an deletions, as opposed
+        to ``t``.
+        gaps (str): The mode of gap counting. Options are "row_wise",
+        "ignore_coherent_deletions", "ignore_trailing_gaps" and
+        "ignore_trailing_gaps_and_coherent_deletions".
+        indelZipf (float): The parameter of the Zipfian distribution.
+
+    Returns:
+        float: The loglikelihood value for the gap structure of the tandem repeat.
+
+    ..  todo:: USE LOG EARLIER, NOT JUST IN RETURN STATEMENT
+    """
+
     insertions = tandem_repeat.insertions
     deletions = tandem_repeat.deletions[gaps]
     gaps = tandem_repeat.gaps[gaps]
@@ -261,7 +402,6 @@ def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat, indelRatePerSite 
     l_deletions = scipy.stats.distributions.binom.pmf(len(deletions), tandem_repeat.lD * tandem_repeat.n, probability_gap_per_site)
 
     # Return the total likelihood of tandem_repeat's gap structure:
-
     return  np.log(l_length * l_insertions * l_deletions)
 
 def loglikelihood_substitutions_gaps(t, substitution_args, gap_args):
@@ -397,23 +537,3 @@ def calculatePDFScores(repeats, resultFilePath, fileName, classifiers = ['entrop
     # Can you generalise the next command for arbitrary classifiers?
     scores = [[repeat.score[classifiers[0]], repeat.score[classifiers[1]]] for repeat in repeats]
     save_distribution(values = scores, items = classifiers, resultFilePath = resultFilePath, fileName = fileName, inverse = True)
-
-
-########################################### MAIN #########################################
-
-
-
-if __name__=="__main__":
-
-
-    import repeat_info
-    Q,eqFreq,alphabet = loadModel()
-    indelRatePerSite = 0.001
-
-    #myTR = repeat_info.Repeat(msa = ['-SQV', '-SQL', 'NATT', '-AQ-', '-AQV'], begin = 0)
-    myTR = repeat_info.Repeat(msa = ['HPFGFV-------------AVPTKNP-DGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPS---SPPKCKFEPPLFHPNV', 'YPSGTVCLsileedkdwrpAITIKQIlLGIQELLN-E---PNIQ-DPAQAEAYTIYCQNRVEYEKrvrAQAK-KFAP-------'], begin = 0)
-    myTR.deleteInsertionColumns()
-
-    print(loglikelihood_gaps_starphylogeny_zipfian(t = 1, tandem_repeat = myTR))
-    print(optimisation(function = loglikelihood_substitution, args = [Q,eqFreq,alphabet,myTR]))
-    print(optimisation(function = loglikelihood_substitutions_gaps, args = [[Q,eqFreq,alphabet,myTR],[myTR,indelRatePerSite]]))
