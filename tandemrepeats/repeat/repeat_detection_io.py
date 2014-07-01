@@ -1,10 +1,9 @@
 # (C) 2011, Alexander Korsunsky
-# (C) 2011,2012 Elke Schaper
+# (C) 2011-2014 Elke Schaper
 
 import logging
 import re
 import csv
-
 
 LOGLEVEL_VERBOSE = 8
 
@@ -23,24 +22,30 @@ class RepeatRegion:
 
 
 def tred_get_repeats(infile):
-    """Read repeats from TRed output1  successively
 
-    Arguments:
-    infile: File stream of output1 from
+    """ Read repeats from a TRED standard output (stdout) file stream successively.
+
+    Read repeats from a TRED standard output (stdout) file stream successively.
+    Postcondition: infile points to EOF.
+
+    Layout of TRED output file:
+
+     Start: start End: \d+ Length: \d+
+
+    ( \d repeat_unit \d
+    ( alignment_indicator )?)*
+
+    Args:
+        infile (file stream): File stream of output1 from
             tred1 myDNA.faa intermediate_output
             tred2 myDNA.faa intermediate_output output1 output2
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
 
-    Postcondition: infile points to EOF.
+    .. todo:: Layout TRED output syntax.
     """
-
-
-    # Start: start End: \d+ Length: \d+
-    #
-    #( \d repeat_unit \d
-    #( alignment_indicator )?)*
 
     # pattern for start index
     pat_start = re.compile(r"Start: (\d+)")
@@ -93,10 +98,21 @@ def tred_get_repeats(infile):
 
 
 def tred_msa_from_pairwise(repeat_units):
-    '''Construct an MSA from pairwise alignments.
-    At the moment, gaps following the repeat are not added.
-    However, repeat_info.Repeat does add this gaps automatically.
-    '''
+
+    """ Construct a MSA from pairwise alignments.
+
+    Construct a MSA from pairwise alignments. At the moment, gaps following the repeat are
+    not added. However, these gaps are added automatically when a ``Repeat`` instance is
+    created.
+
+    Args:
+        repeat_units (list of str): Read in from TRED output files
+
+    Returns:
+         (list of str)
+
+    .. todo:: Is the Args format mentioned correctly?
+    """
 
     pat_gap = re.compile(r"(-*)")
     result = []
@@ -126,28 +142,35 @@ def tred_msa_from_pairwise(repeat_units):
 
 
 def treks_get_repeats(infile):
-    """Read repeats from a T-Reks standard output (stdout) file successively
 
-    Arguments:
-    infile: File stream to the file of the standard output of T-Reks
+    """ Read repeats from a T-REKS standard output (stdout) file stream successively.
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
-
+    Read repeats from a T-REKS standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
+
+    Layout of T-REKS output file:
+
+    protein ::=
+        ">" identifier
+        repeat*
+    #
+    repeat ::=
+        repeat_header
+        sequence*
+        "*"+
+    #
+    repeat_header ::= "Length:" integer "residues - nb:" integer  "from"  integer "to" integer "- Psim:"float "region Length:"integer
+
+
+    Args:
+        infile (file stream): File stream to the file of the standard output of T-Reks
+
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
+
+    .. todo:: Layout T-REKS output syntax.
     """
-
-
-    # protein ::=
-    #     ">" identifier
-    #     repeat*
-    #
-    # repeat ::=
-    #     repeat_header
-    #     sequence*
-    #     "*"+
-    #
-    # repeat_header ::= "Length:" integer "residues - nb:" integer  "from"  integer "to" integer "- Psim:"float "region Length:"integer
 
     # pattern for protein identifier
     pat_identifier = re.compile(r">(\S+)")
@@ -210,19 +233,22 @@ def treks_get_repeats(infile):
 
 
 def xstream_get_repeats(infile):
-    """Read repeats from a XStream output xls chart
 
-    Arguments:
-    infile: File stream to read XStream output from a generated xls chart.
+    """ Read repeats from a XSTREAM output xls chart
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
+    Read repeats from a XSTREAM output xls chart
 
     Postcondition: infile points to EOF.
+
+    Args:
+        infile (file stream): File stream to read XSTREAM output from a xls chart.
+
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
     """
 
-
-    # this one is luckily just csv
+    # The infile is luckily enough in csv format:
     reader = csv.reader(infile, dialect = 'excel-tab')
 
     # read first row with the fieldnames
@@ -234,8 +260,8 @@ def xstream_get_repeats(infile):
         raise ValueError("XStream output file seems to be malformed. "
             "Make sure to open this function with the generated xls chart.")
 
-    # when xstream is fed files with multiple sequences, first field is
-    # "identifier", otherwise it's "seq length"
+    # when XSTREAM is fed files with multiple sequences, first field is "identifier",
+    # otherwise it is "seq length"
     if header[0] == "identifier":
         field_offset = 2
     else:
@@ -254,12 +280,12 @@ def xstream_get_repeats(infile):
 
 
 def trust_fill_repeats(msa, begin, sequence, maximal_gap_length = 20):
-    ''' return a trust msa that has no longer indels than maximal_gap_length, 
+    ''' return a trust msa that has no longer indels than maximal_gap_length,
     that contains the indel characters even when not part of the trust output file.
     Background trust returns tandem repeats, but also distant repeats. '''
     gapless_msa = [repeat_unit.replace('-','').upper() for repeat_unit in msa]
     sequence = sequence.upper()
-    
+
     # Find the start and end positions of the predicted repeat units
     position = [(begin-1, begin + len(gapless_msa[0]) - 2)]
     for repeat_unit in gapless_msa[1:]:
@@ -268,22 +294,22 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length = 20):
             return None, None
         repeat_unit_begin = find_index + position[-1][1]+1
         position.append((repeat_unit_begin,repeat_unit_begin+len(repeat_unit) - 1))
-    
+
     # Derive the start and end positions of the gaps
     gap_position = [(i[1]+1,j[0]-1) for i,j in zip(position[:-1],position[1:])]
     gaps = [i[1]-i[0]+1 for i in gap_position]
-    
+
     ## Filter out repeat units that are further apart than maximal_gap_length
     gap_valid = ''.join(['1' if iGap <=maximal_gap_length else '0' for iGap in gaps])
     import re
     count_valid_pairs = [len(m.group()) for m in re.finditer( re.compile('1+'), gap_valid )]
     if len(count_valid_pairs) == 0: # All repeat units are further apart than maximal_gap_length? -> Discard the repeat
         return None, None
-    
+
     # Choose the sequence of pairs closer then maximal_gap_length that is longest
     valid_index = gap_valid.find('1'*max(count_valid_pairs))
-    
-    # Shorten the predicted msa accordingly. 
+
+    # Shorten the predicted msa accordingly.
     msa = msa[valid_index:valid_index+max(count_valid_pairs)+1]
     gaps = gaps[valid_index:valid_index+max(count_valid_pairs)+1]
     gap_position = gap_position[valid_index:valid_index+max(count_valid_pairs)+1]
@@ -293,25 +319,47 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length = 20):
     repeat_unit_length = len(msa[0])
     gap_count_before = 0
     for i,iGap in enumerate(gaps):
-        gap_count_after = gap_count_before + iGap 
+        gap_count_after = gap_count_before + iGap
         msa[i] += '-'*(gap_count_before) + sequence[gap_position[i][0]:gap_position[i][1]+1] + '-'*(sum(gaps) - gap_count_after)
         gap_count_before = gap_count_after
-    msa[-1] += '-'*sum(gaps)    
-    
+    msa[-1] += '-'*sum(gaps)
+
     return msa, position[0][0]+1
-    
-    
+
+
 
 def trust_get_repeats(infile):
-    """Read repeats from a Trust standard output (stdout) file successively
 
-    Arguments:
-    infile: File stream to the file of the standard output of T-Reks
+    """ Read repeats from a TRUST standard output (stdout) file stream successively.
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
-
+    Read repeats from a TRUST standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
+
+    Layout of TRUST standard output:
+
+    protein ::=
+        ">" identifier
+        (repeat_types)*
+        "//"
+    #
+    repeat_types ::=
+        "REPEAT_TYPE" integer
+        "REPEAT_LENGTH" integer
+        (repeat_info)*
+        (">Repeat " integer
+        sequence)*
+    #
+    repeat_info ::=
+        integer integer [integer] [integer]
+
+    Args:
+        infile (file stream): File stream from TRUST standard output.
+
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
+
+    .. todo:: Layout TRUST output syntax.
     """
 
     pat_identifier = re.compile(r">(\S+)")
@@ -321,22 +369,6 @@ def trust_get_repeats(infile):
     pat_repeat_header = re.compile(r">Repeat \d+")
     pat_repeat_sequence = re.compile("([A-Za-z-]+)") # FIXME find proper character set here
     pat_protein_end = re.compile("//")
-
-
-    # protein ::=
-    #     ">" identifier
-    #     (repeat_types)*
-    #     "//"
-    #
-    # repeat_types ::=
-    #     "REPEAT_TYPE" integer
-    #     "REPEAT_LENGTH" integer
-    #     (repeat_info)*
-    #     (">Repeat " integer
-    #     sequence)*
-    #
-    # repeat_info ::=
-    #     integer integer [integer] [integer]
 
 
     # Our possible parser states:
@@ -476,79 +508,44 @@ def trust_get_repeats(infile):
 
 ################################## TRF - Benson ################################
 
-
-## Derive the MSA from a strange combination of consensusMSA and sequenceMSA in
-## TRF-Benson txt.html files
-def getMSA(sequenceMSA, consensusMSA):
-  msa = [""] * len(sequenceMSA)
-
-  while consensusMSA:
-    ## CHECK for insertions
-    insertion = 1
-    while insertion and consensusMSA:
-      insertion = 0
-      for iCon in consensusMSA:
-        if iCon and iCon[0] == "-":
-          insertion = 1
-          break
-      ## INCLUDE insertions into the msa
-      if insertion:
-        for i in range(len(consensusMSA)):
-          if consensusMSA[i] and consensusMSA[i][0] == "-":
-            msa[i] += sequenceMSA[i][0]
-            sequenceMSA[i] = sequenceMSA[i][1:]
-            consensusMSA[i] = consensusMSA[i][1:]
-          else:
-            msa[i] += "-"
-
-    ## CHECK for deletions and normal sequence
-    if not consensusMSA[0]:
-      break
-
-    for i in range(len(consensusMSA)):
-      # The last repeat unit can be shorter than the ones before
-      if not sequenceMSA[i]:
-        break
-
-      msa[i] += sequenceMSA[i][0]
-      sequenceMSA[i] = sequenceMSA[i][1:]
-      consensusMSA[i] = consensusMSA[i][1:]
-
-  return(msa)
-
 def trf_get_repeats(infile):
-    """Read repeats from a TRF txt.html file successively
 
-    Arguments:
-    infile: TRF .txt.html file
-    (generated via e.g.
-        ./trf404.linux64.exe FASTAFILE 2 7 7 80 10 50 500 -d > /dev/null
+    """ Read repeats from a TRF txt.html file stream file stream successively.
+
+    Read repeats from a TRF txt.html file stream file stream successively.
+    Postcondition: infile points to EOF.
+
+    TRF output file syntax:
+
+    "Sequence: "identifier ## CURRENTLY NOT IMPLEMENTED
+         "Indices: "begin"--"end
+         \d [a-zA-Z]+
+    #
+         begin (repeat)*
+         1  (consensus)*
+    #
+      (( \d (repeat)*
+         \d  (consensus)*
+      )?
+         \d (repeat)*
+         1  (consensus)*
+      )+
+         \d [a-zA-Z]+
+    #
+        "Statistics"
+
+    Args:
+        infile (file stream): File stream from TRF output txt.html.
+    (generated via e.g. ./trf404.linux64.exe FASTAFILE 2 7 7 80 10 50 500 -d > /dev/null
     If the -h flag is set, no .txt.html output is produced)
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
 
-    2bFIXED: Does not search for the sequence identifier at current!
-
-    Postcondition: infile points to EOF.
+    .. todo:: Layout TRF output syntax.
+    .. todo:: Does not search for the sequence identifier at current!
     """
-
-    # "Sequence: "identifier ## CURRENTLY NOT IMPLEMENTED
-    #      "Indices: "begin"--"end
-    #      \d [a-zA-Z]+
-    #
-    #      begin (repeat)*
-    #      1  (consensus)*
-    #
-    #   (( \d (repeat)*
-    #      \d  (consensus)*
-    #   )?
-    #      \d (repeat)*
-    #      1  (consensus)*
-    #   )+
-    #      \d [a-zA-Z]+
-    #
-    #     "Statistics"
 
     # find the name of the sequence ## CURRENTLY NOT IMPLEMENTED
     pat_identifier = re.compile("Sequence: (\S+)")
@@ -720,18 +717,79 @@ def trf_get_repeats(infile):
                 consensus = []
 
 
+def getMSA(sequenceMSA, consensusMSA):
+
+    """ Derive the MSA from a strange combination of consensusMSA and sequenceMSA in TRF
+    (Benson) txt.html output files
+
+    Args:
+        sequenceMSA (?):
+        consensusMSA (?):
+
+    Returns:
+         msa (list of str): The multiple sequence alignment predicted by TRF.
+    """
+
+  msa = [""] * len(sequenceMSA)
+
+  while consensusMSA:
+    ## CHECK for insertions
+    insertion = 1
+    while insertion and consensusMSA:
+      insertion = 0
+      for iCon in consensusMSA:
+        if iCon and iCon[0] == "-":
+          insertion = 1
+          break
+      ## INCLUDE insertions into the msa
+      if insertion:
+        for i in range(len(consensusMSA)):
+          if consensusMSA[i] and consensusMSA[i][0] == "-":
+            msa[i] += sequenceMSA[i][0]
+            sequenceMSA[i] = sequenceMSA[i][1:]
+            consensusMSA[i] = consensusMSA[i][1:]
+          else:
+            msa[i] += "-"
+
+    ## CHECK for deletions and normal sequence
+    if not consensusMSA[0]:
+      break
+
+    for i in range(len(consensusMSA)):
+      # The last repeat unit can be shorter than the ones before
+      if not sequenceMSA[i]:
+        break
+
+      msa[i] += sequenceMSA[i][0]
+      sequenceMSA[i] = sequenceMSA[i][1:]
+      consensusMSA[i] = consensusMSA[i][1:]
+
+  return(msa)
+
 ####################################### HHPredID - Soeding #########################################
 
 def hhpredid_get_repeats(infile):
-    """Read repeats from a HHPredID output file
 
-    Arguments:
-    infile: File stream to read HHPredID output. [Generated by e.g.: ./hhrepid_32 -i FASTAFILE -v 0 -d cal.hhm -o INFILE]
+    """ Read repeats from a HHREPID standard output (stdout) file stream successively.
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
-
+    Read repeats from a TRUST standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
+
+    Layout of HHREPID standard output:
+
+    protein ::=
+         begin"-"\d    "+"\d repeatUnit
+       ( \d"-"\d    "+"\d repeatUnit )+
+
+    Args:
+        infile (file stream): File stream from HHREPID standard output.
+        [Generated by e.g.: ./hhrepid_32 -i FASTAFILE -v 0 -d cal.hhm -o INFILE]
+
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
+
+    .. todo:: Layout HHREPID output syntax.
     """
 
     # find a part of a repeat unit and its first coordinate
@@ -741,16 +799,10 @@ def hhpredid_get_repeats(infile):
     pattern_seq = re.compile("[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)")
 
     # Our possible parser states:
-    #
-    
+
     ## state1: Find number of repeat units n
     ## state2: Find first (partial) row of the MSA
     ## state3: Find all other (partial) rows of the MSA
-
-    # protein ::=
-    #      begin"-"\d    "+"\d repeatUnit
-    #    ( \d"-"\d    "+"\d repeatUnit )+
-    #
 
     region = None
     state = 1
@@ -763,17 +815,17 @@ def hhpredid_get_repeats(infile):
                 logger.debug(" *(1->2) Found repeat")
                 state = 2
                 n = int(search.group(1))
-        
+
         elif 2 == state: # Find first (partial) row of the MSA
-            search = pattern_seq.search(line)  
+            search = pattern_seq.search(line)
             if search:
                 logger.debug(" *(2->3) Found first repeat unit (part)")
-                state = 3  
+                state = 3
                 region = RepeatRegion()
                 region.begin = int(search.group(2))
                 region.msa = [""]*n
                 region.msa[int(search.group(1))-1] = search.group(3).replace('.', '-').upper()
-                
+
         elif 3 == state: # Find all other (partial) rows of the MSA
             search = pattern_seq.search(line)
             if search:
@@ -789,81 +841,31 @@ def hhpredid_get_repeats(infile):
                         yield region
                         region = None
                     else:
-                        logger.warning("HHPREDID: Msa too short %s", str(region.msa))    
-    
-    # Yield final repeat region.    
+                        logger.warning("HHPREDID: Msa too short %s", str(region.msa))
+
+    # Yield final repeat region.
     if not region == None:
         if len(region.msa) >= 2:
             yield region
         else:
             logger.warning("HHPREDID: Msa too short %s", str(region.msa))
 
-
-####################################### Darwin TRF  #########################################
-
-def darwintrf_get_repeats(infile):
-    """Read repeats from a DarwinTRF output file
-
-    Arguments:
-    infile: File stream to read DarwinTRF output.
-
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
-
-    Postcondition: infile points to EOF.
-    """
-
-    pattern_begin = re.compile("(\d+)|")
-    pattern_seq = re.compile("([\-a-zA-Z]+)")
-
-    # Our possible parser states:
-    #
-    ## state 1: Find TR offset
-    ## state 2: Find first repeat unit
-
-    ## UPDATE!!!!
-    # protein ::=
-    #      begin"-"\d    "+"\d repeatUnit
-    #    ( \d"-"\d    "+"\d repeatUnit )+
-    #
-
-    state = 1
-    for i, line in enumerate(infile):
-        #logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
-        if 1 == state: # Find TR offset
-            match = pattern_begin.match(line)
-            if match and match.groups()[0] != None:
-                logger.debug(" *(1->2) Found tandem repeat offset")
-                state = 2
-                region = RepeatRegion()
-                region.begin = int(match.groups()[0])
-                region.msa = []
-
-        elif 2 == state:  # Find all other repeat units
-            match = pattern_seq.search(line)
-            if match and match.groups()[0] != None:
-                logger.debug(" *(2->2) Found a repeat unit")
-                region.msa.append(match.groups()[0])
-            else:
-                logger.debug(" *(2->1) repeat region finished, yielding.")
-                state = 1
-                if len(region.msa) >= 2:
-                    yield region
-                else:
-                    logger.warning("darwin_TRF: Msa too short %s", str(region.msa))
-
 ####################################### Phobos TRF  #########################################
-
 def phobos_get_repeats(infile):
-    """Read repeats from a Phobos output file
 
-    Arguments:
-    infile: File stream to read Phobos output.
+    """ Read repeats from a PHOBOS output file stream successively.
 
-    Returns a generator function that, when called in a loop, yields one repeat
-    per iteration.
-
+    Read repeats from a PHOBOS output file stream successively.
     Postcondition: infile points to EOF.
+
+    Args:
+        infile (file stream): File stream from PHOBOS output.
+
+    Returns:
+         (Repeat): A generator function is returned that, when called in a loop,
+         yields one repeat per iteration.
+
+    .. todo:: Show PHOBOS output syntax.
     """
 
     pattern_begin = re.compile("(\d+) :\s+\d")
@@ -874,12 +876,6 @@ def phobos_get_repeats(infile):
     ## state 1: Find TR begin
     ## state 2: Find first repeat unit
     ## state 3: Find repeat units
-
-    ## UPDATE!!!!
-    # protein ::=
-    #      begin"-"\d    "+"\d repeatUnit
-    #    ( \d"-"\d    "+"\d repeatUnit )+
-    #
 
     state = 1
     for i, line in enumerate(infile):
