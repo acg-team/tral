@@ -224,10 +224,20 @@ def read(hmm_filename, id = None):
 
     return lHMM
 
-def split_HMMER_file(hmm_filename, resultdir):
+def split_HMMER3_file(hmm_filename, resultdir):
+
+    """ Split HMMER3 models from a single file ``hmm_filename`` into many files in
+     ``resultdir``.
+
+    Helper function: split HMMER3 models from a single file ``hmm_filename`` into many
+    files in ``resultdir``. The models are named after the HMM accession.
+
+    Args:
+      hmm_filename (str): Path to HMMER3 file.
+      resultdir (str): Path to directory where result files are stored.
+
     """
-    .. todo:: Is this function needed?
-    """
+
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     tmp_file = os.path.join(resultdir, "tmp.hmm")
@@ -257,10 +267,19 @@ def split_HMMER_file(hmm_filename, resultdir):
                     state = 0
 
 def read_HMMER_acc_lengths(hmm_filename):
-    """Read HMM file in HMMER3 format. (See definition further down)
-        Return the PFAM ID and the lengths of each model.
+    """Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.
 
-    ..  todo:: Is this function needed?
+    Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.
+
+    Args:
+      hmm_filename (str): Path to HMMER3 file.
+
+    Returns:
+        (dict of str: int): The number of match states for all HMM models in
+        ``hmm_filename``.
+
+      ..  todo:: Decide whether this function is needed.
+
     """
 
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
