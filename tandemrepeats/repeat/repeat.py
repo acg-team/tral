@@ -57,6 +57,20 @@ class Repeat:
     """
 
 
+    def __str__(self):
+
+        """
+        .. todo:: Improve output if pValues are only partly calculated.
+
+        """
+
+        if hasattr(self, 'pValue'):
+            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[SCORESLIST[-1]], self.divergence[SCORESLIST[-1]])
+        else:
+            first_line = '>begin:{0} lD:{1} n:{2}\n'.format(self.begin, self.lD, self.n)
+
+        return first_line + "\n".join(self.msa)
+
     def write(self, format, file, *args):
 
         """ Write tandem repeat to file.
@@ -79,19 +93,17 @@ class Repeat:
         else:
             raise Exception('format is unknown.')
 
-
-    def __str__(self):
-        if hasattr(self, 'pValue'):
-            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[SCORESLIST[-1]], self.divergence[SCORESLIST[-1]])
-        else:
-            first_line = '>begin:{0} lD:{1} n:{2}\n'.format(self.begin, self.lD, self.n)
-
-        return first_line + "\n".join(self.msa)
-
-    def __init__(self, msa, begin = None, job_prefix="",
+    def __init__(self, msa, begin = None,
                  sequence_type = 'AA',
                  scoreslist=SCORESLIST,
                  calc_score = False, calc_pValue = False):
+
+        """
+        .. todo:: if calc_score == False and calc_pValue == True, there is an error.
+            However, calc_pValue == True should automatically require the score to be
+            calculated.
+
+        """
 
         # The index of begin start out on Zero.
         if begin != None:
@@ -124,7 +136,7 @@ class Repeat:
             self.gapStructure()
 
             if calc_score:
-                self.calculate_scores(scoreslist=scoreslist, job_prefix=job_prefix)
+                self.calculate_scores(scoreslist=scoreslist)
 
             if calc_pValue:
                 self.calculate_pValues(scoreslist=scoreslist)
@@ -407,50 +419,6 @@ class Repeat:
 
         return insertion_lengths, deletion_lengths
 
-    def isSameRepeat(self, repeat2):
-        ''' return 1 if the two TRs share at least one pair of amino acids (or
-        nucleotides) with common ancestry;
-        else 0 '''
-        if not hasattr(self,'msaIT'):
-            self.calc_index_msa()
-        if not hasattr(repeat2, 'msaIT'):
-            repeat2.calc_index_msa()
-
-        original = repeat2.msaIT
-        potential = self.msaIT
-        try:
-            for p in potential:
-                iP = 0
-                for iP in range(len(p)-1):
-                    i = 0
-                    j = 0
-                    while original[i][j] != p[iP]:
-                        if original[i][j] > p[iP]:
-                            i += 1
-                            j = 0
-                        else:
-                            j += 1
-                        if len(original) <= i or len(original[i]) <= j:
-                            break
-                    else:
-                        for iPRest in range(iP + 1, len(p)):
-                            if p[iPRest] in original[i][j+1:]:
-                               self.isSame = True
-                               self.coverage = self.sequence_length/repeat2.sequence_length
-                               self.greediness = self.lD/repeat2.lD
-                               return True
-        except:
-            logging.warning('error in isSameRepeat with original %s and potential %s',
-                str(self.msaIT), str(repeat2.msaIT))
-            logging.warning('original:', str(repeat2.msa))
-            logging.warning('original:', str(repeat2.begin))
-            logging.warning('potential:', str(self.msa))
-            logging.warning('potential:', str(self.begin))
-            self.isSame = False
-            return False
-        self.isSame = False
-        return False
-
     def repeat_in_sequence(self,sequence, save_original_msa = False):
 
         """ Sanity check whether the `repeat` is part of the `sequence` (in which it
@@ -514,108 +482,6 @@ def calculate_position_in_alignment(begin, length, alignment):
     logger.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
     logger.debug("alignment: {0}".format(str(alignment)))
     return {'begin': seq_indexed[begin-1], 'end': seq_indexed[begin + length - 2]}
-
-
-def cluster_tandem_repeats(tandem_repeats, reference = 'aa_protein_sequence'):
-    ''' (At current) Return best tandem repeat in each tandem repeat cluster.
-    A cluster contains all overlapping tandem repeat with <reference> to 'aa_alignment'
-    or 'aa_protein_sequence'. '''
-
-    # Cluster these according to which part of the alignment they cover. Anything that overlaps ends up in the same cluster.
-    clusters = []
-    count = 0
-    while(tandem_repeats):
-        cluster = [tandem_repeats.pop()]
-        cluster_begin = cluster[0].position[reference]['begin']
-        cluster_end = cluster[0].position[reference]['end']
-        complete_cluster, tandem_repeats = find_overlapping_tandem_repeats(cluster_begin,cluster_end,tandem_repeats, cluster, reference)
-        for iTR in complete_cluster:
-            iTR.cluster = {'position_cluster': count}
-        count += 1
-        clusters.append(complete_cluster)
-
-    logging.debug("{0} clusters were found.".format(str(len(clusters))))
-    return clusters
-
-def find_overlapping_tandem_repeats(cluster_begin,cluster_end,tandem_repeats, cluster, reference):
-    ''' find all tandem_repeats overlapping cluster_begin or cluster_end.
-        (recursive, as cluster_begin and cluster_end can be changed dynamically) '''
-
-    remaining_tandem_repeats = tandem_repeats[:]
-    for i,iTR in enumerate(tandem_repeats):
-        # Is tandem repeat within the boundaries?
-        if iTR.position[reference]['begin'] >= cluster_begin and iTR.position[reference]['end'] <= cluster_end:
-            cluster.append(iTR)
-            remaining_tandem_repeats.remove(iTR)
-            #cluster.append(remaining_tandem_repeats.pop(i))
-        # Is the tandem repeat outside the boundaries?
-        elif iTR.position[reference]['end'] < cluster_begin or iTR.position[reference]['begin'] > cluster_end:
-            continue
-        else:
-            # Is the tandem_repeat spanning the current boundaries?
-            if iTR.position[reference]['begin'] < cluster_begin and iTR.position[reference]['end'] > cluster_end:
-                cluster_begin = iTR.position[reference]['begin']
-                cluster_end = iTR.position[reference]['end']
-            # Is the tandem repeat starting a bit before the boundaries, but ending within?
-            elif iTR.position[reference]['begin'] < cluster_begin and iTR.position[reference]['end'] <= cluster_end:
-                cluster_begin = iTR.position[reference]['begin']
-            # Is the tandem repeat ending a bit after the boundaries, but starting within?
-            elif iTR.position[reference]['begin'] >= cluster_begin and iTR.position[reference]['end'] > cluster_end:
-                cluster_end = iTR.position[reference]['end']
-            else:
-                print("WARNING! IS THIS CASE ALLOWED TO HAPPEN?")
-
-            # In all three cases, add the tandem_repeat to the cluster, and start a new search with new boundaries recursively.
-            cluster.append(iTR)
-            remaining_tandem_repeats.remove(iTR)
-            #cluster.append(remaining_tandem_repeats.pop(i))
-            return find_overlapping_tandem_repeats(cluster_begin,cluster_end,remaining_tandem_repeats, cluster, reference)
-
-    return cluster, remaining_tandem_repeats
-
-
-def find_best_in_cluster(cut_off_constraint,cluster):
-
-    '''
-    Parameters:
-    e.g.
-    cut_off_constraint = {'classifier': 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions', 'alpha': 0.01}
-    '''
-
-    pValues = [iTR.pValue[cut_off_constraint['classifier']] for iTR in cluster]
-    min_pValue = min(pValues)
-    cluster = [cluster[i] for i,j in enumerate(pValues) if j == min_pValue]
-    if len(cluster) > 1:
-        logging.debug("{0} best tandem repeats had the same pValue.".format(str(len(cluster))))
-        divergences = [iTR.divergence[cut_off_constraint['classifier']] for iTR in cluster]
-        min_divergence = min(divergences)
-        cluster = [cluster[i] for i,j in enumerate(divergences) if j == min_divergence]
-        if len(cluster) > 1:
-            logging.debug("{0} best tandem repeats had the same divergence.".format(str(len(cluster))))
-            sequence_lengths = [iTR.sequence_length for iTR in cluster]
-            max_sequence_length = max(sequence_lengths)
-            cluster = [cluster[i] for i,j in enumerate(sequence_lengths) if j == max_sequence_length]
-            if len(cluster) > 1:
-                logging.debug("{0} best tandem repeats had the same maximum sequence length.".format(str(len(cluster))))
-                lDs = [iTR.lD for iTR in cluster]
-                min_lD = min(lDs)
-                cluster = [cluster[i] for i,j in enumerate(lDs) if j == min_lD]
-                if len(cluster) > 1:
-                    logging.debug("{0} best tandem repeats had the same lD.".format(str(len(cluster))))
-                    logging.debug("{0} best tandem repeats could not be destinguished. One is picked randomly.".format(str(len(cluster))))
-    return cluster[0]
-
-
-
-def mark_best_in_clusters(cut_off_constraint,clusters):
-
-    # For each cluster:
-    # Witch TR has the smallest p-Value? If undecided, which has the smallest divergence? If undecided, which has the smallest lD? If undecided, which one is longest? If undecided: First in list.
-    for iCluster in clusters:
-        best_TR = find_best_in_cluster(cut_off_constraint,iCluster)
-        # mark the best tandem repeat
-        best_TR.cluster['best'] = True
-
 
 ########################################### MAIN #########################################
 
