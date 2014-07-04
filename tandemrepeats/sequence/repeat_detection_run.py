@@ -1,5 +1,5 @@
 # (C) 2011, Alexander Korsunsky
-# (C) 2011,2012,2013 Elke Schaper
+# (C) 2011-2014 Elke Schaper
 
 import os, sys, tempfile, shutil
 import re
@@ -9,7 +9,7 @@ import subprocess
 from collections import OrderedDict
 from Bio import SeqIO
 
-from tandemrepeats.repeat import repeat_detection_io
+from tandemrepeats.sequence import repeat_detection_io
 from tandemrepeats.paths import *
 
 
@@ -186,135 +186,6 @@ class TRFFinder(object):
         __stderr_file.close()
 
         return __process.returncode, stdoutfname, stderrfname
-
-
-class FinderDarwinTRF(TRFFinder):
-    name = 'darwinTRF'
-    displayname = "darwinTRF"
-
-    """ darwin is executed via:
-            darwin -i darwinTRF.drw
-            OR pipe the file into darwin:
-            (echo 'a:=3;', cat file1 file2) | darwin """
-
-    class Configuration:
-        def __init__(self):
-            # For now, use darwin with default options only
-            self.boolopts = {
-            }
-
-            self.valopts = {
-            }
-
-            self.scriptopts = {
-                "database"              : 'Bogus.db',
-                "templatefile"          : 'template_TRF.drw',
-                "darwin_TRF_script"     : 'ShowRepeats.drw',
-                "darwininput"           : 'darwinTRF.drw',
-                "outputfile"            : 'darwinTRF.o',
-                "sequence_type"         : 'AA',
-                "substitution_model"    : 'LG', # if '', the Darwin default is used
-                "pam_distance"          : '80',
-                "FixedDel"              : None, # e.g. '-2'
-                "IncDel"                : None # e.g. '-1'
-
-            }
-
-        def set_working_dir(self, working_dir):
-            self.scriptopts['darwininput'] = os.path.join(working_dir,self.scriptopts['darwininput'])
-            self.scriptopts['outputfile'] = os.path.join(working_dir,self.scriptopts['outputfile'])
-            if not os.path.isdir(working_dir):
-                os.makedirs(working_dir)
-
-        def set_data_dir(self):
-            self.scriptopts['database'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['database'])
-            self.scriptopts['templatefile'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['templatefile'])
-            self.scriptopts['darwin_TRF_script'] = os.path.join(DATAROOT,'darwinTRF',self.scriptopts['darwin_TRF_script'])
-
-        def tokens(self, infile=None):
-            """Generate command line tokens based on this configuration.
-            Arguments:
-
-            infile -- generate tokens to pass infile as input file to finder"""
-
-            ## write out input file
-
-            with open(self.scriptopts['darwininput'], "w") as myDarwinInput:
-
-                myDarwinInput.write("Set( printgc = false );\nSet( gc=1e7 );")
-                # Insert options into darwin input file
-                myDarwinInput.write("\nReadProgram( '%s' );"%self.scriptopts['darwin_TRF_script'])
-                myDarwinInput.write("\nReadDb( '%s' );"%self.scriptopts['database'])
-                myDarwinInput.write("\nr := ReadFastaWithNames( '%s' );"%infile)
-                myDarwinInput.write("\nOpenWriting( '%s' );"%self.scriptopts['outputfile'])
-                if self.scriptopts['sequence_type'] == 'AA':
-                    myDarwinInput.write("\nCreateDayMatrices(%s);"%self.scriptopts['substitution_model']) # default: Gonnet, a rate matrix or an array of frequences can be provided as input.
-                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1 , %s);"%self.scriptopts['pam_distance'])
-                elif self.scriptopts['sequence_type'] == 'DNA':
-                    # See function in /home/darwin/v2/source/lib/NucleotideMatrix
-                    # Do something smart for nucleotide frequency input
-                    # Do something smart for parameters (number depending on the chosen model)
-                    myDarwinInput.write("\nCreateNucleotideMatrices('%s', [0.1, 0.2, 0.4, 0.3], [2,3]);"%self.scriptopts['substitution_model'])
-                    myDarwinInput.write("\nmyDay := CreateDayMatrix( NewLogPAM1, %s );"%self.scriptopts['pam_distance'])
-                else: ## self.scriptopts['sequence_type'] == 'CODON'
-                    myDarwinInput.write("\nCreateCodonMatrices(%s);"%self.scriptopts['substitution_model']) # Default: Adrian Schneider. Options: ECM
-                    ##  CHECK: ?CreateCodonModelMatrices
-                    myDarwinInput.write("\nmyDay := CreateDayMatrix( CodonLogPAM1, %s );"%self.scriptopts['pam_distance'])
-
-                if not self.scriptopts['darwin_TRF_script'] == None:
-                    myDarwinInput.write("\nmyDay[FixedDel] := %s;"%self.scriptopts['FixedDel'])
-                if not self.scriptopts['darwin_TRF_script'] == None:
-                    myDarwinInput.write("\nmyDay[IncDel] := %s;"%self.scriptopts['IncDel'])
-
-                # Append template file
-                with open(self.scriptopts['templatefile'], "r") as myTemplate:
-                    myTemplateStream = myTemplate.read()
-                myDarwinInput.write('\n' + myTemplateStream)
-
-
-            ## define toks
-            toks =  ['-i', self.scriptopts['darwininput']]
-            return toks
-
-    def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"darwin")),
-        config = None
-    ):
-        """Construct FinderDarwinTRF object.
-
-        Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
-        """
-        super(FinderDarwinTRF, self).__init__(executable)
-        if config == None:
-            self.config = FinderDarwinTRF.Configuration()
-        else:
-            self.config = config
-
-    def run_process(self, working_dir, infile):
-        """Run finder process on infile in working_dir and return all repeats found"""
-
-        wd = os.path.join(working_dir, FinderDarwinTRF.name)
-
-        self.config.set_working_dir(working_dir=wd)
-        self.config.set_data_dir()
-        prog_args = self.config.tokens(infile=infile)
-
-        # execute finder process
-        retcode, stdoutfname, stderrfname = \
-            super().run_process(wd, *prog_args) ##
-
-        ## CHECK WHETHER outfile exists, else give warning and return empty list.
-
-        # Process output file, return results
-        if os.path.isfile(self.config.scriptopts['outputfile']):
-            with open(self.config.scriptopts['outputfile'], "r") as resultfilehandle:
-                tmp = list(repeat_detection_io.darwintrf_get_repeats(resultfilehandle))
-            return tmp
-        else:
-            logger.warning("Did not find DarwinTRF result file in %s", self.config.scriptopts['outputfile'])
-            return []
 
 
 class FinderHHrepID(TRFFinder):
@@ -959,11 +830,6 @@ def Finders(sequence_type):
         FinderTReks.name        : FinderTReks(),
         FinderTRF.name          : FinderTRF(),
         FinderXStream.name      : FinderXStream(),
-        #FinderDarwinTRF.name    : FinderDarwinTRF(),
-        }
-    elif  sequence_type == 'CODON':
-        finders = {
-        FinderDarwinTRF.name    : FinderDarwinTRF(),
         }
     else :
         if sequence_type != 'AA':
@@ -973,7 +839,6 @@ def Finders(sequence_type):
         FinderTReks.name        : FinderTReks(),
         FinderTrust.name        : FinderTrust(),
         FinderXStream.name      : FinderXStream(),
-        #FinderDarwinTRF.name    : FinderDarwinTRF(),
         }
 
 
