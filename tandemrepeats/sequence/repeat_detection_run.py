@@ -23,28 +23,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-FINDER_DEFAULT = { "AA": ["HHrepID", "TREKS", "TRUST", "XSTREAM"],
-               "DNA": ["Phobos", "TRED", "TREKS", "TRF", "XSTREAM"]
-            }
-
-FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
-                "Phobos": FinderPhobos(),
-                "TRED": FinderTRED(),
-                "TREKS": FinderTREKS(),
-                "TRF": FinderTRF(),
-                "TRUST": FinderTrust(),
-                "XSTREAM": FinderXStream()
-                }
-
-FINDER_LIST = { "HHrepID": FinderHHrepID.name,
-                "Phobos": FinderPhobos.name,
-                "TRED": FinderTRED.name,
-                "TREKS": FinderTREKS.name,
-                "TRF": FinderTRF.name,
-                "TRUST": FinderTrust.name,
-                "XSTREAM": FinderXStream.name
-                }
-
 class BinaryExecutable:
     def __init__(self, binary=None):
         """Construct a BinaryExecutable object.
@@ -1152,3 +1130,29 @@ def run_TRD(sequence_records, sequence_type = 'AA', lFinders = None, default = T
         raise
 
     return predicted_repeats
+
+
+######## HARDCODED PARAMETERS #########
+
+
+FINDER_DEFAULT = { "AA": ["HHrepID", "TREKS", "TRUST", "XSTREAM"],
+               "DNA": ["Phobos", "TRED", "TREKS", "TRF", "XSTREAM"]
+            }
+
+FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
+                "Phobos": FinderPhobos(),
+                "TRED": FinderTRED(),
+                "TREKS": FinderTREKS(),
+                "TRF": FinderTRF(),
+                "TRUST": FinderTrust(),
+                "XSTREAM": FinderXStream()
+                }
+
+FINDER_LIST = { "HHrepID": FinderHHrepID.name,
+                "Phobos": FinderPhobos.name,
+                "TRED": FinderTRED.name,
+                "TREKS": FinderTREKS.name,
+                "TRF": FinderTRF.name,
+                "TRUST": FinderTrust.name,
+                "XSTREAM": FinderXStream.name
+                }
