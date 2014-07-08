@@ -1,21 +1,49 @@
 # (C) 2011, Alexander Korsunsky
 # (C) 2011-2014 Elke Schaper
 
-import os, sys, tempfile, shutil
-import re
+import itertools
 import logging
-import threading, queue
+import os
+import queue
+import re
+import shutil
 import subprocess
+import sys
+import tempfile
+import threading
+
 from collections import OrderedDict
 from Bio import SeqIO
 
 from tandemrepeats.sequence import repeat_detection_io
 from tandemrepeats.paths import *
 
-
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
+FINDER_DEFAULT = { "AA": ["HHrepID", "TREKS", "TRUST", "XSTREAM"],
+               "DNA": ["Phobos", "TRED", "TREKS", "TRF", "XSTREAM"]
+            }
+
+FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
+                "Phobos": FinderPhobos(),
+                "TRED": FinderTRED(),
+                "TREKS": FinderTREKS(),
+                "TRF": FinderTRF(),
+                "TRUST": FinderTrust(),
+                "XSTREAM": FinderXStream()
+                }
+
+FINDER_LIST = { "HHrepID": FinderHHrepID.name,
+                "Phobos": FinderPhobos.name,
+                "TRED": FinderTRED.name,
+                "TREKS": FinderTREKS.name,
+                "TRF": FinderTRF.name,
+                "TRUST": FinderTrust.name,
+                "XSTREAM": FinderXStream.name
+                }
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -457,7 +485,7 @@ class FinderTRED(TRFFinder):
             return []
 
 
-class FinderTReks(TRFFinder):
+class FinderTREKS(TRFFinder):
     name = 't-reks'
     displayname = "T-REKS"
 
@@ -502,31 +530,31 @@ class FinderTReks(TRFFinder):
         executable=JavaExecutable(javaopts = ['-mx512m'], jars=[os.path.join(EXECROOT,"T-Reks.jar")]),
         config = None
     ):
-        """Construct FinderTReks object.
+        """Construct FinderTREKS object.
 
         Arguments:
         executable -- Use this executable object instead of default-constructed one
         config -- Use this configuration object instead of default-constructed one
         """
-        super(FinderTReks, self).__init__(executable)
+        super(FinderTREKS, self).__init__(executable)
         if config == None:
-            self.config = FinderTReks.Configuration()
+            self.config = FinderTREKS.Configuration()
         else:
             self.config = config
 
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
-        wd = os.path.join(working_dir, FinderTReks.name)
+        wd = os.path.join(working_dir, FinderTREKS.name)
 
         prog_args = self.config.tokens(infile=infile)
 
         # execute finder process
         retcode, stdoutfname, stderrfname = \
-            super(FinderTReks, self).run_process(wd, *prog_args)
+            super(FinderTREKS, self).run_process(wd, *prog_args)
 
         if check_java_errors(stdoutfname, stderrfname,
-            logger=logger, procname=FinderTReks.displayname):
+            logger=logger, procname=FinderTREKS.displayname):
             return []
 
         # Process output file, return results
@@ -821,25 +849,31 @@ class FinderXStream(TRFFinder):
 
 
 
-def Finders(sequence_type):
+def Finders(lFinder = None, sequence_type = "AA"):
+
+    """ Define a global dictionary of all used finder functions.
+
+    Define a global dictionary of all used finder functions.
+
+    Args:
+        lFinder (list of str): A list of repeat detection algorithm names.
+        sequence_type (str): Either "AA" or "DNA".
+
+    Raises:
+        Exception: if at least one of the provided finders in ``lFinder`` does not exist.
+
+    .. ToDo:: Is FINDER_LIST defined correctly?
+    """
+
     global finders
-    if sequence_type == 'DNA':
-        finders = {
-        FinderPhobos.name       : FinderPhobos(),
-        FinderTRED.name         : FinderTRED(),
-        FinderTReks.name        : FinderTReks(),
-        FinderTRF.name          : FinderTRF(),
-        FinderXStream.name      : FinderXStream(),
-        }
-    else :
-        if sequence_type != 'AA':
-            logger.error("sequence_type %s not known, assuming AA", sequence_type)
-        finders = {
-        FinderHHrepID.name      : FinderHHrepID(),
-        FinderTReks.name        : FinderTReks(),
-        FinderTrust.name        : FinderTrust(),
-        FinderXStream.name      : FinderXStream(),
-        }
+
+    if not lFinder:
+        lFinder = FINDER_DEFAULT[sequence_type]
+    else:
+        if any(i not in list(itertools.chain(*FINDER_DEFAULT.values())) for i in lFinder):
+            raise Error("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDERLIST))
+
+    finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
 
 
 def split_sequence(seq_records, working_dir):
@@ -1124,7 +1158,7 @@ def set_phobos_config_open():
 ## Incomplete
 def set_treks_config_DNA():
     # construct DNA configuration for T-Reks
-    config = FinderTReks.Configuration()
+    config = FinderTREKS.Configuration()
     config.valopts["-type"] = 1
     logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
                         ", ".join(finders['t-reks'].config.tokens()))
@@ -1132,7 +1166,7 @@ def set_treks_config_DNA():
 
 def set_treks_config_open():
     # construct open configuration for T-Reks
-    config = FinderTReks.Configuration()
+    config = FinderTREKS.Configuration()
     config.valopts["-similarity"] = 0.2
     logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
                         ", ".join(finders['t-reks'].config.tokens()))
@@ -1170,7 +1204,7 @@ def set_xstream_config_open():
 ######## RUN A SET OF TRD #########
 
 
-def run_TRD(sequence_records, sequence_type = 'AA', default = True):
+def run_TRD(sequence_records, sequence_type = 'AA', lFinders = None, default = True):
 
     ''' Run TRD on sequence_records and return the predicted repeats for each sequence_record and for each tandem repeat detector.
         '''
@@ -1180,7 +1214,7 @@ def run_TRD(sequence_records, sequence_type = 'AA', default = True):
     logger.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
 
     # Initialise Finders
-    Finders(sequence_type)
+    Finders(sequence_type, lFinders)
 
     ## Adjust TRD parameters:
     if not default:
