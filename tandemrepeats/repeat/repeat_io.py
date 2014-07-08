@@ -12,7 +12,10 @@ import numpy as np
 #from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
-logger = logging.getLogger('root')
+logging.basicConfig()
+
+logger = logging.getLogger(__name__)
+#logger = logging.getLogger('root')
 
 ################################## READ SEQUENCE #########################################
 

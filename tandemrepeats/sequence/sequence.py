@@ -29,6 +29,27 @@ class Sequence:
                 raise Exception('The seq value is not a String')
         self.seq = seq
 
+
+    def write(self, file, format = 'fasta'):
+
+        """ Write sequence to file.
+
+        Write sequence to file using one of two formats.
+
+        Args:
+            file (str): Path to output file
+            format (str):  Either "stockholm" or "fasta"
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'fasta':
+            sequence_io.save_repeat_fasta(self.seq, file)
+        else:
+            raise Exception("Output format {} is not implemented for sequence.write()".format(format))
+
+
     def detect(self, lHMM = None, denovo = None, **kwargs):
 
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
