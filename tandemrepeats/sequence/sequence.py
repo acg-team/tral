@@ -99,9 +99,9 @@ class Sequence:
         elif denovo:
 
             if 'detection' in kwargs:
-                lPredicted_repeat = repeat_detection_run.run_TRD([self.seq], **kwargs['detection'])[0]
+                lPredicted_repeat = repeat_detection_run.run_TRD([self], **kwargs['detection'])[0]
             else:
-                lPredicted_repeat = repeat_detection_run.run_TRD([self.seq])[0]
+                lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
 
             lRepeat = []
 
