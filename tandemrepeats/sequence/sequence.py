@@ -1,7 +1,10 @@
 import logging
 
 from tandemrepeats.repeat import repeat, repeat_align
+from tandemrepeats.repeat_list import repeat_list
 from tandemrepeats.hmm import hmm, hmm_viterbi
+from tandemrepeats.sequence import repeat_detection_run
+
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -26,7 +29,7 @@ class Sequence:
                 raise Exception('The seq value is not a String')
         self.seq = seq
 
-    def detect(self, lHMM = None, denovo = None, *args):
+    def detect(self, lHMM = None, denovo = None, **kwargs):
 
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
@@ -39,9 +42,9 @@ class Sequence:
 
         Args:
             hmm (HMM): A list of ``HMM`` instances.
-            denovo (list of str): A list of tandem repeat detection algorithm names,
-                e.g. ``["t-reks", "xstream"]``
-            *args: Parameters fed to the Repeat instantiation. E.g. ``calc_score = True``
+            denovo (bool): boolean
+            *args: Parameters fed to denovo TR prediction and/or Repeat instantiation.
+                E.g. ``calc_score = True``
 
         Returns:
             A list of ``Repeat`` instances.
@@ -70,9 +73,39 @@ class Sequence:
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         lRepeat.append(repeat.Repeat(aligned_msa, *args))
-            return lRepeat
+            return repeat_list.Repeat_list(lRepeat)
 
         elif denovo:
-            raise Exception('Not implemented yet.')
+
+            if 'detection' in kwargs:
+                lPredicted_repeat = repeat_detection_run.run_TRD([self.seq], **kwargs['detection'])[0]
+            else:
+                lPredicted_repeat = repeat_detection_run.run_TRD([self.seq])[0]
+
+            lRepeat = []
+
+            for jTRD,jlTR in lPredicted_repeat.items():
+                for iTR in jlTR:
+                    if 'repeat' in kwargs:
+                        iTR = repeat_info.Repeat(iTR.msa, begin = iTR.begin, **kwargs['repeat'])
+                    else:
+                        iTR = repeat_info.Repeat(iTR.msa, begin = iTR.begin)
+
+
+                    # Consider only tandem repeats that have a repeat unit predicted to be at least one character long.
+                    if iTR.lD > 0:
+
+                        # Save l, n, MSA, TRD, scores, sequence_type, position in sequence of given type
+                        iTR.TRD = jTRD
+
+                        repeat_in_sequence = iTR.repeat_in_sequence(self.seq, save_original_msa = True)
+                        if not repeat_in_sequence:
+                            logging.debug("The tandem repeat is not part of the sequence. Detector: {}".format(iTR.TRD))
+                            continue
+
+                        lRepeat.append(iTR)
+
+            return repeat_list.Repeat_list(lRepeat)
+
         else:
-            raise Exception("Neither of the required inputs provided!")
+            raise Exception("Either require denovo detection, or present an HMM")
