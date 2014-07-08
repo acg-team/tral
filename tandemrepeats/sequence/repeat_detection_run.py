@@ -849,7 +849,7 @@ def Finders(lFinder = None, sequence_type = "AA"):
         lFinder = FINDER_DEFAULT[sequence_type]
     else:
         if any(i not in list(itertools.chain(*FINDER_DEFAULT.values())) for i in lFinder):
-            raise Error("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDERLIST))
+            raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
     finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
 
@@ -1100,7 +1100,7 @@ def run_TRD(sequence_records, sequence_type = 'AA', lFinders = None, default = T
     logger.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
 
     # Initialise Finders
-    Finders(sequence_type, lFinders)
+    Finders(lFinders, sequence_type)
 
     ## Adjust TRD parameters:
     if not default:
