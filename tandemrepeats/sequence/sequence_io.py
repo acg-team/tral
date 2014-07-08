@@ -21,9 +21,9 @@ def read_from_file(seq_filename, start, number, sequence_type = 'AA'):
         yield seq_record
 
 
-############################## SAVE SEQUENCE #############################################
+############################## WRITE SEQUENCE #############################################
 
-def save_sequence(sequence, sequence_file, sequence_id = "sequence_id_not_defined"):
+def write(sequence, sequence_file, sequence_id = "sequence_id_not_defined"):
     ''' save the sequence in fasta format in specified <sequence_file> '''
 
     with open(sequence_file, 'a') as fastafile:

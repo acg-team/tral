@@ -45,7 +45,7 @@ class Sequence:
         """
 
         if format == 'fasta':
-            sequence_io.save_repeat_fasta(self.seq, file)
+            sequence_io.write(self.seq, file)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
 
