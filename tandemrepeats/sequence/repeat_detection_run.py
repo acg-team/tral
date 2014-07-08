@@ -858,21 +858,18 @@ def split_sequence(seq_records, working_dir):
     """ Split a FASTA file with multiple entries to several FASTA files with one entry
 
     Arguments:
-    seq_records -- Iterator to the Bio.SeqIO record objec
+    seq_records -- List of Sequence instances.
     working_dir -- Output directory for splitted file
 
     Returns:
     A list of tuples containing the Protein identifier and the file name
     """
-    # FIXME return protein length here!
 
     outfiles = []
 
-
-    for i, record in enumerate(seq_records):
+    for i, seq in enumerate(seq_records):
         filename = "sequence_{0:03}.faa".format(i+1)
-        with open(os.path.join(working_dir,filename), "w", encoding="UTF-8") as outhandle:
-            SeqIO.write(record, outhandle, "fasta")
+        seq.write(file = os.path.join(working_dir,filename), format = "fasta")
         outfiles.append((record.id, filename))
 
     return outfiles
