@@ -863,6 +863,8 @@ def split_sequence(seq_records, working_dir):
 
     Returns:
     A list of tuples containing the Protein identifier and the file name
+
+    .. TODO: Do not append i to outfiles, but a sequence ID
     """
 
     outfiles = []
@@ -870,7 +872,7 @@ def split_sequence(seq_records, working_dir):
     for i, seq in enumerate(seq_records):
         filename = "sequence_{0:03}.faa".format(i+1)
         seq.write(file = os.path.join(working_dir,filename), format = "fasta")
-        outfiles.append((record.id, filename))
+        outfiles.append((i, filename))
 
     return outfiles
 
