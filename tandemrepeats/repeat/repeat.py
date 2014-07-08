@@ -1,20 +1,24 @@
 # (C) 2011, Alexander Korsunsky
 # (C) 2011-2014 Elke Schaper
 
-from os.path import join
-import re
+from collections import defaultdict
+import configobj
+from copy import deepcopy
 import logging
 import numpy as np
+import os
+from os.path import join
+import re
 import scipy.special
-from collections import defaultdict
-from copy import deepcopy
 
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
 
 logger = logging.getLogger(__name__)
 
-PRECISION = 10
-SCORESLIST = ['phylo', 'phylo_gap01', 'phylo_gap001']
+pDefaults = os.path.join(os.path.abspath('.'), 'tandemrepeats', 'data', 'defaults.ini')
+pSpec = os.path.join(os.path.abspath('.'), 'tandemrepeats', 'data', 'spec.ini')
+configs = configobj.ConfigObj(pDefaults, configspec = pSpec)
+config = configs["repeat"]
 
 ################################### Repeat class #########################################
 
@@ -65,7 +69,7 @@ class Repeat:
         """
 
         if hasattr(self, 'pValue'):
-            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[SCORESLIST[-1]], self.divergence[SCORESLIST[-1]])
+            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[config['scoreslist'][-1]], self.divergence[config['scoreslist'][-1]])
         else:
             first_line = '>begin:{0} lD:{1} n:{2}\n'.format(self.begin, self.lD, self.n)
 
@@ -94,9 +98,9 @@ class Repeat:
             raise Exception('format is unknown.')
 
     def __init__(self, msa, begin = None,
-                 sequence_type = 'AA',
-                 scoreslist=SCORESLIST,
-                 calc_score = False, calc_pValue = False):
+                 sequence_type = config["sequence_type"],
+                 scoreslist=config['scoreslist'],
+                 calc_score = config.as_bool('calc_score'), calc_pValue = config.as_bool('calc_pValue')):
 
         """
         .. todo:: if calc_score == False and calc_pValue == True, there is an error.
@@ -161,7 +165,7 @@ class Repeat:
         self.msaIT = [[i for i in c if i != '-'] for c in zip(*msaI)]
         self.msaIT = [i for i in self.msaIT if len(i) > 0]
 
-    def calculate_scores(self, scoreslist=SCORESLIST):
+    def calculate_scores(self, scoreslist=config['scoreslist']):
 
         """ Calculate scores on a Repeat instances for all scores in `scoreslist`.
 
@@ -195,9 +199,9 @@ class Repeat:
             if 'entropy' in scoreslist:
                 self.score['entropy'] = repeat_score.meanSimilarity(self, repeat_score.entropy)
             if 'parsimony' in scoreslist:
-                self.score['parsimony'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.parsimony), decimals = PRECISION)
+                self.score['parsimony'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.parsimony), decimals = config.as_int('precision'))
             if 'pSim' in scoreslist:
-                self.score['pSim'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.pSim), decimals = PRECISION)
+                self.score['pSim'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.pSim), decimals = config.as_int('precision'))
             if 'phylo' in scoreslist:
                 self.divergence['phylo'], self.score['phylo'] = repeat_score.phyloStarTopology_local(self)
             if 'phylo_gap01' in scoreslist:
@@ -211,7 +215,7 @@ class Repeat:
 #                self.divergence['phylo_gap001_ignore_coherent_deletions'], self.score['phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.001)
                 self.divergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.score['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.001)
 
-    def calculate_pValues(self, scoreslist=SCORESLIST):
+    def calculate_pValues(self, scoreslist=config['scoreslist']):
 
         """ Calculate pValues on a Repeat instances for all scores in `scoreslist`.
 
