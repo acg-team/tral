@@ -3,7 +3,7 @@ import logging
 from tandemrepeats.repeat import repeat, repeat_align
 from tandemrepeats.repeat_list import repeat_list
 from tandemrepeats.hmm import hmm, hmm_viterbi
-from tandemrepeats.sequence import repeat_detection_run
+from tandemrepeats.sequence import repeat_detection_run, sequence_io
 
 
 logging.basicConfig()
