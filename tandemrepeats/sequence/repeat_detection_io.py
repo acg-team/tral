@@ -719,16 +719,16 @@ def trf_get_repeats(infile):
 
 def getMSA(sequenceMSA, consensusMSA):
 
-    """ Derive the MSA from a strange combination of consensusMSA and sequenceMSA in TRF
-    (Benson) txt.html output files
+  """ Derive the MSA from a strange combination of consensusMSA and sequenceMSA in TRF
+  (Benson) txt.html output files
 
-    Args:
-        sequenceMSA (?):
-        consensusMSA (?):
+  Args:
+      sequenceMSA (?):
+      consensusMSA (?):
 
-    Returns:
-         msa (list of str): The multiple sequence alignment predicted by TRF.
-    """
+  Returns:
+       msa (list of str): The multiple sequence alignment predicted by TRF.
+  """
 
   msa = [""] * len(sequenceMSA)
 
