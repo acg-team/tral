@@ -949,9 +949,6 @@ def finder_worker(working_dir, job_queue, result_list, result_lock):
             job_queue.task_done()
 
 
-
-
-
 def run_finders(seq_records, working_dir=None, num_threads=1):
     """ Run all finder modules.
 
@@ -1043,95 +1040,6 @@ def run_finders(seq_records, working_dir=None, num_threads=1):
     #shutil.copytree(working_dir, os.path.join(EXECROOT, '..', 'spielwiese'))
 
     return results
-
-
-if __name__ == "__main__":
-    import optparse # FIXME: Migrate to argparse module
-
-    parser = optparse.OptionParser(
-        description='Run various Tandem Repeat Finders on a given sequence',
-        usage='%prog [options] --fasta INPUT_FILE')
-
-    parser.add_option('-f', '--fasta', action="store", type="string", nargs=1,
-                      dest='fasta_fname', metavar='INPUT_FILE',
-                      help='read sequence from INPUT_FILE in fasta format')
-
-    parser.add_option('-d', '--working_directory', action="store",
-                      type="string", nargs=1, dest='working_dir',
-                      metavar='WORKING_DIRECTORY',
-                      help='Operate in WORKING_DIRECTORY. Default is to create a temporary directory')
-
-    parser.add_option('-n', '--num_threads', action="store",
-                      type="int", nargs=1, dest='num_threads',
-                      metavar='NUM_THREADS',
-                      help='Launch NUM_THREADS finders simultanously. Default is to launch only one.')
-
-    parser.add_option('--exec_root', action="store",
-                      type="string", nargs=1, dest='exec_root',
-                      metavar='EXEC_ROOT',
-                      help='Look for required executables in EXEC_ROOT')
-
-    parser.add_option('--log_level', action="store",
-                      type="string", nargs=1, dest='log_level',
-                      metavar='LOG_LEVEL',
-                      help='Set log level to be LOG_LEVEL. Can be one of: DEBUG,INFO,WARNING,ERROR,CRITICAL')
-
-    opts, args = parser.parse_args()
-
-    if opts.fasta_fname == None:
-        parser.error("FASTA input file argument required")
-        exit()
-
-    if not os.path.exists(opts.fasta_fname):
-        raise IOError("The specified input file \"" + infile +
-                      "\" does not exist")
-    infilename = os.path.abspath(opts.fasta_fname)
-
-    if opts.num_threads == None:
-        treads = 1
-    else:
-        treads = opts.num_thread
-
-    if opts.exec_root != None:
-        if not os.path.isdir(opts.exec_root):
-            parser.error("Executable directory \"{0}\" does not exist.".format(opts.exec_root));
-        EXECROOT = opts.exec_root;
-
-
-    if opts.log_level in ("DEBUG","INFO","WARNING","ERROR","CRITICAL"):
-        log_level = getattr(logging, opts.log_level.upper())
-    elif opts.log_level == None:
-        # default is INFO
-        log_level = logging.INFO
-    else:
-        print("Unknown logging level {0}. Using INFO.".format(opts.log_level))
-        log_level = logging.INFO
-
-
-    logging.basicConfig(level=log_level)
-
-
-    logger.debug("Looking for executables in %s", EXECROOT);
-
-    with open(infilename, "r") as infile:
-        record_iter = SeqIO.parse(infile, "fasta")
-        results = run_finders(
-            record_iter,
-            working_dir=opts.working_dir,
-            num_threads=treads)
-
-    # Display repeats hierarchically
-    print("Repeats found:")
-    for i, protein in enumerate(results):
-        print("Protein ", i+1, ":")
-        for finder, repeats in protein.items():
-            for repeat in repeats:
-                msastring = "\n".join(repeat.msa)
-                print(
-                    "Finder: %s; Begin: %d; Score: %d; MSA:\n%s" %
-                        (finder, repeat.begin, 0, msastring)
-                )
-
 
 
 ######## SET OPEN CONFIGS #########
