@@ -22,6 +22,9 @@ class Repeat_list:
         self.repeats = repeats
 
     def filter(self, func_name, *args):
+
+        # Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?
+
         func = getattr(sys.modules[__name__], func_name)
         return Repeat_list( func(self, *args) )
 
@@ -91,6 +94,8 @@ def pValue(rl, score, threshold):
 
     res = []
     for iRepeat in rl.repeats:
+        if not hasattr(iRepeat,'pValue'):
+            iRepeat.calculate_pValues(scoreslist = [score])
         if iRepeat.pValue[score] <= threshold:
             res.append(iRepeat)
     return(res)
