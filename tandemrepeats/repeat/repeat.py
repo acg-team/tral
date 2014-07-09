@@ -12,11 +12,13 @@ import re
 import scipy.special
 
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+from tandemrepeats.paths import *
+
 
 logger = logging.getLogger(__name__)
 
-pDefaults = os.path.join(os.path.abspath('.'), 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(os.path.abspath('.'), 'tandemrepeats', 'data', 'spec.ini')
+pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
+pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
 configs = configobj.ConfigObj(pDefaults, configspec = pSpec)
 config = configs["repeat"]
 
@@ -68,10 +70,12 @@ class Repeat:
 
         """
 
-        if hasattr(self, 'pValue'):
+        if hasattr(self, 'pValue') and hasattr(self, 'begin'):
             first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[config['scoreslist'][-1]], self.divergence[config['scoreslist'][-1]])
+        elif hasattr(self, 'pValue'):
+            first_line = '>lD:{} n:{} pValue:{} divergence:{}\n'.format(self.lD, self.n, self.pValue[config['scoreslist'][-1]], self.divergence[config['scoreslist'][-1]])
         else:
-            first_line = '>begin:{0} lD:{1} n:{2}\n'.format(self.begin, self.lD, self.n)
+            first_line = '>lD:{} n:{}\n'.format(self.lD, self.n)
 
         return first_line + "\n".join(self.msa)
 
@@ -226,6 +230,9 @@ class Repeat:
             scoreslist(list of Str): A list of the names of the scores (e.g. ["phylo_gap01"])
                 for which p-Values are calculated on the Repeat instance `self`
         """
+
+        if not hasattr(self,'score'):
+            self.calculate_scores(scoreslist = scoreslist)
 
         if not hasattr(self,'pValue'):
             self.pValue = defaultdict(int)
