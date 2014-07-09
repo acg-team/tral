@@ -907,7 +907,6 @@ def finder_worker(working_dir, job_queue, result_list, result_lock):
 
             result = job.finder.run_process(wd, job.infile)
 
-
             # lock the mutex for results, append resul
             with result_lock:
                 result_list[job.job_id][job.finder.name].extend(result)

@@ -108,9 +108,9 @@ class Sequence:
             for jTRD,jlTR in lPredicted_repeat.items():
                 for iTR in jlTR:
                     if 'repeat' in kwargs:
-                        iTR = repeat_info.Repeat(iTR.msa, begin = iTR.begin, **kwargs['repeat'])
+                        iTR = repeat.Repeat(iTR.msa, begin = iTR.begin, **kwargs['repeat'])
                     else:
-                        iTR = repeat_info.Repeat(iTR.msa, begin = iTR.begin)
+                        iTR = repeat.Repeat(iTR.msa, begin = iTR.begin)
 
 
                     # Consider only tandem repeats that have a repeat unit predicted to be at least one character long.
