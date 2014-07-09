@@ -925,42 +925,68 @@ def finder_worker(working_dir, job_queue, result_list, result_lock):
             job_queue.task_done()
 
 
-def run_finders(seq_records, working_dir=None, num_threads=1):
-    """ Run all finder modules.
 
-    Keyword arguments:
+################ RUN A SET OF Tandem Repeat Detection algorithms (TRDs) ##################
 
-    seq_records: An iterator to Bio.SeqIO sequence record
-    working_dir: operate in this directory.
-        If None, creates a new temporary directory.
-    num_threads: run num_threads finders simultanously
+def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, local_working_dir=None, num_threads=1):
+    """ Run TRD on sequence_records and return the predicted repeats for each ``seq_records``
+     and for each tandem repeat detector.
+
+    Run TRD on sequence_records and return the predicted repeats for each ``seq_records``
+    and for each tandem repeat detector.
+
+    Args:
+        seq_records (list of Sequence): A list of Sequence instances
+        lFinders (list of str): A list tandem repeat detector names
+        sequence_type (str): Either "AA" or "DNA"
+        default (bool): If True, default values for the detection algorithms are used.
+        local_working_dir (str): Directory where data and results are stored. If provided,
+        temporary files are not deleted/
+        num_threads (int): Run ``num_threads`` finders on parallel threads.
 
     Returns:
-
-    A list with a dictionaryfor each record in seq_records. The dictionary
-    contains a list of repeats for each finder that was used.
-    example:
-    [
-        # record 1
-        {
-        't-reks' : [ Repeat(), Repeat(), ...],
-        'xstream' : [ Repeat(), Repeat(), ...],
-        ...
-        },
-        # record 2
-        ...
-    ]
+        list of dictionary: A list with a dictionary for each record in seq_records. The
+        dictionary contains a list of repeats for each finder that was used.
+        Example:
+            [
+                # record 1
+                {
+                't-reks' : [ Repeat(), Repeat(), ...],
+                'xstream' : [ Repeat(), Repeat(), ...],
+                ...
+                },
+                # record 2
+                ...
+            ]
     """
 
-    # create temporary directory if none was specified
-    if working_dir == None:
-        working_dir = tempfile.mkdtemp()
+    # Create temporary working dir
+    if local_working_dir:
+        working_dir = local_working_dir
     else:
-        working_dir = os.path.abspath(working_dir)
+        working_dir = tempfile.mkdtemp()
+        logger.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
+        if not os.path.isdir(working_dir):
+            raise IOError("The specified directory \""+working_dir+
+                          "\" does not exist")
 
-    if not os.path.isdir(working_dir):
-        raise IOError("The specified directory \""+working_dir+
-                      "\" does not exist")
+    # Initialise Finders
+    Finders(lFinders, sequence_type)
+
+    ## Adjust TRD parameters:
+    if not default:
+        if sequence_type == 'AA':
+            finders['hhrepid'].config = set_hhrepid_config_open()
+            finders['trust'].config = set_trust_config_open()
+        else:
+            finders['trf'].config = set_trf_config_open()
+            finders['phobos'].config = set_phobos_config_open()
+        finders['t-reks'].config = set_treks_config_open()
+        finders['xstream'].config = set_xstream_config_open()
+
+    if sequence_type == 'DNA':
+        finders['t-reks'].config = set_treks_config_DNA()
+
 
     infiles = split_sequence(seq_records, working_dir)
 
@@ -1012,8 +1038,14 @@ def run_finders(seq_records, working_dir=None, num_threads=1):
     job_queue.join()
     logger.info("All jobs returned.")
 
-    #shutil.rmtree(os.path.join(EXECROOT, '..', 'spielwiese'))
-    #shutil.copytree(working_dir, os.path.join(EXECROOT, '..', 'spielwiese'))
+    # delete temporary directory
+    if not local_working_dir:
+        try:
+            shutil.rmtree(working_dir)
+        except: # I guess the error type is known, and you could be more precise :)
+            logging.error("Unexpected error: {0}".format(sys.exc_info()[0]))
+            raise
+
 
     return results
 
@@ -1083,51 +1115,6 @@ def set_xstream_config_open():
     logger.debug("%s config tokens: %s", finders['xstream'].displayname,
                         ", ".join(finders['xstream'].config.tokens()))
     return config
-
-
-######## RUN A SET OF TRD #########
-
-
-def run_TRD(sequence_records, sequence_type = 'AA', lFinders = None, default = True):
-
-    ''' Run TRD on sequence_records and return the predicted repeats for each sequence_record and for each tandem repeat detector.
-        '''
-
-    # Create temporary working dir
-    working_dir = tempfile.mkdtemp()
-    logger.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
-
-    # Initialise Finders
-    Finders(lFinders, sequence_type)
-
-    ## Adjust TRD parameters:
-    if not default:
-        if sequence_type == 'AA':
-            finders['hhrepid'].config = set_hhrepid_config_open()
-            finders['trust'].config = set_trust_config_open()
-        else:
-            finders['trf'].config = set_trf_config_open()
-            finders['phobos'].config = set_phobos_config_open()
-        finders['t-reks'].config = set_treks_config_open()
-        finders['xstream'].config = set_xstream_config_open()
-
-    if sequence_type == 'DNA':
-        finders['t-reks'].config = set_treks_config_DNA()
-
-    # start finder. <repeat_detections> has type list(dict("TRD": list(TR)))
-    predicted_repeats = run_finders(sequence_records, working_dir=working_dir, num_threads=1)  # [0]  if only the first element is of interest
-
-    #shutil.rmtree(os.path.join(EXECROOT, '..', 'spielwiese'))
-    #shutil.copytree(working_dir, os.path.join(EXECROOT, '..', 'spielwiese'))
-
-    # delete temporary directory
-    try:
-        shutil.rmtree(working_dir)
-    except: # I guess the error type is known, and you could be more precise :)
-        logging.error("Unexpected error: {0}".format(sys.exc_info()[0]))
-        raise
-
-    return predicted_repeats
 
 
 ######## HARDCODED PARAMETERS #########
