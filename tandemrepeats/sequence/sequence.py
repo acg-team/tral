@@ -93,7 +93,10 @@ class Sequence:
                     aligned_msa = repeat_align.realign_repeat(unaligned_msa)
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
-                        lRepeat.append(repeat.Repeat(aligned_msa, *args))
+                        if 'repeat' in kwargs:
+                            lRepeat.append(repeat.Repeat(aligned_msa, **kwargs['repeat']))
+                        else:
+                            lRepeat.append(repeat.Repeat(aligned_msa))
             return repeat_list.Repeat_list(lRepeat)
 
         elif denovo:
