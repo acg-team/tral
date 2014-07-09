@@ -28,6 +28,28 @@ class Sequence:
         if not isinstance(seq, str):
                 raise Exception('The seq value is not a String')
         self.seq = seq
+        self.original_seq = seq
+
+
+    def read(file, format = 'fasta'):
+
+        """ Read sequence(s) from file.
+
+        Read sequence(s) from file.
+
+        Args:
+            file (str): Path to input file
+            format (str):  Either "stockholm" or "fasta"
+
+        .. todo:: Write checks for ``format`` and ``file``.
+        """
+
+        if format == 'fasta':
+            lSeq = sequence_io.read_fasta(file)
+        else:
+            raise Exception("Output format {} is not implemented for sequence.write()".format(format))
+
+        return [Sequence(iSeq) for iSeq in lSeq]
 
 
     def write(self, file, format = 'fasta'):
@@ -98,6 +120,10 @@ class Sequence:
                         else:
                             lRepeat.append(repeat.Repeat(aligned_msa))
             return repeat_list.Repeat_list(lRepeat)
+
+        elif lHMM == []:
+            logging.debug("lHMM == []")
+            return None
 
         elif denovo:
 

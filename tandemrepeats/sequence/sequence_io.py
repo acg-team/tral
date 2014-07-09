@@ -9,16 +9,32 @@ logger = logging.getLogger('root')
 ################################## READ SEQUENCE #########################################
 
 
-def read_from_file(seq_filename, start, number, sequence_type = 'AA'):
+def read_fasta(file, indices = None):
 
-    '''Read sequence from fasta. Return a Bio.Seq object '''
+    """ Read all sequences from a fasta file.
+
+    Read all sequences from a fasta file.
+    At current, the Biopython SeqIO parser is used.
+
+    Args:
+        file (str): Path to input file
+        start ([int, int]): Index of the first returned sequence, and the first not returned sequence.
+
+    .. todo:: Write checks for ``format`` and ``file``.
+    """
 
     from Bio import SeqIO
 
     # Making a list out if the generator object might be overhead for huge fastafiles
-    for seq_record in list(SeqIO.parse(seq_filename, "fasta"))[start:start+number]:
-        seq_record.seq.alphabet = sequence_type
-        yield seq_record
+    count = 0
+    for seq_record in SeqIO.parse(file, "fasta"):
+        if indices:
+            count += 1
+            if count < indices[0]:
+                continue
+            elif count >= indices[1]:
+                break
+        yield str(seq_record.seq)
 
 
 ############################## WRITE SEQUENCE #############################################
