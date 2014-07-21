@@ -101,9 +101,7 @@ def pValue(rl, score, threshold):
 
     res = []
     for iRepeat in rl.repeats:
-        if not hasattr(iRepeat,'pValue'):
-            iRepeat.calculate_pValues(scoreslist = [score])
-        if iRepeat.pValue[score] <= threshold:
+        if iRepeat.pValue(score) <= threshold:
             res.append(iRepeat)
     return(res)
 
@@ -124,9 +122,7 @@ def divergence(rl, score, threshold):
 
     res = []
     for iRepeat in rl.repeats:
-        if not hasattr(iRepeat,'divergence'):
-            iRepeat.calculate_scores(scoreslist = [score])
-        if iRepeat.pValue[score] <= threshold:
+        if iRepeat.divergence(score) <= threshold:
             res.append(iRepeat)
     return(res)
 
@@ -215,12 +211,12 @@ def none_overlapping(rl, overlap, dCriterion):
                 break
 
             if criterion_type == 'pValue':
-                min_value = min(i.pValue[criterion_value] for i in iRepeat)
-                iRepeat = [i for i in iRepeat if i.pValue[criterion_value] == min_value]
+                min_value = min(i.pValue(criterion_value) for i in iRepeat)
+                iRepeat = [i for i in iRepeat if i.pValue(criterion_value) == min_value]
 
             elif criterion_type == 'divergence':
-                min_value = min(i.divergence[criterion_value] for i in iRepeat)
-                iRepeat = [i for i in iRepeat if i.divergence[criterion_value] == min_value]
+                min_value = min(i.divergence(criterion_value) for i in iRepeat)
+                iRepeat = [i for i in iRepeat if i.divergence(criterion_value) == min_value]
 
         else:
             logging.debug("repeat_list.none_overlapping(): > 1 Repeats have the same values...")

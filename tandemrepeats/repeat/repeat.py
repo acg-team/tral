@@ -71,9 +71,9 @@ class Repeat:
         """
 
         if hasattr(self, 'pValue') and hasattr(self, 'begin'):
-            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.pValue[config['scoreslist'][-1]], self.divergence[config['scoreslist'][-1]])
+            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.dPValue[config['scoreslist'][-1]], self.dDivergence[config['scoreslist'][-1]])
         elif hasattr(self, 'pValue'):
-            first_line = '>lD:{} n:{} pValue:{} divergence:{}\n'.format(self.lD, self.n, self.pValue[config['scoreslist'][-1]], self.divergence[config['scoreslist'][-1]])
+            first_line = '>lD:{} n:{} pValue:{} divergence:{}\n'.format(self.lD, self.n, self.dPValue[config['scoreslist'][-1]], self.dDivergence[config['scoreslist'][-1]])
         else:
             first_line = '>lD:{} n:{}\n'.format(self.lD, self.n)
 
@@ -100,6 +100,21 @@ class Repeat:
             repeat_io.save_repeat_fasta(self.msa, file)
         else:
             raise Exception('format is unknown.')
+
+    def score(self, score_type):
+        if not hasattr(self,'dScore') or not score_type in self.dScore:
+            self.calculate_scores(scoreslist=[score_type])
+        return self.dScore[score_type]
+
+    def pValue(self, score_type):
+        if not hasattr(self,'dPValue') or not score_type in self.dPValue:
+            self.calculate_pValues(scoreslist=[score_type])
+        return self.dPValue[score_type]
+
+    def divergence(self, score_type):
+        if not hasattr(self,'dDivergence') or not score_type in self.dDivergence:
+            self.calculate_scores(scoreslist=[score_type])
+        return self.dDivergence[score_type]
 
     def __init__(self, msa, begin = None,
                  sequence_type = config["sequence_type"],
@@ -149,6 +164,7 @@ class Repeat:
             if calc_pValue:
                 self.calculate_pValues(scoreslist=scoreslist)
 
+
     def calc_nD(self):
         ''' what is the number of letters in lD, divided by lD?'''
 
@@ -181,11 +197,11 @@ class Repeat:
                 that are calculated on the Repeat instance `self`
         """
 
-        if not hasattr(self,'score'):
-            self.score = defaultdict(int)
+        if not hasattr(self,'dScore'):
+            self.dScore = defaultdict(float)
 
-        if not hasattr(self,'divergence'):
-            self.divergence = defaultdict(int)
+        if not hasattr(self,'dDivergence'):
+            self.dDivergence = defaultdict(float)
 
         worst_score = {
             'entropy' : 1,
@@ -196,28 +212,28 @@ class Repeat:
             'phylo_gap001': 0}
 
         if  self.lD == 0: # Enter worst score
-            self.score = {iScore: worst_score[iScore] for iScore in scoreslist}
+            self.dScore = {iScore: worst_score[iScore] for iScore in scoreslist}
         elif self.n < 2: # Enter None, as a score cannot be calculated if there is just one repeat unit.
-            self.score = {iScore: None for iScore in scoreslist}
+            self.dScore = {iScore: None for iScore in scoreslist}
         else:   # Calculate score
             if 'entropy' in scoreslist:
-                self.score['entropy'] = repeat_score.meanSimilarity(self, repeat_score.entropy)
+                self.dScore['entropy'] = repeat_score.meanSimilarity(self, repeat_score.entropy)
             if 'parsimony' in scoreslist:
-                self.score['parsimony'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.parsimony), decimals = config.as_int('precision'))
+                self.dScore['parsimony'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.parsimony), decimals = config.as_int('precision'))
             if 'pSim' in scoreslist:
-                self.score['pSim'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.pSim), decimals = config.as_int('precision'))
+                self.dScore['pSim'] = np.round_(repeat_score.meanSimilarity(self, repeat_score.pSim), decimals = config.as_int('precision'))
             if 'phylo' in scoreslist:
-                self.divergence['phylo'], self.score['phylo'] = repeat_score.phyloStarTopology_local(self)
+                self.dDivergence['phylo'], self.dScore['phylo'] = repeat_score.phyloStarTopology_local(self)
             if 'phylo_gap01' in scoreslist:
-                self.divergence['phylo_gap01'], self.score['phylo_gap01'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.01)
-                self.divergence['phylo_gap01_ignore_trailing_gaps'], self.score['phylo_gap01_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.01)
-                self.divergence['phylo_gap01_ignore_coherent_deletions'], self.score['phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.01)
-                self.divergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], self.score['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.01)
+                self.dDivergence['phylo_gap01'], self.dScore['phylo_gap01'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.01)
+                self.dDivergence['phylo_gap01_ignore_trailing_gaps'], self.dScore['phylo_gap01_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.01)
+                self.dDivergence['phylo_gap01_ignore_coherent_deletions'], self.dScore['phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.01)
+                self.dDivergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], self.dScore['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.01)
             if 'phylo_gap001' in scoreslist:
-#                self.divergence['phylo_gap001'], self.score['phylo_gap001'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.001)
-#                self.divergence['phylo_gap001_ignore_trailing_gaps'], self.score['phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.001)
-#                self.divergence['phylo_gap001_ignore_coherent_deletions'], self.score['phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.001)
-                self.divergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.score['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.001)
+#                self.dDivergence['phylo_gap001'], self.dScore['phylo_gap001'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.001)
+#                self.dDivergence['phylo_gap001_ignore_trailing_gaps'], self.dScore['phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.001)
+#                self.dDivergence['phylo_gap001_ignore_coherent_deletions'], self.dScore['phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.001)
+                self.dDivergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.dScore['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.001)
 
     def calculate_pValues(self, scoreslist=config['scoreslist']):
 
@@ -231,37 +247,34 @@ class Repeat:
                 for which p-Values are calculated on the Repeat instance `self`
         """
 
-        if not hasattr(self,'score'):
-            self.calculate_scores(scoreslist = scoreslist)
-
-        if not hasattr(self,'pValue'):
-            self.pValue = defaultdict(int)
+        if not hasattr(self,'dPValue'):
+            self.dPValue = defaultdict(int)
 
         if  self.lD == 0: # Enter worst p-value
-            self.pValue = {iScore: 1.0 for iScore in scoreslist}
+            self.dPValue = {iScore: 1.0 for iScore in scoreslist}
         elif self.n < 2: # Enter None, as a pValue cannot be calculated if there is just one repeat unit.
-            self.pValue = {iScore: None for iScore in scoreslist}
+            self.dPValue = {iScore: None for iScore in scoreslist}
         else:   # Calculate score
             if 'entropy' in scoreslist:
-                self.pValue['entropy'] = repeat_pvalue.pValueFromEmpiricialList(self, 'entropy')
+                self.dPValue['entropy'] = repeat_pvalue.pValueFromEmpiricialList(self, 'entropy')
             if 'parsimony' in scoreslist:
-                self.pValue['parsimony'] = repeat_pvalue.pValuePars(self)
+                self.dPValue['parsimony'] = repeat_pvalue.pValuePars(self)
             if 'pSim' in scoreslist:
-                self.pValue['pSim'] = repeat_pvalue.pValuePSim(self)
+                self.dPValue['pSim'] = repeat_pvalue.pValuePSim(self)
             if 'phylo' in scoreslist:
-                self.pValue['phylo'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo')
+                self.dPValue['phylo'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo')
             if 'phylo_gap' in scoreslist:
-                self.pValue['phylo_gap'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap')
+                self.dPValue['phylo_gap'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap')
             if 'phylo_gap01' in scoreslist:
-                self.pValue['phylo_gap01'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01')
-                self.pValue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score['phylo_gap01_ignore_trailing_gaps'])
-                self.pValue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score['phylo_gap01_ignore_coherent_deletions'])
-                self.pValue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'])
+                self.dPValue['phylo_gap01'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01')
+                self.dPValue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_trailing_gaps'))
+                self.dPValue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_coherent_deletions'))
+                self.dPValue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'))
             if 'phylo_gap001' in scoreslist:
-#                self.pValue['phylo_gap001'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001')
-#                self.pValue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score['phylo_gap001_ignore_trailing_gaps'])
-#                self.pValue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score['phylo_gap001_ignore_coherent_deletions'])
-                self.pValue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'])
+#                self.dPValue['phylo_gap001'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001')
+#                self.dPValue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_trailing_gaps'))
+#                self.dPValue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_coherent_deletions'))
+                self.dPValue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'))
 
 
     def deleteInsertionColumns(self):

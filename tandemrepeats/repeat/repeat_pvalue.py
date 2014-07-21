@@ -105,7 +105,7 @@ def pValueFromEmpiricialList(myTR, score = 'phylo', myScore = None, empirical = 
 
     """
     if myScore == None:
-        myScore = myTR.score[score]
+        myScore = myTR.score(score)
 
     if len(empirical) == 0:
         empirical = empiricalList(myTR.lD, myTR.n, myTR.sequence_type, score)
@@ -371,18 +371,18 @@ def pValuePSim(myTR):
     pdf = dAverageMultipleMaxMultinom(myTR,precision)
     cumsumPDF = np.cumsum(pdf[0])
 
-    #index = np.where(myTR.score['pSim'] == pdf[1])[0]
-    index = np.where(np.abs(myTR.score['pSim'] - pdf[1]) <= 1./precision)[0]
+    #index = np.where(myTR.score('pSim') == pdf[1])[0]
+    index = np.where(np.abs(myTR.score('pSim') - pdf[1]) <= 1./precision)[0]
     if len(index) == 1: ## standard case: score is included in pdf[0]
         return(cumsumPDF[index[0]])
 
-    indices = np.where(myTR.score['pSim'] > pdf[1])[0]
+    indices = np.where(myTR.score('pSim') > pdf[1])[0]
     if len(indices) >= 1:
     ## if pars is not exactly included in list, give back mean of value above
     ## and value below (should only occur due to numerical imprecision)
         a = min(indices)
         return((cumsumPDF[a] + cumsumPDF[a-1])/2)
-    else: ## This should only occur if score['pSim'] is really bad or really good
+    else: ## This should only occur if score('pSim') is really bad or really good
         return 1
 
 #################################### parsimony #################################
@@ -486,18 +486,18 @@ def pValuePars(myTR):
         return 1
     cumsumPDF = np.cumsum(pdf[0])
 
-    #index = np.where(pdf[1] == myTR.score['parsimony'])[0]
-    index = np.where(np.abs(myTR.score['parsimony'] - pdf[1]) <= 1./precision)[0]
+    #index = np.where(pdf[1] == myTR.score('parsimony'))[0]
+    index = np.where(np.abs(myTR.score('parsimony') - pdf[1]) <= 1./precision)[0]
     if len(index) == 1: ## standard case: score is included in pdf[0]
         return(cumsumPDF[index[0]])
 
-    indices = np.where(myTR.score['parsimony'] < pdf[1])[0]
+    indices = np.where(myTR.score('parsimony') < pdf[1])[0]
     if len(indices) >= 1:
         ## if pars is not exactly included in list, give back mean of value
         ## above and value below (should only occur due to numerical imprecision)
         a = min(indices)
         return (cumsumPDF[a] + cumsumPDF[a-1])/2
-    else: ## This should only occur if score['parsimony'] is really bad
+    else: ## This should only occur if score('parsimony') is really bad
         return 1
 
 

@@ -21,7 +21,6 @@ def test_create_Repeat_list_from_Repeats():
         assert i == j.msa
 
 
-
 def test_pairwise_overlap():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
@@ -62,8 +61,8 @@ def test_filter_pValue():
     #test_repeats = [repeat.Repeat(msa = i, scoreslist = ["phylo_gap01"], calc_score = True, calc_pValue = True) for i in TEST_REPEATS]
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
     for i,j in zip(test_repeats, TEST_SCORE_VALUE_LIST):
-        i.pValue = {}
-        i.pValue[TEST_SCORE] = j
+        i.dPValue = {}
+        i.dPValue[TEST_SCORE] = j
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
 
@@ -75,17 +74,15 @@ def test_filter_cluster_based():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
     for i,j in zip(test_repeats, TEST_SCORE_VALUE_LIST):
-        i.pValue = {}
-        i.pValue[TEST_SCORE] = j
+        i.dPValue = {}
+        i.dPValue[TEST_SCORE] = j
     for i,j in zip(test_repeats, TEST_BEGIN_LIST):
         i.begin = j
 
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
     test_repeat_list.filter("pValue", TEST_SCORE, 0.1)
-    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ["common_ancestry"], [("pValue", TEST_SCORE), ("divergence", TEST_SCORE)])
+    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ["common_ancestry"], {"pValue":TEST_SCORE, "divergence":TEST_SCORE})
     assert len(test_repeat_list_filtered.repeats) == 3
     for i in test_repeats[:3]:
         assert i in test_repeat_list_filtered.repeats
-
-

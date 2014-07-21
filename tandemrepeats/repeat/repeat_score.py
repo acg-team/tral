@@ -1,6 +1,5 @@
-# coding=iso-8859-15
 # (C) 2011 Alexander Korsunsky
-# (C) 2011, 2012 Elke Schaper
+# (C) 2011-2014 Elke Schaper
 
 import os
 from os.path import join
@@ -507,12 +506,12 @@ def calc_score(repeats, result_path, result_filename, scoreslist=['phylo','phylo
                 for iR in repeats:
                     iR.score = {}
             for iR,iT in zip(repeats,testStatistic):
-                iR.score[iScore] = iT
+                iR.dScore[iScore] = iT
 
 def calibrate_score(repeats, resultFilePath, scoreslist=['phylo','phylo_gap']):
 
     for iScore in scoreslist:
-        testStatistic = np.sort([iRepeat.score[iScore] for iRepeat in repeats])
+        testStatistic = np.sort([iRepeat.dScore[iScore] for iRepeat in repeats])
         np.savez(os.path.join('_'.join([resultFilePath,iScore])) , testStatistic)
 
 #############  CALCULATE AND SAVE THE PDF OF SCORES (Potentially deprecated) #############
@@ -535,5 +534,5 @@ def calculatePDFScores(repeats, resultFilePath, fileName, classifiers = ['entrop
     """ CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES """
 
     # Can you generalise the next command for arbitrary classifiers?
-    scores = [[repeat.score[classifiers[0]], repeat.score[classifiers[1]]] for repeat in repeats]
+    scores = [[repeat.score(classifiers[0]), repeat.score(classifiers[1])] for repeat in repeats]
     save_distribution(values = scores, items = classifiers, resultFilePath = resultFilePath, fileName = fileName, inverse = True)
