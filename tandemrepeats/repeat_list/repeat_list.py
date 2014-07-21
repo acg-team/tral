@@ -1,4 +1,8 @@
+import logging
 import sys
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
 
 class Repeat_list:
 
@@ -20,6 +24,9 @@ class Repeat_list:
 
     def __init__(self, repeats):
         self.repeats = repeats
+
+    def __add__(self, rl):
+        return Repeat_list(self.repeats + rl.repeats)
 
     def filter(self, func_name, *args):
 
@@ -100,7 +107,82 @@ def pValue(rl, score, threshold):
             res.append(iRepeat)
     return(res)
 
-def none_overlapping(rl, overlap, lCriterion):
+
+def divergence(rl, score, threshold):
+
+    """ Returns all repeats in ``rl`` with a divergence below a certain threshold.
+
+    Returns all repeats in ``rl`` with a divergence below a certain threshold.
+
+    Args:
+        rl (Repeat_list): An instance of the Repeat_list class.
+        score (str): The type of score defines the divergence that is used for filtering
+        threshold (float): All repeats with a divergence of type `score` above this threshold
+            are filtered out.
+
+    """
+
+    res = []
+    for iRepeat in rl.repeats:
+        if not hasattr(iRepeat,'divergence'):
+            iRepeat.calculate_scores(scoreslist = [score])
+        if iRepeat.pValue[score] <= threshold:
+            res.append(iRepeat)
+    return(res)
+
+def attribute(rl, attribute, type, threshold):
+
+    """ Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
+
+    Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
+
+    Args:
+        rl (Repeat_list): An instance of the Repeat_list class.
+        attribute (str): The attribute of the Repeat instance
+        type (str): Either "min" or "max"
+        threshold (float): All repeats with an attribute value below (above) this threshold
+            are filtered out.
+
+    """
+
+    res = []
+    for iRepeat in rl.repeats:
+        value = getattr(iRepeat, attribute)
+        if type == "min":
+            if value >= threshold:
+                res.append(iRepeat)
+        elif type == "max":
+            if value <= threshold:
+                res.append(iRepeat)
+    return(res)
+
+
+def none_overlapping_fixed_repeats(rl, rl_fixed, overlap_type):
+    """ Returns all repeats in ``rl`` none-overlapping with ``rl_fixed``.
+
+    Returns all repeats in ``rl`` none-overlapping with ``rl_fixed`` according to
+    ``overlap``.
+
+    Args:
+        rl (Repeat_list): An instance of the Repeat_list class.
+        rl (rl_fixed): A second instance of the Repeat_list class.
+        overlap (list): First list element: Name (str) of an overlap method in repeat_list.
+        All remaining elements are additional arguments for this class.
+    """
+
+    res = []
+    for iRepeat in rl.repeats:
+
+        for iRepeat_fixed in rl_fixed.repeats:
+            if two_repeats_overlap(overlap_type, repeat1 = iRepeat, repeat2 = iRepeat_fixed):
+                break
+        else:
+             res.append(iRepeat)
+
+    return(res)
+
+
+def none_overlapping(rl, overlap, dCriterion):
 
     """ Returns all none-overlapping repeats in ``rl``.
 
@@ -127,7 +209,7 @@ def none_overlapping(rl, overlap, lCriterion):
 
         iRepeat = [rl.repeats[i] for i in iCluster]
 
-        for criterion_type, criterion_value in lCriterion:
+        for criterion_type, criterion_value in dCriterion.items():
             if len(iRepeat) == 1:
                 res.append(iRepeat[0])
                 break
@@ -139,6 +221,11 @@ def none_overlapping(rl, overlap, lCriterion):
             elif criterion_type == 'divergence':
                 min_value = min(i.divergence[criterion_value] for i in iRepeat)
                 iRepeat = [i for i in iRepeat if i.divergence[criterion_value] == min_value]
+
+        else:
+            logging.debug("repeat_list.none_overlapping(): > 1 Repeats have the same values...")
+            res.append(iRepeat[0])
+
     return(res)
 
 
