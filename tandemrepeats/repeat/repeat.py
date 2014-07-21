@@ -93,7 +93,6 @@ class Repeat:
 
         """
 
-
         if format == 'stockholm':
             repeat_io.save_repeat_stockholm(self.msa, file)
         elif format == 'fasta':
@@ -104,17 +103,20 @@ class Repeat:
     def score(self, score_type):
         if not hasattr(self,'dScore') or not score_type in self.dScore:
             self.calculate_scores(scoreslist=[score_type])
-        return self.dScore[score_type]
+        if score_type in self.dScore:
+            return self.dScore[score_type]
 
     def pValue(self, score_type):
         if not hasattr(self,'dPValue') or not score_type in self.dPValue:
             self.calculate_pValues(scoreslist=[score_type])
-        return self.dPValue[score_type]
+        if score_type in self.dPValue:
+            return self.dPValue[score_type]
 
     def divergence(self, score_type):
         if not hasattr(self,'dDivergence') or not score_type in self.dDivergence:
             self.calculate_scores(scoreslist=[score_type])
-        return self.dDivergence[score_type]
+        if score_type in self.dDivergence:
+            return self.dDivergence[score_type]
 
     def __init__(self, msa, begin = None,
                  sequence_type = config["sequence_type"],
@@ -135,7 +137,7 @@ class Repeat:
         # Replace underscores and asterisks with scores, transform letters to uppercase, replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K)
         self.msa = [repeat_unit.upper().replace("_", "-").replace("*", "-") for repeat_unit in msa]
 
-        self.msa_standard_aa = standardize(self.msa)
+        self.msa_standard_aa = [standardize(i) for i in self.msa]
 
         self.sequence_type = sequence_type
 
@@ -227,13 +229,19 @@ class Repeat:
                 self.dDivergence['phylo'], self.dScore['phylo'] = repeat_score.phyloStarTopology_local(self)
             if 'phylo_gap01' in scoreslist:
                 self.dDivergence['phylo_gap01'], self.dScore['phylo_gap01'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.01)
+            if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
                 self.dDivergence['phylo_gap01_ignore_trailing_gaps'], self.dScore['phylo_gap01_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.01)
+            if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
                 self.dDivergence['phylo_gap01_ignore_coherent_deletions'], self.dScore['phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.01)
+            if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.dDivergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], self.dScore['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.01)
             if 'phylo_gap001' in scoreslist:
-#                self.dDivergence['phylo_gap001'], self.dScore['phylo_gap001'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.001)
-#                self.dDivergence['phylo_gap001_ignore_trailing_gaps'], self.dScore['phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.001)
-#                self.dDivergence['phylo_gap001_ignore_coherent_deletions'], self.dScore['phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.001)
+                self.dDivergence['phylo_gap001'], self.dScore['phylo_gap001'] = repeat_score.phyloStarTopology_local(self, gaps = 'row_wise', indelRatePerSite = 0.001)
+            if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
+                self.dDivergence['phylo_gap001_ignore_trailing_gaps'], self.dScore['phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps', indelRatePerSite = 0.001)
+            if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
+                self.dDivergence['phylo_gap001_ignore_coherent_deletions'], self.dScore['phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_coherent_deletions', indelRatePerSite = 0.001)
+            if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.dDivergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.dScore['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps = 'ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite = 0.001)
 
     def calculate_pValues(self, scoreslist=config['scoreslist']):
@@ -268,15 +276,20 @@ class Repeat:
                 self.dPValue['phylo_gap'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap')
             if 'phylo_gap01' in scoreslist:
                 self.dPValue['phylo_gap01'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01')
+            if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
                 self.dPValue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_trailing_gaps'))
+            if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
                 self.dPValue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_coherent_deletions'))
+            if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.dPValue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01', self.score('phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'))
             if 'phylo_gap001' in scoreslist:
-#                self.dPValue['phylo_gap001'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001')
-#                self.dPValue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_trailing_gaps'))
-#                self.dPValue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_coherent_deletions'))
+                self.dPValue['phylo_gap001'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001')
+            if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
+                self.dPValue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_trailing_gaps'))
+            if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
+                self.dPValue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_coherent_deletions'))
+            if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.dPValue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap001', self.score('phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'))
-
 
     def deleteInsertionColumns(self):
 
@@ -302,12 +315,13 @@ class Repeat:
             ])
         )
 
-        self.msaTD_standard_aa = standardize(self.msaTD)
+        self.msaTD_standard_aa = [standardize(i) for i in self.msaTD]
 
         self.msaD = ["".join(c) for c in zip(*self.msaTD)]
 
         self.lD = len(self.msaTD)
         self.textD = " ".join(self.msaD)
+        self.textD_standard_aa = standardize(self.textD)
         self.totD = len(self.textD) - self.textD.count('-') - self.n + 1
         if self.lD != 0:
             self.nD = (len("".join(self.msaD)) - self.textD.count('-'))/self.lD
@@ -494,13 +508,11 @@ class Repeat:
 
 ################################## Standardize MSA ######################################
 
-def standardize(msa):
-    standarized_msa = []
-    for repeat_unit in msa:
-        for original, replacement in configs['dAmbiguous_amino_acid'].items():
-            repeat_unit.replace(original, replacement[0])
-        standarized_msa.append(repeat_unit)
-    return standarized_msa
+def standardize(blob):
+
+    for original, replacement in configs['dAmbiguous_amino_acid'].items():
+        blob = blob.replace(original, replacement[0])
+    return blob
 
 ################################### Localize repeat ######################################
 

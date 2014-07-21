@@ -317,7 +317,7 @@ def loglikelihood_substitution(t,Q,eqFreq,alphabet,tandem_repeat):
     except:
         tandem_repeat.msaTDN = []
         for column in tandem_repeat.msaTD_standard_aa:
-            column.replace("-","")
+            column = column.replace("-","")
             my_diag = {i:0 for i in range(len(alphabet.keys()))}
             for iN in column:
                 my_diag[alphabet[iN]] = my_diag[alphabet[iN]] + 1
@@ -410,7 +410,7 @@ def loglikelihood_random(repeat, evolution_model="lg", parameters = False):
         loglikelihoodRandom = 0.
         for aa, freq in equilibrium_freq.items():
             # np.log uses the natural logarithm.
-            loglikelihoodRandom += repeat.textD.count(aa) * np.log(float(freq))
+            loglikelihoodRandom += repeat.textD_standard_aa.count(aa) * np.log(float(freq))
     elif repeat.sequence_type == 'DNA':
         ## CHECK THIS!
         ## At the moment, we assume equal frequencies for each nucleotide - Baseml Model J69 or K80
