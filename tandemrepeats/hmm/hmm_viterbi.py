@@ -1,21 +1,21 @@
 # (C) 2012-2014 Elke Schaper
-
-import operator
-import numpy as np
-import logging
-import re
 from collections import defaultdict
+import configobj
+import logging
+import numpy as np
+import operator
+import os
+import re
 
-#from tandemrepeats.hmm import hmm
 from tandemrepeats.repeat import repeat
+from tandemrepeats.paths import *
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
-lStandard_amino_acid = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
-dAmbiguous_amino_acid = {"B": {"D":0,"N": 0}, "Z": {"E":0,"Q":0}, "X": {i:0 for i in lStandard_amino_acid}}
-lAll_amino_acid = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y'] + list(dAmbiguous_amino_acid.keys())
-
+pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
+pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
+config = configobj.ConfigObj(pDefaults, configspec = pSpec)
 
 def viterbi(hmm, emission):
 
@@ -36,43 +36,40 @@ def viterbi(hmm, emission):
         form of a list of str.
 
     .. todo:: Adapt docstrings to refactored Viterbi -> Viterbi_path classes.
-    .. todo:: This line of code should be standardized and commented: emission.replace("U", "C").replace("O", "K")
-    .. todo:: read in global variables (lStandard_amino_acid, dAmbiguous_amino_acid,
-            lAll_amino_acid) from data folder.
     .. todo:: Check: Do you need local copies of all variables?
     .. todo:: Do the functions related to viterbi need to be summarized (e.g. in one
          class?) How do they relate to the Sequence class, or the HMM class?
     """
-
-    emission = emission.replace("U", "C").replace("O", "K")
 
     states = hmm.states
     p_0 = {iS: value for iS,value in hmm.p_0.items()}
     p_e = {iS: {iE: value for iE,value in emission.items()} for iS,emission in hmm.p_e.items()}
     p_t = {iS: {iT: value for iT,value in transition.items()} for iS,transition in hmm.p_t.items()}
 
-    if any([(iS not in lAll_amino_acid) for iS in emission]):
+    if any([(iS not in config['lAll_amino_acid']) for iS in emission]):
         raise Exception("There is an unknown amino acid in:\n {}\n".format(emission))
 
     # In case there are ambiguous amino acids in the sequence, calculate the expected frequencies of the AAs that they could stand for
     # from the emission frequencies of the hmm in the neutral state "N".
-    for iA in dAmbiguous_amino_acid.keys():
+    dAmbiguous_local = {}
+    for iA in config['dAmbiguous_amino_acid'].keys():
+        dAmbiguous_local[iA] = {}
         if iA in emission:
-            total = np.log10(sum(10 ** p_e['N'][iAmbiguous] for iAmbiguous in dAmbiguous_amino_acid[iA].keys()))
-            for iAmbiguous in dAmbiguous_amino_acid[iA].keys():
-                dAmbiguous_amino_acid[iA][iAmbiguous] = p_e['N'][iAmbiguous] - total
+            total = np.log10(sum(10 ** p_e['N'][iAmbiguous] for iAmbiguous in config['dAmbiguous_amino_acid'][iA]))
+            for iAmbiguous in config['dAmbiguous_amino_acid'][iA]:
+                dAmbiguous_local[iA][iAmbiguous] = p_e['N'][iAmbiguous] - total
 
     logging.debug("p_0: {0}".format(p_0))
     logging.debug("p_e: {0}".format(p_e))
     logging.debug("p_t: {0}".format(p_t))
 
     # Initialisation of the probabilities on the first emitted character
-    if emission[0] in dAmbiguous_amino_acid:
+    if emission[0] in dAmbiguous_local:
         path = {iS: {'probability': p_0[iS] , 'path': [iS]} for iS in states}
         for iS in states:
             # Calculate the average emission probability of ambiguity chars.
             # The numerical trick to calculate the average log values in high precision is reused in the next for-loop and described there.
-            lP_emission = [ dAmbiguous_amino_acid[emission[0]][iAmbiguous] + p_e[iS][iAmbiguous] for iAmbiguous in dAmbiguous_amino_acid[emission[0]] ]
+            lP_emission = [ dAmbiguous_local[emission[0]][iAmbiguous] + p_e[iS][iAmbiguous] for iAmbiguous in dAmbiguous_local[emission[0]] ]
             max_p = max(lP_emission)
             path[iS]['probability'] += np.log10( sum( [ 10 ** (i - max_p) for i in lP_emission]  ) ) + max_p
 
@@ -88,10 +85,10 @@ def viterbi(hmm, emission):
         for iS in states:
             p = {}
             for iFormer in states:
-                if iE in dAmbiguous_amino_acid:
+                if iE in dAmbiguous_local:
                     ## Calculate the probability of being in state iS and emitting iAmbiguous for any of the AAs that the ambiguous iE stands for.
                     # Then, average over these probabilities (taking into account the background frequencies of all iAmbiguous)
-                    dP_Former =  {iAmbiguous: probability_of_the_former_state(iFormer, iS, iAmbiguous, p_e, p_t, path, p) for iAmbiguous in dAmbiguous_amino_acid[iE].keys()}
+                    dP_Former =  {iAmbiguous: probability_of_the_former_state(iFormer, iS, iAmbiguous, p_e, p_t, path, p) for iAmbiguous in dAmbiguous_local[iE].keys()}
                     dP_Former = {iAmbiguous:j for iAmbiguous,j in dP_Former.items() if j}
                     if len(dP_Former) > 0:
                         # Next, we need to calculated a weighted average over log10 probabilities.
@@ -100,7 +97,7 @@ def viterbi(hmm, emission):
                         # Instead of sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) ) ) we calculate
                         # sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) + k ) ) / (10 ** k), which can easily be shown to be equivalent.
                         # For (-k), we choose the maximum value in log(w(i)) + log(p(i)), as it corresponds to the maximum and thus most pronounced probability of the sum.
-                        lP_Former = [ i + dAmbiguous_amino_acid[iE][iAmbiguous] for iAmbiguous,i  in dP_Former.items()]
+                        lP_Former = [ i + dAmbiguous_local[iE][iAmbiguous] for iAmbiguous,i  in dP_Former.items()]
                         max_p = max(lP_Former)
                         p[iFormer] =  np.log10( sum( [ 10 ** (i - max_p) for i in lP_Former]  ) ) + max_p
                 else:
