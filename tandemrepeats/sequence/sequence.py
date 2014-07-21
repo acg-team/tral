@@ -1,10 +1,16 @@
+import configobj
 import logging
+import os
 
 from tandemrepeats.repeat import repeat, repeat_align
 from tandemrepeats.repeat_list import repeat_list
 from tandemrepeats.hmm import hmm, hmm_viterbi
 from tandemrepeats.sequence import repeat_detection_run, sequence_io
+from tandemrepeats.paths import *
 
+pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
+pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
+config = configobj.ConfigObj(pDefaults, configspec = pSpec)
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -27,9 +33,12 @@ class Sequence:
 
         if not isinstance(seq, str):
                 raise Exception('The seq value is not a String')
-        self.seq = seq
-        self.original_seq = seq
+        self.seq = seq.upper()
+        for i in self.seq:
+            if i not in config['lAll_amino_acid']:
+                raise Exception("{} is not in config['lAll_amino_acid']: {}".format(i, config['lAll_amino_acid']))
 
+        self.seq_standard_aa = [i if i not in config['dAmbiguous_amino_acid'] else config['dAmbiguous_amino_acid'][i][0] for i in self.seq]
 
     def read(file, format = 'fasta'):
 
