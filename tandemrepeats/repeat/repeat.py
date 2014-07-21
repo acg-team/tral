@@ -133,8 +133,10 @@ class Repeat:
             self.begin = begin
 
         # Replace underscores and asterisks with scores, transform letters to uppercase, replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K)
-        self.msa_original = [repeat_unit.upper().replace("_", "-").replace("*", "-") for repeat_unit in msa]
-        self.msa = [repeat_unit.replace("U", "C").replace("O", "K") for repeat_unit in self.msa_original]
+        self.msa = [repeat_unit.upper().replace("_", "-").replace("*", "-") for repeat_unit in msa]
+
+        self.msa_standard_aa = standardize(self.msa)
+
         self.sequence_type = sequence_type
 
         self.n = len(self.msa)
@@ -163,7 +165,6 @@ class Repeat:
 
             if calc_pValue:
                 self.calculate_pValues(scoreslist=scoreslist)
-
 
     def calc_nD(self):
         ''' what is the number of letters in lD, divided by lD?'''
@@ -300,6 +301,8 @@ class Repeat:
                 for column in self.msaT
             ])
         )
+
+        self.msaTD_standard_aa = standardize(self.msaTD)
 
         self.msaD = ["".join(c) for c in zip(*self.msaTD)]
 
@@ -472,7 +475,8 @@ class Repeat:
 
     def save_original_msa(self, sequence):
 
-        ''' recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.) '''
+        ''' recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.)
+        This function might be obsolete when the original MSA is saved from the beginning.'''
         repeat_sequence = sequence[self.begin-1:self.begin-1 + self.sequence_length]
 
         count = 0
@@ -487,8 +491,18 @@ class Repeat:
                     count += 1
             self.msa_original.append(unit_original)
 
-################################## Repeat functions ######################################
 
+################################## Standardize MSA ######################################
+
+def standardize(msa):
+    standarized_msa = []
+    for repeat_unit in msa:
+        for original, replacement in configs['dAmbiguous_amino_acid'].items():
+            repeat_unit.replace(original, replacement[0])
+        standarized_msa.append(repeat_unit)
+    return standarized_msa
+
+################################### Localize repeat ######################################
 
 def calculate_position_in_alignment(begin, length, alignment):
 
@@ -501,11 +515,3 @@ def calculate_position_in_alignment(begin, length, alignment):
     logger.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
     logger.debug("alignment: {0}".format(str(alignment)))
     return {'begin': seq_indexed[begin-1], 'end': seq_indexed[begin + length - 2]}
-
-########################################### MAIN #########################################
-
-if __name__=="__main__":
-
-    myTR = Repeat(begin = 10, msa = ['DFG','DFG','DFG'], sequence_type = 'AA', calc_score = True, calc_pValue = True)
-
-
