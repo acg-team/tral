@@ -33,6 +33,7 @@ def path():
     """
     return os.path.join(os.path.abspath('.'), 'test')
 
+@pytest.mark.slow
 def test_MBE_2014_pipeline():
     # The Schaper et al. (MBE, 2014) pipeline is tested on a single sequence.
 
