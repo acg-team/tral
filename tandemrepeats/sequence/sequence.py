@@ -119,6 +119,11 @@ class Sequence:
                             lRepeat.append(repeat.Repeat(aligned_msa, **kwargs['repeat']))
                         else:
                             lRepeat.append(repeat.Repeat(aligned_msa))
+
+            # Set begin coordinate for all repeats
+            for iRepeat in lRepeat:
+                iRepeat.repeat_in_sequence(self.seq)
+
             return repeat_list.Repeat_list(lRepeat)
 
         elif lHMM == []:
@@ -148,12 +153,16 @@ class Sequence:
                         # Save l, n, MSA, TRD, scores, sequence_type, position in sequence of given type
                         iTR.TRD = jTRD
 
-                        repeat_in_sequence = iTR.repeat_in_sequence(self.seq, save_original_msa = True)
+                        repeat_in_sequence = iTR.repeat_in_sequence(self.seq)
                         if not repeat_in_sequence:
                             logging.debug("The tandem repeat is not part of the sequence. Detector: {}".format(iTR.TRD))
                             continue
 
                         lRepeat.append(iTR)
+
+            # Set begin coordinate for all repeats
+            for iRepeat in lRepeat:
+                iRepeat.repeat_in_sequence(self.seq)
 
             return repeat_list.Repeat_list(lRepeat)
 
