@@ -430,7 +430,7 @@ class Repeat:
 
         return insertion_lengths, deletion_lengths
 
-    def repeat_in_sequence(self,sequence, save_original_msa = False):
+    def repeat_in_sequence(self,sequence):
 
         """ Sanity check whether the `repeat` is part of the `sequence` (in which it
             was detected). In case, calculate the position of the `repeat` within the `sequence`.
@@ -440,8 +440,6 @@ class Repeat:
 
         Args:
             sequence (sequence): A sequence instance.
-            save_original_msa (bool): A boolean to decide on saving the original msa
-                (without changed chars) as an attribute of the Repeat instance.
 
         todo:: None-straight forward replaces such as "U" -> "C" are implemented. These
             need generalisation.
@@ -451,10 +449,7 @@ class Repeat:
         repeat_sequence = "".join(self.msa).upper().replace("_", "").replace("-", "")
         starts = [m.start()+1 for m in re.finditer(repeat_sequence,sequence.replace("U", "C").replace("O", "K"))] # The first letter in the sequence is counted as 1 (not 0, as in python).
 
-        if self.begin in starts: # Was the begin predicted correctly?
-            self.save_original_msa(sequence)
-            return True
-        elif len(starts) != 0: # is the tandem repeat somewhere else?
+        if len(starts) != 0: # Is the tandem repeat predicted correctly?
             self.begin = starts[0]
             self.save_original_msa(sequence)
             return True
