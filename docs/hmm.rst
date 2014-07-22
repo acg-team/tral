@@ -18,11 +18,6 @@ hmm_own_model
 .. automodule:: tandemrepeats.hmm.hmm_own_model
     :members:
 
-hmm_test
-=============================
-.. automodule:: tandemrepeats.hmm.hmm_test
-    :members:
-
 hmm_viterbi
 =============================
 .. automodule:: tandemrepeats.hmm.hmm_viterbi

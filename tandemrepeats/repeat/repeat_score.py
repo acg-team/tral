@@ -184,7 +184,7 @@ def optimisation(function, args, start_min = 0.5, start_max = 1.5, nIteration = 
     Perform a binary one dimensional optimisation of parameter ``t`` on ``function`` with
     the additional list of arguments/parameters ``args``. Start on a given range of start,
     and iterate ``nIteration`` times. Return the maximum of the function, together with
-     the maximum parameter ``t`` as a tuple.
+    the maximum parameter ``t`` as a tuple.
 
     In addition to ``start_min`` and ``start_max``, additional hard boundaries
     on the optimisation parameter ``t`` are hard-coded: t E [0.0000000001, 100]

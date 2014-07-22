@@ -93,20 +93,26 @@ class JavaExecutable:
 
 
 def check_java_errors(outfile, errfile, log=None, procname=None):
-    """Checks for java problems and returns True if there were problem
-    and False if there weren't.
 
-    Arguments:
-    outfile  -- Name of the redirected standard output channel file
-    errfile  -- Name of the redirected standard error channel file
-    log   -- Name of the log to issue log messages to. If none, no log
+    """ Check for java problems. Return True if there were problems, else False.
+
+    Check for these java errors:
+
+     * Stdout file is empty but stderr file is not.
+     * Java Exception string is indicated in the errfile
+
+     Return True if there were problems, else False.
+
+    Args:
+        outfile (file handle):  Redirected standard output channel file.
+        errfile (file handle): Redirected standard error channel file
+            If None, no copies are saved.
+        log (?): Name of the log to issue log messages to. If none, no log
                 messages will be issued.
 
-
-    Checks for the following things:
-     - Stdout file is empty but stderr file is not.
-     - Java Exception string is indicated in the errfile
+    .. todo:: Complete docstring
     """
+
 
     has_error = False
 
@@ -796,7 +802,17 @@ class FinderXStream(TRFFinder):
 
 
     def run_process(self, working_dir, infile):
-        """Run finder process on infile in working_dir and return all repeats found"""
+        """ Run finder process on infile in working_dir and return all repeats found.
+
+        Run finder process on infile in working_dir and return all repeats found.
+
+        Args:
+            working_dir (str): Working directory
+            infile (str): Infile
+
+        .. ToDo:: Complete docstrings.
+        """
+
         wd = os.path.join(working_dir, FinderXStream.name)
 
         # execute finder process
@@ -825,7 +841,6 @@ class FinderXStream(TRFFinder):
 
 
 def Finders(lFinder = None, sequence_type = "AA"):
-
     """ Define a global dictionary of all used finder functions.
 
     Define a global dictionary of all used finder functions.
@@ -930,7 +945,17 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
      and for each tandem repeat detector.
 
     Run TRD on sequence_records and return the predicted repeats for each ``seq_records``
-    and for each tandem repeat detector.
+    and for each tandem repeat detector. Example of return type::
+        [
+            # record 1
+            {
+            't-reks' : [ Repeat(), Repeat(), ...],
+            'xstream' : [ Repeat(), Repeat(), ...],
+            ...
+            },
+            # record 2
+            ...
+        ]
 
     Args:
         seq_records (list of Sequence): A list of Sequence instances
@@ -944,17 +969,6 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
     Returns:
         list of dictionary: A list with a dictionary for each record in seq_records. The
         dictionary contains a list of repeats for each finder that was used.
-        Example:
-            [
-                # record 1
-                {
-                't-reks' : [ Repeat(), Repeat(), ...],
-                'xstream' : [ Repeat(), Repeat(), ...],
-                ...
-                },
-                # record 2
-                ...
-            ]
     """
 
     # Create temporary working dir

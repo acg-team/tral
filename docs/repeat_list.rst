@@ -1,5 +1,5 @@
 Repeat_list code documentation
-**************************
+********************************
 
 Initial version of the repeat_list submodule documentation.
 

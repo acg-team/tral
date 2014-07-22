@@ -14,6 +14,7 @@ Contents:
    hmm
    repeat
    repeat_list
+   sequence
 
 Indices and tables
 ==================

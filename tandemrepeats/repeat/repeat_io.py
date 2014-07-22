@@ -108,9 +108,17 @@ def save_repeat_treks(tandem_repeats, file):
 
 def read_repeats(seq_filename, sequence_type = 'AA'):
 
-    '''Read repeat from file.
-        Repeat needs to be saved as if it was a fasta object.
-       Return a repeat_info.Repeat object '''
+    """ Read repeat from file in fasta format.
+
+    Read repeat from file in fasta format.
+
+    Args:
+        seq_filename (str):  Path to the repeats containing fasta file
+        sequence_type (str): Either "AA" or "DNA"
+
+    Returns:
+        (list of Repeat): A list of Repeat instances.
+    """
 
     pat_start = re.compile(r">(.*)")
     pat_repeat_unit = re.compile(r"([\w\.\-]+)")
@@ -154,12 +162,28 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
 ################################### SIMULATE SEQUENCE ####################################
 
 def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutationRate = 50, tree = 'star', indelRatePerSite = False, return_type = 'repeat'):
+    """ Evolve sequence with ALF.
 
-    """Evolve sequence with Alf.
-    If return_type == 'repeat':
-        Return a repeat_info.Repeat object
-    Else:
-        Return a Bio.Seq.Seq object
+    Evolve sequence with ALF:
+    Dalquen, D. A., Anisimova, M., Gonnet, G. H. & Dessimoz, C.
+    ALF--a simulation framework for genome evolution. Molecular Biology and Evolution 29,
+    1115–1123 (2012).
+
+    Args:
+        l (int): The length of the repeat unit
+        n (int): The number of repeat units in the tandem repeat
+        n_samples (int):  The number of samples
+        sequence_type (str): Either "AA" or "DNA"
+        jobID (str): A tag for files produces with ALF, and result files.
+        mutationRate (float): The mutation rate.
+        tree (str): The type of tree, e.g. "star" or "birthdeath"
+        indelRatePerSite (int or False): The indel rate per site.
+        return_type (str): Either "repeat" or "list"
+
+        sequence_length (int): The total length of the simulated sequence
+
+    Returns:
+        Return type depends on ``return_type``: ``Repeat`` or ``Bio.Seq.Seq`` instance.
     """
 
     runfile_template = os.path.join(DATAROOT, "ALF",  "template.drw")
@@ -302,6 +326,22 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
 
 
 def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equilibrium_frequencies = 'human', l = 0, n = 0, sequence_length = 0):
+    """ Simulate random sequence locally.
+
+    Simulate random sequence locally.
+
+    Args:
+        n_samples (int):  The number of samples
+        sequence_type (str): Either "AA" or "DNA"
+        return_type (str): Either "repeat" or "list"
+        equilibrium_frequencies (str): Only "human" option available at current
+        l (int): The length of the repeat unit
+        n (int): The number of repeat units in the tandem repeat
+        sequence_length (int): The total length of the simulated sequence
+
+    Returns:
+        Return type depends on ``return_type``.
+    """
 
     """Simulate random sequence locally.
     If return_type == 'repeat':

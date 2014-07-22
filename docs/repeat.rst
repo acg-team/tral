@@ -13,11 +13,6 @@ repeat_conversation_test
 .. automodule:: tandemrepeats.repeat.repeat_conversation_test
     :members:
 
-repeat_detection_io
-=============================
-.. automodule:: tandemrepeats.repeat.repeat_detection_io
-    :members:
-
 repeat_exon
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_exon
@@ -26,11 +21,6 @@ repeat_exon
 repeat_io
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_io
-    :members:
-
-repeat_main
-=============================
-.. automodule:: tandemrepeats.repeat.repeat_main
     :members:
 
 repeat_pvalue

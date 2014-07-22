@@ -463,18 +463,21 @@ class Repeat:
 
     def repeat_in_sequence(self,sequence):
 
-        """ Sanity check whether the `repeat` is part of the `sequence` (in which it
-            was detected). In case, calculate the position of the `repeat` within the `sequence`.
+        """ Sanity check whether the `repeat` is part of the `sequence` (in which it was
+        detected). In case, calculate the position of the `repeat` within the `sequence`.
 
-            If yes: Return True, set self.begin to corrected value if necessary.
-            If no: Return False.
+        If yes: Return True, set self.begin to corrected value if necessary.
+        If no: Return False.
 
         Args:
             sequence (sequence): A sequence instance.
 
-        todo:: None-straight forward replaces such as "U" -> "C" are implemented. These
+        Returns:
+            bool: True if repeat is part of sequence, else false
+
+        .. todo:: None-straight forward replaces such as "U" -> "C" are implemented. These
             need generalisation.
-        todo:: save_original_msa is needed here?
+        .. todo:: save_original_msa is needed here?
         """
 
         repeat_sequence = "".join(self.msa).upper().replace("_", "").replace("-", "")

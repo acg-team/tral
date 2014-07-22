@@ -22,12 +22,12 @@ def tred_get_repeats(infile):
     Read repeats from a TRED standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
 
-    Layout of TRED output file:
+    Layout of TRED output file::
 
-     Start: start End: \d+ Length: \d+
+         Start: start End: \d+ Length: \d+
 
-    ( \d repeat_unit \d
-    ( alignment_indicator )?)*
+        ( \d repeat_unit \d
+        ( alignment_indicator )?)*
 
     Args:
         infile (file stream): File stream of output1 from
@@ -142,18 +142,18 @@ def treks_get_repeats(infile):
     Read repeats from a T-REKS standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
 
-    Layout of T-REKS output file:
+    Layout of T-REKS output file::
 
-    protein ::=
-        ">" identifier
-        repeat*
-    #
-    repeat ::=
-        repeat_header
-        sequence*
-        "*"+
-    #
-    repeat_header ::= "Length:" integer "residues - nb:" integer  "from"  integer "to" integer "- Psim:"float "region Length:"integer
+        protein ::=
+            ">" identifier
+            repeat*
+        #
+        repeat ::=
+            repeat_header
+            sequence*
+            "*"+
+        #
+        repeat_header ::= "Length:" integer "residues - nb:" integer  "from"  integer "to" integer "- Psim:"float "region Length:"integer
 
 
     Args:
@@ -329,22 +329,22 @@ def trust_get_repeats(infile):
     Read repeats from a TRUST standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
 
-    Layout of TRUST standard output:
+    Layout of TRUST standard output::
 
-    protein ::=
-        ">" identifier
-        (repeat_types)*
-        "//"
-    #
-    repeat_types ::=
-        "REPEAT_TYPE" integer
-        "REPEAT_LENGTH" integer
-        (repeat_info)*
-        (">Repeat " integer
-        sequence)*
-    #
-    repeat_info ::=
-        integer integer [integer] [integer]
+        protein ::=
+            ">" identifier
+            (repeat_types)*
+            "//"
+        #
+        repeat_types ::=
+            "REPEAT_TYPE" integer
+            "REPEAT_LENGTH" integer
+            (repeat_info)*
+            (">Repeat " integer
+            sequence)*
+        #
+        repeat_info ::=
+            integer integer [integer] [integer]
 
     Args:
         infile (file stream): File stream from TRUST standard output.
@@ -509,24 +509,24 @@ def trf_get_repeats(infile):
     Read repeats from a TRF txt.html file stream file stream successively.
     Postcondition: infile points to EOF.
 
-    TRF output file syntax:
+    TRF output file syntax::
 
-    "Sequence: "identifier ## CURRENTLY NOT IMPLEMENTED
-         "Indices: "begin"--"end
-         \d [a-zA-Z]+
-    #
-         begin (repeat)*
-         1  (consensus)*
-    #
-      (( \d (repeat)*
-         \d  (consensus)*
-      )?
-         \d (repeat)*
-         1  (consensus)*
-      )+
-         \d [a-zA-Z]+
-    #
-        "Statistics"
+        Sequence: ``identifier``
+             Indices: ``begin``--``end``
+             \d [a-zA-Z]+
+        #
+             begin (repeat)*
+             1  (consensus)*
+        #
+          (( \d (repeat)*
+             \d  (consensus)*
+          )?
+             \d (repeat)*
+             1  (consensus)*
+          )+
+             \d [a-zA-Z]+
+        #
+            ``Statistics``
 
     Args:
         infile (file stream): File stream from TRF output txt.html.
@@ -769,11 +769,11 @@ def hhpredid_get_repeats(infile):
     Read repeats from a HHREPID standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
 
-    Layout of HHREPID standard output:
+    Layout of HHREPID standard output::
 
-    protein ::=
-         begin"-"\d    "+"\d repeatUnit
-       ( \d"-"\d    "+"\d repeatUnit )+
+        protein ::=
+             begin"-"\d    "+"\d repeatUnit
+           ( \d"-"\d    "+"\d repeatUnit )+
 
     Args:
         infile (file stream): File stream from HHREPID standard output.
