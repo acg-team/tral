@@ -9,7 +9,7 @@ import numpy as np
 import scipy as sp
 import scipy.stats, scipy.special
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 from tandemrepeats.paths import *
 

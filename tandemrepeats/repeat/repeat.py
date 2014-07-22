@@ -14,8 +14,7 @@ import scipy.special
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
 from tandemrepeats.paths import *
 
-
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
 pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
@@ -129,6 +128,8 @@ class Repeat:
             calculated.
 
         """
+
+        log.debug(msa)
 
         # The index of begin start out on Zero.
         if begin != None:
@@ -524,6 +525,6 @@ def calculate_position_in_alignment(begin, length, alignment):
 
     # a alignment.seq (hopefully!) is a string of letters, with many gaps "-", as it this particular case is an alignment sequence.
     seq_indexed = [i for i,j in enumerate(str(alignment)) if j != '-']
-    logger.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
-    logger.debug("alignment: {0}".format(str(alignment)))
+    log.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
+    log.debug("alignment: {0}".format(str(alignment)))
     return {'begin': seq_indexed[begin-1], 'end': seq_indexed[begin + length - 2]}

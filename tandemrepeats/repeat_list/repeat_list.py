@@ -1,8 +1,7 @@
 import logging
 import sys
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class Repeat_list:
 

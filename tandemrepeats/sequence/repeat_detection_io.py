@@ -5,11 +5,7 @@ import logging
 import re
 import csv
 
-LOGLEVEL_VERBOSE = 8
-
-logger = logging.getLogger(__name__)
-logging.addLevelName(LOGLEVEL_VERBOSE, "VERBOSE") # for parser debug output
-
+log = logging.getLogger(__name__)
 
 class RepeatRegion:
     def __init__(self, protein_id="", begin=None, msa=None):
@@ -18,8 +14,6 @@ class RepeatRegion:
         if msa == None:
             msa = []
         self.msa = msa
-
-
 
 def tred_get_repeats(infile):
 
@@ -62,20 +56,20 @@ def tred_get_repeats(infile):
     state = 1
     repeat_units = []
     for i, line in enumerate(infile):
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
         if 1 == state:
             region = RepeatRegion(protein_id=identifier, msa=[])
             match = pat_start.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (1->2) Found start")
-                logger.log(LOGLEVEL_VERBOSE, "Start: %s",  match.group(1))
+                log.debug(" * (1->2) Found start")
+                log.debug("Start: %s",  match.group(1))
                 region.begin = int(match.group(1))
                 state = 2
 
         if 2 == state:
             match = pat_repeat_unit.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (2->3) Found first repeat_unit")
+                log.debug(" * (2->3) Found first repeat_unit")
                 repeat_units.append((match.group(1),True))
                 state = 3
                 continue
@@ -83,15 +77,15 @@ def tred_get_repeats(infile):
         if 3 == state:
             match = pat_repeat_unit.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (3->3) Found another repeat_unit")
+                log.debug(" * (3->3) Found another repeat_unit")
                 repeat_units.append((match.group(1),True))
             else:
                 match = pat_alignment_indicator.match(line)
                 if match:
-                    logger.log(LOGLEVEL_VERBOSE, " * (3->3) Found an alignment_indicator unit")
+                    log.debug(" * (3->3) Found an alignment_indicator unit")
                     repeat_units.append((match.group(1),False))
                 else:
-                    logger.debug(" * (3->1) Found end of repeat (yielding)")
+                    log.debug(" * (3->1) Found end of repeat (yielding)")
                     state = 1
                     region.msa = tred_msa_from_pairwise(repeat_units)
                     yield region
@@ -198,32 +192,32 @@ def treks_get_repeats(infile):
     identifier = ""
 
     for i, line in enumerate(infile):
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
 
         if 1 == state:
             region = RepeatRegion(protein_id=identifier, msa=[])
-            logger.log(LOGLEVEL_VERBOSE, "msa: %s", "\n".join(region.msa))
+            log.debug("msa: %s", "\n".join(region.msa))
             match = pat_repeat_header.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (1->2) Found properties")
+                log.debug(" * (1->2) Found properties")
                 region.begin = int(match.group(2))
                 state = 2
 
             match = pat_identifier.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (1->1) Found identifier")
+                log.debug(" * (1->1) Found identifier")
                 identifier = match.group(1)
                 state = 1
 
         elif 2 == state:
             match = pat_sequence.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " * (2->2) Found MSA line (appending)")
+                log.debug(" * (2->2) Found MSA line (appending)")
                 region.msa.append(match.group(1))
                 state = 2
             match = pat_repeat_end.match(line)
             if match:
-                logger.debug(" * (2->1) Found end of repeat (yielding)")
+                log.debug(" * (2->1) Found end of repeat (yielding)")
                 state = 1
                 yield region
 
@@ -254,7 +248,7 @@ def xstream_get_repeats(infile):
     # read first row with the fieldnames
     header = next(reader)
 
-    logger.log(LOGLEVEL_VERBOSE, "Header has %d fields.", len(header))
+    log.debug("Header has %d fields.", len(header))
 
     if len(header) != 8 and len(header) != 10:
         raise ValueError("XStream output file seems to be malformed. "
@@ -274,7 +268,7 @@ def xstream_get_repeats(infile):
 
         region.begin = int(row[0+field_offset])
         region.msa = row[4+field_offset].split()
-        logger.debug("Found repeat, yielding.")
+        log.debug("Found repeat, yielding.")
         if len(region.msa) >= 2:
             yield region
 
@@ -404,12 +398,12 @@ def trust_get_repeats(infile):
         if not line or line == '\n':
             continue
 
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
 
         if 0 == state:
             match = pat_identifier.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE,
+                log.debug(
                     " *(0->1) Found identifier (storing \"%s\")", match.group(1)
                 )
 
@@ -420,13 +414,13 @@ def trust_get_repeats(infile):
         elif 1 == state:
             match = pat_REPEAT_TYPE.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(1->2) Found REPEAT_TYPE")
+                log.debug(" *(1->2) Found REPEAT_TYPE")
                 state = 2
                 continue
 
             match = pat_protein_end.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(1->0) Found protein end")
+                log.debug(" *(1->0) Found protein end")
                 state = 0
                 continue
 
@@ -436,14 +430,14 @@ def trust_get_repeats(infile):
 
             match = pat_REPEAT_LENGTH.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(2->3) Found REPEAT_LENGTH")
+                log.debug(" *(2->3) Found REPEAT_LENGTH")
                 state = 3
                 continue
 
         elif 3 == state:
             match = pat_repeat_info.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE,
+                log.debug(
                     " *(3->4) Found repeat_info (storing begin: \"%s\")",
                     match.group(1)
                 )
@@ -454,27 +448,27 @@ def trust_get_repeats(infile):
 
             match = pat_repeat_header.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(3->5) Found repeat_header")
+                log.debug(" *(3->5) Found repeat_header")
                 state = 5
                 continue
 
         elif 4 == state:
             match = pat_repeat_info.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(4->4) Found repeat_info")
+                log.debug(" *(4->4) Found repeat_info")
                 state = 4
                 continue
 
             match = pat_repeat_header.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(4->5) Found repeat_header")
+                log.debug(" *(4->5) Found repeat_header")
                 state = 5
                 continue
 
         elif 5 == state:
             match = pat_repeat_sequence.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(5->6) Found sequence (storing \"%s\")", match.group(1))
+                log.debug(" *(5->6) Found sequence (storing \"%s\")", match.group(1))
 
                 region.msa.append(match.group(1))
 
@@ -484,12 +478,12 @@ def trust_get_repeats(infile):
         elif 6 == state:
             match = pat_repeat_header.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(6->5) Found repeat_header")
+                log.debug(" *(6->5) Found repeat_header")
                 state = 5
                 continue
             match = pat_REPEAT_TYPE.match(line)
             if match:
-                logger.debug(" *(6->2) Found REPEAT_TYPE, yielding.")
+                log.debug(" *(6->2) Found REPEAT_TYPE, yielding.")
 
                 state = 2
                 if len(region.msa) >= 2:
@@ -497,7 +491,7 @@ def trust_get_repeats(infile):
                 continue
             match = pat_protein_end.match(line)
             if match:
-                logger.debug(" *(6->0) Found protein end, yielding.")
+                log.debug(" *(6->0) Found protein end, yielding.")
                 state = 0
                 if len(region.msa) >= 2:
                     yield region
@@ -581,7 +575,7 @@ def trf_get_repeats(infile):
     preMSA = []
     consensus = []
     for i, line in enumerate(infile):
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
 
         ## CURRENTLY NOT IMPLEMENTED
         #if state == 0: #searching for sequenceMSA identifier
@@ -595,7 +589,7 @@ def trf_get_repeats(infile):
         if 1 == state: #searching for repeat region coordinates
             search = pat_coordinates.search(line)
             if search:
-                logger.log(LOGLEVEL_VERBOSE, " * (1->2) Found coordinates")
+                log.debug(" * (1->2) Found coordinates")
                 state = 2
                 region = RepeatRegion()
                 region.begin = int(search.group(1))
@@ -605,30 +599,30 @@ def trf_get_repeats(infile):
         elif state == 2: # searching for beginning of MSA & save sequence to tmpMSA-> 4
             match = pattern_seq.match(line)
             if match and match.group(1) == str(region.begin):
-                logger.log(LOGLEVEL_VERBOSE, " *(2->4) Found first row of first MSA repeat unit")
+                log.debug(" *(2->4) Found first row of first MSA repeat unit")
                 state = 4
                 if len(match.group(2).strip().split(" ")) > 1:
                     short = True
                     preMSA = match.group(2).strip().split(" ")
-                    logger.log(LOGLEVEL_VERBOSE, "Repeat unit is short; preMSA: %s", str(preMSA))
+                    log.debug("Repeat unit is short; preMSA: %s", str(preMSA))
                 else:
                     tmpMSA = [match.group(2).strip().split(" ")[0]]
-                    logger.log(LOGLEVEL_VERBOSE, " tmpMSA: %s", str(tmpMSA))
+                    log.debug(" tmpMSA: %s", str(tmpMSA))
 
         elif state == 3: # new repeat unit: save sequence to tmpMSA -> 4
             match = pattern_seq.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(3->5) Found first row of new repeat unit")
+                log.debug(" *(3->5) Found first row of new repeat unit")
                 state = 6
                 if short:
                     preMSA += match.group(2).strip().split(" ")
-                    logger.log(LOGLEVEL_VERBOSE, "Repeat unit is short; preMSA: %s", str(preMSA))
+                    log.debug("Repeat unit is short; preMSA: %s", str(preMSA))
                 else:
                     tmpMSA.append(match.group(2).strip().split(" ")[0])
-                    logger.log(LOGLEVEL_VERBOSE, " tmpMSA: %s", str(tmpMSA))
+                    log.debug(" tmpMSA: %s", str(tmpMSA))
             # if end: save tmpMSA to preMSA; save tmpConsensus to consensus; Yield repeat region -> 1
             if pat_statistics.search(line):
-                logger.log(LOGLEVEL_VERBOSE, " *(5->1) Encountered 'Statistics': No more repeats, yielding.")
+                log.debug(" *(5->1) Encountered 'Statistics': No more repeats, yielding.")
                 state = 1
                 if not short:
                     preMSA.append("".join(tmpMSA))
@@ -642,31 +636,31 @@ def trf_get_repeats(infile):
         elif state == 4: # new repeat unit: save sequence to tmpConsensus -> 5
             match = pattern_seq.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(4->5) Found first consensus row of the repeat unit")
+                log.debug(" *(4->5) Found first consensus row of the repeat unit")
                 state = 5
                 if short:
                     consensus = match.group(2).strip().split(" ")
-                    logger.log(LOGLEVEL_VERBOSE, "Repeat unit is short;  consensus: %s", str(consensus))
+                    log.debug("Repeat unit is short;  consensus: %s", str(consensus))
                 else:
                     tmpConsensus = [match.group(2).strip().split(" ")[0]]
-                    logger.log(LOGLEVEL_VERBOSE, " tmpConsensus: %s", str(tmpConsensus))
+                    log.debug(" tmpConsensus: %s", str(tmpConsensus))
 
         elif state == 5: ## SEARCHING FOR MSA ROW
             # if sequence: save sequence to tmpMSA -> 6
             match = pattern_seq.match(line)
             if match:
-                logger.log(LOGLEVEL_VERBOSE, " *(5->6) Found a MSA row")
+                log.debug(" *(5->6) Found a MSA row")
                 state = 6
                 if short:
                     preMSA += match.group(2).strip().split(" ")
-                    logger.log(LOGLEVEL_VERBOSE, "Repeat unit is short; preMSA: %s", str(preMSA))
+                    log.debug("Repeat unit is short; preMSA: %s", str(preMSA))
                 else:
                     tmpMSA.append(match.group(2).strip().split(" ")[0])
-                    logger.log(LOGLEVEL_VERBOSE, " tmpMSA: %s", str(tmpMSA))
+                    log.debug(" tmpMSA: %s", str(tmpMSA))
 
             # if end: save tmpMSA to preMSA; save tmpConsensus to consensus; Yield repeat region -> 1
             if pat_statistics.search(line):
-                logger.log(LOGLEVEL_VERBOSE, " *(5->1) Encountered 'Statistics': No more repeats, yielding.")
+                log.debug(" *(5->1) Encountered 'Statistics': No more repeats, yielding.")
                 state = 1
                 if not short:
                     preMSA.append("".join(tmpMSA))
@@ -681,11 +675,11 @@ def trf_get_repeats(infile):
             match = pattern_seq.match(line)
             # 1: save tmpConsensus -> 3
             if match and match.group(1) == '1':
-                logger.log(LOGLEVEL_VERBOSE, " *(6->3) Found a consensus row of a new repeat unit")
+                log.debug(" *(6->3) Found a consensus row of a new repeat unit")
                 state = 3
                 if short: ### NEEDS TO BE CODED
                     consensus += match.group(2).strip().split(" ")
-                    logger.log(LOGLEVEL_VERBOSE, "Repeat unit is short; consensus: %s", str(consensus))
+                    log.debug("Repeat unit is short; consensus: %s", str(consensus))
                 else:
                     newMSA = tmpMSA.pop()
                     preMSA.append("".join(tmpMSA))
@@ -695,21 +689,21 @@ def trf_get_repeats(infile):
 
             # 0: save sequence to tmpConsensus -> 5
             elif match:
-                logger.log(LOGLEVEL_VERBOSE, " *(6->5) Found a consensus row")
+                log.debug(" *(6->5) Found a consensus row")
                 state = 5
                 tmpConsensus.append(match.group(2).strip().split(" ")[0])
 
             # YIELD
             else:  ## aha! there should have been a consensus sequence, but there is not. Hence we are finished with this repeat!
-                logger.log(LOGLEVEL_VERBOSE, ' *(6->1) No consensus row: repeat finished')
+                log.debug(' *(6->1) No consensus row: repeat finished')
                 state = 1
                 if short:
                     preMSA = preMSA[:-1]
                 else:
                     preMSA.append("".join(tmpMSA[0:-1])) # The last tmpMSA entry was not a repeat unit
                     consensus.append("".join(tmpConsensus))
-                logger.log(LOGLEVEL_VERBOSE, " preMSA: %s", str(preMSA))
-                logger.log(LOGLEVEL_VERBOSE, " consensus: %s", str(consensus))
+                log.debug(" preMSA: %s", str(preMSA))
+                log.debug(" consensus: %s", str(consensus))
                 region.msa = getMSA(preMSA, consensus)
                 if len(region.msa) >= 2:
                     yield region
@@ -772,7 +766,7 @@ def hhpredid_get_repeats(infile):
 
     """ Read repeats from a HHREPID standard output (stdout) file stream successively.
 
-    Read repeats from a TRUST standard output (stdout) file stream successively.
+    Read repeats from a HHREPID standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
 
     Layout of HHREPID standard output:
@@ -807,19 +801,19 @@ def hhpredid_get_repeats(infile):
     region = None
     state = 1
     for i, line in enumerate(infile):
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
 
         if 1 == state: # Find 'Repeats' marker of new repeat
             search = pattern_repeat_unit_count.search(line)
             if search:
-                logger.debug(" *(1->2) Found repeat")
+                log.debug(" *(1->2) Found repeat")
                 state = 2
                 n = int(search.group(1))
 
         elif 2 == state: # Find first (partial) row of the MSA
             search = pattern_seq.search(line)
             if search:
-                logger.debug(" *(2->3) Found first repeat unit (part)")
+                log.debug(" *(2->3) Found first repeat unit (part)")
                 state = 3
                 region = RepeatRegion()
                 region.begin = int(search.group(2))
@@ -829,26 +823,26 @@ def hhpredid_get_repeats(infile):
         elif 3 == state: # Find all other (partial) rows of the MSA
             search = pattern_seq.search(line)
             if search:
-                logger.debug(" *(3->3) Found other repeat unit (part)")
+                log.debug(" *(3->3) Found other repeat unit (part)")
                 region.msa[int(search.group(1))-1] += search.group(3).replace('.', '-').upper()
             else:
                 search = pattern_repeat_unit_count.search(line)
                 if search:
-                    logger.debug(" *(3->2) Yield Repeat, begin next")
+                    log.debug(" *(3->2) Yield Repeat, begin next")
                     state = 2
                     n = int(search.group(1))
                     if len(region.msa) >= 2:
                         yield region
                         region = None
                     else:
-                        logger.warning("HHPREDID: Msa too short %s", str(region.msa))
+                        log.warning("HHPREDID: Msa too short %s", str(region.msa))
 
     # Yield final repeat region.
     if not region == None:
         if len(region.msa) >= 2:
             yield region
         else:
-            logger.warning("HHPREDID: Msa too short %s", str(region.msa))
+            log.warning("HHPREDID: Msa too short %s", str(region.msa))
 
 ####################################### Phobos TRF  #########################################
 def phobos_get_repeats(infile):
@@ -879,11 +873,11 @@ def phobos_get_repeats(infile):
 
     state = 1
     for i, line in enumerate(infile):
-        logger.log(LOGLEVEL_VERBOSE, "Line %d: %s", i, line[0:-1])
+        log.debug("Line %d: %s", i, line[0:-1])
         if 1 == state: # Find TR offset
             search = pattern_begin.search(line)
             if search and search.groups()[0] != None:
-                logger.log(LOGLEVEL_VERBOSE, " *(1->2) Found tandem repeat begin")
+                log.debug(" *(1->2) Found tandem repeat begin")
                 state = 2
                 region = RepeatRegion()
                 region.begin = int(search.groups()[0])
@@ -892,20 +886,20 @@ def phobos_get_repeats(infile):
         elif 2 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
             if match and match.groups()[0] != None:
-                logger.log(LOGLEVEL_VERBOSE, " *(2->3) Found first repeat unit")
+                log.debug(" *(2->3) Found first repeat unit")
                 region.msa.append(match.groups()[0])
                 state = 3
 
         elif 3 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
             if match and match.groups()[0] != None:
-                logger.log(LOGLEVEL_VERBOSE, " *(3->3) Found a repeat unit")
+                log.debug(" *(3->3) Found a repeat unit")
                 region.msa.append(match.groups()[0])
             else:
-                logger.log(LOGLEVEL_VERBOSE, " *(3->1) repeat region finished, yielding.")
+                log.debug(" *(3->1) repeat region finished, yielding.")
                 state = 1
                 if len(region.msa) >= 2:
                     yield region
                 else:
-                    logger.warning("phobos: Msa too short %s", str(region.msa))
+                    log.warning("phobos: Msa too short %s", str(region.msa))
 

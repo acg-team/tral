@@ -3,7 +3,7 @@
 import logging, os, subprocess, tempfile
 from Bio import AlignIO
 
-logger = logging.getLogger('root')
+log = logging.getLogger(__name__)
 
 from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
@@ -16,7 +16,7 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
 
     # Create temporary working directory
     working_dir = tempfile.mkdtemp()
-    logger.debug("evolvedTR: Created temp directory: %s", working_dir)
+    log.debug("evolvedTR: Created temp directory: %s", working_dir)
 
     # Save my_TR to temp directory:
     msa_file = os.path.join(working_dir, 'msa_temp.faa')
@@ -37,7 +37,7 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
             else:
                 msa[-1] += iLine
         msa = [i for i in msa if i != '']
-        logger.debug('\n'.join(msa))
+        log.debug('\n'.join(msa))
         p.wait()
         try:
             return msa

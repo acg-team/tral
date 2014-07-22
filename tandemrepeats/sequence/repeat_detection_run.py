@@ -18,10 +18,7 @@ from Bio import SeqIO
 from tandemrepeats.sequence import repeat_detection_io
 from tandemrepeats.paths import *
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
+log = logging.getLogger(__name__)
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -95,14 +92,14 @@ class JavaExecutable:
 
 
 
-def check_java_errors(outfile, errfile, logger=None, procname=None):
+def check_java_errors(outfile, errfile, log=None, procname=None):
     """Checks for java problems and returns True if there were problem
     and False if there weren't.
 
     Arguments:
     outfile  -- Name of the redirected standard output channel file
     errfile  -- Name of the redirected standard error channel file
-    logger   -- Name of the logger to issue log messages to. If none, no log
+    log   -- Name of the log to issue log messages to. If none, no log
                 messages will be issued.
 
 
@@ -121,8 +118,8 @@ def check_java_errors(outfile, errfile, logger=None, procname=None):
 
     if (errfile_size != 0 and outfile_size == 0):
         has_error = True
-        if logger:
-            logger.warning(
+        if log:
+            log.warning(
                 "Process \"%s\" has empty STDOUT but non-empty STDERR",
                 procname)
 
@@ -131,8 +128,8 @@ def check_java_errors(outfile, errfile, logger=None, procname=None):
     m = pat_javaexc.search(errfile_str)
     if m:
         has_error = True
-        if logger:
-            logger.warning(
+        if log:
+            log.warning(
                 "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
                 procname, m.group(0))
 
@@ -175,10 +172,10 @@ class TRFFinder(object):
         __stdout_file = open(stdoutfname, mode='w')
         __stderr_file = open(stderrfname, mode='w')
 
-        logger.debug("Launching process: %s in %s",
+        log.debug("Launching process: %s in %s",
             self.__executable.get_execute_line(*args), working_dir)
 
-        logger.debug("Launching process tokens: %s in %s",
+        log.debug("Launching process tokens: %s in %s",
             self.__executable.get_execute_tokens(*args), working_dir)
         # launch process
         __process = subprocess.Popen(
@@ -384,7 +381,7 @@ class FinderPhobos(TRFFinder):
                 tmp = list(repeat_detection_io.phobos_get_repeats(resultfilehandle))
             return tmp
         else:
-            logger.warning("Did not find Phobos result file in %s", self.config.scriptopts['outputfile'])
+            log.warning("Did not find Phobos result file in %s", self.config.scriptopts['outputfile'])
             return []
 
 
@@ -459,7 +456,7 @@ class FinderTRED(TRFFinder):
                 tmp = list(repeat_detection_io.tred_get_repeats(infilehandle))
             return tmp
         else:
-            logger.warning("Did not find TRED result file in %s", self.result_file)
+            log.warning("Did not find TRED result file in %s", self.result_file)
             return []
 
 
@@ -532,7 +529,7 @@ class FinderTREKS(TRFFinder):
             super(FinderTREKS, self).run_process(wd, *prog_args)
 
         if check_java_errors(stdoutfname, stderrfname,
-            logger=logger, procname=FinderTREKS.displayname):
+            log=log, procname=FinderTREKS.displayname):
             return []
 
         # Process output file, return results
@@ -701,7 +698,7 @@ class FinderTrust(TRFFinder):
                super(FinderTrust, self).run_process(wd, *self.config.tokens(infile))
 
         if check_java_errors(stdoutfname, stderrfname,
-            logger=logger, procname=FinderTrust.displayname):
+            log=log, procname=FinderTrust.displayname):
             return []
 
         #shutil.copyfile(stdoutfname, YOUR FAVOURITE PATH)
@@ -808,7 +805,7 @@ class FinderXStream(TRFFinder):
 
 
         if check_java_errors(stdoutfname, stderrfname,
-            logger=logger, procname=FinderXStream.displayname):
+            log=log, procname=FinderXStream.displayname):
             return []
 
         # Find output file, cry about it if not found
@@ -818,7 +815,7 @@ class FinderXStream(TRFFinder):
 
         chartfilename = self.find_chartfile(wd)
         if not chartfilename:
-            logger.error("No XSTREAM output chart file found in %s!", wd)
+            log.error("No XSTREAM output chart file found in %s!", wd)
             return []
 
         # Process output file, return results
@@ -902,7 +899,7 @@ def finder_worker(working_dir, job_queue, result_list, result_lock):
         try:
             wd = os.path.join(working_dir, "{0:03}".format(job.job_id+1))
 
-            logger.debug("Launching finder \"%s\" in directory %s",
+            log.debug("Launching finder \"%s\" in directory %s",
                 job.finder.name, os.path.join(wd, job.finder.name))
 
             result = job.finder.run_process(wd, job.infile)
@@ -912,12 +909,12 @@ def finder_worker(working_dir, job_queue, result_list, result_lock):
                 result_list[job.job_id][job.finder.name].extend(result)
 
 
-            logger.debug("Finder \"%s\" returned from job %d",
+            log.debug("Finder \"%s\" returned from job %d",
                 job.finder.name, job.job_id)
         except:
             # On errors, kill all jobs in queue, cry to the logfile and return
             clear_queue(job_queue)
-            logger.exception(
+            log.exception(
                 "Exception occured in worker while processing %s with %s",
                 job.infile, job.finder.name)
             # raise
@@ -965,7 +962,7 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         working_dir = local_working_dir
     else:
         working_dir = tempfile.mkdtemp()
-        logger.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
+        log.debug("repeat_detection_run.run_TRD: Created tempfile: %s", working_dir)
         if not os.path.isdir(working_dir):
             raise IOError("The specified directory \""+working_dir+
                           "\" does not exist")
@@ -1023,11 +1020,11 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         t.daemon = True
         t.start()
 
-    logger.debug("Threads active after launching workers: %d",
+    log.debug("Threads active after launching workers: %d",
         threading.active_count())
 
 
-    logger.info("Processing %d input files in %d jobs.",
+    log.info("Processing %d input files in %d jobs.",
         len(infiles), len(joblist))
 
     # put joblist into job queue, thus starting actual work
@@ -1036,7 +1033,7 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
 
 
     job_queue.join()
-    logger.info("All jobs returned.")
+    log.info("All jobs returned.")
 
     # delete temporary directory
     if not local_working_dir:
@@ -1059,7 +1056,7 @@ def set_hhrepid_config_open():
     config.valopts["-P"] = 0.6  # <float> max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)
     config.valopts["-T"] = 0.2  # <float> max total repeat p-value (def=0.001)
     config.valopts["-lmin"] = 0  # [0,inf[  minimal length of repeats to be identified (def=7)
-    logger.debug("%s config tokens: %s", finders['hhrepid'].displayname,
+    log.debug("%s config tokens: %s", finders['hhrepid'].displayname,
                         ", ".join(finders['hhrepid'].config.tokens()))
     return config
 
@@ -1076,7 +1073,7 @@ def set_treks_config_DNA():
     # construct DNA configuration for T-Reks
     config = FinderTREKS.Configuration()
     config.valopts["-type"] = 1
-    logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
+    log.debug("%s config tokens: %s", finders['t-reks'].displayname,
                         ", ".join(finders['t-reks'].config.tokens()))
     return config
 
@@ -1084,7 +1081,7 @@ def set_treks_config_open():
     # construct open configuration for T-Reks
     config = FinderTREKS.Configuration()
     config.valopts["-similarity"] = 0.2
-    logger.debug("%s config tokens: %s", finders['t-reks'].displayname,
+    log.debug("%s config tokens: %s", finders['t-reks'].displayname,
                         ", ".join(finders['t-reks'].config.tokens()))
     return config
 
@@ -1092,7 +1089,7 @@ def set_trf_config_open():
     # construct open configuration for TRF
     config = FinderTRF.Configuration()
     config.valopts["Minscore"] = 20
-    logger.debug("%s config tokens: %s", finders['trf'].displayname,
+    log.debug("%s config tokens: %s", finders['trf'].displayname,
                         ", ".join(finders['trf'].config.tokens()))
     return config
 
@@ -1100,7 +1097,7 @@ def set_trust_config_open():
     # construct open configuration for Trust
     config = FinderTrust.Configuration()
     config.boolopts['-force'] = True
-    logger.debug("%s config tokens: %s", finders['trust'].displayname,
+    log.debug("%s config tokens: %s", finders['trust'].displayname,
                         ", ".join(finders['trust'].config.tokens()))
     return config
 
@@ -1112,7 +1109,7 @@ def set_xstream_config_open():
     config.valopts["-I"] = 0.2
     config.valopts["-i"] = 0.1
     config.valopts["-g"] = 100
-    logger.debug("%s config tokens: %s", finders['xstream'].displayname,
+    log.debug("%s config tokens: %s", finders['xstream'].displayname,
                         ", ".join(finders['xstream'].config.tokens()))
     return config
 

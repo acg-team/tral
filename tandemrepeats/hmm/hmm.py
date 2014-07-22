@@ -22,10 +22,7 @@ from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
 from tandemrepeats.repeat.repeat_score import loadModel
 
-
-logging.basicConfig()
-
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 ################################### HMM class #########################################
 
@@ -133,27 +130,22 @@ class HMM:
             # Completing the circle of the HMM.
             if i == self.lD - 1:
                 iTransition_Probabilities = self.set_circle_transition_probability_hmmer3(iTransition_Probabilities, dTranslate_States[iState])
-            logger.debug("iState: %s", iState)
-            logger.debug("set_circle_transition_probability_hmmer3: %s", iTransition_Probabilities)
+            log.debug("iState: %s", iState)
+            log.debug("set_circle_transition_probability_hmmer3: %s", iTransition_Probabilities)
             self.set_transition_probability_hmmer3(i, iTransition_Probabilities)
 
-        logger.debug("p_t before deletion: %s", self.p_t)
+        log.debug("p_t before deletion: %s", self.p_t)
 
         # Translate deletion states into direct transitions from match to match states.
         if self.lD > 1:
             p_t_d = {}
             for i,iMatch_state in enumerate(self.match_states):
                  p_t_d[iMatch_state] = self.get_direct_transition_probabilities_for_deletions(i,iMatch_state)
-                 #print(iMatch_state)
-                 #print('M' + str(((i+1)%self.lD)+1))
-                 #print(p_t_d[iMatch_state]['M' + str(((i+1)%self.lD)+1)])
             for iMatch_state in self.match_states:
                 for iGoal_state, iP in p_t_d[iMatch_state].items():
                     self.p_t[iMatch_state][iGoal_state] = iP
-        else:
-            print(self.p_t)
 
-        logger.debug("p_t after deletion: %s", self.p_t)
+        log.debug("p_t after deletion: %s", self.p_t)
 
         # As it is never likely to got from a terminal state to a deletion state or vice versa, this transition probabilities can be ignored.
         # Thus, you may advance and:
@@ -208,7 +200,7 @@ class HMM:
         else:
             raise Exception("Neither of the required inputs provided!")
 
-        logger.debug(hmmer_probabilities)
+        log.debug(hmmer_probabilities)
         return HMM(hmmer_probabilities)
 
     def create_from_repeat(tandem_repeat, hmm_copy_path = None,
@@ -261,7 +253,7 @@ class HMM:
         hmm_file = os.path.join(tmp_dir, tmp_id + ".hmm")
         if hmm_copy_path:
             if not os.path.exists(hmm_copy_path):
-                logger.critical('Specified path for the file copy does not '
+                log.critical('Specified path for the file copy does not '
                                 'exist, not saving copy: %s.', hmm_copy_path)
             else:
                 if hmm_copy_id:
@@ -325,7 +317,7 @@ class HMM:
         self.deletion_states = ["D{0}".format(str(i+1)) for i in range(lD)]
         self.terminal_states = ["N","C"]
         self.states = [self.terminal_states[0]] + self.match_states + self.insertion_states + self.deletion_states + [self.terminal_states[1]]
-        logger.debug("HMM states: %s", self.states)
+        log.debug("HMM states: %s", self.states)
 
         ## Initialisation
         # The transition probability is initially set to None for all states.
@@ -413,8 +405,8 @@ class HMM:
         skip_states = ['COMPO', 'letters', final_state, 'id']
 
         # M->M, M->I, M->D: Use an average from all other transitions from match states.
-        logger.debug("self.hmmer.keys(): %s", self.hmmer.items())
-        logger.debug("self.hmmer.items(): %s", self.hmmer.items())
+        log.debug("self.hmmer.keys(): %s", self.hmmer.items())
+        log.debug("self.hmmer.items(): %s", self.hmmer.items())
         mean_M_M = np.mean([np.exp(-iP["transition"][0]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         mean_M_I = np.mean([np.exp(-iP["transition"][1]) for iState, iP in self.hmmer.items() if iState not in skip_states])
         mean_M_D = np.mean([np.exp(-iP["transition"][2]) for iState, iP in self.hmmer.items() if iState not in skip_states])

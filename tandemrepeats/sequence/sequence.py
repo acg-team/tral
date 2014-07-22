@@ -12,8 +12,7 @@ pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
 pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
 config = configobj.ConfigObj(pDefaults, configspec = pSpec)
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class Sequence:
 

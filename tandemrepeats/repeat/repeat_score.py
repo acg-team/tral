@@ -13,7 +13,7 @@ import scipy.stats, scipy.special, scipy.linalg
 
 from tandemrepeats.paths import *
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 INDEL_ZIPF = 1.821
 

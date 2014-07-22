@@ -3,8 +3,7 @@ import logging
 import os
 import re
 
-
-logger = logging.getLogger('root')
+log = logging.getLogger(__name__)
 
 ################################## READ SEQUENCE #########################################
 

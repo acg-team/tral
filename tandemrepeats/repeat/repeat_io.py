@@ -9,44 +9,12 @@ import tempfile
 import subprocess
 import numpy as np
 
-#from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
-logging.basicConfig()
-
-logger = logging.getLogger(__name__)
-#logger = logging.getLogger('root')
-
-################################## READ SEQUENCE #########################################
+log = logging.getLogger(__name__)
 
 
-def read_from_file(seq_filename, start, number, sequence_type = 'AA'):
-
-    '''Read sequence from fasta. Return a Bio.Seq object '''
-
-    from Bio import SeqIO
-
-    # Making a list out if the generator object might be overhead for huge fastafiles
-    for seq_record in list(SeqIO.parse(seq_filename, "fasta"))[start:start+number]:
-        seq_record.seq.alphabet = sequence_type
-        yield seq_record
-
-
-############################## SAVE SEQUENCE #############################################
-
-def save_sequence(sequence, type, sequence_file, sequence_id):
-    ''' save the sequence in fasta format in specified <sequence_file> '''
-
-    with open(sequence_file, 'a') as fastafile:
-        fastafile.write(">"+str(sequence_id) + '\n')
-
-        if type == 'sequence':
-            fastafile.write(str(sequence) + '\n')
-        else: #type == 'repeat':
-            for i in sequence.msa:
-                fastafile.write(i + '\n')
-
-
+###################### SAVE REPEAT #############################################
 
 def save_repeat_fasta(tandem_repeats, file):
     ''' save multiple <tandem_repeats> in Fasta format in specified <file>
@@ -198,7 +166,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
     alf_exec = os.path.join(EXECROOT, "alfsim")
     # create temporary directory
     working_dir = tempfile.mkdtemp()
-    logger.debug("evolvedTR: Created tempfile: %s", working_dir)
+    log.debug("evolvedTR: Created tempfile: %s", working_dir)
 
     # create working dir
     if not os.path.isdir(working_dir):
@@ -238,7 +206,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
             runfile.write("treeLength:= %d ;\n"%tree_length)
             ## DANIEL: Is a tree := missing?
         if tree not in {'star', 'birthdeath'}:
-            logger.warning("evolvedTR: tree input %s not known, assuming birthdeath tree", tree)
+            log.warning("evolvedTR: tree input %s not known, assuming birthdeath tree", tree)
 
         # parameters concerning the substitution models
         if sequence_type == 'AA':
@@ -268,7 +236,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
         if os.path.isfile(infilePath):
             break
     else:
-        logger.error('ALFSIM was not able to produce simulated sequence.')
+        log.error('ALFSIM was not able to produce simulated sequence.')
 
     #shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
     #shutil.copytree(working_dir, '/cluster/home/infk/eschaper/spielwiese/')
@@ -297,22 +265,22 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
     state = 1
     with open(infilePath, "r") as infile:
         for i, line in enumerate(infile):
-            logger.debug("Line %d: %s", i, line[0:-1])
+            log.debug("Line %d: %s", i, line[0:-1])
 
             if 1 == state: # Find first repeat unit & save begin
                 search = pattern_start.search(line)
                 if search:
-                    logger.debug(" *(1->2) Found MSA start")
+                    log.debug(" *(1->2) Found MSA start")
                     state = 2
                     msa = []
 
             elif 2 == state:  # Find all repeat units
                 search = pattern_seq.search(line)
                 if search:
-                    logger.debug(" *(2->2) Found another repeat unit")
+                    log.debug(" *(2->2) Found another repeat unit")
                     msa.append(search.group(1))
                 else:
-                    logger.debug(" *(2->1) repeat region finished, yielding.")
+                    log.debug(" *(2->1) repeat region finished, yielding.")
                     state = 1
                     ## YIELD IF WE HAVE FOUND AT LEAST TWO REPEAT UNITS:
                     if len(msa) > 1:
@@ -322,7 +290,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
                             yield msa
                         else:
                             ## CHECK!!!
-                            logger.debug("YIELD: %s", "".join(msa).replace('-',''))
+                            log.debug("YIELD: %s", "".join(msa).replace('-',''))
                             yield Bio.Seq.Seq("".join(msa).replace('-',''), sequence_type)
 
     # delete temporary directory
@@ -343,7 +311,7 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
     """
 
     if sequence_length == 0 and (l == 0 or n == 0):
-        logger.error('The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
+        log.error('The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
     else:
         if sequence_length == 0:
             sequence_length = l*n

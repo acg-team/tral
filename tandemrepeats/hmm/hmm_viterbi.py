@@ -10,8 +10,7 @@ import re
 from tandemrepeats.repeat import repeat
 from tandemrepeats.paths import *
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
 pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
