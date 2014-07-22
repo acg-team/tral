@@ -1,13 +1,14 @@
 # (C) 2011 Alexander Korsunsky
 # (C) 2011-2014 Elke Schaper
 
+import collections
+import configobj
+import logging
+import math
+import numpy as np
 import os
 from os.path import join
 import re
-import logging
-import collections
-import math
-import numpy as np
 import scipy as sp
 import scipy.stats, scipy.special, scipy.linalg
 
@@ -15,7 +16,9 @@ from tandemrepeats.paths import *
 
 log = logging.getLogger(__name__)
 
-INDEL_ZIPF = 1.821
+pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
+pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
+config = configobj.ConfigObj(pDefaults, configspec = pSpec)["repeat_score"]
 
 ########################## REPEAT SCORE CALCULATION FUNCTIONS ############################
 
@@ -73,7 +76,7 @@ def load_equilibrium_freq(filename):
     }
 
 
-def meanSimilarity(repeat, measureOfSimilarity, ignoreGaps = True):
+def meanSimilarity(repeat, measureOfSimilarity, ignoreGaps = config['indel'].as_bool('ignore_gaps')):
     """ Calculate the mean similarity of all columns in the multiple sequence alignment
     in ``repeat`` according to a ``measureOfSimilarity``.
 
@@ -177,7 +180,9 @@ def pSim(column):
 #################### 2. MAXIMUM LIKELIHOOD CALCULATIONS ##################################
 
 
-def optimisation(function, args, start_min = 0.5, start_max = 1.5, nIteration = 14):
+def optimisation(function, args, start_min = config['optimisation'].as_float('start_min'),
+                start_max = config['optimisation'].as_float('start_max'),
+                nIteration = config['optimisation'].as_int('nIteration')):
 
     """Binary one-dimensional optimisation of ``function``.
 
@@ -271,7 +276,7 @@ def loadModel(evolution_model = 'lg'):
     Q *= - sum( (i*j for i,j in zip(diagonal, eqFreq) ))
     return (Q,eqFreq,alphabet)
 
-def TN93(alpha_1 = 0.3, alpha_2 = 0.4, beta = 0.7):
+def TN93(alpha_1 = config['TN93']['alpha_1'], alpha_2 = config['TN93']['alpha_2'], beta = config['TN93']['beta']):
     '''TN93'''
     #4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93
     Q = [[-(alpha_1 + 2*beta), alpha_1, beta, beta],[alpha_1, -(alpha_1 + 2*beta), beta, beta], \
@@ -279,7 +284,7 @@ def TN93(alpha_1 = 0.3, alpha_2 = 0.4, beta = 0.7):
 
     return(['T', 'C', 'A','G'],[0.25, 0.25, 0.25, 0.25],Q)
 
-def K80(kappa = 2.59):
+def K80(kappa = config['K80']['kappa']):
     ''' K80 '''
     return(TN93(alpha_1 = kappa, alpha_2 = kappa, beta = 1))
 
@@ -329,7 +334,9 @@ def loglikelihood_substitution(t,Q,eqFreq,alphabet,tandem_repeat):
     likelihood = sum( np.log( np.sum( iJ * np.product(np.power(P[i], column)) for i,iJ in enumerate(eqFreq) ) ) for column in  tandem_repeat.msaTDN )
     return likelihood
 
-def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat, indelRatePerSite = 0.01, gaps = 'row_wise', indelZipf =INDEL_ZIPF):
+def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat,
+        indelRatePerSite = config['indel'].as_float('indelRatePerSite'),
+        gaps = config['indel']['gaps'], indelZipf =config['indel'].as_float('zipf')):
 
     """ Calculate the log-likelihood of the gap structure in a ``tandem repeat`` assuming
      a star tree.
@@ -381,7 +388,11 @@ def loglikelihood_substitutions_gaps(t, substitution_args, gap_args):
         loglikelihood_gaps_starphylogeny_zipfian(t, *gap_args)
 
 
-def loglikelihood_starTopology_local(tandem_repeat, evolution_model="lg", gaps = False, indelRatePerSite = 0.001, parameters = False):
+def loglikelihood_starTopology_local(tandem_repeat,
+            evolution_model=config['evolutionary_model'],
+            gaps = config['indel']['gaps'],
+            indelRatePerSite = config['indel'].as_float('indelRatePerSite'),
+            parameters = False):
 
     if tandem_repeat.lD == 0:
         return 100,-100
@@ -398,7 +409,9 @@ def loglikelihood_starTopology_local(tandem_repeat, evolution_model="lg", gaps =
 
     return divergence,loglikelihoodDuplicationHistory
 
-def loglikelihood_random(repeat, evolution_model="lg", parameters = False):
+def loglikelihood_random(repeat,
+                        evolution_model = config['evolutionary_model'],
+                        parameters = False):
 
     if repeat.sequence_type == 'AA':
         if parameters:
@@ -433,7 +446,10 @@ def phyloStarTopology_local(tandem_repeat, evolution_model=False, gaps = False, 
 
 ###################### TANDEM REPEAT SCORE CALIBRATION ###################################
 
-def calc_score(repeats, result_path, result_filename, scoreslist=['phylo','phylo_gap'], save_calibration = False, precision = 10):
+def calc_score(repeats, result_path, result_filename,
+            scoreslist = config['score_calibration'].as_list('scoreslist'),
+            save_calibration = config['score_calibration'].as_bool('save_calibration'),
+            precision = config['score_calibration'].as_int('precision') ):
 
     sequence_type = repeats[0].sequence_type
     if repeats[0].sequence_type == 'AA':
@@ -481,7 +497,8 @@ def calc_score(repeats, result_path, result_filename, scoreslist=['phylo','phylo
             for iR,iT in zip(repeats,testStatistic):
                 iR.dScore[iScore] = iT
 
-def calibrate_score(repeats, resultFilePath, scoreslist=['phylo','phylo_gap']):
+def calibrate_score(repeats, resultFilePath,
+                    scoreslist=config['score_calibration'].as_list('scoreslist')):
 
     for iScore in scoreslist:
         testStatistic = np.sort([iRepeat.dScore[iScore] for iRepeat in repeats])
@@ -502,10 +519,11 @@ def save_distribution(values, items, resultFilePath, fileName, inverse):
             os.makedirs(os.path.join(resultFilePath, items[iC]))
         np.savez(os.path.join(resultFilePath, items[iC], fileName), cdf=result_p,value=result_val)
 
-def calculatePDFScores(repeats, resultFilePath, fileName, classifiers = ['entropy', 'phylo']):
+def calculatePDFScores(repeats, resultFilePath, fileName,
+                scoreslist = config['score_calibration'].as_list('scoreslist')):
 
     """ CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES """
 
     # Can you generalise the next command for arbitrary classifiers?
-    scores = [[repeat.score(classifiers[0]), repeat.score(classifiers[1])] for repeat in repeats]
-    save_distribution(values = scores, items = classifiers, resultFilePath = resultFilePath, fileName = fileName, inverse = True)
+    scores = [[repeat.score(scoreslist[0]), repeat.score(scoreslist[1])] for repeat in repeats]
+    save_distribution(values = scores, items = scoreslist, resultFilePath = resultFilePath, fileName = fileName, inverse = True)
