@@ -349,10 +349,12 @@ class HMM:
         Set p_e of states to `lEmission_Probabilities` for `state` given `self.alphabet`
         In HMMER3 data, emission probabilities are -ln(p).
 
-        It is e.g. self.alphabet =
-        ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+        It is e.g.::
+            self.alphabet =
+            ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
-        Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)
+        Return log10(p), that is convert between the two. Conversion:
+        p_Local = - p_HMM * log10(e)
 
         Args:
             state (str): The state of the HMM. E.g. the fourth match state 'M4'.
@@ -513,16 +515,15 @@ class HMM:
 
 ############################### External parameters ######################################
 
-
 def hmmer3_emission_probabilities(hmmer_probabilities, letters, lMatch):
     '''
     Get emission probabilities from hmmer3 hmm file.
     In hmm file, emission probabilities are -ln(p).
     Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)
 
-    Parameters (e.g.):
-    letters = ['A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y']
-    lMatch = ['M'+str(i) for i in range(24)]
+    Parameters (e.g.)::
+        letters = ['A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N', 'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y']
+        lMatch = ['M'+str(i) for i in range(24)]
 
     Return format (pseudo code):
     [{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in lMatch]
@@ -542,24 +543,3 @@ def hmmer3_emission_probabilities(hmmer_probabilities, letters, lMatch):
 
     return [{iL: -(iP)*np.log10(np.exp(1)) for iL,iP in zip(hmmer_probabilities['letters'], data['emissions']) if iL in letters} for key,data in hmmer_probabilities.items() if key not in ['letters','COMPO']]
 
-
-##################################### Tests ##############################################
-
-
-#def test():
-#
-#    ''' To be implemented... '''
-#    tandem_repeat = ...
-#    divergence = 0
-#    calculate_log10_offspring_likelihood(tandem_repeat, divergence)
-
-##################################### Main ###############################################
-
-def main():
-    my_TR = repeat_info.Repeat(begin = 0, msa = ['A-G', 'ACG', 'ACG'], sequence_type = 'DNA')
-    #my_TR = TR()
-    my_HMM = HMM(my_TR, divergence = 0.1)
-
-
-if __name__ == "__main__":
-    main()
