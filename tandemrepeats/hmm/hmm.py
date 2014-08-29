@@ -20,7 +20,6 @@ import tempfile
 from tandemrepeats.hmm import hmm_io, hmm_viterbi
 from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
-from tandemrepeats.repeat.repeat_score import loadModel
 
 log = logging.getLogger(__name__)
 
@@ -102,10 +101,6 @@ class HMM:
 
         self.lD = max([int(key) for key in hmmer_probabilities.keys()
                        if key.isdigit()])
-
-
-        # Assume: sequence_type = 'AA'
-        #Q,null_model_emission_p,alphabet = loadModel('lg')
 
         # Initialise all HMM states to default value (e.g. transition to or from terminal state all have the same cost 0).
         self.initialise_HMM_structure(self.lD)
