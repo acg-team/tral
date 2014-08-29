@@ -8,18 +8,16 @@
     .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
 
 """
-import configobj
 import logging
 import os
 
-from tandemrepeats.repeat_list.repeat_list import Repeat_list
+from tandemrepeats import configuration
 from tandemrepeats.paths import *
 
 log = logging.getLogger(__name__)
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
-config_general = configobj.ConfigObj(pDefaults, configspec = pSpec)
+c = configuration.Configuration.Instance()
+config_general = c.config
 config = config_general["repeat_list"]
 
 

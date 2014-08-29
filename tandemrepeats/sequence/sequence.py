@@ -1,16 +1,15 @@
-import configobj
 import logging
 import os
 
+from tandemrepeats import configuration
 from tandemrepeats.repeat import repeat, repeat_align
 from tandemrepeats.repeat_list import repeat_list
 from tandemrepeats.hmm import hmm, hmm_viterbi
 from tandemrepeats.sequence import repeat_detection_run, sequence_io
 from tandemrepeats.paths import *
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
-config = configobj.ConfigObj(pDefaults, configspec = pSpec)
+c = configuration.Configuration.Instance()
+config = c.config
 
 log = logging.getLogger(__name__)
 
@@ -78,7 +77,6 @@ class Sequence:
             sequence_io.write(self.seq, file)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
-
 
     def detect(self, lHMM = None, denovo = None, **kwargs):
 

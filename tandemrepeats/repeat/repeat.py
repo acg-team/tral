@@ -2,7 +2,6 @@
 # (C) 2011-2014 Elke Schaper
 
 from collections import defaultdict
-import configobj
 from copy import deepcopy
 import logging
 import numpy as np
@@ -13,13 +12,13 @@ import scipy.special
 
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
 from tandemrepeats.paths import *
+from tandemrepeats import configuration
 
 log = logging.getLogger(__name__)
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
-configs = configobj.ConfigObj(pDefaults, configspec = pSpec)
-config = configs["repeat"]
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["repeat"]
 
 ################################### Repeat class #########################################
 
@@ -118,7 +117,7 @@ class Repeat:
             return self.dDivergence[score_type]
 
     def __init__(self, msa, begin = None,
-                 sequence_type = config["sequence_type"],
+                 sequence_type = config_general["sequence_type"],
                  scoreslist=config['scoreslist'],
                  calc_score = config.as_bool('calc_score'), calc_pValue = config.as_bool('calc_pValue')):
 
@@ -170,7 +169,7 @@ class Repeat:
                 self.calculate_pValues(scoreslist=scoreslist)
 
     def calc_nD(self):
-        ''' what is the number of letters in lD, divided by lD?'''
+        ''' what is the number of letters in in all non-insertion columns, divided by lD?'''
 
         if self.lD != 0:
             self.nD = (len("".join(self.msaD)) - self.textD.count('-'))/self.lD
@@ -484,7 +483,8 @@ class Repeat:
         starts = [m.start()+1 for m in re.finditer(repeat_sequence,sequence.replace("U", "C").replace("O", "K"))] # The first letter in the sequence is counted as 1 (not 0, as in python).
 
         if len(starts) != 0: # Is the tandem repeat predicted correctly?
-            self.begin = starts[0]
+            if not hasattr(self,"begin") or not self.begin in starts:
+                self.begin = starts[0]
             self.save_original_msa(sequence)
             return True
         else:
@@ -514,7 +514,7 @@ class Repeat:
 
 def standardize(blob):
 
-    for original, replacement in configs['dAmbiguous_amino_acid'].items():
+    for original, replacement in config_general['dAmbiguous_amino_acid'].items():
         blob = blob.replace(original, replacement[0])
     return blob
 

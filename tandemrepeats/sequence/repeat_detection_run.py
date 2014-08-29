@@ -15,10 +15,15 @@ import threading
 from collections import OrderedDict
 from Bio import SeqIO
 
+from tandemrepeats import configuration
 from tandemrepeats.sequence import repeat_detection_io
 from tandemrepeats.paths import *
 
 log = logging.getLogger(__name__)
+
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["sequence"]["repeat_detection"]
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -858,9 +863,9 @@ def Finders(lFinder = None, sequence_type = "AA"):
     global finders
 
     if not lFinder:
-        lFinder = FINDER_DEFAULT[sequence_type]
+        lFinder = config[sequence_type]
     else:
-        if any(i not in list(itertools.chain(*FINDER_DEFAULT.values())) for i in lFinder):
+        if any(i not in list(itertools.chain(*config.values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
     finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
@@ -1128,12 +1133,7 @@ def set_xstream_config_open():
     return config
 
 
-######## HARDCODED PARAMETERS #########
-
-
-FINDER_DEFAULT = { "AA": ["HHrepID", "TREKS", "TRUST", "XSTREAM"],
-               "DNA": ["Phobos", "TRED", "TREKS", "TRF", "XSTREAM"]
-            }
+######################## HARDCODED OVERVIEW DICTIONARIES #################################
 
 FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
                 "Phobos": FinderPhobos(),
