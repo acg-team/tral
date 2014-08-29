@@ -65,7 +65,7 @@ def save_repeat_stockholm(tandem_repeat, file):
 
 
 def save_repeat_treks(tandem_repeats, file):
-    ''' save multiple <tandem_repeats> in T-REKS format in specified <file>
+    ''' Save multiple <tandem_repeats> in T-REKS format in specified <file>
 
         At current, only one TR per sequence can be defined, as the identifiers in
         the dict <tandem_repeats> must be unique.
@@ -343,13 +343,6 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
         Return type depends on ``return_type``.
     """
 
-    """Simulate random sequence locally.
-    If return_type == 'repeat':
-        Return a repeat_info.Repeat object
-    Else:
-        Return a Bio.Seq.Seq object
-    """
-
     if sequence_length == 0 and (l == 0 or n == 0):
         log.error('The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
     else:
@@ -373,7 +366,6 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
                 if seed_int <= 0:
                     seed = key
                     break
-
 
             dimer = [''.join(i) for i in itertools.product(alphabet, repeat=2)]
             third_letter_frequencies = {iD: {iA: frequencies[iD+iA] for iA in alphabet} for iD in dimer}
