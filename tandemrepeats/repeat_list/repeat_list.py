@@ -3,6 +3,8 @@ import sys
 
 log = logging.getLogger(__name__)
 
+from tandemrepeats.repeat_list import repeat_list_io
+
 class Repeat_list:
 
     """ A `repeat_list` is a list of repeats that belong to the same sequence, or set of
@@ -26,6 +28,31 @@ class Repeat_list:
 
     def __add__(self, rl):
         return Repeat_list(self.repeats + rl.repeats)
+
+    def write(self, format, file = None, *args):
+
+        """ Serialize repeat_lists
+
+        Serialize ``Repeat_list`` instance using the stated ``format`` into a ``Str``.
+        If a ``file`` is specified, save the ``Str``. Else, give back the ``Str``.
+
+        Args:
+            format (str):  "tsv"
+            file (str): Path to output file
+
+        .. todo:: Write checks for ``format`` and ``file``.
+        """
+
+        if format == 'tsv':
+            output = repeat_list_io.serialize_repeat_list_tsv(self)
+        else:
+            raise Exception('format is unknown.')
+
+        if file:
+            with open(file, 'w') as fh:
+                fh.write(output)
+        else:
+            return output
 
     def filter(self, func_name, *args):
 
@@ -116,7 +143,6 @@ def divergence(rl, score, threshold):
         score (str): The type of score defines the divergence that is used for filtering
         threshold (float): All repeats with a divergence of type `score` above this threshold
             are filtered out.
-
     """
 
     res = []
@@ -137,7 +163,6 @@ def attribute(rl, attribute, type, threshold):
         type (str): Either "min" or "max"
         threshold (float): All repeats with an attribute value below (above) this threshold
             are filtered out.
-
     """
 
     res = []
