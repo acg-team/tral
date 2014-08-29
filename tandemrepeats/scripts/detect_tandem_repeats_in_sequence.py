@@ -11,19 +11,29 @@ from tandemrepeats.sequence import sequence
 c = configuration.Configuration.Instance()
 config = c.config
 
+
 def main():
+
+    print(config)
 
     pars = read_commandline_arguments()
     print(pars)
-    sequence_file = pars.path
-    sequence_type = pars.sequence_type
-    lTRD = pars.detectors
-    dSignificanceTest = json.loads(pars.significance_test)
 
-#     seq = sequence.Sequence.read(fasta_file)[0]
-#     test_parameters = {"detection": {"lFinders": ["XSTREAM"]}}
-#     denovo_list = seq.detect(denovo = True, **test_parameters)
-#     sys.stdout.write(denovo_list.write("tsv") + "\n")
+    # Update configuration
+    if "path" in pars:
+        fasta_file = pars["path"]
+    if "sequence_type" in pars:
+        config["sequence_type"] = pars["sequence_type"]
+    if "detectors" in pars:
+        config["sequence"]["repeat_detection"][config["sequence_type"]] = pars["detectors"]
+    if "significance_test" in pars:
+        config["repeat_score"]["score_calibration"] = pars["significance_test"]
+
+    print(config)
+
+    seq = sequence.Sequence.read(fasta_file)[0]
+    denovo_list = seq.detect(denovo = True)
+    sys.stdout.write(denovo_list.write("tsv") + "\n")
 
 def read_commandline_arguments():
 
@@ -41,8 +51,9 @@ def read_commandline_arguments():
     parser.add_argument("-cf", "--cluster_filter", type=str, required=False,
                         help='The filter by which best representatives are chosen. For example:')
 
-
-    return parser.parse_args()
+    pars = vars(parser.parse_args())
+    pars = {key: value for key, value in pars.items() if value != None}
+    return pars
 
 
 if __name__ == "__main__":

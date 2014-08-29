@@ -845,7 +845,7 @@ class FinderXStream(TRFFinder):
 
 
 
-def Finders(lFinder = None, sequence_type = "AA"):
+def Finders(lFinder = None, sequence_type = None):
     """ Define a global dictionary of all used finder functions.
 
     Define a global dictionary of all used finder functions.
@@ -862,6 +862,8 @@ def Finders(lFinder = None, sequence_type = "AA"):
 
     global finders
 
+    if not sequence_type:
+        sequence_type = config_general["sequence_type"]
     if not lFinder:
         lFinder = config[sequence_type]
     else:
