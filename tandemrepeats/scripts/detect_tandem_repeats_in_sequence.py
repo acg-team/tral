@@ -14,10 +14,7 @@ config = c.config
 
 def main():
 
-    print(config)
-
     pars = read_commandline_arguments()
-    print(pars)
 
     # Update configuration
     if "path" in pars:
@@ -28,8 +25,6 @@ def main():
         config["sequence"]["repeat_detection"][config["sequence_type"]] = pars["detectors"]
     if "significance_test" in pars:
         config["repeat_score"]["score_calibration"] = pars["significance_test"]
-
-    print(config)
 
     seq = sequence.Sequence.read(fasta_file)[0]
     denovo_list = seq.detect(denovo = True)
@@ -49,7 +44,7 @@ def read_commandline_arguments():
     parser.add_argument("-c", "--cluster", type=str, required=False,
                         help='The overlap definition by which tandem repeats are clustered. For example: -c common_ancestry')
     parser.add_argument("-cf", "--cluster_filter", type=str, required=False,
-                        help='The filter by which best representatives are chosen. For example:')
+                        help='The filter by which best representatives are chosen. For example: [TODO]')
 
     pars = vars(parser.parse_args())
     pars = {key: value for key, value in pars.items() if value != None}
