@@ -1,5 +1,4 @@
 import collections
-import logging
 import os
 import pytest
 
@@ -10,6 +9,9 @@ TEST_REPEATS = [["AA","AA"],["AAA","AAA"],["AAAA","AAAA"], ["AAA-","AAAA"]]
 TEST_SCORE = "phylo_gap01"
 TEST_SCORE_VALUE_LIST = [0.0, 0.5, 1.0,  1.0]
 TEST_BEGIN_LIST = [6,10,10,10]
+TEST_SEQUENCE = "JAAAAKAAAAAAL"
+TEST_TSV = "msa_original\tbegin\tnD\tlD\tsequence_length\tpValue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
+
 
 def test_create_Repeat_list_from_Repeats():
 
@@ -19,6 +21,21 @@ def test_create_Repeat_list_from_Repeats():
     assert len(test_repeat_list.repeats) == 4
     for i,j in zip (TEST_REPEATS, test_repeat_list.repeats):
         assert i == j.msa
+
+
+
+def test_serialize_repeat_list_tsv():
+
+    test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS[:2]]
+    for i in test_repeats:
+        i.repeat_in_sequence(sequence = TEST_SEQUENCE)
+
+    test_repeat_list = rl.Repeat_list(repeats = test_repeats)
+
+    tsv = test_repeat_list.write("tsv")
+
+    assert tsv == TEST_TSV
+
 
 
 def test_pairwise_overlap():

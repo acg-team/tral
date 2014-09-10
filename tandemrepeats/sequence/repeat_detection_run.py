@@ -15,10 +15,15 @@ import threading
 from collections import OrderedDict
 from Bio import SeqIO
 
+from tandemrepeats import configuration
 from tandemrepeats.sequence import repeat_detection_io
 from tandemrepeats.paths import *
 
 log = logging.getLogger(__name__)
+
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["sequence"]["repeat_detection"]
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -162,7 +167,7 @@ class TRFFinder(object):
             - The name to the file with the redirected standard error channel (stderror)
 
         The standard output (stdout) and standard error (stderr) channels will
-        be redirected to working_dir/stdout.txt and working_dir/stdout.tx
+        be redirected to working_dir/stdout.txt and working_dir/stdout.txt
         respectively.
         """
 
@@ -198,7 +203,7 @@ class TRFFinder(object):
 
 
 class FinderHHrepID(TRFFinder):
-    name = 'hhrepid' # or 'hhrepID_64' ?
+    name = 'HHrepID'
     displayname = "HHrepID"
 
     """ Execute vi
@@ -289,7 +294,7 @@ class FinderHHrepID(TRFFinder):
 
 
 class FinderPhobos(TRFFinder):
-    name = 'phobos'
+    name = 'PHOBOS'
     displayname = "PHOBOS"
 
     # execute via phobos --printRepeatSeqMode 3 DNA.faa phobos.o
@@ -392,7 +397,7 @@ class FinderPhobos(TRFFinder):
 
 
 class FinderTRED(TRFFinder):
-    name = 'tred'
+    name = 'TRED'
     displayname = "TRED"
 
     """ tred is a shell script executing:
@@ -467,7 +472,7 @@ class FinderTRED(TRFFinder):
 
 
 class FinderTREKS(TRFFinder):
-    name = 't-reks'
+    name = 'T-REKS'
     displayname = "T-REKS"
 
     class Configuration:
@@ -544,7 +549,7 @@ class FinderTREKS(TRFFinder):
         return tmp
 
 class FinderTRF(TRFFinder):
-    name = 'trf'
+    name = 'TRF'
     displayname = "TRF_Benson"
 
     ### Execute via:
@@ -642,7 +647,7 @@ class FinderTRF(TRFFinder):
 
 
 class FinderTrust(TRFFinder):
-    name = 'trust'
+    name = 'TRUST'
     displayname = "TRUST"
 
     class Configuration:
@@ -715,7 +720,7 @@ class FinderTrust(TRFFinder):
 
 
 class FinderXStream(TRFFinder):
-    name = 'xstream'
+    name = 'XSTREAM'
     displayname = "XSTREAM"
 
     class Configuration:
@@ -840,7 +845,7 @@ class FinderXStream(TRFFinder):
 
 
 
-def Finders(lFinder = None, sequence_type = "AA"):
+def Finders(lFinder = None, sequence_type = None):
     """ Define a global dictionary of all used finder functions.
 
     Define a global dictionary of all used finder functions.
@@ -857,10 +862,12 @@ def Finders(lFinder = None, sequence_type = "AA"):
 
     global finders
 
+    if not sequence_type:
+        sequence_type = config_general["sequence_type"]
     if not lFinder:
-        lFinder = FINDER_DEFAULT[sequence_type]
+        lFinder = config[sequence_type]
     else:
-        if any(i not in list(itertools.chain(*FINDER_DEFAULT.values())) for i in lFinder):
+        if any(i not in list(itertools.chain(*config.values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
     finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
@@ -949,8 +956,8 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         [
             # record 1
             {
-            't-reks' : [ Repeat(), Repeat(), ...],
-            'xstream' : [ Repeat(), Repeat(), ...],
+            'T-REKS' : [ Repeat(), Repeat(), ...],
+            'XSTREAM' : [ Repeat(), Repeat(), ...],
             ...
             },
             # record 2
@@ -987,16 +994,16 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
     ## Adjust TRD parameters:
     if not default:
         if sequence_type == 'AA':
-            finders['hhrepid'].config = set_hhrepid_config_open()
-            finders['trust'].config = set_trust_config_open()
+            finders['HHrepID'].config = set_hhrepid_config_open()
+            finders['TRUST'].config = set_trust_config_open()
         else:
-            finders['trf'].config = set_trf_config_open()
-            finders['phobos'].config = set_phobos_config_open()
-        finders['t-reks'].config = set_treks_config_open()
-        finders['xstream'].config = set_xstream_config_open()
+            finders['TRF'].config = set_trf_config_open()
+            finders['PHOBOS'].config = set_phobos_config_open()
+        finders['T-REKS'].config = set_treks_config_open()
+        finders['XSTREAM'].config = set_xstream_config_open()
 
     if sequence_type == 'DNA':
-        finders['t-reks'].config = set_treks_config_DNA()
+        finders['T-REKS'].config = set_treks_config_DNA()
 
 
     infiles = split_sequence(seq_records, working_dir)
@@ -1128,17 +1135,12 @@ def set_xstream_config_open():
     return config
 
 
-######## HARDCODED PARAMETERS #########
-
-
-FINDER_DEFAULT = { "AA": ["HHrepID", "TREKS", "TRUST", "XSTREAM"],
-               "DNA": ["Phobos", "TRED", "TREKS", "TRF", "XSTREAM"]
-            }
+######################## HARDCODED OVERVIEW DICTIONARIES #################################
 
 FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
                 "Phobos": FinderPhobos(),
                 "TRED": FinderTRED(),
-                "TREKS": FinderTREKS(),
+                "T-REKS": FinderTREKS(),
                 "TRF": FinderTRF(),
                 "TRUST": FinderTrust(),
                 "XSTREAM": FinderXStream()
@@ -1147,7 +1149,7 @@ FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
 FINDER_LIST = { "HHrepID": FinderHHrepID.name,
                 "Phobos": FinderPhobos.name,
                 "TRED": FinderTRED.name,
-                "TREKS": FinderTREKS.name,
+                "T-REKS": FinderTREKS.name,
                 "TRF": FinderTRF.name,
                 "TRUST": FinderTrust.name,
                 "XSTREAM": FinderXStream.name

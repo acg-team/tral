@@ -1,20 +1,19 @@
 # (C) 2012-2014 Elke Schaper
 from collections import defaultdict
-import configobj
 import logging
 import numpy as np
 import operator
 import os
 import re
 
-from tandemrepeats.repeat import repeat
+from tandemrepeats import configuration
 from tandemrepeats.paths import *
+from tandemrepeats.repeat import repeat
 
 log = logging.getLogger(__name__)
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
-config = configobj.ConfigObj(pDefaults, configspec = pSpec)
+c = configuration.Configuration.Instance()
+config = c.config
 
 def viterbi(hmm, emission):
 

@@ -2,7 +2,6 @@
 # (C) 2011-2014 Elke Schaper
 
 import collections
-import configobj
 import logging
 import math
 import numpy as np
@@ -12,13 +11,14 @@ import re
 import scipy as sp
 import scipy.stats, scipy.special, scipy.linalg
 
+from tandemrepeats import configuration
 from tandemrepeats.paths import *
 
 log = logging.getLogger(__name__)
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
-config = configobj.ConfigObj(pDefaults, configspec = pSpec)["repeat_score"]
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["repeat_score"]
 
 ########################## REPEAT SCORE CALCULATION FUNCTIONS ############################
 
