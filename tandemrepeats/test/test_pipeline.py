@@ -1,6 +1,12 @@
 import logging
+import logging.config
 import os
 import pytest
+
+from tandemrepeats.paths import *
+
+logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
+log = logging.getLogger('root')
 
 from tandemrepeats.sequence import repeat_detection_run, sequence
 from tandemrepeats.hmm import hmm
@@ -17,10 +23,28 @@ TEST_SCORE_MBE_2014 = "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions"
 # 19571_3   28            426            69.73498                530  29.0 14 13.275862      xstream
 # 19571_2   28            429            69.02473                533  28.0 14 13.500000      xstream
 
+# RESULTS DE NOVO:
+# T-REKS:
+# ["QALAI-","QAV-L-","QAA-Q-","QAV-MG"]
+# ["TALE--ALLCPSATVTQ-VCSNPPCETHETGTTN","TATT--SN-AGSAQR--V-CSNPPCETHETGTTH","TATTATSN-GGTGQP--EGGQQPPA-----GRPC"]
+# ["TSTVGQQNGSVVRVC-SNPPCETHETGTTNTATTA","TSNMAGQHG-----C-SNPPCETHETGTTNTATTA","MSSVGANHQ-----RDARRACAAG-TPAVIRISVA"]
+# TRUST
+# ["T--AATA-TS-------PTP-NPvP-SVpANP-----P---KSPAP--A---A---------AA--PAVQPLTQVG----IT-L--L-PQAAP-AP-------PT--TT-TIQVLP","T--VPGS-SI-------SVP-TA-A-RT-QGV-----P--AVLKVT--GpqaT---------TG--TPLVTMRPAS----QAGK--ApVTVTS-LPagvrmvvPT--QSAQ-GTV-","T--LITA-PS-------GVE-AQ-P--V-HDL-----P--VSILAS--P---T---------TEqpTATVTIADSGqgdvQPGT--V-TLVCS-NP-------PC--ETHETGTTN","T--ATTTvVA-------NLG-GH-P-QP-TQV-----QfvCDRQEA--A------------------ASLVTSTVGq---QNGS--V-VRVCS-NP-------PC--ETHETGTTN","T--ATTA-TS-------NMA-GQ-H-GC-SNP-----P--CETHET--G---T---------TN--TATTAMSSVG----ANHQrdA-RRACA------------------AGTPA","VirISVA-TG-------ALE-AA-Q-G--SKS-----Q--CQTRQT--S---A---------TS--TTMTVMAT-G----AP---------CSaGPllg----PS--MAREPGGRS","P--AFVQ-LA-------PLS-SK-V-RL-SSPsikdlP--AGRH-S--H---A---------VS--TAAMTRSSVG-----AGE--P-RMA----P-------VC--ESLQGGSPS","T--TVTV-TAleallcpSAT-VT-Q-VC-SNP-----P--CETHET--G---T---------TN--TATT-----S----NAGS--A-QRVCS-NP-------PC--ETHETGTTH","T--ATTA-TS-------NGGtGQ-PeGG-QQPpagr-P--CETHQ-------T---------TS--TGTTMSVSV-------GA--L-L------P----------------DATS","S--HRTV-ES-------GLE-------V-AAA-----P--SVTPQA--G---T--------------------ALL----APFP--T-QRVCS-NP-------PC--ETHETGTTH","R--AVTT-VT-------QST-PV-P-GP-SVP-----P--PEELQVspG---PrqqlpprqlLQ--SASTAL--MG----ESAE--V-LSASQ-TPel-----PAavDLSSTGEPS"]
+# ["SN-PATrmLKTA-AAQVGTSVSSATNTSTRPIITVHK----SGTVTVAQQAQVVTTV----VGG--VTKTITLV","KS-PIS--VPGG-SALISNLGKVMSVVQTKPVQTSAV----TGQASTGPVTQIIQTKGPLPAGT--ILKLVTSA","DGkPTT--IIT--TTQASGAGTKPTILGISSVSPST-----TKPGTTTIIKTIPMSAIITQAGAtgVTSS-PGI","KS-PIT--IITT-KVMTSGTGAPAKIITAVP---KIA----TGHGQQG-VTQVVLKGAPGQPGT--ILRTV---","---PM-----GG-VRLVT----PVTVSAVKPAVTTLVvkgtTGVTTLGTVTGTVSTSLAGAGGH--STS--ASL","AT-PIT--TLGTiATLSSQVINPTAITVSA-AQTTLT----AAGGLTTPTITMQPVSQPTQ-------------"]
+# ["WKRVVG----W-SGPVPRPRHGHRAVA------IKELIVVFGggneG--------------I-------------------VDELhvYNTA----TNQWF","IPAVRGDIP------PGCAAYG--FVC------DGTRLLVFG----Gmveygk--------Y-------------------SNDL--YELQ----ASRWE","WKRLKAKTP-K-NGPPPCPRLGHSFSL------VGNKCYLFG----GlandsedpknniprY-------------------LNDL--YILElrpgSGVVA","W-----DIPiT-YGVLPPPRESHTAVVytekdnKKSKLVIYG----Gmsgc----------R-------------------LGDL--WTLD----IDTLT","WNK-----P-SlSGVAPLPRSLHSATT------IGNKMYVFG----G--------------WvplvmddvkvathekewkcTNTL--ACLN----LDTMA","WETILMDTL-E-DNI-PRARAGHCAVA------INTRLYIWS----G-----------------------------------------------------"]
+# XSTREAM
+# ["CSNPPCETHETGTTNTATTATSNMAG-QHG","CSNPPCETHETGTTNTATTAMS-SVGANHQ","CSNPPCETHETGTTNTATTAMSMAGNHG","CSNPPCETHETGTTNTATTAMS-MAG-NHG"]
+# ["VCSNPPCETHETGTTNTA-T-TSNAGSAQR","VCSNPPCETHETGTTHTATTATSNGGTGQP","VCSNPPCETHETGTTHTATTSNAGSAQP","VCSNPPCETHETGTTHTA-T-TSNAGSAQP"]
+# ["GTVT","GTVS","GTVS","GTVS"]
+# ["AAAE","AAAQ","AAA","AAAE","AAAE"]
+# ["ATA","ATA","ATA","ATA"]
+# ["EGQ","EGQ","EGQ","EGQ"]
+# ["A","A","A","A","A","A","A","A"]
+
 
 TEST_FAA_FILE = "HIV-1_388796.faa"
 TEST_HMM_FILE = "zf-CCHC.hmm"
-TEST_DENOVO_PARAMETERS = {"detection": {"lFinders": ["XSTREAM", "TREKS"]}}
+TEST_DENOVO_PARAMETERS = {"detection": {"lFinders": ["XSTREAM", "T-REKS"]}}
 TEST_SCORE = "phylo_gap01"
 TEST_RESULT_SEQ1 = [3, [["LFNSTKLE","LFNSST-N"], ["GDII", "GDIR"], ["FLG","FLG"]], 3,
          [["FNCGG-EF","FYCNTSNL","FNSTKLEL","FNSST-NL"], ["GDII", "GDIR"], ["FLG","FLG"]]]
