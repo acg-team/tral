@@ -8,7 +8,6 @@ import numpy as np
 import os
 from os.path import join
 import re
-import scipy.special
 
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
 from tandemrepeats.paths import *
@@ -439,7 +438,7 @@ class Repeat:
                     length += l
                 print(length)
 
-                repeat_sequence = ''.join(self.msa)
+                repeat_sequence = get_repeat_sequence(self.msa)
                 for i in range(self.n):
                     insertion = repeat_sequence[i*l + begin:min(len(repeat_sequence),i*l + begin+length)]
                     insertion_lengths[iL].extend([len(iI) for iI in re.findall('\w+',insertion)])
@@ -460,37 +459,6 @@ class Repeat:
 
         return insertion_lengths, deletion_lengths
 
-    def repeat_in_sequence(self,sequence):
-
-        """ Sanity check whether the `repeat` is part of the `sequence` (in which it was
-        detected). In case, calculate the position of the `repeat` within the `sequence`.
-
-        If yes: Return True, set self.begin to corrected value if necessary.
-        If no: Return False.
-
-        Args:
-            sequence (sequence): A sequence instance.
-
-        Returns:
-            bool: True if repeat is part of sequence, else false
-
-        .. todo:: None-straight forward replaces such as "U" -> "C" are implemented. These
-            need generalisation.
-        .. todo:: save_original_msa is needed here?
-        """
-
-        repeat_sequence = "".join(self.msa).upper().replace("_", "").replace("-", "")
-        starts = [m.start()+1 for m in re.finditer(repeat_sequence,sequence.replace("U", "C").replace("O", "K"))] # The first letter in the sequence is counted as 1 (not 0, as in python).
-
-        if len(starts) != 0: # Is the tandem repeat predicted correctly?
-            if not hasattr(self,"begin") or not self.begin in starts:
-                self.begin = starts[0]
-            self.save_original_msa(sequence)
-            return True
-        else:
-            return False
-
-
     def save_original_msa(self, sequence):
 
         ''' recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.)
@@ -509,7 +477,6 @@ class Repeat:
                     count += 1
             self.msa_original.append(unit_original)
 
-
 ################################## Standardize MSA ######################################
 
 def standardize(blob):
@@ -517,6 +484,11 @@ def standardize(blob):
     for original, replacement in config_general['dAmbiguous_amino_acid'].items():
         blob = blob.replace(original, replacement[0])
     return blob
+
+def get_repeat_sequence(msa):
+
+    return "".join([i.replace("_", "").replace("-", "") for i in msa])
+
 
 ################################### Localize repeat ######################################
 

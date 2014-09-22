@@ -1,3 +1,5 @@
+# (C) 2014 Elke Schaper
+
 import Bio.Seq
 import logging
 import os

@@ -1,4 +1,3 @@
-import logging
 import os
 import pytest
 
@@ -10,7 +9,6 @@ TEST_SEQUENCE = "GYEDEDEDRPFYALGLGKRPRTYSFGL"
 TEST_REPEAT_MSA_DOUBLE = ["AA","AA"]
 TEST_HMM_STATES_DOUBLE = ["N", "M1", "I1","M2","I2","C"]
 TEST_HMM_P0_DOUBLE = {i:0 for i in TEST_HMM_STATES_DOUBLE}
-
 
 
 TEST_REPEAT_MSA_SINGLE = ["A","A","A"]

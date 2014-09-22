@@ -953,6 +953,7 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
 
     Run TRD on sequence_records and return the predicted repeats for each ``seq_records``
     and for each tandem repeat detector. Example of return type::
+
         [
             # record 1
             {
