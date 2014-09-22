@@ -8,11 +8,6 @@ repeat
 .. automodule:: tandemrepeats.repeat.repeat
     :members:
 
-repeat_conversation_test
-=============================
-.. automodule:: tandemrepeats.repeat.repeat_conversation_test
-    :members:
-
 repeat_exon
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_exon
