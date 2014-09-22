@@ -4,6 +4,7 @@ import pytest
 
 from tandemrepeats.repeat_list import repeat_list as rl
 from tandemrepeats.repeat import repeat
+from tandemrepeats.sequence import sequence
 
 TEST_REPEATS = [["AA","AA"],["AAA","AAA"],["AAAA","AAAA"], ["AAA-","AAAA"]]
 TEST_SCORE = "phylo_gap01"
@@ -27,9 +28,9 @@ def test_create_Repeat_list_from_Repeats():
 def test_serialize_repeat_list_tsv():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS[:2]]
+    test_seq = sequence.Sequence(TEST_SEQUENCE)
     for i in test_repeats:
-        i.repeat_in_sequence(sequence = TEST_SEQUENCE)
-
+        test_seq.repeat_in_sequence(repeat = i)
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
 
     tsv = test_repeat_list.write("tsv")
