@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 
 from tandemrepeats import configuration
 from tandemrepeats.repeat import repeat, repeat_align
@@ -216,7 +217,7 @@ class Sequence:
         if len(starts) != 0: # Is the tandem repeat predicted correctly?
             if not hasattr(myRepeat,"begin") or not myRepeat.begin in starts:
                 myRepeat.begin = starts[0]
-            myRepeat.save_original_msa(sequence)
+            myRepeat.save_original_msa(self.seq)
             return True
         else:
             return False
