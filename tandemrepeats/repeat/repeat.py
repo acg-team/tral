@@ -7,6 +7,7 @@ import logging
 import numpy as np
 import os
 from os.path import join
+import pickle
 import re
 
 from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
@@ -76,24 +77,47 @@ class Repeat:
 
         return first_line + "\n".join(self.msa)
 
-    def write(self, format, file, *args):
+    def create(file, format):
 
-        """ Write tandem repeat to file.
+        """ Read tandem repeat from file.
 
-        Write tandem repeat to file using one of two formats.
+        Read tandem repeat from file (currently, only pickle is supported)
 
         Args:
-            format (str):  Either "stockholm" or "fasta"
+            format (str):  Currently only "pickle"
             file (str): Path to output file
 
         .. todo:: Write checks for ``format`` and ``file``.
 
         """
 
-        if format == 'stockholm':
-            repeat_io.save_repeat_stockholm(self.msa, file)
-        elif format == 'fasta':
+        if format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
+        else:
+            raise Exception('format is unknown.')
+
+    def write(self, file, format, *args):
+
+        """ Write tandem repeat to file.
+
+        Write tandem repeat to file using one of three formats.
+
+        Args:
+            file (str): Path to input file
+            format (str):  Either "fasta", "pickle" or "stockholm"
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'fasta':
             repeat_io.save_repeat_fasta(self.msa, file)
+        elif format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
+        elif format == 'stockholm':
+            repeat_io.save_repeat_stockholm(self.msa, file)
         else:
             raise Exception('format is unknown.')
 

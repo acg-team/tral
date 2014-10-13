@@ -13,6 +13,7 @@ import datetime
 import logging
 import numpy as np
 import os
+import pickle
 import shutil
 import subprocess
 import tempfile
@@ -153,7 +154,7 @@ class HMM:
         del self.deletion_states
 
 
-    def create(hmmer_file = None, repeat = None):
+    def create(format, file = None, repeat = None):
         """ Creates a HMM instance from 2 possible input formats.
 
         A `HMM` instance is created from one of the two possible inputs:
@@ -183,11 +184,14 @@ class HMM:
 
         """
 
-        if hmmer_file:
-            if not os.path.exists(hmmer_file):
+        if format == 'hmmer':
+            if not os.path.exists(file):
                 raise Exception('HMMER3 file does not exist.')
-            hmmer_probabilities = HMM.read(hmmer_file)[0]
-        elif repeat:
+            hmmer_probabilities = HMM.read(file)[0]
+        elif format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
+        elif format == 'repeat':
             if not isinstance(repeat, Repeat):
                 raise Exception('The repeat value is not a valid instance of '
                                 'the Repeat class.')
@@ -263,6 +267,26 @@ class HMM:
 
         return hmmer_probabilities
 
+
+    def write(self, file, format, *args):
+
+        """ Write ``HMM`` to file.
+
+        Write ``HMM`` to file. Currently, only pickle is implemented.
+
+        Args:
+            file (str): Path to input file
+            format (str):  Either "fasta", "pickle" or "stockholm"
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
+        else:
+            raise Exception('format is unknown.')
 
     def HMM_example(self):
 

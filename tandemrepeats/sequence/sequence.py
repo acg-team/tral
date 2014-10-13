@@ -1,6 +1,7 @@
 # (C) 2014 Elke Schaper
 
 import logging
+import pickle
 import os
 import re
 
@@ -42,28 +43,29 @@ class Sequence:
 
         self.seq_standard_aa = repeat.standardize(self.seq)
 
-    def read(file, format = 'fasta'):
+    def create(file, format):
 
-        """ Read sequence(s) from file.
+        """ Create sequence(s) from file.
 
-        Read sequence(s) from file.
+        Create sequence(s) from file.
 
         Args:
             file (str): Path to input file
-            format (str):  Either "stockholm" or "fasta"
+            format (str):  Either "fasta" or "pickle"
 
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
         if format == 'fasta':
             lSeq = sequence_io.read_fasta(file)
+            return [Sequence(iSeq) for iSeq in lSeq]
+        if format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
 
-        return [Sequence(iSeq) for iSeq in lSeq]
-
-
-    def write(self, file, format = 'fasta'):
+    def write(self, file, format):
 
         """ Write sequence to file.
 
@@ -71,7 +73,7 @@ class Sequence:
 
         Args:
             file (str): Path to output file
-            format (str):  Either "stockholm" or "fasta"
+            format (str):  Either "fasta" or "pickle"
 
         .. todo:: Write checks for ``format`` and ``file``.
 
@@ -79,6 +81,9 @@ class Sequence:
 
         if format == 'fasta':
             sequence_io.write(self.seq, file)
+        elif format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
 

@@ -1,4 +1,5 @@
 import logging
+import pickle
 import sys
 
 log = logging.getLogger(__name__)
@@ -26,24 +27,52 @@ class Repeat_list:
     def __init__(self, repeats):
         self.repeats = repeats
 
+
     def __add__(self, rl):
         return Repeat_list(self.repeats + rl.repeats)
 
-    def write(self, format, file = None, *args):
 
-        """ Serialize repeat_lists
+    def create(file, format):
 
-        Serialize ``Repeat_list`` instance using the stated ``format`` into a ``Str``.
-        If a ``file`` is specified, save the ``Str``. Else, give back the ``Str``.
+        """ Read ``Repeat_list`` from file.
+
+        Read ``Repeat_list`` from file (currently, only pickle is supported)
 
         Args:
-            format (str):  "tsv"
+            format (str):  Currently only "pickle"
+            file (str): Path to output file
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
+        else:
+            raise Exception('format is unknown.')
+
+
+    def write(self, format, file = None, str = None, *args):
+
+        """ Serialize and write ``Repeat_list`` instances.
+
+        Serialize ``Repeat_list`` instance using the stated ``format``.
+        If a ``file`` is specified, save the String. If ``str`` is specified, give back
+        the String (not possible for pickles).
+
+        Args:
+            format (str):  The input format: Either "pickle" or "tsv"
             file (str): Path to output file
 
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
-        if format == 'tsv':
+        if format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
+            file = False
+        elif format == 'tsv':
             output = repeat_list_io.serialize_repeat_list_tsv(self)
         else:
             raise Exception('format is unknown.')
@@ -51,7 +80,7 @@ class Repeat_list:
         if file:
             with open(file, 'w') as fh:
                 fh.write(output)
-        else:
+        if str:
             return output
 
     def filter(self, func_name, *args):
