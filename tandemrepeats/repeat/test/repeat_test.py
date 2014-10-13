@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import pytest
 
 from tandemrepeats.repeat import repeat
@@ -13,6 +14,13 @@ TEST_SCORE = "phylo"
 # pValue 'phylo': 0.3821
 
 notfixed = pytest.mark.notfixed
+
+@pytest.fixture
+def path():
+    """Return the path to the test data files.
+    """
+    return os.path.join(os.path.abspath('.'), 'repeat', 'test')
+
 
 def test_standardize_amino_acids():
 
@@ -33,3 +41,19 @@ def test_repeat_ambiguous():
 
     assert myTR_O.divergence(TEST_SCORE) == 2.5986328125
     assert myTR_K.pValue(TEST_SCORE) == 0.3821
+
+
+def test_repeat_pickle():
+
+    myTR_O = repeat.Repeat(msa = TEST_MSA_O)
+
+    test_pickle = os.path.join(path(), "test.pickle")
+    myTR_O.write(test_pickle, 'pickle')
+    myTR_O_new = repeat.Repeat.create(test_pickle, 'pickle')
+
+    assert myTR_O.msa == myTR_O_new.msa
+    assert myTR_O.sequence_type == myTR_O_new.sequence_type
+    assert myTR_O.text == myTR_O_new.text
+
+    if os.path.exists(test_pickle):
+        os.remove(test_pickle)

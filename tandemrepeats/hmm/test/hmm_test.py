@@ -29,7 +29,7 @@ def test_create_HMM_from_Repeat():
 
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(repeat = test_repeat)
+    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
 
     assert test_hmm.lD == 2
     assert set(test_hmm.states) == set(TEST_HMM_STATES_DOUBLE)
@@ -38,8 +38,24 @@ def test_create_HMM_from_Repeat():
 
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_SINGLE)
-    test_hmm = HMM.create(repeat = test_repeat)
+    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
 
     assert test_hmm.lD == 1
     assert test_hmm.states == TEST_HMM_STATES_SINGLE
     assert test_hmm.p_0 == TEST_HMM_P0_SINGLE
+
+
+def test_hmm_pickle():
+
+    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
+    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+
+    test_pickle = os.path.join(path(), "test.pickle")
+    test_hmm.write(test_pickle, 'pickle')
+    test_hmm_new = HMM.create(format = 'pickle', file = test_pickle)
+
+    assert test_hmm.hmmer == test_hmm_new.hmmer
+    assert test_hmm.alphabet == test_hmm_new.alphabet
+
+    if os.path.exists(test_pickle):
+        os.remove(test_pickle)
