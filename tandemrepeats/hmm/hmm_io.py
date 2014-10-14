@@ -184,9 +184,11 @@ def read(hmm_filename, id = None):
                     if id:
                         log.debug(" * (3->TERMINAL) HMM Found and compiled,"
                                      " return HMM.")
+                        log.info("Yielding {}".format(hmm['id']))
                         yield hmm
                     else:
                         log.debug(" * (3->0) Finished HMM compilation")
+                        log.info("Yielding {}".format(hmm['id']))
                         yield hmm
                         state = 0
                 else:
