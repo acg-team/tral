@@ -2,6 +2,7 @@ import os
 import pytest
 
 from tandemrepeats.hmm.hmm import HMM
+from tandemrepeats.hmm import hmm_io
 from tandemrepeats.repeat.repeat import Repeat
 
 
@@ -38,7 +39,7 @@ def path():
     return os.path.join(os.path.abspath('.'), 'hmm', 'test')
 
 def test_single_hmm_with_id_read(path):
-    test_dict_list = HMM.read(os.path.join(path, TEST_FILE_WITH_ID))
+    test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITH_ID)))
     assert len(test_dict_list) == 1
     test_dict = test_dict_list[0]
 
@@ -48,7 +49,7 @@ def test_single_hmm_with_id_read(path):
 
 
 def test_single_hmm_without_id_read(path):
-    test_dict_list = HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID))
+    test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID)))
     assert len(test_dict_list) == 1
     test_dict = test_dict_list[0]
 
@@ -58,20 +59,20 @@ def test_single_hmm_without_id_read(path):
 
 
 def test_single_hmm_no_id_with_query_read(path):
-    test_dict_list = HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID),
-                              id=CARCINUSTATIN_ID)
+    test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID),
+                              id=CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
 def test_single_hmm_with_wrong_query_read(path):
-    test_dict_list = HMM.read(os.path.join(path, TEST_FILE_WITH_ID),
-                              id=WRONG_CARCINUSTATIN_ID)
+    test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITH_ID),
+                              id=WRONG_CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
 def test_single_hmm_with_short_query_read(path):
-    test_dict_list = HMM.read(os.path.join(path, TEST_FILE_WITH_ID),
-                              id=SHORT_CARCINUSTATIN_ID)
+    test_dict_list = list(hmm_io.read(os.path.join(path, TEST_FILE_WITH_ID),
+                              id=SHORT_CARCINUSTATIN_ID))
     assert len(test_dict_list) == 1
     test_dict = test_dict_list[0]
 

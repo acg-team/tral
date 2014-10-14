@@ -98,6 +98,7 @@ class HMM:
             hmmer_probabilities (dict): A dictionary with HMM parameters.
         """
         self.hmmer = hmmer_probabilities
+        self.id = hmmer_probabilities['id']
         self.alphabet = self.hmmer['letters']
 
         self.lD = max([int(key) for key in hmmer_probabilities.keys()
@@ -185,9 +186,10 @@ class HMM:
         """
 
         if format == 'hmmer':
+            # Read only first element from HMMER3 file.
             if not os.path.exists(file):
                 raise Exception('HMMER3 file does not exist.')
-            hmmer_probabilities = HMM.read(file)[0]
+            hmmer_probabilities = next(HMM.read(file))
         elif format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
@@ -195,7 +197,7 @@ class HMM:
             if not isinstance(repeat, Repeat):
                 raise Exception('The repeat value is not a valid instance of '
                                 'the Repeat class.')
-            hmmer_probabilities = HMM.create_from_repeat(repeat)[0]
+            hmmer_probabilities = HMM.create_from_repeat(repeat)
         else:
             raise Exception("Neither of the required inputs provided!")
 
@@ -261,7 +263,7 @@ class HMM:
                 else:
                     shutil.copy(hmm_file, hmm_copy_path)
 
-        hmmer_probabilities = HMM.read(hmm_filename = hmm_file, id = hmm_copy_id)
+        hmmer_probabilities = next(HMM.read(hmm_filename = hmm_file, id = hmm_copy_id))
 
         shutil.rmtree(tmp_dir)
 
