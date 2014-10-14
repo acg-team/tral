@@ -105,9 +105,6 @@ def read(hmm_filename, id = None):
     # 4: searching for insertion emission probabilities
     # 5: searching for transition probabilities
 
-    lHMM = []
-    hmm = {'id': None}
-
     state = 0
     with open(hmm_filename, "rt") as infile:
 
@@ -120,6 +117,7 @@ def read(hmm_filename, id = None):
                     state = 0.1
 
             elif 0.1 == state:
+                hmm = {'id': None}
                 match = pat_accession.match(line)
                 if match:
                     iID = match.group(1)
@@ -139,7 +137,7 @@ def read(hmm_filename, id = None):
                         state = 1
 
                 # This is done in order to be able to parse HMMs without an
-                # accesion number, e.g. when created from a Repeat.
+                # accession number, e.g. when created from a Repeat.
                 match2 = pat_HMM.match(line)
                 if match2:
                     letters = pat_letters.findall(line[3:])
@@ -186,10 +184,10 @@ def read(hmm_filename, id = None):
                     if id:
                         log.debug(" * (3->TERMINAL) HMM Found and compiled,"
                                      " return HMM.")
-                        return [hmm]
+                        yield hmm
                     else:
                         log.debug(" * (3->0) Finished HMM compilation")
-                        lHMM.append(hmm)
+                        yield hmm
                         state = 0
                 else:
                     log.debug(" * (3->0) Error: No emission line")
@@ -223,7 +221,6 @@ def read(hmm_filename, id = None):
                     log.debug(" * (5->0) Error: No transition line")
                     state = 0
 
-    return lHMM
 
 def split_HMMER3_file(hmm_filename, resultdir):
 
