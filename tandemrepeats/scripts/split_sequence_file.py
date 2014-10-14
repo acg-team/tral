@@ -56,7 +56,7 @@ def main():
 
 def read_commandline_arguments():
 
-    parser = argparse.ArgumentParser(description='Process tandem repeat detection options')
+    parser = argparse.ArgumentParser(description='Process split sequence options')
     parser.add_argument('path', metavar='sequence_file', type=str,
                        help='The path to the input sequence file.')
     parser.add_argument('-o','--output', type=str,

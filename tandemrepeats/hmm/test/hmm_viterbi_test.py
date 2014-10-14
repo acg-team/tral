@@ -33,7 +33,7 @@ def test_viterbi():
 
     for test, p in TEST.items():
         test_repeat = repeat.Repeat(msa = p[0])
-        test_hmm = HMM.create(repeat = test_repeat)
+        test_hmm = HMM.create(format = "repeat", repeat = test_repeat)
 
         for iHMM in [test_hmm]:
             # Detect TRs on self.seq with hmm using the Viterbi algorithm.
