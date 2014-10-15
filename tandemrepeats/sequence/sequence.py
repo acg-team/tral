@@ -146,7 +146,6 @@ class Sequence:
             return None
 
         elif denovo:
-
             if 'detection' in kwargs:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self], **kwargs['detection'])[0]
             else:
@@ -196,6 +195,14 @@ class Sequence:
             self.dRepeat_list = {}
 
         self.dRepeat_list[tag] = repeat_list
+
+    def annotate(self, data, tag):
+
+        if not hasattr(self,"annotations"):
+            self.dAnnotations = {}
+
+        self.dAnnotations[tag] = data
+
 
     def repeat_in_sequence(self, myRepeat):
 
