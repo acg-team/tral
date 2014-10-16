@@ -72,7 +72,7 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 
     if annotation_data_file:
         try:
-            with open(annotation_pickle, 'rb') as fh:
+            with open(annotation_data_file, 'rb') as fh:
                 annotations = pickle.load(fh)
         except:
             raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
