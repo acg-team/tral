@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 import csv
 import logging
 import logging.config
@@ -12,6 +13,45 @@ from tandemrepeats.sequence import sequence
 
 logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
 log = logging.getLogger('root')
+
+
+def read_pfam_uniprot(annotation_data_file, output_file):
+    ''' annotation_file from:
+        http://www.uniprot.org/uniprot/?query=database:(type:pfam%20AND%20*)&fil=&sort=score '''
+
+    p = {}
+    if annotation_data_file:
+        try:
+            with open(annotation_data_file) as f:
+                reader = csv.reader(f, delimiter="\t")
+                for row in reader:
+                    p[row[0]] = row[1][:-1].split(";")
+        except:
+            raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
+
+    with open('d.pickle', 'wb') as fh:
+       pickle.dump(p,fh)
+
+
+def annotate_seq_pickles(sequence_dir, output_path, annotation_pickle):
+
+    with open(annotation_pickle, 'rb') as fh:
+        annotations = pickle.load(fh)
+
+    for file in os.listdir(sequence_dir):
+        if file.endswith(".pickle"):
+            with open(os.path.join(sequence_dir, file), 'rb') as fh:
+                lSeq = pickle.load(fh)
+
+            for iS in lSeq:
+                if iS.id in annotations.keys():
+                    iS.annotate(annotations[iS.id], "PFAM")
+
+            output_file = os.path.join(output_path, file)
+            with open(output_file, 'wb') as fh:
+                pickle.dump(lSeq, fh)
+
+    print("DONE")
 
 
 def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_file = None):
@@ -58,9 +98,9 @@ def main():
 
     pars = read_commandline_arguments()
     if "annotation_file" in pars:
-        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"], pars["annotation_file"])
+        annotate_seq_pickles(pars["sequence_dir"], pars["output_path"], pars["annotation_file"])
     else:
-        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"])
+        annotate_seq_pickles(pars["sequence_dir"], pars["output_path"])
 
 
 def read_commandline_arguments():
