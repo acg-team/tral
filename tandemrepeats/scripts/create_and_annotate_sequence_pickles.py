@@ -72,9 +72,8 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 
     if annotation_data_file:
         try:
-            with open(annotation_data_file) as f:
-                reader = csv.reader(f, delimiter="\t")
-                d = list(reader)
+            with open(annotation_pickle, 'rb') as fh:
+                annotations = pickle.load(fh)
         except:
             raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
 
@@ -84,8 +83,8 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 
             if annotation_data_file:
                 for iS in lSeq:
-                    lPFAM = [i["accession"] for i in d if d['seq'] == iS['id'] and d['accession_type'] == 'PFAM']
-                    iS.annotate(data, "PFAM")
+                    if iS.id in annotations.keys():
+                        iS.annotate(annotations[iS.id], "PFAM")
 
             output_file = os.path.join(output_path, file.replace("fasta", "pickle"))
             with open(output_file, 'wb') as fh:
