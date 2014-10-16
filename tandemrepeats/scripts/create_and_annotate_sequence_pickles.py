@@ -97,9 +97,9 @@ def main():
 
     pars = read_commandline_arguments()
     if "annotation_file" in pars:
-        annotate_seq_pickles(pars["sequence_dir"], pars["output_path"], pars["annotation_file"])
+        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"], pars["annotation_file"])
     else:
-        annotate_seq_pickles(pars["sequence_dir"], pars["output_path"])
+        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"])
 
 
 def read_commandline_arguments():
