@@ -35,7 +35,7 @@ def read_fasta(file, indices = None):
                 continue
             elif count >= indices[1]:
                 break
-        yield str(seq_record.seq)
+        yield str(seq_record.seq), seq_record.id
 
 
 ############################## WRITE SEQUENCE #############################################

@@ -32,7 +32,7 @@ class Sequence:
     """
 
 
-    def __init__(self, seq):
+    def __init__(self, seq, id = None):
 
         if not isinstance(seq, str):
                 raise Exception('The seq value is not a String')
@@ -42,6 +42,9 @@ class Sequence:
                 raise Exception("{} is not in config['lAll_amino_acid']: {}".format(i, config['lAll_amino_acid']))
 
         self.seq_standard_aa = repeat.standardize(self.seq)
+
+        if id:
+            self.id = id
 
     def create(file, format):
 
@@ -58,7 +61,7 @@ class Sequence:
 
         if format == 'fasta':
             lSeq = sequence_io.read_fasta(file)
-            return [Sequence(iSeq) for iSeq in lSeq]
+            return [Sequence(iSeq, iID) for iSeq, iID in lSeq]
         if format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
