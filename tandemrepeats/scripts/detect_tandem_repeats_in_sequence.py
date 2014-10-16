@@ -18,6 +18,13 @@ log = logging.getLogger('root')
 c = configuration.Configuration.Instance()
 config = c.config
 
+# Shift REPEAT_LIST_TAG to configuration file and rename?
+REPEAT_LIST_TAG = "all"
+BASIC_FILTER_TAG = "basic_filter"
+DE_NOVO_TAG = "denovo"
+DENOVO_LIST_TAG = "denovo"
+
+
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
 
@@ -69,7 +76,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     print("DONE")
 
 
-def annotate_de_novo(sequences_file, result_file, detector):
+def annotate_de_novo(sequences_file, result_file, detector = None):
     ''' Annotate sequences with TRs with a de novo TR ``detector``.
 
      Annotate sequences with TRs with a de novo TR ``detector``.
@@ -88,9 +95,12 @@ def annotate_de_novo(sequences_file, result_file, detector):
         with open(sequences_file, 'rb') as fh:
             lSequence = pickle.load(fh)
     except:
-        raise Exception("Cannot load putative pickle file sequences_File: {}".format(sequences_File))
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
-    detection_parameters = {"detection": {"lFinders": [detector]}}
+    if detector:
+        detection_parameters = {"detection": {"lFinders": [detector]}}
+    else:
+        detection_parameters = {}
     log.debug("detection_parameters: {}".format(detection_parameters))
 
     dRL = {}
@@ -137,10 +147,12 @@ def calculate_significance(repeat_file, result_file, **kwargs):
     print("DONE")
 
 
-def calculate_overlap(sequences_file, repeat_files, result_file, lOverlap_type, **kwargs):
-    ''' Calculate the overlap of TR annotations from several sources.
+def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
 
-    Calculate the overlap of TR annotations from several sources.
+    ''' Merge TR annotations from several sources and perform basic filtering.
+
+    Merge TR annotations from several sources and perform basic filtering based on the
+    number of repeat units and the statistical significance of the tandem repeats.
 
     Args:
         sequences_file (str): Path to the pickle file containing a list of ``Sequence``
@@ -155,9 +167,12 @@ def calculate_overlap(sequences_file, repeat_files, result_file, lOverlap_type, 
         Exception: If the pickle ``repeat_file`` cannot be loaded
      Raises:
         Exception: If any of the pickles in ``sequences_file`` cannot be loaded
+
+    ..ToDo: Differentiate between Pfam and denovo repeat_files
     '''
 
-    rl_tag = "all"
+    BASIC_FILTER = [{'func_name:': 'pValue', 'args': {'score': 'phylo_gap01', 'threshold': 0.1}},
+            {'func_name:': 'attribute', 'args': {'attribute': 'nD', 'type': 'min',  'threshold': 1.9}}]
 
     try:
         with open(sequences_file, 'rb') as fh:
@@ -181,10 +196,14 @@ def calculate_overlap(sequences_file, repeat_files, result_file, lOverlap_type, 
 
     log.debug("Append ``repeat_list`` to ``sequence``.")
     for iS in lSequence:
-        iS.set_repeat_list(dRL_all[iS.id], rl_tag)
+        iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
+        denovo_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if hasattr(i, "TRD")])
+        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
 
-    for iS, iO in zip(lSequence, lOverlap_type):
-        iS.dRepeat_list[rl_tag].cluster(overlap_type = iO)
+    for iS in lSequence:
+        for iB in BASIC_FILTER:
+            rl_tmp = repeat_list.Repeat_list(iS.dRepeat_list[REPEAT_LIST_TAG].filter(**iB))
+        iS.set_repeat_list(rl_tmp, BASIC_FILTER_TAG)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
@@ -192,8 +211,64 @@ def calculate_overlap(sequences_file, repeat_files, result_file, lOverlap_type, 
     print("DONE")
 
 
-def filter():
-    return True
+
+def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
+    ''' Calculate the overlap of TR annotations from several sources.
+
+    Calculate the overlap of TR annotations from several sources.
+
+    Args:
+        sequences_file (str): Path to the pickle file containing a list of ``Sequence``
+            instances.
+        result_file (str): Path to the result file.
+        kwargs (dict): A dictionary of parameters for the applied significance test.
+
+
+     Raises:
+        Exception: If any of the pickles in ``sequences_file`` cannot be loaded
+    '''
+
+    try:
+        with open(sequences_file, 'rb') as fh:
+            lSequence = pickle.load(fh)
+    except:
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
+
+    for iS, iO in zip(lSequence, lOverlap_type):
+        iS.dRepeat_list[BASIC_FILTER_TAG].cluster(overlap_type = iO)
+
+    with open(result_file, 'wb') as fh:
+        pickle.dump(lSequence, fh)
+
+    print("DONE")
+
+
+def filter(sequences_file):
+    ''' Filter TRs according to several criteria.
+
+    Filter TRs according to several criteria. E.g., assuming overlap
+
+    Args:
+        sequences_file (str): Path to the pickle file containing a list of ``Sequence``
+            instances.
+        kwargs (dict): A dictionary of parameters for the applied filtering criteria.
+
+     Raises:
+        Exception: If ``sequences_file`` cannot be loaded
+    '''
+
+    # THIS IS MORE COMPLEX!
+    COMPLEX_FILTER = [{'func_name:': 'pValue', 'args': {'score': 'phylo_gap01', 'threshold': 0.1}},
+            {'func_name:': 'attribute', 'args': {'attribute': 'nD', 'type': 'min',  'threshold': 1.9}}]
+
+
+    try:
+        with open(sequences_file, 'rb') as fh:
+            lSequence = pickle.load(fh)
+    except:
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
+
+    print("DONE")
 
 def refine_denovo():
     return True
@@ -216,15 +291,22 @@ def main():
     if "significance_test" in pars:
         config["repeat_score"]["score_calibration"] = pars["significance_test"]
 
-    seq = sequence.Sequence.read(fasta_file)[0]
-    denovo_list = seq.detect(denovo = True)
-    sys.stdout.write(denovo_list.write("tsv") + "\n")
+
+    # method = getattr(sys.modules[__name__], pars["method_name"])
+    # method()
+    if pars["method"] == "annotate_de_novo":
+        annotate_de_novo(pars["input"], pars["output"])
+
 
 def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Process tandem repeat detection options')
-    parser.add_argument('path', metavar='seq.faa', type=str,
-                       help='The path to the sequence fasta file.')
+    parser.add_argument('input', metavar='input_file', type=str,
+                       help='The path to the input file.')
+    parser.add_argument('output', metavar='output_file', type=str,
+                       help='The path to the output file.')
+    parser.add_argument('method', metavar='method_name', type=str,
+                       help='The name of the method to be executed.')
     parser.add_argument('-seq','--sequence_type', type=str,
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-d', '--detectors', nargs='+', type=str,
