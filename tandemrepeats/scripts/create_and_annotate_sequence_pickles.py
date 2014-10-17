@@ -83,7 +83,10 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 
             if annotation_data_file:
                 for iS in lSeq:
+                    iS.id_long = iS.id
+                    iS.id = iS.id.split("|")[1]
                     if iS.id in annotations.keys():
+                        print(annotations[iS.id])
                         iS.annotate(annotations[iS.id], "PFAM")
 
             output_file = os.path.join(output_path, file.replace("fasta", "pickle"))
