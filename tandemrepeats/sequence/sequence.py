@@ -212,7 +212,7 @@ class Sequence:
         if hasattr(self,"dAnnotations") and tag in self.dAnnotations:
             return self.dAnnotations[tag]
         else:
-            return None
+            return []
 
     def repeat_in_sequence(self, myRepeat):
 
