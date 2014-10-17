@@ -110,6 +110,7 @@ def annotate_de_novo(sequences_file, result_file, detector = None):
     dRL = {}
     for iS in lSequence:
         iRL = iS.detect(denovo = True, **detection_parameters)
+        log.debug(iRL.repeats)
         for iTR in iRL.repeats:
             iTR.TRD = detector
         dRL[iS.id] = iRL
@@ -295,13 +296,15 @@ def main():
     if "significance_test" in pars:
         config["repeat_score"]["score_calibration"] = pars["significance_test"]
 
-
     # method = getattr(sys.modules[__name__], pars["method_name"])
     # method()
     if pars["method"] == "annotate_de_novo":
         annotate_de_novo(pars["input"], pars["output"])
     elif pars["method"] == "annotate_TRs_from_hmmer":
         annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
+    elif pars["method"] == "calculate_significance":
+        calculate_significance(pars["input"], pars["output"])
+
 
 def read_commandline_arguments():
 
