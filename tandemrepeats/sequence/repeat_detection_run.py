@@ -218,7 +218,7 @@ class FinderHHrepID(TRFFinder):
 
             self.valopts = {
                 "-i"      :None,        # <file> input query alignment  (fasta/a2m/a3m) or HMM file (.hhm)
-                "-d"      :os.path.join(DATAROOT,'hhrepid','dummyHMM.hmm'),   # <path> dummy hmm database file
+                "-d"      :os.path.join(repeat_detector_path[name],'dummyHMM.hmm'),   # <path> dummy hmm database file
                 "-o"      :'hhrepID.o',    # <file> write results and multiple sequence alignment to file (default=none)
                 "-v"      :0,           # -v: verbose mode (default: show only warnings)  ;  -v 0: suppress all screen outpu
                 "-P"      :None,        # <float> max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)
