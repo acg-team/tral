@@ -58,7 +58,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     lHMM = set(lHMM)
     infoNHMM = len(lHMM)
     log.debug("These derive from {} independent HMMs.".format(infoNHMM))
-    dHMM = {hmm_ID: hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID, ".pickle"))
+    dHMM = {hmm_ID: hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID + ".pickle"))
                 for hmm_ID in lHMM}
 
     dTR = {}
