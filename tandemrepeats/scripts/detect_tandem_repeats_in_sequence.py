@@ -63,10 +63,13 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     dTR = {}
     for iS in lSequence:
         log.debug("".format(iS.get_annotation('PFAM')))
-        iRL = iS.detect([dHMM[hmm_ID] for hmm_ID in iS.get_annotation('PFAM')])
-        for iTR, hmm_ID in zip(iRL.repeats, iS.get_annotation('PFAM')):
-            iTR.model = hmm_ID
-        dTR[iS.id] = iRL
+        if iS.get_annotation('PFAM'):
+            iRL = iS.detect([dHMM[hmm_ID] for hmm_ID in iS.get_annotation('PFAM')])
+            for iTR, hmm_ID in zip(iRL.repeats, iS.get_annotation('PFAM')):
+                iTR.model = hmm_ID
+            dTR[iS.id] = iRL
+        else:
+           dTR[iS.id] = None
 
     with open(result_file, 'wb') as fh:
         pickle.dump(dTR, fh)
