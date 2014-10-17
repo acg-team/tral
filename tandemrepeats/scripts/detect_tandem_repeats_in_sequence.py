@@ -51,14 +51,14 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
         raise Exception("hmm_dir does not exists: {}".format(hmm_dir))
 
     # Load all HMM pickles needed for all sequences.
-    lHMM = [hmm_ID for iS in lSequence for hmm_ID in iS.lHMM_ID]
+    lHMM = [hmm_ID for iS in lSequence for hmm_ID in iS.annotations['PFAM']]
     infoNRuns = len(lHMM)
     log.debug("{} Viterbi runs need to be performed.".format(infoNHMM))
     lHMM = set(lHMM)
     infoNHMM = len(lHMM)
     log.debug("These derive from {} independent HMMs.".format(infoNHMM))
     dHMM = {hmm_ID: hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID, ".pickle"))
-                for iHMM in lHMM}
+                for hmm_ID in lHMM}
 
     dTR = {}
     for iS in lSequence:
@@ -296,7 +296,8 @@ def main():
     # method()
     if pars["method"] == "annotate_de_novo":
         annotate_de_novo(pars["input"], pars["output"])
-
+    elif pars["method"] == "annotate_TRs_from_hmmer":
+        annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
 
 def read_commandline_arguments():
 
@@ -311,6 +312,8 @@ def read_commandline_arguments():
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-d', '--detectors', nargs='+', type=str,
                         help='The de novo tandem repeat detectors. For example: -d T-REKS XSTREAM')
+    parser.add_argument('-hmm', '--hmm', type=str,
+                        help='The path to the dir with HMMER pickles')
     parser.add_argument("-test", "--significance_test", type=str, required=False,
                         help='The significance tests and cut-off values used. For example: -test \'{"phylo_gap01":0.01}\'')
     parser.add_argument("-c", "--cluster", type=str, required=False,
