@@ -62,9 +62,9 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
 
     dTR = {}
     for iS in lSequence:
-        log.debug("".format(iS.lHMM_ID))
-        iRL = iS.detect([dHMM[hmm_ID] for hmm_ID in iS.lHMM_ID])
-        for iTR, hmm_ID in zip(iRL.repeats, iS.lHMM_ID):
+        log.debug("".format(iS.get_annotation('PFAM')))
+        iRL = iS.detect([dHMM[hmm_ID] for hmm_ID in iS.get_annotation('PFAM')])
+        for iTR, hmm_ID in zip(iRL.repeats, iS.get_annotation('PFAM')):
             iTR.model = hmm_ID
         dTR[iS.id] = iRL
 
