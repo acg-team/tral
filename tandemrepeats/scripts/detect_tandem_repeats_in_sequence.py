@@ -11,6 +11,7 @@ import sys
 from tandemrepeats import configuration
 from tandemrepeats.paths import *
 from tandemrepeats.sequence import sequence
+for tandemrepeats.hmm import hmm
 
 logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
 log = logging.getLogger('root')
