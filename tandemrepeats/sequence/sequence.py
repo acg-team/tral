@@ -201,11 +201,18 @@ class Sequence:
 
     def annotate(self, data, tag):
 
-        if not hasattr(self,"annotations"):
+        if not hasattr(self,"dAnnotations"):
             self.dAnnotations = {}
 
         self.dAnnotations[tag] = data
 
+
+    def get_annotation(self, tag):
+
+        if hasattr(self,"dAnnotations") and tag in self.dAnnotations:
+            return self.dAnnotations[tag]
+        else:
+            return None
 
     def repeat_in_sequence(self, myRepeat):
 
