@@ -61,7 +61,7 @@ def path():
 def test_MBE_2014_pipeline():
     # The Schaper et al. (MBE, 2014) pipeline is tested on a single sequence.
 
-    test_lSeq = sequence.Sequence.read(os.path.join(path(), TEST_FAA_FILE_MBE_2014))
+    test_lSeq = sequence.Sequence.create(os.path.join(path(), TEST_FAA_FILE_MBE_2014), format = 'fasta')
     test_seq = test_lSeq[0]
 
     # Information on sequence domains (here: Pfam) in this sequence are added.

@@ -21,7 +21,6 @@ def test_detect_TRUST():
     assert predicted_repeats[0].msa == ['HLREDIAQIP---TCAEAGE---QEGRLQR', 'KQKNATGGRR--HICHECGKSFAQSSGLSK', 'HRRIHTGEKP--YECEECGKAFIGSSALVI', 'HQRVHTGEKP--YECEECGKAFSHSSDLIK', 'HQRTHTGEKP--YECDDCGKTFSQSCSLLE', 'HHRIHTGEKP--YQCSMCGKAFRRSSHLLR', 'HQRIHTGDKN--VQEPEQGEAW--KSRM--', 'ESQLENVETPmsYKCNECERSFTQNTGLIE', 'HQKIHTGEKP--YQCNACGKGFTRISYLVQ']
 
 def test_detect_XSTREAM():
-
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
     predicted_repeats = repeat_detection_run.run_TRD(seq_records = [test_seq], lFinders = ["XSTREAM"])[0]['XSTREAM']
     assert len(predicted_repeats) == 1

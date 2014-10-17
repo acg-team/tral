@@ -22,8 +22,8 @@ from tandemrepeats.paths import *
 log = logging.getLogger(__name__)
 
 c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["sequence"]["repeat_detection"]
+general_config = c.config
+repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -149,6 +149,7 @@ class TRFFinder(object):
 
     def __init__(self, executable):
         """Construct a TRFFinder object with executable als executable object"""
+        log.debug(executable)
         self.__executable = executable
 
     def run_process(self, working_dir, *args):
@@ -252,7 +253,7 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"hhrepid_64")),
+        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"hhrepid_64")),
         config = None
     ):
         """Construct FinderHHrepID object.
@@ -356,7 +357,7 @@ class FinderPhobos(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"phobos")),
+        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"phobos")),
         config = None
     ):
         """Construct FinderPhobos object.
@@ -428,7 +429,7 @@ class FinderTRED(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"tred")),
+        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"tred")),
         config = None
     ):
         """Construct FinderTRED object.
@@ -511,7 +512,7 @@ class FinderTREKS(TRFFinder):
             return bool_toks + value_toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'], jars=[os.path.join(EXECROOT,"T-Reks.jar")]),
+        executable=JavaExecutable(javaopts = ['-mx512m'], jars=[os.path.join(repeat_detector_path[name],"T-Reks.jar")]),
         config = None
     ):
         """Construct FinderTREKS object.
@@ -603,7 +604,7 @@ class FinderTRF(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"trf")),
+        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"trf")),
         config = None
     ):
         """Construct FinderTRF object.
@@ -779,7 +780,7 @@ class FinderXStream(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx1024m'], jars=[os.path.join(EXECROOT,"xstream.jar")]),
+        executable=JavaExecutable(javaopts = ['-mx1024m'], jars=[os.path.join(repeat_detector_path[name],"xstream.jar")]),
         config = Configuration()
     ):
         """Construct FinderXStream object.
@@ -861,11 +862,11 @@ def Finders(lFinder = None, sequence_type = None):
     global finders
 
     if not sequence_type:
-        sequence_type = config_general["sequence_type"]
+        sequence_type = general_config["sequence_type"]
     if not lFinder:
-        lFinder = config[sequence_type]
+        lFinder = general_config["sequence"]["repeat_detection"][sequence_type]
     else:
-        if any(i not in list(itertools.chain(*config.values())) for i in lFinder):
+        if any(i not in list(itertools.chain(*general_config["sequence"]["repeat_detection"].values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
     finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}

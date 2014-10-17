@@ -278,7 +278,7 @@ def loadModel(evolution_model = 'lg'):
 
 def TN93(alpha_1 = config['TN93']['alpha_1'], alpha_2 = config['TN93']['alpha_2'], beta = config['TN93']['beta']):
     '''TN93'''
-    #4*4 matrix with alpha_1 = 0.3, alpha_2 = 0.4, beta = 0.7 according to TN93
+    #4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93
     Q = [[-(alpha_1 + 2*beta), alpha_1, beta, beta],[alpha_1, -(alpha_1 + 2*beta), beta, beta], \
     [beta, beta, -(alpha_2 + 2*beta), alpha_2], [beta, beta, alpha_2, -(alpha_2 + 2*beta)]]
 
