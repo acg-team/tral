@@ -53,7 +53,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     # Load all HMM pickles needed for all sequences.
     lHMM = [hmm_ID for iS in lSequence for hmm_ID in iS.get_annotation('PFAM')]
     infoNRuns = len(lHMM)
-    log.debug("{} Viterbi runs need to be performed.".format(infoNHMM))
+    log.debug("{} Viterbi runs need to be performed.".format(infoNRuns))
     lHMM = set(lHMM)
     infoNHMM = len(lHMM)
     log.debug("These derive from {} independent HMMs.".format(infoNHMM))
