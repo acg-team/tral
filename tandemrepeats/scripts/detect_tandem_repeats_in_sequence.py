@@ -143,7 +143,7 @@ def calculate_significance(repeat_file, result_file, **kwargs):
         raise Exception("Cannot load putative pickle file repeat_file: {}".format(repeat_file))
 
     for iRL in dRL.values():
-        for iTR in iRL.repeats():
+        for iTR in iRL.repeats:
             iTR.calculate_pValues(**kwargs)
 
     with open(result_file, 'wb') as fh:
