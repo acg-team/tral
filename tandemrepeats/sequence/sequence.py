@@ -154,6 +154,7 @@ class Sequence:
             else:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
 
+            log.debug("lPredicted_repeat: {}".format(lPredicted_repeat))
             lRepeat = []
 
             for jTRD,jlTR in lPredicted_repeat.items():

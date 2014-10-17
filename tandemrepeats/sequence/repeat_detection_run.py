@@ -129,20 +129,18 @@ def check_java_errors(outfile, errfile, log=None, procname=None):
 
     if (errfile_size != 0 and outfile_size == 0):
         has_error = True
-        if log:
-            log.warning(
-                "Process \"%s\" has empty STDOUT but non-empty STDERR",
-                procname)
+        log.warning(
+            "Process \"%s\" has empty STDOUT but non-empty STDERR",
+            procname)
 
     pat_javaexc = re.compile(r'Exception in thread ".+" \S+:.*$(\s+at .+)+', re.M)
 
     m = pat_javaexc.search(errfile_str)
     if m:
         has_error = True
-        if log:
-            log.warning(
-                "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
-                procname, m.group(0))
+        log.warning(
+            "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
+            procname, m.group(0))
 
     return has_error
 
