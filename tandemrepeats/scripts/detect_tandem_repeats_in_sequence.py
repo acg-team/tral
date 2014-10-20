@@ -203,12 +203,17 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
         iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
         if iS.dRepeat_list[REPEAT_LIST_TAG]:
             denovo_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if hasattr(i, "TRD")])
-            iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
+        else:
+            denovo_repeat_list = iS.dRepeat_list[REPEAT_LIST_TAG]
+        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
 
     for iS in lSequence:
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
-        for iB in basic_filter['dict'].values():
-            rl_tmp = rl_tmp.filter(**iB)
+        if iS.dRepeat_list[REPEAT_LIST_TAG]:
+            for iB in basic_filter['dict'].values():
+                rl_tmp = rl_tmp.filter(**iB)
+        else:
+            rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
         iS.set_repeat_list(rl_tmp, basic_filter_tag)
 
     with open(result_file, 'wb') as fh:
