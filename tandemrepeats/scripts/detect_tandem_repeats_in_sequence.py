@@ -10,6 +10,7 @@ import sys
 
 from tandemrepeats import configuration
 from tandemrepeats.paths import *
+from tandemrepeats.repeat_list import repeat_list
 from tandemrepeats.sequence import sequence
 from tandemrepeats.hmm import hmm
 
@@ -21,10 +22,7 @@ config = c.config
 
 # Shift REPEAT_LIST_TAG to configuration file and rename?
 REPEAT_LIST_TAG = "all"
-BASIC_FILTER_TAG = "basic_filter"
 DE_NOVO_TAG = "denovo"
-DENOVO_LIST_TAG = "denovo"
-
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
@@ -122,9 +120,9 @@ def annotate_de_novo(sequences_file, result_file, detector = None):
 
 
 def calculate_significance(repeat_file, result_file, **kwargs):
-    ''' Calculate the statistical significance for all repeat in ``repeat_file``.
+    ''' Calculate the statistical significance for all repeats in ``repeat_file``.
 
-     Calculate the statistical significance for all repeat in ``repeat_file``.
+     Calculate the statistical significance for all repeats in ``repeat_file``.
 
      Args:
          repeat_file (str): Path to the pickle file containing a dict of ``Repeat``
@@ -143,8 +141,9 @@ def calculate_significance(repeat_file, result_file, **kwargs):
         raise Exception("Cannot load putative pickle file repeat_file: {}".format(repeat_file))
 
     for iRL in dRL.values():
-        for iTR in iRL.repeats:
-            iTR.calculate_pValues(**kwargs)
+        if iRL:
+            for iTR in iRL.repeats:
+                iTR.calculate_pValues(**kwargs)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(dRL, fh)
@@ -173,17 +172,17 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
      Raises:
         Exception: If any of the pickles in ``sequences_file`` cannot be loaded
 
-    ..ToDo: Differentiate between Pfam and denovo repeat_files
+    ..ToDo: Input BASIC_FILTER as PARAMETERS
     '''
 
-    BASIC_FILTER = [{'func_name:': 'pValue', 'args': {'score': 'phylo_gap01', 'threshold': 0.1}},
-            {'func_name:': 'attribute', 'args': {'attribute': 'nD', 'type': 'min',  'threshold': 1.9}}]
+    basic_filter = config['filter']['basic']
+    basic_filter_tag = config['filter']['basic']['tag']
 
     try:
         with open(sequences_file, 'rb') as fh:
             lSequence = pickle.load(fh)
     except:
-        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_File))
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     log.debug("Merging all repeat lists in from ``repeat_files``.")
     dRL_all = {}
@@ -199,6 +198,9 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
             for iS_ID,iRL in dRL.items():
                 dRL_all[iS_ID] += iRL
 
+    # WARNING! TEMP!
+    dRL_all = {i.split("|")[1]:j for i,j in dRL_all.items()}
+
     log.debug("Append ``repeat_list`` to ``sequence``.")
     for iS in lSequence:
         iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
@@ -206,15 +208,15 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
         iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
 
     for iS in lSequence:
-        for iB in BASIC_FILTER:
-            rl_tmp = repeat_list.Repeat_list(iS.dRepeat_list[REPEAT_LIST_TAG].filter(**iB))
-        iS.set_repeat_list(rl_tmp, BASIC_FILTER_TAG)
+        rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
+        for iB in basic_filter['dict'].values():
+            rl_tmp = rl_tmp.filter(**iB)
+        iS.set_repeat_list(rl_tmp, basic_filter_tag)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
 
     print("DONE")
-
 
 
 def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
@@ -240,7 +242,7 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     for iS, iO in zip(lSequence, lOverlap_type):
-        iS.dRepeat_list[BASIC_FILTER_TAG].cluster(overlap_type = iO)
+        iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
@@ -304,6 +306,8 @@ def main():
         annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
     elif pars["method"] == "calculate_significance":
         calculate_significance(pars["input"], pars["output"])
+    elif pars["method"] == "merge_and_basic_filter":
+        merge_and_basic_filter(pars["input"], pars['repeat_files'], pars["output"])
 
 
 def read_commandline_arguments():
@@ -317,6 +321,8 @@ def read_commandline_arguments():
                        help='The name of the method to be executed.')
     parser.add_argument('-seq','--sequence_type', type=str,
                        help='The sequence type: -seq AA or -seq DNA')
+    parser.add_argument('-rep','--repeat_files', nargs='+', type=str,
+                       help='The repeat files')
     parser.add_argument('-d', '--detectors', nargs='+', type=str,
                         help='The de novo tandem repeat detectors. For example: -d T-REKS XSTREAM')
     parser.add_argument('-hmm', '--hmm', type=str,

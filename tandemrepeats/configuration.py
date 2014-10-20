@@ -50,5 +50,5 @@ class Singleton:
 @Singleton
 class Configuration:
     def __init__(self):
-        self.config = configobj.ConfigObj(pDefaults, configspec = pSpec)
+        self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
 

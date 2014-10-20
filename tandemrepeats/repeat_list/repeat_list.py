@@ -83,12 +83,12 @@ class Repeat_list:
         if str:
             return output
 
-    def filter(self, func_name, *args):
+    def filter(self, func_name, *args, **kwargs):
 
         # Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?
 
         func = getattr(sys.modules[__name__], func_name)
-        return Repeat_list( func(self, *args) )
+        return Repeat_list( func(self, *args, **kwargs) )
 
     def cluster(self, overlap_type, *args):
 
@@ -154,6 +154,8 @@ def pValue(rl, score, threshold):
 
     """
 
+    threshold = float(threshold)
+
     res = []
     for iRepeat in rl.repeats:
         if iRepeat.pValue(score) <= threshold:
@@ -194,6 +196,8 @@ def attribute(rl, attribute, type, threshold):
             are filtered out.
     """
 
+    threshold = float(threshold)
+
     res = []
     for iRepeat in rl.repeats:
         value = getattr(iRepeat, attribute)
@@ -203,6 +207,8 @@ def attribute(rl, attribute, type, threshold):
         elif type == "max":
             if value <= threshold:
                 res.append(iRepeat)
+        else:
+            raise Exception("type must either be 'min' or 'max'. Instead, it is {}.".format(type))
     return(res)
 
 
