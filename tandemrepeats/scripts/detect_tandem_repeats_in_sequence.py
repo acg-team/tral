@@ -198,9 +198,6 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
             for iS_ID,iRL in dRL.items():
                 dRL_all[iS_ID] += iRL
 
-    # WARNING! TEMP!
-    dRL_all = {i.split("|")[1]:j for i,j in dRL_all.items()}
-
     log.debug("Append ``repeat_list`` to ``sequence``.")
     for iS in lSequence:
         iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
