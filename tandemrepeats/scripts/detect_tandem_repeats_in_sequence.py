@@ -201,8 +201,9 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
     log.debug("Append ``repeat_list`` to ``sequence``.")
     for iS in lSequence:
         iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
-        denovo_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if hasattr(i, "TRD")])
-        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
+        if iS.dRepeat_list[REPEAT_LIST_TAG]:
+            denovo_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if hasattr(i, "TRD")])
+            iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
 
     for iS in lSequence:
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
