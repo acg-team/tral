@@ -4,13 +4,11 @@
 import itertools
 import logging
 import os
-import queue
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 
 from collections import OrderedDict
 from Bio import SeqIO
@@ -902,46 +900,6 @@ class FinderJob:
         self.job_id = job_id
         self.protein_id = protein_id
 
-def finder_worker(working_dir, job_queue, result_list, result_lock):
-    def clear_queue(q):
-        """Eat all items in job queue.
-        To be called if you wish to terminate execution."""
-        while not q.empty():
-            try:
-                q.get_nowait()
-                q.task_done()
-            except:
-                break
-
-    # Run infinitely, because this should be called as a daemon thread
-    while True:
-        job = job_queue.get()
-
-        try:
-            wd = os.path.join(working_dir, "{0:03}".format(job.job_id+1))
-
-            log.debug("Launching finder \"%s\" in directory %s",
-                job.finder.name, os.path.join(wd, job.finder.name))
-
-            result = job.finder.run_process(wd, job.infile)
-
-            # lock the mutex for results, append resul
-            with result_lock:
-                result_list[job.job_id][job.finder.name].extend(result)
-
-
-            log.debug("Finder \"%s\" returned from job %d",
-                job.finder.name, job.job_id)
-        except:
-            # On errors, kill all jobs in queue, cry to the logfile and return
-            clear_queue(job_queue)
-            log.exception(
-                "Exception occured in worker while processing %s with %s",
-                job.infile, job.finder.name)
-            # raise
-        finally:
-            job_queue.task_done()
-
 
 
 ################ RUN A SET OF Tandem Repeat Detection algorithms (TRDs) ##################
@@ -1015,11 +973,6 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
             for i in range(len(infiles))
     ]
 
-    result_lock = threading.Lock()
-
-    # A queue for all jobs we have to run
-    job_queue = queue.Queue()
-
     # Create a list for our jobs
     joblist = [
         FinderJob(
@@ -1032,28 +985,30 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         for job_id, infile in enumerate(infiles)
     ]
 
-    # launch worker daemon thread
-    for i in range(num_threads):
-        t = threading.Thread(
-            target=finder_worker,
-            args=(working_dir, job_queue, results, result_lock)
-        )
-        t.daemon = True
-        t.start()
-
-    log.debug("Threads active after launching workers: %d",
-        threading.active_count())
-
-
     log.info("Processing %d input files in %d jobs.",
         len(infiles), len(joblist))
 
     # put joblist into job queue, thus starting actual work
     for job in joblist:
-        job_queue.put(job)
+        try:
+            wd = os.path.join(working_dir, "{0:03}".format(job.job_id+1))
 
+            log.debug("Launching finder \"%s\" in directory %s",
+                job.finder.name, os.path.join(wd, job.finder.name))
 
-    job_queue.join()
+            result = job.finder.run_process(wd, job.infile)
+
+            # lock the mutex for results, append result
+            #with result_lock:
+            results[job.job_id][job.finder.name].extend(result)
+
+            log.debug("Finder \"%s\" returned from job %d",
+                job.finder.name, job.job_id)
+        except:
+            log.exception(
+                "Exception occured in worker while processing %s with %s",
+                job.infile, job.finder.name)å
+
     log.info("All jobs returned.")
 
     # delete temporary directory
@@ -1063,7 +1018,6 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         except: # I guess the error type is known, and you could be more precise :)
             logging.error("Unexpected error: {0}".format(sys.exc_info()[0]))
             raise
-
 
     return results
 
