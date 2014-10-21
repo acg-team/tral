@@ -1007,7 +1007,7 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         except:
             log.exception(
                 "Exception occured in worker while processing %s with %s",
-                job.infile, job.finder.name)å
+                job.infile, job.finder.name)
 
     log.info("All jobs returned.")
 
