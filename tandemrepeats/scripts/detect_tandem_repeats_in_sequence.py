@@ -238,6 +238,8 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
         Exception: If any of the pickles in ``sequences_file`` cannot be loaded
     '''
 
+    basic_filter_tag = config['filter']['basic']['tag']
+
     try:
         with open(sequences_file, 'rb') as fh:
             lSequence = pickle.load(fh)
@@ -311,6 +313,9 @@ def main():
         calculate_significance(pars["input"], pars["output"])
     elif pars["method"] == "merge_and_basic_filter":
         merge_and_basic_filter(pars["input"], pars['repeat_files'], pars["output"])
+    elif pars["method"] == "calculate_overlap":
+        calculate_overlap(pars["input"], pars["output"], pars["overlap_type"])
+
 
 
 def read_commandline_arguments():
@@ -326,6 +331,8 @@ def read_commandline_arguments():
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-rep','--repeat_files', nargs='+', type=str,
                        help='The repeat files')
+    parser.add_argument('-ov','--overlap_type', nargs='+', type=str,
+                       help='The overlap type, e.g. "common_ancestry shared_char"')
     parser.add_argument('-d', '--detectors', nargs='+', type=str,
                         help='The de novo tandem repeat detectors. For example: -d T-REKS XSTREAM')
     parser.add_argument('-hmm', '--hmm', type=str,
