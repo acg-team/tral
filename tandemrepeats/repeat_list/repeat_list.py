@@ -29,8 +29,10 @@ class Repeat_list:
 
 
     def __add__(self, rl):
-        return Repeat_list(self.repeats + rl.repeats)
-
+        if rl:
+            return Repeat_list(self.repeats + rl.repeats)
+        else:
+            return self
 
     def create(file, format):
 
