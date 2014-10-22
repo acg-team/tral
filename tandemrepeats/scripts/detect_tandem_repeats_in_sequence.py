@@ -1,6 +1,7 @@
 #!python
 
 import argparse
+import itertools
 import json
 import logging
 import logging.config
@@ -196,8 +197,7 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
             dRL_all = dRL
         else:
             for iS_ID,iRL in dRL.items():
-                if iRL:
-                    dRL_all[iS_ID] += iRL
+                dRL_all[iS_ID] += iRL
 
     log.debug("Append ``repeat_list`` to ``sequence``.")
     for iS in lSequence:
@@ -247,7 +247,7 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
     except:
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
-    for iS, iO in zip(lSequence, lOverlap_type):
+    for iS,iO in itertools.product(lSequence, lOverlap_type):
         iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
 
     with open(result_file, 'wb') as fh:
