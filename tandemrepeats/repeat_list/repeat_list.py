@@ -36,7 +36,7 @@ class Repeat_list:
 
     def intersection(self, rl):
         if rl:
-            return Repeat_list([i for i in self.repeats if i in rl.repeats)
+            return Repeat_list([i for i in self.repeats if i in rl.repeats])
         else:
             return self
 
