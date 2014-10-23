@@ -34,6 +34,12 @@ class Repeat_list:
         else:
             return self
 
+    def intersection(self, rl):
+        if rl:
+            return Repeat_list([i for i in self.repeats if i in rl.repeats)
+        else:
+            return self
+
     def create(file, format):
 
         """ Read ``Repeat_list`` from file.
