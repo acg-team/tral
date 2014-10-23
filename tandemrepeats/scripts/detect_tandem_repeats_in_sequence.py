@@ -339,7 +339,7 @@ def serialize_annotations(sequences_dir, result_file, format):
     ..ToDo: Serialisation format currently not used..
     '''
 
-    lFiles = [file for file in os.listdir(sequences_dir) if file.endswith(".pickle")]:
+    lFiles = [file for file in os.listdir(sequences_dir) if file.endswith(".pickle")]
 
     with open(result_file, 'w') as fh:
         for iFile in Files:
