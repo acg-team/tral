@@ -296,24 +296,22 @@ def refine_denovo(sequences_file, result_file):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     for iS in lSequence:
-        if not iS.dRepeat_list[DE_NOVO_TAG]:
-            iS.set_repeat_list(iS.dRepeat_list[DE_NOVO_TAG], DE_NOVO_FINAL_TAG)
-            continue
-        # Create HMM from TR
-        denovo_hmm = [hmm.HMM.create(format = 'repeat', repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
-        print(denovo_hmm)
-        # Run HMM on sequence
-        denovo_refined_rl = iS.detect(lHMM = denovo_hmm)
-        print(denovo_refined_rl)
-        print(denovo_refined_rl.repeats)
-        iS.set_repeat_list(denovo_refined_rl, DE_NOVO_REFINED_TAG)
         denovo_final = []
-        for iTR, iTR_refined in zip(iS.dRepeat_list[DE_NOVO_TAG].repeats, denovo_refined_rl.repeats):
-            # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
-            if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
-                denovo_final.append(iTR)
-            else:
-                denovo_final.append(iTR_refined)
+        denovo_refined = []
+        for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+            # Create HMM from TR
+            denovo_hmm = hmm.HMM.create(format = 'repeat', repeat = iTR)
+            # Run HMM on sequence
+            denovo_refined_rl = iS.detect(lHMM = [denovo_hmm])
+            if denovo_refined_rl:
+                iTR_refined = denovo_refined_rl.repeats[0]
+                denovo_refined.append(iTR_refined)
+                # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
+                if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
+                    denovo_final.append(iTR)
+                else:
+                    denovo_final.append(iTR_refined)
+        iS.set_repeat_list(repeat_list.Repeat_list(denovo_refined), DE_NOVO_REFINED_TAG)
         iS.set_repeat_list(repeat_list.Repeat_list(denovo_final), DE_NOVO_FINAL_TAG)
 
     with open(result_file, 'wb') as fh:
