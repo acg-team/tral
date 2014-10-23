@@ -252,59 +252,17 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
     except:
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
-    for iS,iO in itertools.product(lSequence, lOverlap_type):
-        iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
-
+    #for iS,iO in itertools.product(lSequence, lOverlap_type):
+    #    iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
 
     # Perform common ancestry overlap filter and keep PFAMs
-    #iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[basic_filter_tag], "overlap_type": }
-    rl_tmp = rl_tmp.filter(**iC)
-    iS.set_repeat_list(rl_tmp, complex_filter_tag)
+    iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
+    iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
 
-    with open(result_file, 'wb') as fh:
-        pickle.dump(lSequence, fh)
+    # Choose only the most convincing de novo TRs
+    iC = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
+    iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
 
-    print("DONE")
-
-
-def complex_filter(sequences_file, result_file):
-    ''' Filter TRs according to several criteria.
-
-    Filter TRs according to several criteria. E.g., assuming overlap
-
-    Args:
-        sequences_file (str): Path to the pickle file containing a list of ``Sequence``
-            instances.
-        kwargs (dict): A dictionary of parameters for the applied filtering criteria.
-
-     Raises:
-        Exception: If ``sequences_file`` cannot be loaded
-    '''
-
-    # THIS IS MORE COMPLEX! YOU ABSOLUTELY NEED TO UPDATE THE COMPLEX FILTERS
-    # USE none_overlapping_fixed_repeats
-
-    complex_filter = config['filter']['complex']
-    basic_filter_tag = config['filter']['basic']['tag']
-    complex_filter_tag = config['filter']['complex']['tag']
-
-    try:
-        with open(sequences_file, 'rb') as fh:
-            lSequence = pickle.load(fh)
-    except:
-        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
-
-    for iS in lSequence:
-
-        # get rid of all denovo TRs overlapping with PFAM TRs
-
-        rl_tmp = iS.dRepeat_list[basic_filter_tag]
-        if iS.dRepeat_list[basic_filter_tag]:
-            for iC in complex_filter['dict'].values():
-                rl_tmp = rl_tmp.filter(**iC)
-        else:
-            rl_tmp = iS.dRepeat_list[basic_filter_tag]
-        iS.set_repeat_list(rl_tmp, complex_filter_tag)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
