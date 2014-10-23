@@ -299,10 +299,10 @@ def refine_denovo(sequences_file, result_file):
         # Create HMM from TR
         denovo_hmm = [hmm.HMM.create(format = 'repeat', repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
         # Run HMM on sequence
-        denovo_list_refined = iS.detect(lHMM = denovo_hmm)
-        iS.set_repeat_list(repeat_list.Repeat_list(denovo_list_refined), DE_NOVO_REFINED_TAG)
+        denovo_refined_rl = iS.detect(lHMM = denovo_hmm)
+        iS.set_repeat_list(denovo_refined_rl, DE_NOVO_REFINED_TAG)
         denovo_final = []
-        for iTR, iTR_refined in zip(iS.dRepeat_list[DE_NOVO_TAG].repeats, denovo_list_refined):\
+        for iTR, iTR_refined in zip(iS.dRepeat_list[DE_NOVO_TAG].repeats, denovo_refined_rl.repeats):
             # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
             if not two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
                 denovo_final.append(iTR)
