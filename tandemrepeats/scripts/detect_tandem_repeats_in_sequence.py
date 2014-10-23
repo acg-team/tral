@@ -378,7 +378,7 @@ def main():
     # method = getattr(sys.modules[__name__], pars["method_name"])
     # method()
     if pars["method"] == "annotate_de_novo":
-        annotate_de_novo(pars["input"], pars["output"])
+        annotate_de_novo(pars["input"], pars["output"], detector = pars['detectors'])
     elif pars["method"] == "annotate_TRs_from_hmmer":
         annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
     elif pars["method"] == "calculate_significance":
