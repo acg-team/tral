@@ -84,7 +84,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     print("DONE")
 
 
-def annotate_de_novo(sequences_file, result_file, detector = None):
+def annotate_de_novo(sequences_file, result_file, detectors = None):
     ''' Annotate sequences with TRs with a de novo TR ``detector``.
 
      Annotate sequences with TRs with a de novo TR ``detector``.
@@ -106,7 +106,7 @@ def annotate_de_novo(sequences_file, result_file, detector = None):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     if detector:
-        detection_parameters = {"detection": {"lFinders": [detector]}}
+        detection_parameters = {"detection": {"lFinders": detectors}}
     else:
         detection_parameters = {}
     log.debug("detection_parameters: {}".format(detection_parameters))
@@ -378,7 +378,7 @@ def main():
     # method = getattr(sys.modules[__name__], pars["method_name"])
     # method()
     if pars["method"] == "annotate_de_novo":
-        annotate_de_novo(pars["input"], pars["output"], detector = pars['detectors'])
+        annotate_de_novo(pars["input"], pars["output"], detectors = pars['detectors'])
     elif pars["method"] == "annotate_TRs_from_hmmer":
         annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
     elif pars["method"] == "calculate_significance":
