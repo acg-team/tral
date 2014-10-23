@@ -24,6 +24,8 @@ config = c.config
 # Shift REPEAT_LIST_TAG to configuration file and rename?
 REPEAT_LIST_TAG = "all"
 DE_NOVO_TAG = "denovo"
+PFAM_TAG = "pfam"
+
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
@@ -204,9 +206,12 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
         iS.set_repeat_list(dRL_all[iS.id], REPEAT_LIST_TAG)
         if iS.dRepeat_list[REPEAT_LIST_TAG]:
             denovo_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if hasattr(i, "TRD")])
+            pfam_repeat_list = repeat_list.Repeat_list([i for i in iS.dRepeat_list[REPEAT_LIST_TAG].repeats if not hasattr(i, "TRD")])
         else:
             denovo_repeat_list = iS.dRepeat_list[REPEAT_LIST_TAG]
+            pfam_repeat_list = iS.dRepeat_list[REPEAT_LIST_TAG]
         iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
+        iS.set_repeat_list(pfam_repeat_list, PFAM_TAG)
 
     for iS in lSequence:
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
@@ -250,13 +255,19 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
     for iS,iO in itertools.product(lSequence, lOverlap_type):
         iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
 
+
+    # Perform common ancestry overlap filter and keep PFAMs
+    iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[basic_filter_tag], "overlap_type": }
+    rl_tmp = rl_tmp.filter(**iC)
+    iS.set_repeat_list(rl_tmp, complex_filter_tag)
+
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
 
     print("DONE")
 
 
-def filter(sequences_file):
+def complex_filter(sequences_file, result_file):
     ''' Filter TRs according to several criteria.
 
     Filter TRs according to several criteria. E.g., assuming overlap
@@ -270,10 +281,12 @@ def filter(sequences_file):
         Exception: If ``sequences_file`` cannot be loaded
     '''
 
-    # THIS IS MORE COMPLEX!
-    COMPLEX_FILTER = [{'func_name:': 'pValue', 'args': {'score': 'phylo_gap01', 'threshold': 0.1}},
-            {'func_name:': 'attribute', 'args': {'attribute': 'nD', 'type': 'min',  'threshold': 1.9}}]
+    # THIS IS MORE COMPLEX! YOU ABSOLUTELY NEED TO UPDATE THE COMPLEX FILTERS
+    # USE none_overlapping_fixed_repeats
 
+    complex_filter = config['filter']['complex']
+    basic_filter_tag = config['filter']['basic']['tag']
+    complex_filter_tag = config['filter']['complex']['tag']
 
     try:
         with open(sequences_file, 'rb') as fh:
@@ -281,7 +294,23 @@ def filter(sequences_file):
     except:
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
+    for iS in lSequence:
+
+        # get rid of all denovo TRs overlapping with PFAM TRs
+
+        rl_tmp = iS.dRepeat_list[basic_filter_tag]
+        if iS.dRepeat_list[basic_filter_tag]:
+            for iC in complex_filter['dict'].values():
+                rl_tmp = rl_tmp.filter(**iC)
+        else:
+            rl_tmp = iS.dRepeat_list[basic_filter_tag]
+        iS.set_repeat_list(rl_tmp, complex_filter_tag)
+
+    with open(result_file, 'wb') as fh:
+        pickle.dump(lSequence, fh)
+
     print("DONE")
+
 
 def refine_denovo():
     return True
@@ -316,7 +345,8 @@ def main():
         merge_and_basic_filter(pars["input"], pars['repeat_files'], pars["output"])
     elif pars["method"] == "calculate_overlap":
         calculate_overlap(pars["input"], pars["output"], pars["overlap_type"])
-
+    elif pars["method"] == "complex_filter":
+        complex_filter(pars["input"], pars["output"])
 
 
 def read_commandline_arguments():
