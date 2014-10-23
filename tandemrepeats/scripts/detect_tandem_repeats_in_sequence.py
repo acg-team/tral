@@ -23,9 +23,10 @@ config = c.config
 
 # Shift REPEAT_LIST_TAG to configuration file and rename?
 REPEAT_LIST_TAG = "all"
+DE_NOVO_ALL_TAG = "denovo_all"
+PFAM_ALL_TAG = "pfam_all"
 DE_NOVO_TAG = "denovo"
 PFAM_TAG = "pfam"
-
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
@@ -210,8 +211,8 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
         else:
             denovo_repeat_list = iS.dRepeat_list[REPEAT_LIST_TAG]
             pfam_repeat_list = iS.dRepeat_list[REPEAT_LIST_TAG]
-        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_TAG)
-        iS.set_repeat_list(pfam_repeat_list, PFAM_TAG)
+        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_ALL_TAG)
+        iS.set_repeat_list(pfam_repeat_list, PFAM_ALL_TAG)
 
     for iS in lSequence:
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
@@ -221,6 +222,8 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
         else:
             rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
         iS.set_repeat_list(rl_tmp, basic_filter_tag)
+        iS.set_repeat_list(rl_tmp.intersection(iS.dRepeat_list[PFAM_ALL_TAG]), PFAM_TAG)
+        iS.set_repeat_list(rl_tmp.intersection(iS.dRepeat_list[DE_NOVO_ALL_TAG]), DE_NOVO_TAG)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
@@ -257,12 +260,12 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
 
     for iS in lSequence:
         # Perform common ancestry overlap filter and keep PFAMs
-        iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
+        iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_ALL_TAG], "overlap_type": "common_ancestry"}
+        iS.dRepeat_list[DE_NOVO_ALL_TAG] = iS.dRepeat_list[DE_NOVO_ALL_TAG].filter(**iC)
 
         # Choose only the most convincing de novo TRs
         iC = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
+        iS.dRepeat_list[DE_NOVO_ALL_TAG] = iS.dRepeat_list[DE_NOVO_ALL_TAG].filter(**iC)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
