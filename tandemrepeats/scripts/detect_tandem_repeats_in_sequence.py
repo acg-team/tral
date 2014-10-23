@@ -296,6 +296,9 @@ def refine_denovo(sequences_file, result_file):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     for iS in lSequence:
+        if not iS.dRepeat_list[DE_NOVO_TAG]:
+            iS.set_repeat_list(iS.dRepeat_list[DE_NOVO_TAG], DE_NOVO_FINAL_TAG)
+            continue
         # Create HMM from TR
         denovo_hmm = [hmm.HMM.create(format = 'repeat', repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
         # Run HMM on sequence
