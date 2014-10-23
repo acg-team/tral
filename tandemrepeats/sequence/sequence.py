@@ -108,10 +108,7 @@ class Sequence:
                 E.g. ``calc_score = True``
 
         Returns:
-            A list of ``Repeat`` instances.
-
-        .. todo:: Return ``repeat_list`` instance instead of a list of repeats
-
+            A ``Repeat_list`` instance
         """
 
         if lHMM:
