@@ -21,8 +21,13 @@ import tempfile
 from tandemrepeats.hmm import hmm_io, hmm_viterbi
 from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
+from tandemrepeats import configuration
 
 log = logging.getLogger(__name__)
+
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["hmm"]
 
 ################################### HMM class #########################################
 
@@ -246,7 +251,7 @@ class HMM:
         tandem_repeat.write(file=stockholm_file, format = "stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen(["hmmbuild", "--amino", tmp_id + ".hmm",
+        p = subprocess.Popen([config["hmmbuild"], "--amino", tmp_id + ".hmm",
                               tmp_id + ".sto"],
                              stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
         p.wait()
