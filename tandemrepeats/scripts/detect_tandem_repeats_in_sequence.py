@@ -84,7 +84,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     print("DONE")
 
 
-def annotate_de_novo(sequences_file, result_file, detectors = None):
+def annotate_de_novo(sequences_file, result_file, detector = None):
     ''' Annotate sequences with TRs with a de novo TR ``detector``.
 
      Annotate sequences with TRs with a de novo TR ``detector``.
@@ -106,7 +106,7 @@ def annotate_de_novo(sequences_file, result_file, detectors = None):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     if detector:
-        detection_parameters = {"detection": {"lFinders": detectors}}
+        detection_parameters = {"detection": {"lFinders": [detector]}}
     else:
         detection_parameters = {}
     log.debug("detection_parameters: {}".format(detection_parameters))
@@ -378,7 +378,7 @@ def main():
     # method = getattr(sys.modules[__name__], pars["method_name"])
     # method()
     if pars["method"] == "annotate_de_novo":
-        annotate_de_novo(pars["input"], pars["output"], detectors = pars['detectors'])
+        annotate_de_novo(pars["input"], pars["output"], detector = pars['detector'])
     elif pars["method"] == "annotate_TRs_from_hmmer":
         annotate_TRs_from_hmmer(pars["input"], pars["hmm"], pars["output"])
     elif pars["method"] == "calculate_significance":
@@ -409,8 +409,8 @@ def read_commandline_arguments():
                        help='The serialization format, e.g. tsv')
     parser.add_argument('-ov','--overlap_type', nargs='+', type=str,
                        help='The overlap type, e.g. "common_ancestry shared_char"')
-    parser.add_argument('-d', '--detectors', nargs='+', type=str,
-                        help='The de novo tandem repeat detectors. For example: -d T-REKS XSTREAM')
+    parser.add_argument('-d', '--detectors', type=str,
+                        help='The de novo tandem repeat detectors. For example: -d T-REKS')
     parser.add_argument('-hmm', '--hmm', type=str,
                         help='The path to the dir with HMMER pickles')
     parser.add_argument("-test", "--significance_test", type=str, required=False,
