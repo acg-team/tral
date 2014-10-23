@@ -239,24 +239,24 @@ def none_overlapping_fixed_repeats(rl, rl_fixed, overlap_type):
     return(res)
 
 
-def none_overlapping(rl, overlap, dCriterion):
+def none_overlapping(rl, overlap, lCriterion):
 
     """ Returns all none-overlapping repeats in ``rl``.
 
     Returns all none-overlapping repeats in ``rl``. Repeats are clustered according to
     ``overlap``. Of each cluster, only the best repeat is returned according to
-    ``lCriterion``.
+    ``dCriterion``.
 
     Args:
         rl (Repeat_list): An instance of the Repeat_list class.
-        overlap (list): First list element: Name (str) of an overlap method in repeat_list.
+        overlap (tuple): First element: Name (str) of an overlap method in repeat_list. Second element: **kwargs
         All remaining elements are additional arguments for this class.
         lCriterion (list): list of (criterion (str), criterion arguments) tuples. Until
         only one repeat is remainining in a cluster, the criteria are applied in order.
     """
 
     overlap_type = overlap[0]
-    overlap_args = overlap[1:]
+    overlap_args = overlap[1]
 
     if not (hasattr(rl,'dCluster') and overlap_type in rl.dCluster):
         rl.cluster(overlap_type, overlap_args)
@@ -266,7 +266,7 @@ def none_overlapping(rl, overlap, dCriterion):
 
         iRepeat = [rl.repeats[i] for i in iCluster]
 
-        for criterion_type, criterion_value in dCriterion.items():
+        for criterion_type, criterion_value in lCriterion:
             if len(iRepeat) == 1:
                 res.append(iRepeat[0])
                 break
