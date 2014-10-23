@@ -120,7 +120,7 @@ def test_filter_cluster_based():
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
     test_repeat_list.filter("pValue", TEST_SCORE, 0.1)
-    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ["common_ancestry"], {"pValue":TEST_SCORE, "divergence":TEST_SCORE})
+    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ("common_ancestry", None), [("pValue", TEST_SCORE), ("divergence", TEST_SCORE)])
     assert len(test_repeat_list_filtered.repeats) == 3
     for i in test_repeats[:3]:
         assert i in test_repeat_list_filtered.repeats

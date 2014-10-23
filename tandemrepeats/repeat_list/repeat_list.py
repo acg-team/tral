@@ -272,7 +272,8 @@ def none_overlapping(rl, overlap, lCriterion):
 
         iRepeat = [rl.repeats[i] for i in iCluster]
 
-        for criterion_type, criterion_value in lCriterion:
+        for iC in lCriterion:
+            criterion_type, criterion_value = iC
             if len(iRepeat) == 1:
                 res.append(iRepeat[0])
                 break

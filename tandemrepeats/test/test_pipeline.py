@@ -65,7 +65,7 @@ def test_MBE_2014_pipeline():
     test_seq = test_lSeq[0]
 
     # Information on sequence domains (here: Pfam) in this sequence are added.
-    test_pfam_hmm = [hmm.HMM.create( hmmer_file = os.path.join(path(),i) ) for i in TEST_HMM_FILES_MBE_2014]
+    test_pfam_hmm = [hmm.HMM.create( format = 'hmmer', file = os.path.join(path(),i) ) for i in TEST_HMM_FILES_MBE_2014]
 
     # The sequence is searched for tandem repetitions of the Pfam domain in the sequence
     test_pfam_list = test_seq.detect(lHMM = test_pfam_hmm)
@@ -92,7 +92,7 @@ def test_MBE_2014_pipeline():
     assert len(test_denovo_list.repeats) == 2
 
     # De novo TRs were remastered with HMM
-    test_denovo_hmm = [hmm.HMM.create(repeat = iTR) for iTR in test_denovo_list.repeats]
+    test_denovo_hmm = [hmm.HMM.create(format = 'repeat', repeat = iTR) for iTR in test_denovo_list.repeats]
     test_denovo_list_remastered = test_seq.detect(lHMM = test_denovo_hmm)
     assert len(test_denovo_list_remastered.repeats) == 2
 
@@ -109,7 +109,8 @@ def test_MBE_2014_pipeline():
 
     # Remaining De novo TRs were clustered for overlap (common ancestry). Only best =
     # lowest p-Value and lowest divergence were retained.
-    test_denovo_list_remastered = test_denovo_list_remastered.filter("none_overlapping", ["common_ancestry"], {"pValue":TEST_SCORE_MBE_2014, "divergence":TEST_SCORE_MBE_2014})
+    test_denovo_list_remastered = test_denovo_list_remastered.filter("none_overlapping",
+        ("common_ancestry", None), [("pValue", TEST_SCORE_MBE_2014), ("divergence", TEST_SCORE_MBE_2014)])
     assert len(test_denovo_list_remastered.repeats) == 1
 
     # Merge remaining set of de novo and Pfam TRs.
