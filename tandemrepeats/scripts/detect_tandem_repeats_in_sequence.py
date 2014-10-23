@@ -304,7 +304,7 @@ def refine_denovo(sequences_file, result_file):
         denovo_final = []
         for iTR, iTR_refined in zip(iS.dRepeat_list[DE_NOVO_TAG].repeats, denovo_refined_rl.repeats):
             # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
-            if not two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
+            if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
                 denovo_final.append(iTR)
             else:
                 denovo_final.append(iTR_refined)
