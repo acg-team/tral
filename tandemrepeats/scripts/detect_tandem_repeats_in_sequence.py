@@ -409,7 +409,7 @@ def read_commandline_arguments():
                        help='The serialization format, e.g. tsv')
     parser.add_argument('-ov','--overlap_type', nargs='+', type=str,
                        help='The overlap type, e.g. "common_ancestry shared_char"')
-    parser.add_argument('-d', '--detectors', type=str,
+    parser.add_argument('-d', '--detector', type=str,
                         help='The de novo tandem repeat detectors. For example: -d T-REKS')
     parser.add_argument('-hmm', '--hmm', type=str,
                         help='The path to the dir with HMMER pickles')
