@@ -346,7 +346,7 @@ def main():
     elif pars["method"] == "calculate_overlap":
         calculate_overlap(pars["input"], pars["output"], pars["overlap_type"])
     elif pars["method"] == "refine_denovo":
-        complex_filter(pars["input"], pars["output"])
+        refine_denovo(pars["input"], pars["output"])
 
 
 def read_commandline_arguments():
