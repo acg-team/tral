@@ -252,17 +252,17 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
     except:
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
-    #for iS,iO in itertools.product(lSequence, lOverlap_type):
-    #    iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
+    for iS,iO in itertools.product(lSequence, lOverlap_type):
+        iS.dRepeat_list[basic_filter_tag].cluster(overlap_type = iO)
 
-    # Perform common ancestry overlap filter and keep PFAMs
-    iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
-    iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
+    for iS in lSequence:
+        # Perform common ancestry overlap filter and keep PFAMs
+        iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
 
-    # Choose only the most convincing de novo TRs
-    iC = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-    iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
-
+        # Choose only the most convincing de novo TRs
+        iC = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
