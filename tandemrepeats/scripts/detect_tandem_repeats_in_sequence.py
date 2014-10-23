@@ -297,7 +297,7 @@ def refine_denovo(sequences_file, result_file):
 
     for iS in lSequence:
         # Create HMM from TR
-        denovo_hmm = [hmm.HMM.create(repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
+        denovo_hmm = [hmm.HMM.create(format = 'repeat', repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
         # Run HMM on sequence
         denovo_list_refined = iS.detect(lHMM = denovo_hmm)
         iS.set_repeat_list(repeat_list.Repeat_list(denovo_list_refined), DE_NOVO_REFINED_TAG)
