@@ -345,7 +345,7 @@ def main():
         merge_and_basic_filter(pars["input"], pars['repeat_files'], pars["output"])
     elif pars["method"] == "calculate_overlap":
         calculate_overlap(pars["input"], pars["output"], pars["overlap_type"])
-    elif pars["method"] == "complex_filter":
+    elif pars["method"] == "refine_denovo":
         complex_filter(pars["input"], pars["output"])
 
 
