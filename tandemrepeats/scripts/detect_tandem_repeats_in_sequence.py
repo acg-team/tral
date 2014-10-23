@@ -27,6 +27,8 @@ DE_NOVO_ALL_TAG = "denovo_all"
 PFAM_ALL_TAG = "pfam_all"
 DE_NOVO_TAG = "denovo"
 PFAM_TAG = "pfam"
+DE_NOVO_REFINED_TAG = "denovo_refined"
+DE_NOVO_FINAL_TAG = "denovo_final"
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
@@ -273,8 +275,45 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
     print("DONE")
 
 
-def refine_denovo():
-    return True
+def refine_denovo(sequences_file, result_file):
+    ''' Refine denovo TRs.
+
+     Refine denovo TRs. Calculate significance. Check location in sequence. Discard insignificant.
+
+     Args:
+         sequences_file (str): Path to the pickle file containing a list of ``Sequence``
+            instances.
+         result_file (str): Path to the result file.
+
+     Raises:
+        Exception: If the pickle ``sequences_file`` cannot be loaded
+    '''
+
+    try:
+        with open(sequences_file, 'rb') as fh:
+            lSequence = pickle.load(fh)
+    except:
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
+
+    for iS in lSequence:
+        # Create HMM from TR
+        denovo_hmm = [hmm.HMM.create(repeat = iTR) for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats]
+        # Run HMM on sequence
+        denovo_list_refined = iS.detect(lHMM = denovo_hmm)
+        iS.set_repeat_list(repeat_list.Repeat_list(denovo_list_refined), DE_NOVO_REFINED_TAG)
+        denovo_final = []
+        for iTR, iTR_refined in zip(iS.dRepeat_list[DE_NOVO_TAG].repeats, denovo_list_refined):\
+            # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
+            if not two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
+                denovo_final.append(iTR)
+            else:
+                denovo_final.append(iTR_refined)
+        iS.set_repeat_list(repeat_list.Repeat_list(denovo_final), DE_NOVO_FINAL_TAG)
+
+    with open(result_file, 'wb') as fh:
+        pickle.dump(lSequence, fh)
+
+    print("DONE")
 
 def serialize_annotations():
     return True
