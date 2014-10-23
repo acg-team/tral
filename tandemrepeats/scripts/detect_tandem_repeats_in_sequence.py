@@ -296,6 +296,7 @@ def refine_denovo(sequences_file, result_file):
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     for iS in lSequence:
+        log.debug(iS.id)
         denovo_final = []
         denovo_refined = []
         for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
@@ -305,6 +306,7 @@ def refine_denovo(sequences_file, result_file):
             denovo_refined_rl = iS.detect(lHMM = [denovo_hmm])
             if denovo_refined_rl:
                 iTR_refined = denovo_refined_rl.repeats[0]
+                iTR_refined.TRD = iTR.TRD + "_refined"
                 denovo_refined.append(iTR_refined)
                 # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
                 if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
@@ -319,8 +321,44 @@ def refine_denovo(sequences_file, result_file):
 
     print("DONE")
 
-def serialize_annotations():
-    return True
+
+def serialize_annotations(sequences_dir, result_file, format):
+    ''' Serialize tandem repeat annotation results
+
+     Serialize tandem repeat annotation results
+
+     Args:
+         sequences_dir (str): Path to the dir containing pickle file of lists of ``Sequence``
+            instances.
+         result_file (str): Path to the result file.
+         format (str): Serialization format name, e.g. tsv.
+
+     Raises:
+        Exception: If the pickles in ``sequences_dir`` cannot be loaded
+
+    ..ToDo: Serialisation format currently not used..
+    '''
+
+    lFiles = [file in os.listdir(sequences_dir) if file.endswith(".pickle")]:
+
+    with open(result_file, 'w') as fh:
+        for iFile in Files:
+            sequences_file = os.path.join(sequences_dir, iFile)
+            try:
+                with open(sequences_file, 'rb') as fh:
+                    lSequence = pickle.load(fh)
+            except:
+                raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
+
+            for result_file in lSequence:
+                for iTR in iS.dRepeat_list[PFAM_TAG].repeats:
+                    data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.model]]
+                    result_file.write("\t".join(data))
+                for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+                    data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD]]
+                    result_file.write("\t".join(data))
+
+    print("DONE")
 
 
 def main():
@@ -351,7 +389,8 @@ def main():
         calculate_overlap(pars["input"], pars["output"], pars["overlap_type"])
     elif pars["method"] == "refine_denovo":
         refine_denovo(pars["input"], pars["output"])
-
+    elif pars["method"] == "serialize_annotations":
+        serialize_annotations(pars["input"], pars["output"], )
 
 def read_commandline_arguments():
 
@@ -366,6 +405,8 @@ def read_commandline_arguments():
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-rep','--repeat_files', nargs='+', type=str,
                        help='The repeat files')
+    parser.add_argument('-f','--format', type=str,
+                       help='The serialization format, e.g. tsv')
     parser.add_argument('-ov','--overlap_type', nargs='+', type=str,
                        help='The overlap type, e.g. "common_ancestry shared_char"')
     parser.add_argument('-d', '--detectors', nargs='+', type=str,
