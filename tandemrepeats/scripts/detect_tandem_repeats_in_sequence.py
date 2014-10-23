@@ -29,6 +29,7 @@ DE_NOVO_TAG = "denovo"
 PFAM_TAG = "pfam"
 DE_NOVO_REFINED_TAG = "denovo_refined"
 DE_NOVO_FINAL_TAG = "denovo_final"
+FINAL_TAG = "final"
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
@@ -72,6 +73,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
             iRL = iS.detect([dHMM[hmm_ID] for hmm_ID in iS.get_annotation('PFAM')])
             for iTR, hmm_ID in zip(iRL.repeats, iS.get_annotation('PFAM')):
                 iTR.model = hmm_ID
+                iTR.TRD = "PFAM"
             dTR[iS.id] = iRL
         else:
            dTR[iS.id] = None
@@ -117,6 +119,7 @@ def annotate_de_novo(sequences_file, result_file, detector = None):
         log.debug(iRL.repeats)
         for iTR in iRL.repeats:
             iTR.TRD = detector
+            iTR.model = None
         dRL[iS.id] = iRL
 
     with open(result_file, 'wb') as fh:
@@ -262,12 +265,12 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
 
     for iS in lSequence:
         # Perform common ancestry overlap filter and keep PFAMs
-        iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
+        criterion_pfam_fixed = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_pfam_fixed)
 
         # Choose only the most convincing de novo TRs
-        iC = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**iC)
+        criterion_filter_order = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_overlap_order)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
@@ -278,7 +281,19 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
 def refine_denovo(sequences_file, result_file):
     ''' Refine denovo TRs.
 
-     Refine denovo TRs. Calculate significance. Check location in sequence. Discard insignificant.
+    Refine denovo TRs from the DE_NOVO_TAG ``repeat_list``.
+    If the refined de novo TR
+        - exists
+    append it to the DE_NOVO_REFINED_TAG ``repeat_list``. Otherwise, append False. Append
+    None for TRs that are in DE_NOVO_ALL_TAG, but not in DE_NOVO_TAG, such that finally,
+    all TRs in DE_NOVO_ALL_TAG have a corresponding entry (which might be None or False)
+    in DE_NOVO_REFINED_TAG.
+
+    If the refined de novo TR
+        - exists
+        - overlaps with the original de novo TR
+        - passes the basic filtering test
+    append it to the FINAL_TAG ``repeat_list``. Otherwise, append the original de novo TR.
 
      Args:
          sequences_file (str): Path to the pickle file containing a list of ``Sequence``
@@ -289,6 +304,8 @@ def refine_denovo(sequences_file, result_file):
         Exception: If the pickle ``sequences_file`` cannot be loaded
     '''
 
+    basic_filter = config['filter']['basic']
+
     try:
         with open(sequences_file, 'rb') as fh:
             lSequence = pickle.load(fh)
@@ -298,23 +315,37 @@ def refine_denovo(sequences_file, result_file):
     for iS in lSequence:
         log.debug(iS.id)
         denovo_final = []
-        denovo_refined = []
-        for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+        denovo_refined = [None] * len(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats)
+        for i,iTR in enumerate(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats):
+            if not iTR in iS.dRepeat_list[DE_NOVO_TAG]:
+                continue
             # Create HMM from TR
             denovo_hmm = hmm.HMM.create(format = 'repeat', repeat = iTR)
             # Run HMM on sequence
             denovo_refined_rl = iS.detect(lHMM = [denovo_hmm])
+            append_refined = False
             if denovo_refined_rl:
                 iTR_refined = denovo_refined_rl.repeats[0]
-                iTR_refined.TRD = iTR.TRD + "_refined"
-                denovo_refined.append(iTR_refined)
+                iTR_refined.TRD = iTR.TRD
+                iTR_refined.model = "cpHMM"
+                denovo_refined[i] = iTR_refined
                 # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
-                if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined) and not iTR_refined.pValue("phylo_gap01") < 0.1:
-                    denovo_final.append(iTR)
-                else:
-                    denovo_final.append(iTR_refined)
+                if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
+                    rl_tmp = repeat_list.Repeat_list([iTR_refined])
+                    for iB in basic_filter['dict'].values():
+                        rl_tmp = rl_tmp.filter(**iB)
+                    if rl_tmp.repeats:
+                        append_refined = True
+            else:
+                denovo_refined[i] = False
+            if append_refined:
+                denovo_final.append(iTR_refined)
+            else:
+                denovo_final.append(iTR)
+
         iS.set_repeat_list(repeat_list.Repeat_list(denovo_refined), DE_NOVO_REFINED_TAG)
         iS.set_repeat_list(repeat_list.Repeat_list(denovo_final), DE_NOVO_FINAL_TAG)
+        iS.set_repeat_list(iS.dRepeat_list[DE_NOVO_FINAL_TAG] + iS.dRepeat_list[PFAM_TAG], FINAL_TAG)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
@@ -335,9 +366,11 @@ def serialize_annotations(sequences_dir, result_file, format):
 
      Raises:
         Exception: If the pickles in ``sequences_dir`` cannot be loaded
-
-    ..ToDo: Serialisation format currently not used..
+        Exception: If ``format`` is not implemented.
     '''
+
+    if not format in ['tsv']:
+        raise Exception("Serializiation format not implemented: {}".format(format))
 
     lFiles = [file for file in os.listdir(sequences_dir) if file.endswith(".pickle")]
 
@@ -351,11 +384,10 @@ def serialize_annotations(sequences_dir, result_file, format):
                 raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
             for result_file in lSequence:
-                for iTR in iS.dRepeat_list[PFAM_TAG].repeats:
-                    data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.model]]
-                    result_file.write("\t".join(data))
-                for iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
-                    data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD]]
+                for iTR in iS.dRepeat_list[FINAL_TAG].repeats
+                    if format == 'tsv':
+                        data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
+
                     result_file.write("\t".join(data))
 
     print("DONE")
@@ -390,10 +422,9 @@ def main():
     elif pars["method"] == "refine_denovo":
         refine_denovo(pars["input"], pars["output"])
     elif pars["method"] == "serialize_annotations":
-        serialize_annotations(pars["input"], pars["output"], )
+        serialize_annotations(pars["input"], pars["output"], pars["format"])
 
 def read_commandline_arguments():
-
     parser = argparse.ArgumentParser(description='Process tandem repeat detection options')
     parser.add_argument('input', metavar='input_file', type=str,
                        help='The path to the input file.')
