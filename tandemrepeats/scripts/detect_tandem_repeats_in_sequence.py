@@ -257,7 +257,7 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
 
 
     # Perform common ancestry overlap filter and keep PFAMs
-    iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[basic_filter_tag], "overlap_type": }
+    #iC = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[basic_filter_tag], "overlap_type": }
     rl_tmp = rl_tmp.filter(**iC)
     iS.set_repeat_list(rl_tmp, complex_filter_tag)
 
