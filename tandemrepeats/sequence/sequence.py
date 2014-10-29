@@ -123,7 +123,9 @@ class Sequence:
             for iHMM in lHMM:
                 # Detect TRs on self.seq with hmm using the Viterbi algorithm.
                 most_likely_path = iHMM.viterbi(self.seq)
-                logging.debug(most_likely_path)
+                logging.debug("most_likely_path: {}".format(most_likely_path))
+                if not most_likely_path:
+                    continue
                 unaligned_msa = hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units(self.seq, most_likely_path, iHMM.lD)
                 if len(unaligned_msa) > 1:
                     # Align the msa

@@ -18,6 +18,13 @@ TEST_RESULT_REPEAT_MSA_SINGLE = ["A","A","A","A","A","A"]
 TEST_REPEAT_MSA_DOUBLE = ["AA","AA"]
 TEST_RESULT_REPEAT_MSA_DOUBLE = ["AA","AA","AA"]
 
+TEST_RESULT_REPEAT_MSA_LONG = [10*"A", 10*"A"]
+TEST_SEQUENCE_A = 18*"A"
+
+TEST_RESULT_REPEAT_MSA_SUPER_LONG = [100*"A", 100*"A"]
+TEST_SEQUENCE_SUPER_LONG_A = 200*"A"
+
+
 #Test file names
 TEST_FILE_WITH_ID = 'carcinustatin.hmm'
 
@@ -58,6 +65,23 @@ def test_detect_repeats_with_repeat():
     assert type(test_optimized_repeat) == repeat_list.Repeat_list
     assert len(test_optimized_repeat.repeats) == 1
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_SINGLE
+
+
+def test_too_big_hmms():
+
+    test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_LONG)
+    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_seq = sequence.Sequence(TEST_SEQUENCE_A)
+    test_optimized_repeat = test_seq.detect([test_hmm])
+    assert type(test_optimized_repeat) == repeat_list.Repeat_list
+    assert len(test_optimized_repeat.repeats) == 0
+
+    test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_SUPER_LONG)
+    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_seq = sequence.Sequence(TEST_SEQUENCE_SUPER_LONG_A)
+    test_optimized_repeat = test_seq.detect([test_hmm])
+    assert type(test_optimized_repeat) == repeat_list.Repeat_list
+    assert len(test_optimized_repeat.repeats) == 0
 
 #@notfixed
 def test_detect_repeats_denovo():
