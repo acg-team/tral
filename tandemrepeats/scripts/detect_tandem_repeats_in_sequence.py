@@ -184,7 +184,7 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
     ..ToDo: Input BASIC_FILTER as PARAMETERS
     '''
 
-    basic_filter = config['filter']['basic']
+    basic_filter = config['filter']['basic']['dict']
     basic_filter_tag = config['filter']['basic']['tag']
 
     try:
@@ -304,7 +304,7 @@ def refine_denovo(sequences_file, result_file):
         Exception: If the pickle ``sequences_file`` cannot be loaded
     '''
 
-    basic_filter = config['filter']['basic']
+    basic_filter = config['filter']['basic']['dict']
 
     try:
         with open(sequences_file, 'rb') as fh:
