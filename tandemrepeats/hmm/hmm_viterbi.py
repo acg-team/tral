@@ -39,9 +39,9 @@ def viterbi(hmm, emission):
          class?) How do they relate to the Sequence class, or the HMM class?
     """
 
-    if len(emission)/hmm.lD < float(config['filter']['basic']['nD']['threshold']):
+    if len(emission)/hmm.lD < float(config['filter']['basic']['dict']['nD']['threshold']):
         logging.info("Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min nD ({}).".format(hmm.lD, \
-             len(emission), config['filter']['basic']['nD']))
+             len(emission), config['filter']['basic']['dict']['nD']))
         return None
     if hmm.lD > float(config['hmm']['lDMax']):
         logging.info("Skip the HMM as it is too long ({}) according to the filter criterion max hmm.lD ({}).".format(hmm.lD, config['hmm']['lDMax']))
