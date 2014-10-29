@@ -384,7 +384,7 @@ def serialize_annotations(sequences_dir, result_file, format):
                 raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
             for result_file in lSequence:
-                for iTR in iS.dRepeat_list[FINAL_TAG].repeats
+                for iTR in iS.dRepeat_list[FINAL_TAG].repeats:
                     if format == 'tsv':
                         data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
 
