@@ -222,7 +222,7 @@ def merge_and_basic_filter(sequences_file, repeat_files, result_file, **kwargs):
     for iS in lSequence:
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
         if iS.dRepeat_list[REPEAT_LIST_TAG]:
-            for iB in basic_filter['dict'].values():
+            for iB in basic_filter.values():
                 rl_tmp = rl_tmp.filter(**iB)
         else:
             rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
@@ -324,7 +324,7 @@ def refine_denovo(sequences_file, result_file):
             # Run HMM on sequence
             denovo_refined_rl = iS.detect(lHMM = [denovo_hmm])
             append_refined = False
-            if denovo_refined_rl:
+            if denovo_refined_rl and denovo_refined_rl.repeats:
                 iTR_refined = denovo_refined_rl.repeats[0]
                 iTR_refined.TRD = iTR.TRD
                 iTR_refined.model = "cpHMM"
@@ -332,7 +332,7 @@ def refine_denovo(sequences_file, result_file):
                 # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
                 if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
                     rl_tmp = repeat_list.Repeat_list([iTR_refined])
-                    for iB in basic_filter['dict'].values():
+                    for iB in basic_filter.values():
                         rl_tmp = rl_tmp.filter(**iB)
                     if rl_tmp.repeats:
                         append_refined = True
