@@ -332,6 +332,9 @@ def refine_denovo(sequences_file, result_file):
                 # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
                 if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
                     rl_tmp = repeat_list.Repeat_list([iTR_refined])
+                    log.error(".")
+                    log.error(iTR_refined.msa)
+                    log.error(iTR.msa)
                     for iB in basic_filter.values():
                         rl_tmp = rl_tmp.filter(**iB)
                     if rl_tmp.repeats:
