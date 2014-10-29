@@ -330,7 +330,7 @@ def refine_denovo(sequences_file, result_file):
                 iTR_refined.model = "cpHMM"
                 denovo_refined[i] = iTR_refined
                 # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
-                if not repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
+                if repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
                     rl_tmp = repeat_list.Repeat_list([iTR_refined])
                     print("Overlap")
                     print(iTR_refined.msa)
@@ -339,10 +339,6 @@ def refine_denovo(sequences_file, result_file):
                         rl_tmp = rl_tmp.filter(**iB)
                     if rl_tmp.repeats:
                         append_refined = True
-                else:
-                    print("No overlap")
-                    print(iTR_refined.msa)
-                    print(iTR.msa)
             else:
                 denovo_refined[i] = False
             if append_refined:
