@@ -270,7 +270,7 @@ def calculate_overlap(sequences_file, result_file, lOverlap_type, **kwargs):
 
         # Choose only the most convincing de novo TRs
         criterion_filter_order = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_overlap_order)
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_filter_order)
 
     with open(result_file, 'wb') as fh:
         pickle.dump(lSequence, fh)
