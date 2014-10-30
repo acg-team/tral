@@ -82,7 +82,7 @@ def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
         pickle.dump(dTR, fh)
 
     print("\n" + "\t".join(["infoNRuns", "infoNHMM"]))
-    print("\n" + "\t".join([infoNRuns, infoNHMM]))
+    print("\n" + "\t".join([str(infoNRuns), str(infoNHMM)]))
     print("DONE")
 
 
@@ -384,6 +384,10 @@ def serialize_annotations(sequences_dir, result_file, format):
             except:
                 raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
+            if format == 'tsv':
+                header = ["ID", "MSA", "begin", "pValue", "lD", "n", "nD", "TRD", "model"]
+            fh_o.write("\t".join(header))
+
             for iS in lSequence:
                 for iTR in iS.dRepeat_list[FINAL_TAG].repeats:
                     if format == 'tsv':
@@ -391,15 +395,9 @@ def serialize_annotations(sequences_dir, result_file, format):
                             data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
                         except:
                             print(iTR)
-                            try:
-                                print(iTR.TRD)
-                            except:
-                                print("no TRD")
-                            try:
-                                print(iTR.model)
-                            except:
-                                print("no model")
-                    fh_o.write("\t".join(data) + "\n")
+                            raise Exception("(Could not save data for the above TR.)")
+
+                    fh_o.write("\n" + "\t".join(data))
 
     print("DONE")
 
