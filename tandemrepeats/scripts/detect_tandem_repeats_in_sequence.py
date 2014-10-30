@@ -375,21 +375,31 @@ def serialize_annotations(sequences_dir, result_file, format):
 
     lFiles = [file for file in os.listdir(sequences_dir) if file.endswith(".pickle")]
 
-    with open(result_file, 'w') as fh:
-        for iFile in Files:
+    with open(result_file, 'w') as fh_o:
+        for iFile in lFiles:
             sequences_file = os.path.join(sequences_dir, iFile)
             try:
-                with open(sequences_file, 'rb') as fh:
-                    lSequence = pickle.load(fh)
+                with open(sequences_file, 'rb') as fh_i:
+                    lSequence = pickle.load(fh_i)
             except:
                 raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
-            for result_file in lSequence:
+            for iS in lSequence:
                 for iTR in iS.dRepeat_list[FINAL_TAG].repeats:
                     if format == 'tsv':
-                        data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
-
-                    result_file.write("\t".join(data))
+                        try:
+                            data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
+                        except:
+                            print(iTR)
+                            try:
+                                print(iTR.TRD)
+                            except:
+                                print("no TRD")
+                            try:
+                                print(iTR.model)
+                            except:
+                                print("no model")
+                    fh_o.write("\t".join(data) + "\n")
 
     print("DONE")
 
