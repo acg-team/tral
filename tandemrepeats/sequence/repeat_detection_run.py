@@ -251,8 +251,8 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"hhrepid_64")),
-        config = None
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
+        config = Configuration()
     ):
         """Construct FinderHHrepID object.
 
@@ -427,7 +427,7 @@ class FinderTRED(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"tred")),
+        executable=BinaryExecutable(binary=repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTRED object.
@@ -510,7 +510,7 @@ class FinderTREKS(TRFFinder):
             return bool_toks + value_toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'], jars=[os.path.join(repeat_detector_path[name],"T-Reks.jar")]),
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTREKS object.
@@ -602,7 +602,7 @@ class FinderTRF(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"trf")),
+        executable=BinaryExecutable(binary=repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTRF object.
@@ -681,11 +681,8 @@ class FinderTrust(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'],
-            javaclass='nl.vu.cs.align.SelfSimilarity',
-            classpaths=[os.path.join(EXECROOT,"trust")]
-        ),
-        config=Configuration()
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
+        config = Configuration()
     ):
         """Construct FinderTrust object.
 
@@ -778,7 +775,7 @@ class FinderXStream(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx1024m'], jars=[os.path.join(repeat_detector_path[name],"xstream.jar")]),
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
         config = Configuration()
     ):
         """Construct FinderXStream object.
