@@ -45,7 +45,7 @@ def main():
 
     pars = read_commandline_arguments()
 
-    record_iter = SeqIO.parse(open(pars['path']),pars['format'])
+    record_iter = SeqIO.parse(open(pars['input']),pars['format'])
     for i, batch in enumerate(batch_iterator(record_iter, pars['number'])) :
         filename = "{}{}.{}".format(pars['output'], str(i+1), pars['format'])
         handle = open(filename, "w")
@@ -57,7 +57,7 @@ def main():
 def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Process split sequence options')
-    parser.add_argument('path', metavar='sequence_file', type=str,
+    parser.add_argument('-i', '--input', type=str, required=True,
                        help='The path to the input sequence file.')
     parser.add_argument('-o','--output', type=str,
                        help='The path to the output files, e.g. /path/to/output/name_')
