@@ -83,6 +83,8 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 
             if annotation_data_file:
                 for iS in lSeq:
+                    # The fasta files sequence ID follow the pattern "sp|SPID|SPNAME"
+                    # Here, we extract SPID
                     iS.id_long = iS.id
                     iS.id = iS.id.split("|")[1]
                     if iS.id in annotations.keys():
@@ -100,20 +102,20 @@ def main():
 
     pars = read_commandline_arguments()
     if "annotation_file" in pars:
-        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"], pars["annotation_file"])
+        create_and_annotate_seq_pickles(pars["input"], pars["output_path"], pars["annotation_file"])
     else:
-        create_and_annotate_seq_pickles(pars["sequence_dir"], pars["output_path"])
+        create_and_annotate_seq_pickles(pars["input"], pars["output_path"])
 
 
 def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Process create hmm pickles options')
+    parser.add_argument('-i','--input', type=str, required=True,
+                       help='The path to the sequence directory containing .fasta files, e.g. /path/to/sequence_dir')
+    parser.add_argument('-o','--output_path', type=str, required=True,
+                       help='The path to the output files, e.g. /path/to/output')
     parser.add_argument('-a', '--annotation_file', type=str,
                        help='The path to the annotation data tab-separated file.')
-    parser.add_argument('-s','--sequence_dir', type=str,
-                       help='The path to the sequence directory containing .fasta files, e.g. /path/to/sequence_dir')
-    parser.add_argument('-o','--output_path', type=str,
-                       help='The path to the output files, e.g. /path/to/output')
 
     pars = vars(parser.parse_args())
     pars = {key: value for key, value in pars.items() if value != None}
