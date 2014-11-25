@@ -18,7 +18,7 @@ def main():
 
     pars = read_commandline_arguments()
 
-    for hmmer_probabilities in hmm_io.read(pars["hmm_file"]):
+    for hmmer_probabilities in hmm_io.read(pars["i"]):
         iID = hmmer_probabilities['id'].split(".")[0]
         iHMM = hmm.HMM(hmmer_probabilities)
         file = os.path.join(pars['output_path'], "{}.pickle".format(iID))
@@ -28,9 +28,9 @@ def main():
 def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Process create hmm pickles options')
-    parser.add_argument('hmm_file', metavar='hmm_file', type=str,
-                       help='The path to the input sequence file.')
-    parser.add_argument('-o','--output_path', type=str,
+    parser.add_argument('-i', '--input', type=str, required=True,
+                       help='The path to the input .hmm file')
+    parser.add_argument('-o','--output_path', type=str, required=True,
                        help='The path to the output files, e.g. /path/to/output')
 
     pars = vars(parser.parse_args())
