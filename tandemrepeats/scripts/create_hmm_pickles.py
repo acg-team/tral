@@ -18,7 +18,7 @@ def main():
 
     pars = read_commandline_arguments()
 
-    for hmmer_probabilities in hmm_io.read(pars["i"]):
+    for hmmer_probabilities in hmm_io.read(pars["input"]):
         iID = hmmer_probabilities['id'].split(".")[0]
         iHMM = hmm.HMM(hmmer_probabilities)
         file = os.path.join(pars['output_path'], "{}.pickle".format(iID))
