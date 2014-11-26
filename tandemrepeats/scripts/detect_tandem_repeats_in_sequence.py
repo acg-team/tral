@@ -435,12 +435,12 @@ def main():
 
 def read_commandline_arguments():
     parser = argparse.ArgumentParser(description='Process tandem repeat detection options')
-    parser.add_argument('input', metavar='input_file', type=str,
-                       help='The path to the input file.')
-    parser.add_argument('output', metavar='output_file', type=str,
-                       help='The path to the output file.')
     parser.add_argument('method', metavar='method_name', type=str,
                        help='The name of the method to be executed.')
+    parser.add_argument('-i', '--input', type=str, required=True,
+                       help='The path to the input file.')
+    parser.add_argument('-o', '--output', type=str, required=True,
+                       help='The path to the output file.')
     parser.add_argument('-seq','--sequence_type', type=str,
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-rep','--repeat_files', nargs='+', type=str,
