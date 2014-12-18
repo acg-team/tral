@@ -189,8 +189,8 @@ class TRFFinder(object):
             self.__executable.get_execute_tokens(*args), working_dir)
         # launch process
         __process = subprocess.Popen(
-            ["ulimit -d {0} -m {0} -v {0}; ".format(MAX_MEMORY_USAGE)] + self.__executable.get_execute_tokens(*args), cwd=working_dir,
-            stdout=__stdout_file, stderr=__stderr_file, close_fds=True
+            ["ulimit -d {0} -m {0} -v {0};".format(MAX_MEMORY_USAGE)] + self.__executable.get_execute_tokens(*args), cwd=working_dir,
+            stdout=__stdout_file, stderr=__stderr_file, close_fds=True, shell = True
         )
         __process.wait()
 
