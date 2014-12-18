@@ -23,12 +23,7 @@ c = configuration.Configuration.Instance()
 general_config = c.config
 repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
-
-def setlimits():
-    # Source: http://stackoverflow.com/questions/3830658/check-memory-usage-of-subprocess-in-python
-    # Set maximum heap size (in bytes)in child process.
-    logging.debug("Setting resource limit in child (pid %d)" % os.getpid())
-    resource.setrlimit(resource.RLIMIT_DATA, (1000000000, -1))
+MAX_MEMORY_USAGE = 1000000
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -194,8 +189,8 @@ class TRFFinder(object):
             self.__executable.get_execute_tokens(*args), working_dir)
         # launch process
         __process = subprocess.Popen(
-            self.__executable.get_execute_tokens(*args), cwd=working_dir,
-            stdout=__stdout_file, stderr=__stderr_file, close_fds=True, preexec_fn=setlimits
+            [ulimit -d MAX_MEMORY_USAGE -m MAX_MEMORY_USAGE -v MAX_MEMORY_USAGE] + self.__executable.get_execute_tokens(*args), cwd=working_dir,
+            stdout=__stdout_file, stderr=__stderr_file, close_fds=True
         )
         __process.wait()
 
