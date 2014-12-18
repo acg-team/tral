@@ -5,13 +5,13 @@ import itertools
 import logging
 import os
 import re
+import resource
 import shutil
 import subprocess
 import sys
 import tempfile
 
 from collections import OrderedDict
-from Bio import SeqIO
 
 from tandemrepeats import configuration
 from tandemrepeats.sequence import repeat_detection_io
@@ -22,6 +22,12 @@ log = logging.getLogger(__name__)
 c = configuration.Configuration.Instance()
 general_config = c.config
 repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
+
+
+def setlimits():
+    # Set maximum heap size (in bytes)in child process.
+    print "Setting resource limit in child (pid %d)" % os.getpid()
+    resource.setrlimit(resource.RLIMIT_DATA, (1000000, -1))
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -188,7 +194,7 @@ class TRFFinder(object):
         # launch process
         __process = subprocess.Popen(
             self.__executable.get_execute_tokens(*args),
-            cwd=working_dir, stdout=__stdout_file, stderr=__stderr_file, close_fds=True
+            cwd=working_dir, stdout=__stdout_file, stderr=__stderr_file, close_fds=True, preexec_fn=setlimits
         )
 
         __process.wait()
