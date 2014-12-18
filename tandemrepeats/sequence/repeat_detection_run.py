@@ -23,7 +23,7 @@ c = configuration.Configuration.Instance()
 general_config = c.config
 repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
-MAX_MEMORY_USAGE = 1000000
+MAX_MEMORY_USAGE = str(1000000)
 
 class BinaryExecutable:
     def __init__(self, binary=None):
