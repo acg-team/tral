@@ -25,8 +25,9 @@ repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
 
 def setlimits():
+    # Source: http://stackoverflow.com/questions/3830658/check-memory-usage-of-subprocess-in-python
     # Set maximum heap size (in bytes)in child process.
-    print "Setting resource limit in child (pid %d)" % os.getpid()
+    logging.info("Setting resource limit in child (pid %d)" % os.getpid())
     resource.setrlimit(resource.RLIMIT_DATA, (1000000, -1))
 
 class BinaryExecutable:
