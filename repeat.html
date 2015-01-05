@@ -55,93 +55,316 @@
   <div class="section" id="repeat-code-documentation">
 <h1>Repeat code documentation<a class="headerlink" href="#repeat-code-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Initial version of the repeat submodule documentation.</p>
-<div class="section" id="repeat">
-<h2>repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h2>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 8)</p>
-autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat&#8217;; the following exception was raised:
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
-    return self._instance
-AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+<div class="section" id="module-tandemrepeats.repeat.repeat">
+<span id="repeat"></span><h2>repeat<a class="headerlink" href="#module-tandemrepeats.repeat.repeat" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tandemrepeats.repeat.repeat.Repeat">
+<em class="property">class </em><tt class="descclassname">tandemrepeats.repeat.repeat.</tt><tt class="descname">Repeat</tt><big>(</big><em>msa, begin=None, sequence_type='AA', scoreslist=['phylo_gap01'], calc_score=False, calc_pValue=False</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tandem repeats are consecutive copies of genomic sequence.</p>
+<p>A tandem repeat is stored in terms of a multiple sequence alignment of its
+tandem repeat units. For example, the amino acid tandem repeat
+KLMKLMKLKLM
+can be displayed as a multiple sequence alignment (here: &#8220;multiple repeat unit alignment&#8221;)
+KLM
+KLM
+KL-
+KLM
+and can be stored as
+[&#8220;KLM&#8221;, &#8220;KLM&#8221;, &#8220;KL-&#8221;, &#8220;KLM&#8221;].
+The - char stands for a gap: It indicates that either, there used to be a char at the
+same position, but it got deleted. Or, all other chars in the same column got inserted
+at some point.</p>
+<p>For research on tandem repeats, many different statistics need to be calculated on
+the multiple sequence alignment of the tandem repeat.</p>
+<p>[Description of these statistics]</p>
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.msa_original">
+<tt class="descname">msa_original</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msa_original" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The original alignment of repeat units.</p>
+</dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.msa">
+<tt class="descname">msa</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msa" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The alignment of repeat units without rare chars.</p>
+</dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
-    _inspec=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
-    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
-OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.msaT">
+<tt class="descname">msaT</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msaT" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The transposed alignment of repeat units. E.g.
+[&#8220;KKKK&#8221;, &#8220;LLLL&#8221;, &#8220;MM-M&#8221;].</p>
+</dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.sequence_type">
+<tt class="descname">sequence_type</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.sequence_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em></p>
+<p>&#8220;AA&#8221; or &#8220;DNA&#8221;</p>
+</dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
-    __import__(self.modname)
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
-    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
-    c = configuration.Configuration.Instance()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
-    self._instance = self._decorated()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
-    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
-    self._handle_configspec(configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
-    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
-OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.n">
+<tt class="descname">n</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.n" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>The number of repeat units in the original msa. E.g. 4.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.l">
+<tt class="descname">l</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.l" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>The length of the repeat units in the original msa. E.g. 3.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.nD">
+<tt class="descname">nD</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.nD" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>[Needs explanation]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.lD">
+<tt class="descname">lD</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.lD" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>[Needs explanation]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.text">
+<tt class="descname">text</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.text" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em></p>
+<p>[Needs explanation]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.nGap">
+<tt class="descname">nGap</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.nGap" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>The number of gaps in <tt class="docutils literal"><span class="pre">msa</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tandemrepeats.repeat.repeat.Repeat.sequence_length">
+<tt class="descname">sequence_length</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.sequence_length" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>[Needs explanation]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Improve output if pValues are only partly calculated.</p>
 </div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.calc_index_msa">
+<tt class="descname">calc_index_msa</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calc_index_msa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calc_index_msa" title="Permalink to this definition">¶</a></dt>
+<dd><p>formerly named: set_begin</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.calc_nD">
+<tt class="descname">calc_nD</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calc_nD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calc_nD" title="Permalink to this definition">¶</a></dt>
+<dd><p>what is the number of letters in in all non-insertion columns, divided by lD?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.calculate_pValues">
+<tt class="descname">calculate_pValues</tt><big>(</big><em>scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calculate_pValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calculate_pValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pValues on a Repeat instances for all scores in <cite>scoreslist</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd><dl class="first last docutils">
+<dt>scoreslist(list of Str): A list of the names of the scores (e.g. [&#8220;phylo_gap01&#8221;])</dt>
+<dd>for which p-Values are calculated on the Repeat instance <cite>self</cite></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.calculate_scores">
+<tt class="descname">calculate_scores</tt><big>(</big><em>scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calculate_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calculate_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate scores on a Repeat instances for all scores in <cite>scoreslist</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd><dl class="first last docutils">
+<dt>scoreslist(list of str): A list of the names of the scores (e.g. [&#8220;phylo_gap01&#8221;])</dt>
+<dd>that are calculated on the Repeat instance <cite>self</cite></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.create">
+<tt class="descname">create</tt><big>(</big><em>file</em>, <em>format</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read tandem repeat from file.</p>
+<p>Read tandem repeat from file (currently, only pickle is supported)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>format</strong> (<em>str</em>) &#8211; Currently only &#8220;pickle&#8221;</li>
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
-<div class="section" id="repeat-exon">
-<h2>repeat_exon<a class="headerlink" href="#repeat-exon" title="Permalink to this headline">¶</a></h2>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 13)</p>
-autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat_exon&#8217;; the following exception was raised:
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
-    return self._instance
-AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+</dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.deleteInsertionColumns">
+<tt class="descname">deleteInsertionColumns</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.deleteInsertionColumns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.deleteInsertionColumns" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Create the tandem repeat attributes <cite>msa</cite>, <cite>masT</cite>, <cite>l</cite> and <cite>n</cite> without</dt>
+<dd>insertion columns.</dd>
+</dl>
+<p>We define insertion columns as columns where there are more or equal gaps
+compared to chars.
+These columns are removed from both <cite>msa</cite> to create <cite>msaD</cite> and <cite>msaT</cite> to create
+<cite>msaTD</cite>.</p>
+<p>todo:: Check: is <cite>totD</cite> needed anywhere else? Is <cite>textD</cite> needed?</p>
+</dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
-    _inspec=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
-    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
-OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.gapStructure">
+<tt class="descname">gapStructure</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.gapStructure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.gapStructure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the number and length of insertions and deletions for this tandem repeat.</p>
+</dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.gap_structure_HMM">
+<tt class="descname">gap_structure_HMM</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.gap_structure_HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.gap_structure_HMM" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate for each column in the transposed multiple repeat unit alignment</dt>
+<dd><p class="first"><cite>msaTD</cite></p>
+<ul class="last">
+<li><dl class="first docutils">
+<dt>how many deletions of what length begin in this column?:</dt>
+<dd><p class="first last"><cite>deletion_lengths`[`iColumn</cite>] = list of deletion lengths</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>how many insertions of what length begin in potential insertion columns</dt>
+<dd><p class="first last">before this column?: <cite>insertion_lengths`[`iColumn</cite>] = list of insertion lengths</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
-    __import__(self.modname)
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_exon.py&#8221;, line 9, in &lt;module&gt;
-    from tandemrepeats.repeat import repeat
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
-    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
-    c = configuration.Configuration.Instance()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
-    self._instance = self._decorated()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
-    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
-    self._handle_configspec(configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
-    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
-OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.save_original_msa">
+<tt class="descname">save_original_msa</tt><big>(</big><em>sequence</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.save_original_msa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.save_original_msa" title="Permalink to this definition">¶</a></dt>
+<dd><p>recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.)
+This function might be obsolete when the original MSA is saved from the beginning.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tandemrepeats.repeat.repeat.Repeat.write">
+<tt class="descname">write</tt><big>(</big><em>file</em>, <em>format</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write tandem repeat to file.</p>
+<p>Write tandem repeat to file using one of three formats.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to input file</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; Either &#8220;fasta&#8221;, &#8220;pickle&#8221; or &#8220;stockholm&#8221;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat.calculate_position_in_alignment">
+<tt class="descclassname">tandemrepeats.repeat.repeat.</tt><tt class="descname">calculate_position_in_alignment</tt><big>(</big><em>begin</em>, <em>length</em>, <em>alignment</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#calculate_position_in_alignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.calculate_position_in_alignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the index of the begin and the end of a TR within an alignment
+returns</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tandemrepeats.repeat.repeat_exon">
+<span id="repeat-exon"></span><h2>repeat_exon<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_exon" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_exon.get_exon_measures">
+<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">get_exon_measures</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#get_exon_measures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.get_exon_measures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate diverse exon measures</p>
+<p>Exon structure parameters:
+# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_exon.get_exon_structure">
+<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">get_exon_structure</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#get_exon_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.get_exon_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exon structure parameters:
+# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tandemrepeats.repeat.repeat_exon.logger">
+<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">logger</tt><em class="property"> = &lt;logging.Logger object at 0x105229978&gt;</em><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Functions to check whether the exon structure and the repeat unit structure are correlated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_exon.print_exon_structure">
+<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">print_exon_structure</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#print_exon_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.print_exon_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exon structure parameters:
+# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-tandemrepeats.repeat.repeat_io">
 <span id="repeat-io"></span><h2>repeat_io<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_io" title="Permalink to this headline">¶</a></h2>
@@ -348,7 +571,7 @@ nRepeatStructure (int)</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-0">
+<div class="admonition-todo admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">Include exact definition of returned values.</p>
 </div>
@@ -393,11 +616,11 @@ a given <tt class="docutils literal"><span class="pre">n</span></tt> the closest
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-1">
+<div class="admonition-todo admonition" id="index-4">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check return type.</p>
 </div>
-<div class="admonition-todo admonition" id="index-2">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check how this method concurs with the <tt class="docutils literal"><span class="pre">empiricalList</span></tt> method.</p>
 </div>
@@ -436,7 +659,7 @@ Nucleic Acids Research (2012).</p>
 <p class="last">if precision higher than max(uint32) use uint64 instead.
 CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
 </div>
-<div class="admonition-todo admonition" id="index-3">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe return value.</p>
 </div>
@@ -558,11 +781,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-4">
+<div class="admonition-todo admonition" id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define &#8220;phylo&#8221; model.</p>
 </div>
-<div class="admonition-todo admonition" id="index-5">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">Perhaps add distributions beyond lMax, nMax.</p>
 </div>
@@ -587,11 +810,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define <tt class="docutils literal"><span class="pre">mu</span></tt> more precisely.</p>
 </div>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is this function called from anywhere? In case, consider refactoring.</p>
 </div>
@@ -642,16 +865,16 @@ pSim score of <tt class="docutils literal"><span class="pre">myTR</span></tt>.</
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-12">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-13">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe <tt class="docutils literal"><span class="pre">precision</span></tt>.</p>
 </div>
@@ -674,58 +897,288 @@ parsimony score of <tt class="docutils literal"><span class="pre">myTR</span></t
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-14">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-15">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
 </dd></dl>
 
 </div>
-<div class="section" id="repeat-score">
-<h2>repeat_score<a class="headerlink" href="#repeat-score" title="Permalink to this headline">¶</a></h2>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 28)</p>
-autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat_score&#8217;; the following exception was raised:
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
-    return self._instance
-AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+<div class="section" id="module-tandemrepeats.repeat.repeat_score">
+<span id="repeat-score"></span><h2>repeat_score<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_score" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.K80">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">K80</tt><big>(</big><em>kappa='2.59'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#K80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.K80" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.LG">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">LG</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#LG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.LG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
-    _inspec=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
-    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
-OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.TN93">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">TN93</tt><big>(</big><em>alpha_1='0.3'</em>, <em>alpha_2='0.4'</em>, <em>beta='0.7'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#TN93"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.TN93" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-During handling of the above exception, another exception occurred:
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.calculatePDFScores">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">calculatePDFScores</tt><big>(</big><em>repeats, resultFilePath, fileName, scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#calculatePDFScores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.calculatePDFScores" title="Permalink to this definition">¶</a></dt>
+<dd><p>CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES</p>
+</dd></dl>
 
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
-    __import__(self.modname)
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
-    c = configuration.Configuration.Instance()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
-    self._instance = self._decorated()
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
-    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
-    self._load(infile, configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
-    self._handle_configspec(configspec)
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
-    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
-OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.entropy">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">entropy</tt><big>(</big><em>column</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the entropy of a list.</p>
+<blockquote>
+<div>Calculate the entropy of list. Assume that the frequency of elements in the list
+reflects a probability density estimator.</div></blockquote>
+<p>For an exact description see:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>list of str</em>) &#8211; List of elements that can be ordered in a set, e.g. str or int.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The entropy of <tt class="docutils literal"><span class="pre">column</span></tt>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.load_equilibrium_freq">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">load_equilibrium_freq</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#load_equilibrium_freq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.load_equilibrium_freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load equilibrium frequencies from a substitution matrix file.</p>
+<dl class="docutils">
+<dt>Load equilibrium frequencies from a substitution matrix file. Note that with minor</dt>
+<dd>changes, the whole amino acid substitution matrix could be returned.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; Path to substitution matrix file, E.g. LG.dat.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(Dict of str,float): Dictionary of one letter amino acid codes and float value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.loglikelihood_gaps_starphylogeny_zipfian">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">loglikelihood_gaps_starphylogeny_zipfian</tt><big>(</big><em>t</em>, <em>tandem_repeat</em>, <em>indelRatePerSite=0.01</em>, <em>gaps='row_wise'</em>, <em>indelZipf=1.821</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#loglikelihood_gaps_starphylogeny_zipfian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.loglikelihood_gaps_starphylogeny_zipfian" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate the log-likelihood of the gap structure in a <tt class="docutils literal"><span class="pre">tandem</span> <span class="pre">repeat</span></tt> assuming</dt>
+<dd>a star tree.</dd>
+</dl>
+<p>Calculate the log-likelihood of the gap structure in a <tt class="docutils literal"><span class="pre">tandem</span> <span class="pre">repeat</span></tt> assuming a
+star tree (i.e. repeat unit correlations are not modeled). The gap length model is a
+zipfian distribution with parameter <tt class="docutils literal"><span class="pre">indelZipf</span></tt>. The gap generation model is a
+simple poisson model with rate parameter <tt class="docutils literal"><span class="pre">indelRatePerSite</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<em>float</em>) &#8211; The divergence of the <tt class="docutils literal"><span class="pre">tandem_repeat</span></tt> units.</li>
+<li><strong>tandem_repeat</strong> (<em>Repeat</em>) &#8211; An instance of the <tt class="docutils literal"><span class="pre">Repeat</span></tt> class.</li>
+<li><strong>indelRatePerSite</strong> (<em>float</em>) &#8211; The mutation rate of insertions an deletions, as opposed</li>
+<li><strong>gaps</strong> (<em>str</em>) &#8211; The mode of gap counting. Options are &#8220;row_wise&#8221;,</li>
+<li><strong>indelZipf</strong> (<em>float</em>) &#8211; The parameter of the Zipfian distribution.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The loglikelihood value for the gap structure of the tandem repeat.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-16">
+<p class="first admonition-title">Todo</p>
+<p class="last">USE LOG EARLIER, NOT JUST IN RETURN STATEMENT</p>
 </div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.loglikelihood_substitution">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">loglikelihood_substitution</tt><big>(</big><em>t</em>, <em>Q</em>, <em>eqFreq</em>, <em>alphabet</em>, <em>tandem_repeat</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#loglikelihood_substitution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.loglikelihood_substitution" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate the likelihood of a repeat assuming a star tree and a sequence model</dt>
+<dd>defined by <tt class="docutils literal"><span class="pre">Q</span></tt>, <tt class="docutils literal"><span class="pre">t</span></tt>, <tt class="docutils literal"><span class="pre">eqFreq</span></tt> and <tt class="docutils literal"><span class="pre">alphabet</span></tt>.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<em>float</em>) &#8211; The divergence of the <tt class="docutils literal"><span class="pre">tandem_repeat</span></tt> units.</li>
+<li><strong>Q</strong> (<em>dict ?</em>) &#8211; A substitution matrix.</li>
+<li><strong>eqFreq</strong> (<em>dict ?</em>) &#8211; Equilibrium frequencies of all chars.</li>
+<li><strong>alphabet</strong> (<em>dict of str,?</em>) &#8211; An alphabet from a substitution matrix.</li>
+<li><strong>tandem_repeat</strong> (<em>Repeat</em>) &#8211; An instance of the <tt class="docutils literal"><span class="pre">Repeat</span></tt> class.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The loglikelihood value for the tandem repeat.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.meanSimilarity">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">meanSimilarity</tt><big>(</big><em>repeat</em>, <em>measureOfSimilarity</em>, <em>ignoreGaps=True</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#meanSimilarity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.meanSimilarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the mean similarity of all columns in the multiple sequence alignment
+in <tt class="docutils literal"><span class="pre">repeat</span></tt> according to a <tt class="docutils literal"><span class="pre">measureOfSimilarity</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>repeat</strong> (<em>Repeat</em>) &#8211; An instance of the Repeat class.</li>
+<li><strong>measureOfSimilarity</strong> (<em>str</em>) &#8211; Either &#8220;entropy&#8221;, &#8220;parsimony&#8221;, or &#8220;pSim&#8221;.</li>
+<li><strong>ignoreGaps</strong> (<em>boolean</em>) &#8211; Are gaps, &#8220;-&#8221; treated as chars (False) or ignored (True).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A similarity measure for the repeat units in <tt class="docutils literal"><span class="pre">repeat</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-17">
+<p class="first admonition-title">Todo</p>
+<p class="last">Is <tt class="docutils literal"><span class="pre">rep_and_meas</span></tt> used at current.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.optimisation">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">optimisation</tt><big>(</big><em>function</em>, <em>args</em>, <em>start_min=0.5</em>, <em>start_max=1.5</em>, <em>nIteration=14</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#optimisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.optimisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary one-dimensional optimisation of <tt class="docutils literal"><span class="pre">function</span></tt>.</p>
+<p>Perform a binary one dimensional optimisation of parameter <tt class="docutils literal"><span class="pre">t</span></tt> on <tt class="docutils literal"><span class="pre">function</span></tt> with
+the additional list of arguments/parameters <tt class="docutils literal"><span class="pre">args</span></tt>. Start on a given range of start,
+and iterate <tt class="docutils literal"><span class="pre">nIteration</span></tt> times. Return the maximum of the function, together with
+the maximum parameter <tt class="docutils literal"><span class="pre">t</span></tt> as a tuple.</p>
+<p>In addition to <tt class="docutils literal"><span class="pre">start_min</span></tt> and <tt class="docutils literal"><span class="pre">start_max</span></tt>, additional hard boundaries
+on the optimisation parameter <tt class="docutils literal"><span class="pre">t</span></tt> are hard-coded: t E [0.0000000001, 100]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>function</strong> (<em>method</em>) &#8211; Method with input (float, <tt class="docutils literal"><span class="pre">args</span></tt>) and output float.</li>
+<li><strong>args</strong> (<em>list of items</em>) &#8211; List of arguments for <tt class="docutils literal"><span class="pre">function</span></tt>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Kwargs:</dt>
+<dd>start_min (float): Minimum value of function parameter <tt class="docutils literal"><span class="pre">t</span></tt>.
+start_max (float): Maximum value of function parameter <tt class="docutils literal"><span class="pre">t</span></tt>.
+nIteration (int): Number of iterations until optimisation results are returned.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (Maximum of function: float, Corresponding function parameter: float)<span class="target" id="index-18"></span><div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check why <tt class="docutils literal"><span class="pre">regionBounded</span></tt> is hardcoded at current.</p>
+</div>
+<span class="target" id="index-19"></span><div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check why <tt class="docutils literal"><span class="pre">stepsize</span></tt> is hardcoded at current.</p>
+</div>
+<span class="target" id="index-20"></span><div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Generalise hard-coded optimisation parameter boundaries.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.pSim">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">pSim</tt><big>(</big><em>column</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#pSim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.pSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the pSim score of a list.</p>
+<p>Calculate the pSim score on <tt class="docutils literal"><span class="pre">column</span></tt>:  Count the frequency of the most frequent
+element in a <tt class="docutils literal"><span class="pre">column</span></tt> of a multiple sequence alignment.</p>
+<p>For an exact description see:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>list of str</em>) &#8211; A list of elements.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The pSim score of <tt class="docutils literal"><span class="pre">column</span></tt>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_score.parsimony">
+<tt class="descclassname">tandemrepeats.repeat.repeat_score.</tt><tt class="descname">parsimony</tt><big>(</big><em>column</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_score.html#parsimony"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_score.parsimony" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the parsimony score of a list.</p>
+<p>Calculate the parsimony score on <tt class="docutils literal"><span class="pre">column</span></tt>:  Count the number of changes in a
+<tt class="docutils literal"><span class="pre">column</span></tt> of a multiple sequence alignment and divide by the maximally possible
+number of changes.</p>
+<p>For an exact description see:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<em>list of str</em>) &#8211; A <tt class="docutils literal"><span class="pre">list</span></tt> of two or more elements that can be ordered in a <tt class="docutils literal"><span class="pre">set</span></tt>, e.g.
+<tt class="docutils literal"><span class="pre">str</span></tt> or <tt class="docutils literal"><span class="pre">int</span></tt></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The parsimony score of <tt class="docutils literal"><span class="pre">column</span></tt>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-21">
+<p class="first admonition-title">Todo</p>
+<p class="last">At which step should we assert that the length of <tt class="docutils literal"><span class="pre">column</span></tt> &gt; 1?</p>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="test-dependencies">
 <h2>test_dependencies<a class="headerlink" href="#test-dependencies" title="Permalink to this headline">¶</a></h2>
@@ -749,11 +1202,11 @@ ImportError: No module named &#8216;tandemrepeats.repeat.test_dependencies&#8217
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Repeat code documentation</a><ul>
-<li><a class="reference internal" href="#repeat">repeat</a></li>
-<li><a class="reference internal" href="#repeat-exon">repeat_exon</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat">repeat</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_exon">repeat_exon</a></li>
 <li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_io">repeat_io</a></li>
 <li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_pvalue">repeat_pvalue</a></li>
-<li><a class="reference internal" href="#repeat-score">repeat_score</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_score">repeat_score</a></li>
 <li><a class="reference internal" href="#test-dependencies">test_dependencies</a></li>
 </ul>
 </li>
