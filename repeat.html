@@ -1,0 +1,813 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Repeat code documentation &mdash; tandemrepeats 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Repeat_list code documentation" href="repeat_list.html" />
+    <link rel="prev" title="HMM code documentation" href="hmm.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repeat_list.html" title="Repeat_list code documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hmm.html" title="HMM code documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="repeat-code-documentation">
+<h1>Repeat code documentation<a class="headerlink" href="#repeat-code-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Initial version of the repeat submodule documentation.</p>
+<div class="section" id="repeat">
+<h2>repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 8)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="repeat-exon">
+<h2>repeat_exon<a class="headerlink" href="#repeat-exon" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 13)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat_exon&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_exon.py&#8221;, line 9, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="module-tandemrepeats.repeat.repeat_io">
+<span id="repeat-io"></span><h2>repeat_io<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_io" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.evolved_tandem_repeats">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">evolved_tandem_repeats</tt><big>(</big><em>l</em>, <em>n</em>, <em>n_samples</em>, <em>sequence_type</em>, <em>jobID='jobID'</em>, <em>mutationRate=50</em>, <em>tree='star'</em>, <em>indelRatePerSite=False</em>, <em>return_type='repeat'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#evolved_tandem_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.evolved_tandem_repeats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evolve sequence with ALF.</p>
+<p>Evolve sequence with ALF:
+Dalquen, D. A., Anisimova, M., Gonnet, G. H. &amp; Dessimoz, C.
+ALF&#8211;a simulation framework for genome evolution. Molecular Biology and Evolution 29,
+1115–1123 (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units in the tandem repeat</li>
+<li><strong>n_samples</strong> (<em>int</em>) &#8211; The number of samples</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
+<li><strong>jobID</strong> (<em>str</em>) &#8211; A tag for files produces with ALF, and result files.</li>
+<li><strong>mutationRate</strong> (<em>float</em>) &#8211; The mutation rate.</li>
+<li><strong>tree</strong> (<em>str</em>) &#8211; The type of tree, e.g. &#8220;star&#8221; or &#8220;birthdeath&#8221;</li>
+<li><strong>indelRatePerSite</strong> (<em>int or False</em>) &#8211; The indel rate per site.</li>
+<li><strong>return_type</strong> (<em>str</em>) &#8211; Either &#8220;repeat&#8221; or &#8220;list&#8221;</li>
+<li><strong>sequence_length</strong> (<em>int</em>) &#8211; The total length of the simulated sequence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Return type depends on <tt class="docutils literal"><span class="pre">return_type</span></tt>: <tt class="docutils literal"><span class="pre">Repeat</span></tt> or <tt class="docutils literal"><span class="pre">Bio.Seq.Seq</span></tt> instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.random_sequence">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">random_sequence</tt><big>(</big><em>n_samples</em>, <em>sequence_type='AA'</em>, <em>return_type='repeat'</em>, <em>equilibrium_frequencies='human'</em>, <em>l=0</em>, <em>n=0</em>, <em>sequence_length=0</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#random_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.random_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate random sequence locally.</p>
+<p>Simulate random sequence locally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_samples</strong> (<em>int</em>) &#8211; The number of samples</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
+<li><strong>return_type</strong> (<em>str</em>) &#8211; Either &#8220;repeat&#8221; or &#8220;list&#8221;</li>
+<li><strong>equilibrium_frequencies</strong> (<em>str</em>) &#8211; Only &#8220;human&#8221; option available at current</li>
+<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units in the tandem repeat</li>
+<li><strong>sequence_length</strong> (<em>int</em>) &#8211; The total length of the simulated sequence</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Return type depends on <tt class="docutils literal"><span class="pre">return_type</span></tt>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.read_repeats">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">read_repeats</tt><big>(</big><em>seq_filename</em>, <em>sequence_type='AA'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#read_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.read_repeats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read repeat from file in fasta format.</p>
+<p>Read repeat from file in fasta format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>seq_filename</strong> (<em>str</em>) &#8211; Path to the repeats containing fasta file</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(list of Repeat): A list of Repeat instances.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.save_repeat_fasta">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">save_repeat_fasta</tt><big>(</big><em>tandem_repeats</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#save_repeat_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.save_repeat_fasta" title="Permalink to this definition">¶</a></dt>
+<dd><p>save multiple &lt;tandem_repeats&gt; in Fasta format in specified &lt;file&gt;</p>
+<p>At current, only one TR per sequence can be defined, as the identifiers in
+the dict &lt;tandem_repeats&gt; must be unique.</p>
+<dl class="docutils">
+<dt>Parameters: Dict of tandem repeats and identifiers.</dt>
+<dd><p class="first">e.g. {&#8216;ENSP00012&#8217;: msa1, &#8216;ENSP00013&#8217;: msa2}</p>
+<p class="last">&gt;ID
+GHKI
+GHKI
+GH&#8211;</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.save_repeat_stockholm">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">save_repeat_stockholm</tt><big>(</big><em>tandem_repeat</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#save_repeat_stockholm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.save_repeat_stockholm" title="Permalink to this definition">¶</a></dt>
+<dd><p>save &lt;tandem_repeat&gt; in STOCKHOLM format in specified &lt;file&gt;</p>
+<dl class="docutils">
+<dt>Parameters: Tandem repeat MSA.</dt>
+<dd><p class="first">e.g. [&#8220;ACDEF-&#8221;, &#8220;ACCDEF&#8221;]</p>
+<p>More information in <a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>
+STOCKHOLM Format Example:</p>
+<p># STOCKHOLM 1.0
+seq1 ACDEF...GHIKL
+seq2 ACDEF...GHIKL
+seq3 ...EFMNRGHIKL</p>
+<p class="last">seq1 MNPQTVWY
+seq2 MNPQTVWY
+seq3 MNPQT...
+//</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_io.save_repeat_treks">
+<tt class="descclassname">tandemrepeats.repeat.repeat_io.</tt><tt class="descname">save_repeat_treks</tt><big>(</big><em>tandem_repeats</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_io.html#save_repeat_treks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_io.save_repeat_treks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save multiple &lt;tandem_repeats&gt; in T-REKS format in specified &lt;file&gt;</p>
+<p>At current, only one TR per sequence can be defined, as the identifiers in
+the dict &lt;tandem_repeats&gt; must be unique.</p>
+<dl class="docutils">
+<dt>Parameters: Dict of tandem repeats and identifiers.</dt>
+<dd><p class="first">e.g. {&#8216;ENSP00012&#8217;: [msa1, begin1], &#8216;ENSP00013&#8217;: [msa2, begin2]}</p>
+<p>T-REKS Format Example:</p>
+<p>&gt;a
+Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8076923076923077 region Length:42
+GHKI
+GHKI
+GH&#8211;
+<strong>******************</strong></p>
+<p>Length: 3 residues - nb: 2  from  21 to 27 - Psim:0.7857142857142857 region Length:22
+GHKI
+GH&#8211;
+<strong>******************</strong></p>
+<p class="last">&gt;b
+Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8095238095238095 region Length:20
+UIR
+UIR
+UIR</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tandemrepeats.repeat.repeat_pvalue">
+<span id="repeat-pvalue"></span><h2>repeat_pvalue<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_pvalue" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.calc_pValues">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">calc_pValues</tt><big>(</big><em>repeats, resultFilePath, fileName, scoreslist=['phylo', 'phylo_gap'], gappy_data=False</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#calc_pValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.calc_pValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and save a null distribution for <tt class="docutils literal"><span class="pre">repeats</span></tt> scores for p-Value calculation.</p>
+<p>You can use a different null distribution for each column of different length for both
+the parsimony and the pSim score. Therefore, calculate the structure of the TR before
+you calculate the null distribution of tandem repeat scores of tandem repeats with
+the same gap distribution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>repeats</strong> (<em>list of Repeat</em>) &#8211; A list of <tt class="docutils literal"><span class="pre">Repeat</span></tt> instances.</li>
+<li><strong>resultFilePath</strong> (<em>str</em>) &#8211; Path to result folder.</li>
+<li><strong>fileName</strong> (<em>str</em>) &#8211; Name of result file.</li>
+<li><strong>scoreslist</strong> (<em>list of str</em>) &#8211; List of scores. E.g. [&#8216;phylo&#8217;,&#8217;phylo_gap&#8217;].</li>
+<li><strong>gappy_data</strong> (<em>bool</em>) &#8211; True if any of <tt class="docutils literal"><span class="pre">repeats</span></tt> contain gaps, else False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.calculate_repeat_structure">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">calculate_repeat_structure</tt><big>(</big><em>myTR</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#calculate_repeat_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.calculate_repeat_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the number of columns with a certain number of gaps for each column in
+a <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</p>
+<p>You can use a different null distribution for each column of different length for both
+the parsimony and the pSim score. Therefore, calculate the structure of the TR before
+you calculate the null distribution of tandem repeat scores of tandem repeats with
+the same gap distribution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
+<li><strong>score</strong> &#8211; The heuristic model used. E.g. &#8220;psim&#8221;.</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">lRepeatStructure (list)
+nRepeatStructure (int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Include exact definition of returned values.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.columnPDF">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">columnPDF</tt><big>(</big><em>n</em>, <em>score='psim'</em>, <em>sequence_type='AA'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#columnPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.columnPDF" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Load and return the probability density function of the score on random</dt>
+<dd><tt class="docutils literal"><span class="pre">sequence_type</span></tt> data of length <tt class="docutils literal"><span class="pre">n</span></tt>.</dd>
+</dl>
+<p>Load and return the probability density function of the score on random
+<tt class="docutils literal"><span class="pre">sequence_type</span></tt> data of length <tt class="docutils literal"><span class="pre">n</span></tt>.
+This method handels scores with distributions independent of <tt class="docutils literal"><span class="pre">l</span></tt>. This includes
+all parsimony scores, and excludes model based scores.</p>
+<p>The order of the values in the probability density function is WORST FIRST: The first
+values describe the probability for &#8220;bad&#8221; scores, the last values the probabilities
+for &#8220;top&#8221; scores.</p>
+<p>Currently, for all models values are available until</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">nMax</span></tt> = 150</li>
+</ul>
+</div></blockquote>
+<p>For <tt class="docutils literal"><span class="pre">n</span></tt> &lt;=  <tt class="docutils literal"><span class="pre">nMax</span></tt> all values are available. If no distribution is available for
+a given <tt class="docutils literal"><span class="pre">n</span></tt> the closest values for <tt class="docutils literal"><span class="pre">n</span></tt> is used.</p>
+<p>For values of <tt class="docutils literal"><span class="pre">n</span></tt> above <tt class="docutils literal"><span class="pre">nMax</span></tt>, the <tt class="docutils literal"><span class="pre">nMax</span></tt> pdf is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
+<li><strong>score</strong> &#8211; The heuristic model used. E.g. &#8220;psim&#8221;.</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy list of length 10.000</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check return type.</p>
+</div>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check how this method concurs with the <tt class="docutils literal"><span class="pre">empiricalList</span></tt> method.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.dAverageMultinom">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">dAverageMultinom</tt><big>(</big><em>l</em>, <em>n</em>, <em>sequence_type</em>, <em>score</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#dAverageMultinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.dAverageMultinom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for the analytic calculation of parsimony or pSim scores.</p>
+<p>Called by <tt class="docutils literal"><span class="pre">dAverageMultipleMaxMultinom</span></tt> or <tt class="docutils literal"><span class="pre">dAverageMultipleParsMultinom</span></tt>.</p>
+<p>Return the <tt class="docutils literal"><span class="pre">l</span></tt>-times self-convoluted pdf of the score on random sequence_type data
+of length <tt class="docutils literal"><span class="pre">n</span></tt>. The order of the pdf is kept from <tt class="docutils literal"><span class="pre">columnPDF()</span></tt>.</p>
+<p>For details see:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit.</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
+<li><strong>score</strong> &#8211; The model of repeat evolution used. Either &#8216;psim&#8217; or &#8216;parsimony&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(description missing)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">if precision higher than max(uint32) use uint64 instead.
+CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
+</div>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">Describe return value.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.dAverageMultipleMaxMultinom">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">dAverageMultipleMaxMultinom</tt><big>(</big><em>myTR</em>, <em>precision=10000.0</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#dAverageMultipleMaxMultinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.dAverageMultipleMaxMultinom" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate null distribution for e.g. the pSim score for repeats of type <tt class="docutils literal"><span class="pre">myTR</span></tt></dt>
+<dd>as a probability density function.</dd>
+</dl>
+<p>Analytically calculate the p-Value distribution for the pSim score for repeats of
+type <tt class="docutils literal"><span class="pre">myTR</span></tt>. The derivation is described in:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>myTR</strong> (<em>Repeat</em>) &#8211; A <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</li>
+<li><strong>precision</strong> (<em>float</em>) &#8211; The precision of the returned probability density function in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>p</strong> &#8211;
+cumulated probabilities from 0 to 1.
+unnamed (list of float): scores corresponding to the probabilities in <tt class="docutils literal"><span class="pre">p</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">if precision higher than max(uint32) use uint64 instead.
+CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.dAverageMultipleParsMultinom">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">dAverageMultipleParsMultinom</tt><big>(</big><em>myTR</em>, <em>precision=10000.0</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#dAverageMultipleParsMultinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.dAverageMultipleParsMultinom" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate null distribution for the parsimony score for repeats of type <tt class="docutils literal"><span class="pre">myTR</span></tt></dt>
+<dd>as a probability density function.</dd>
+</dl>
+<p>Analytically calculate the p-Value distribution for the parsimony score for repeats of
+type <tt class="docutils literal"><span class="pre">myTR</span></tt>. The derivation is described in:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>myTR</strong> (<em>Repeat</em>) &#8211; A <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</li>
+<li><strong>precision</strong> (<em>float</em>) &#8211; The precision of the returned probability density function in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>p</strong> &#8211;
+cumulated probabilities from 0 to 1.
+unnamed (list of float): scores corresponding to the probabilities in <tt class="docutils literal"><span class="pre">p</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">if precision higher than max(uint32) use uint64 instead.
+CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.empiricalList">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">empiricalList</tt><big>(</big><em>l</em>, <em>n</em>, <em>sequence_type='AA'</em>, <em>score='phylo'</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#empiricalList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.empiricalList" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Load and return a numpy list with 10,000 empirical values of the user defined</dt>
+<dd>distribution from an external file.</dd>
+</dl>
+<p>If no distribution is available for a given <tt class="docutils literal"><span class="pre">l</span></tt> and <tt class="docutils literal"><span class="pre">n</span></tt>, the closest values for
+<tt class="docutils literal"><span class="pre">l</span></tt> and <tt class="docutils literal"><span class="pre">n</span></tt> are chosen instead.</p>
+<p>For the standard model score &#8220;phylo&#8221;, currently values are available until</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">lMax</span></tt> = 99</li>
+<li><tt class="docutils literal"><span class="pre">nMax</span></tt> = 49</li>
+<li><tt class="docutils literal"><span class="pre">totalRepeatLengthMax</span></tt> = 1000</li>
+</ul>
+</div></blockquote>
+<p>For <tt class="docutils literal"><span class="pre">l</span></tt> &lt;=  <tt class="docutils literal"><span class="pre">lMax</span></tt> and <tt class="docutils literal"><span class="pre">n</span></tt> &lt;=  <tt class="docutils literal"><span class="pre">nMax</span></tt> and <tt class="docutils literal"><span class="pre">n*l</span></tt> &lt;=  <tt class="docutils literal"><span class="pre">totalRepeatLengthMax</span></tt>
+all values are available.</p>
+<p>For other values, we use the closest distribution, assuming that values change little
+(heuristic assumption!).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit.</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
+<li><strong>score</strong> &#8211; The model of repeat evolution used. E.g. &#8220;phylo&#8221;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy list of length 10.000</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-4">
+<p class="first admonition-title">Todo</p>
+<p class="last">Define &#8220;phylo&#8221; model.</p>
+</div>
+<div class="admonition-todo admonition" id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">Perhaps add distributions beyond lMax, nMax.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.gapPenalty">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">gapPenalty</tt><big>(</big><em>myTR</em>, <em>mu</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#gapPenalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.gapPenalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the gap penalty for a <tt class="docutils literal"><span class="pre">Repeat</span></tt> given mutation rate <tt class="docutils literal"><span class="pre">mu</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>myTR</strong> (<em>Repeat</em>) &#8211; A <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</li>
+<li><strong>mu</strong> (<em>float</em>) &#8211; The mutation rate.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Gap penalty (float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-6">
+<p class="first admonition-title">Todo</p>
+<p class="last">Define <tt class="docutils literal"><span class="pre">mu</span></tt> more precisely.</p>
+</div>
+<div class="admonition-todo admonition" id="index-7">
+<p class="first admonition-title">Todo</p>
+<p class="last">Is this function called from anywhere? In case, consider refactoring.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.pValueFromEmpiricialList">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">pValueFromEmpiricialList</tt><big>(</big><em>myTR</em>, <em>score='phylo'</em>, <em>myScore=None</em>, <em>empirical=[]</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#pValueFromEmpiricialList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.pValueFromEmpiricialList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the p-Value of a score for the given myTR.</p>
+<p>The p-Value is the number of scores for comparable tandem repeats, i.e. of same
+repeat unit length and repeat unit copy number that are as good or better.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>myTR</strong> (<em>Repeat</em>) &#8211; An instance of the Repeat class.</li>
+<li><strong>score</strong> &#8211; The model of repeat evolution used. E.g. &#8220;phylo&#8221;.</li>
+<li><strong>myScore</strong> (<em>float</em>) &#8211; The value of the score of the Repeat instance.</li>
+<li><strong>empirical</strong> &#8211; The null distribution of the score for repeats of the same type.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A float.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pValue</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.pValuePSim">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">pValuePSim</tt><big>(</big><em>myTR</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#pValuePSim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.pValuePSim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the p-Value of the pSim score for a Repeat.</p>
+<p>Retrieve the probability density function for repeats of the same type as <tt class="docutils literal"><span class="pre">myTR</span></tt>.
+Then, calculate the p-Value given this probability density function, and the
+pSim score of <tt class="docutils literal"><span class="pre">myTR</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>myTR</strong> (<em>Repeat</em>) &#8211; A <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">p-Value (float)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-8">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
+calculated before.</p>
+</div>
+<div class="admonition-todo admonition" id="index-9">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check exception: if pdf == False: return 1.</p>
+</div>
+<div class="admonition-todo admonition" id="index-10">
+<p class="first admonition-title">Todo</p>
+<p class="last">Describe <tt class="docutils literal"><span class="pre">precision</span></tt>.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.repeat.repeat_pvalue.pValuePars">
+<tt class="descclassname">tandemrepeats.repeat.repeat_pvalue.</tt><tt class="descname">pValuePars</tt><big>(</big><em>myTR</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_pvalue.html#pValuePars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_pvalue.pValuePars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the p-Value of the parsimony score for a Repeat.</p>
+<p>Retrieve the probability density function for repeats of the same type as <tt class="docutils literal"><span class="pre">myTR</span></tt>.
+Then, calculate the p-Value given this probability density function, and the
+parsimony score of <tt class="docutils literal"><span class="pre">myTR</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>myTR</strong> (<em>Repeat</em>) &#8211; A <tt class="docutils literal"><span class="pre">Repeat</span></tt> instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">p-Value (float)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-11">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
+calculated before.</p>
+</div>
+<div class="admonition-todo admonition" id="index-12">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check exception: if pdf == False: return 1.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="repeat-score">
+<h2>repeat_score<a class="headerlink" href="#repeat-score" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 28)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat_score&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="test-dependencies">
+<h2>test_dependencies<a class="headerlink" href="#test-dependencies" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 33)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.test_dependencies&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+ImportError: No module named &#8216;tandemrepeats.repeat.test_dependencies&#8217;
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Repeat code documentation</a><ul>
+<li><a class="reference internal" href="#repeat">repeat</a></li>
+<li><a class="reference internal" href="#repeat-exon">repeat_exon</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_io">repeat_io</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_pvalue">repeat_pvalue</a></li>
+<li><a class="reference internal" href="#repeat-score">repeat_score</a></li>
+<li><a class="reference internal" href="#test-dependencies">test_dependencies</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="hmm.html"
+                        title="previous chapter">HMM code documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="repeat_list.html"
+                        title="next chapter">Repeat_list code documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/repeat.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repeat_list.html" title="Repeat_list code documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hmm.html" title="HMM code documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Elke Schaper.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

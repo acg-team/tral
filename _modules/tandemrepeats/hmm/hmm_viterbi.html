@@ -1,0 +1,548 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tandemrepeats.hmm.hmm_viterbi &mdash; tandemrepeats 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tandemrepeats.hmm.hmm_viterbi</h1><div class="highlight"><pre>
+<span class="c"># (C) 2012-2014 Elke Schaper</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">configuration</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats.paths</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats.repeat</span> <span class="kn">import</span> <span class="n">repeat</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">Instance</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">config</span>
+
+<div class="viewcode-block" id="viterbi"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.viterbi">[docs]</a><span class="k">def</span> <span class="nf">viterbi</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">emission</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Calculate the most probable sequence of states given a sequence of emissions</span>
+<span class="sd">    and a HMM using the Viterbi algorithm</span>
+
+<span class="sd">    Get local copies of all variables.</span>
+<span class="sd">    All probabilities must be given as logarithms</span>
+<span class="sd">    Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K)</span>
+<span class="sd">    [Reason: Seldom AAs that are not part of standard amino acid substitution models.]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hmm (hmm): An instance of the HMM class.</span>
+<span class="sd">        emission (sequence): An instance of the Sequence class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The most likely sequence of hmm states to emit the sequence in the</span>
+<span class="sd">        form of a list of str.</span>
+
+<span class="sd">    .. todo:: Adapt docstrings to refactored Viterbi -&gt; Viterbi_path classes.</span>
+<span class="sd">    .. todo:: Check: Do you need local copies of all variables?</span>
+<span class="sd">    .. todo:: Do the functions related to viterbi need to be summarized (e.g. in one</span>
+<span class="sd">         class?) How do they relate to the Sequence class, or the HMM class?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">emission</span><span class="p">)</span><span class="o">/</span><span class="n">hmm</span><span class="o">.</span><span class="n">lD</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;filter&#39;</span><span class="p">][</span><span class="s">&#39;basic&#39;</span><span class="p">][</span><span class="s">&#39;dict&#39;</span><span class="p">][</span><span class="s">&#39;nD&#39;</span><span class="p">][</span><span class="s">&#39;threshold&#39;</span><span class="p">]):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min nD ({}).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">lD</span><span class="p">,</span> \
+             <span class="nb">len</span><span class="p">(</span><span class="n">emission</span><span class="p">),</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;filter&#39;</span><span class="p">][</span><span class="s">&#39;basic&#39;</span><span class="p">][</span><span class="s">&#39;dict&#39;</span><span class="p">][</span><span class="s">&#39;nD&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">hmm</span><span class="o">.</span><span class="n">lD</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;hmm&#39;</span><span class="p">][</span><span class="s">&#39;lDMax&#39;</span><span class="p">]):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Skip the HMM as it is too long ({}) according to the filter criterion max hmm.lD ({}).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">lD</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;hmm&#39;</span><span class="p">][</span><span class="s">&#39;lDMax&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">states</span>
+    <span class="n">p_0</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">hmm</span><span class="o">.</span><span class="n">p_0</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">p_e</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="n">iE</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">iE</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">emission</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">emission</span> <span class="ow">in</span> <span class="n">hmm</span><span class="o">.</span><span class="n">p_e</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">p_t</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="n">iT</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">iT</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">transition</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">transition</span> <span class="ow">in</span> <span class="n">hmm</span><span class="o">.</span><span class="n">p_t</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([(</span><span class="n">iS</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;lAll_amino_acid&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">emission</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;There is an unknown amino acid in:</span><span class="se">\n</span><span class="s"> {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">emission</span><span class="p">))</span>
+
+    <span class="c"># In case there are ambiguous amino acids in the sequence, calculate the expected frequencies of the AAs that they could stand for</span>
+    <span class="c"># from the emission frequencies of the hmm in the neutral state &quot;N&quot;.</span>
+    <span class="n">dAmbiguous_local</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">iA</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;dAmbiguous_amino_acid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">iA</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">iA</span> <span class="ow">in</span> <span class="n">emission</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">p_e</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="k">for</span> <span class="n">iAmbiguous</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;dAmbiguous_amino_acid&#39;</span><span class="p">][</span><span class="n">iA</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">iAmbiguous</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;dAmbiguous_amino_acid&#39;</span><span class="p">][</span><span class="n">iA</span><span class="p">]:</span>
+                <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">iA</span><span class="p">][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_e</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="o">-</span> <span class="n">total</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;p_0: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_0</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;p_e: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_e</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;p_t: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_t</span><span class="p">))</span>
+
+    <span class="c"># Initialisation of the probabilities on the first emitted character</span>
+    <span class="k">if</span> <span class="n">emission</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">dAmbiguous_local</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;probability&#39;</span><span class="p">:</span> <span class="n">p_0</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span> <span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">iS</span><span class="p">]}</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">states</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+            <span class="c"># Calculate the average emission probability of ambiguity chars.</span>
+            <span class="c"># The numerical trick to calculate the average log values in high precision is reused in the next for-loop and described there.</span>
+            <span class="n">lP_emission</span> <span class="o">=</span> <span class="p">[</span> <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">emission</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_e</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="k">for</span> <span class="n">iAmbiguous</span> <span class="ow">in</span> <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">emission</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="p">]</span>
+            <span class="n">max_p</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lP_emission</span><span class="p">)</span>
+            <span class="n">path</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="s">&#39;probability&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">max_p</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lP_emission</span><span class="p">]</span>  <span class="p">)</span> <span class="p">)</span> <span class="o">+</span> <span class="n">max_p</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">{</span> <span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;probability&#39;</span><span class="p">:</span> <span class="n">p_0</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span><span class="o">+</span><span class="n">p_e</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="n">emission</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="p">,</span> <span class="s">&#39;path&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">iS</span><span class="p">]}</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">states</span><span class="p">}</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Path: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="c"># Viterbi on all remaining emitted characters</span>
+    <span class="k">for</span> <span class="n">iE</span> <span class="ow">in</span> <span class="n">emission</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Emitted: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iE</span><span class="p">))</span>
+
+        <span class="c">### Determine next most probable state and its probability ...</span>
+        <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">iFormer</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">iE</span> <span class="ow">in</span> <span class="n">dAmbiguous_local</span><span class="p">:</span>
+                    <span class="c">## Calculate the probability of being in state iS and emitting iAmbiguous for any of the AAs that the ambiguous iE stands for.</span>
+                    <span class="c"># Then, average over these probabilities (taking into account the background frequencies of all iAmbiguous)</span>
+                    <span class="n">dP_Former</span> <span class="o">=</span>  <span class="p">{</span><span class="n">iAmbiguous</span><span class="p">:</span> <span class="n">probability_of_the_former_state</span><span class="p">(</span><span class="n">iFormer</span><span class="p">,</span> <span class="n">iS</span><span class="p">,</span> <span class="n">iAmbiguous</span><span class="p">,</span> <span class="n">p_e</span><span class="p">,</span> <span class="n">p_t</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">iAmbiguous</span> <span class="ow">in</span> <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">iE</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                    <span class="n">dP_Former</span> <span class="o">=</span> <span class="p">{</span><span class="n">iAmbiguous</span><span class="p">:</span><span class="n">j</span> <span class="k">for</span> <span class="n">iAmbiguous</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="n">dP_Former</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">j</span><span class="p">}</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dP_Former</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c"># Next, we need to calculated a weighted average over log10 probabilities.</span>
+                        <span class="c"># For this purpose, we need to transform the log10ps back to ps.</span>
+                        <span class="c"># However, the ps might have too small values. We apply a numerical trick:</span>
+                        <span class="c"># Instead of sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) ) ) we calculate</span>
+                        <span class="c"># sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) + k ) ) / (10 ** k), which can easily be shown to be equivalent.</span>
+                        <span class="c"># For (-k), we choose the maximum value in log(w(i)) + log(p(i)), as it corresponds to the maximum and thus most pronounced probability of the sum.</span>
+                        <span class="n">lP_Former</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span> <span class="o">+</span> <span class="n">dAmbiguous_local</span><span class="p">[</span><span class="n">iE</span><span class="p">][</span><span class="n">iAmbiguous</span><span class="p">]</span> <span class="k">for</span> <span class="n">iAmbiguous</span><span class="p">,</span><span class="n">i</span>  <span class="ow">in</span> <span class="n">dP_Former</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+                        <span class="n">max_p</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lP_Former</span><span class="p">)</span>
+                        <span class="n">p</span><span class="p">[</span><span class="n">iFormer</span><span class="p">]</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">max_p</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lP_Former</span><span class="p">]</span>  <span class="p">)</span> <span class="p">)</span> <span class="o">+</span> <span class="n">max_p</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p_Former</span> <span class="o">=</span> <span class="n">probability_of_the_former_state</span><span class="p">(</span><span class="n">iFormer</span><span class="p">,</span> <span class="n">iS</span><span class="p">,</span> <span class="n">iE</span><span class="p">,</span> <span class="n">p_e</span><span class="p">,</span> <span class="n">p_t</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">p_Former</span><span class="p">:</span>
+                        <span class="n">p</span><span class="p">[</span><span class="n">iFormer</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_Former</span>
+
+            <span class="c">## This error will occur when it is not possible to enter a state iS at emission iE. This can happen for more complex HMMs, but should not happen for the simple</span>
+            <span class="c">## circular HMMs that we consider here. It means that state iS cannot be reached by emission iE. Either iS cannot emit iE, or iS cannot be reached by transitions at this point.</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="p">{}:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;The dict p is empty. This should never happen.&quot;</span><span class="p">)</span>
+            <span class="c"># Detect the most likely path.</span>
+            <span class="n">next_state</span><span class="p">,</span> <span class="n">p_next_state</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">path</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="s">&#39;probability_next&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_next_state</span>
+            <span class="n">path</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="s">&#39;path_next&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="n">next_state</span><span class="p">][</span><span class="s">&#39;path&#39;</span><span class="p">][:]</span>
+            <span class="n">path</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="s">&#39;path_next&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iS</span><span class="p">)</span>
+
+        <span class="c">### ... and update the path accordingly</span>
+        <span class="k">for</span> <span class="n">iV</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">iV</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iV</span><span class="p">[</span><span class="s">&#39;path_next&#39;</span><span class="p">][:]</span>
+            <span class="n">iV</span><span class="p">[</span><span class="s">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iV</span><span class="p">[</span><span class="s">&#39;probability_next&#39;</span><span class="p">]</span>
+        <span class="c">#logging.debug(&quot;Path: {0}&quot;.format(path))</span>
+
+    <span class="c"># Which overall path is the most likely?</span>
+    <span class="n">path_summary</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="n">path</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="s">&#39;probability&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">states</span><span class="p">}</span>
+    <span class="n">most_likely_terminal_state</span><span class="p">,</span> <span class="n">p_most_likely_path</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">path_summary</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">most_likely_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="n">most_likely_terminal_state</span><span class="p">][</span><span class="s">&#39;path&#39;</span><span class="p">]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;The most likely path is {0}. It has a score of {1}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">most_likely_path</span><span class="p">,</span> <span class="n">p_most_likely_path</span><span class="p">))</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">most_likely_path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="probability_of_the_former_state"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.probability_of_the_former_state">[docs]</a><span class="k">def</span> <span class="nf">probability_of_the_former_state</span><span class="p">(</span><span class="n">iFormer</span><span class="p">,</span> <span class="n">iS</span><span class="p">,</span> <span class="n">iE</span><span class="p">,</span> <span class="n">p_e</span><span class="p">,</span> <span class="n">p_t</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+
+    <span class="sd">&#39;&#39;&#39; Calculate the probability of iFormer, given iS and iE together with the dicts of emission and transition probabilities.&#39;&#39;&#39;</span>
+    <span class="c">## Exclude paths with a zero probability (i.e. a log(probability) set to None)</span>
+    <span class="k">if</span>  <span class="n">iS</span> <span class="ow">in</span> <span class="n">p_t</span><span class="p">[</span><span class="n">iFormer</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">None</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">p_t</span><span class="p">[</span><span class="n">iFormer</span><span class="p">][</span><span class="n">iS</span><span class="p">]</span> <span class="ow">and</span> <span class="n">iE</span> <span class="ow">in</span> <span class="n">p_e</span><span class="p">[</span><span class="n">iS</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">None</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">p_e</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="n">iE</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">None</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">path</span><span class="p">[</span><span class="n">iFormer</span><span class="p">][</span><span class="s">&#39;probability&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">path</span><span class="p">[</span><span class="n">iFormer</span><span class="p">][</span><span class="s">&#39;probability&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_t</span><span class="p">[</span><span class="n">iFormer</span><span class="p">][</span><span class="n">iS</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_e</span><span class="p">[</span><span class="n">iS</span><span class="p">][</span><span class="n">iE</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="bp">None</span>
+
+</div>
+<div class="viewcode-block" id="distance_index"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.distance_index">[docs]</a><span class="k">def</span> <span class="nf">distance_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function to calculate the distance between two indices in a circular HMM.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        i (int): first index</span>
+<span class="sd">        j (int): second index</span>
+<span class="sd">        length (int): length of the HMM</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The distance between the indices ``i`` and ``j``: As the HMM</span>
+<span class="sd">        is circular ``j`` may have a smaller value than ``i``, even though</span>
+<span class="sd">        ``j`` is ahead of ``i``.</span>
+
+<span class="sd">    .. todo:: May be replaced by a simple mod, as distance_index is used only once in</span>
+<span class="sd">        the code at current.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">j</span><span class="o">-</span><span class="n">i</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">length</span> <span class="o">+</span> <span class="n">j</span> <span class="o">-</span> <span class="n">i</span>
+
+</div>
+<div class="viewcode-block" id="hmm_path_to_maximal_complete_tandem_repeat_units"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.hmm_path_to_maximal_complete_tandem_repeat_units">[docs]</a><span class="k">def</span> <span class="nf">hmm_path_to_maximal_complete_tandem_repeat_units</span><span class="p">(</span><span class="n">lSequence</span><span class="p">,</span> <span class="n">lPath</span><span class="p">,</span> <span class="n">lD</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.</span>
+
+<span class="sd">    Be ungreedy: Start from the last index in the cluster of all start state and end state indices.</span>
+
+<span class="sd">    Only integrate repeat units that are at least alpha complete (be it before of after)</span>
+<span class="sd">    If you prefer absolute number of characters to filter which repeat units are used, and which not,</span>
+<span class="sd">    change this in two occurrences of alpha.</span>
+
+<span class="sd">    Assume that all states are counted starting on 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lSequence (list of str): A list of sequences.</span>
+<span class="sd">        lPath (list of list of str): A list of Viterbi paths</span>
+<span class="sd">        lD (int): length of the HMM used to create the Viterbi paths.</span>
+<span class="sd">        alpha (Float): alpha element [0,1].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of multiple sequence alignments (MSAs) in the form of a list of</span>
+<span class="sd">        list of str, e.g. ``[[&#39;ATAILC&#39;, &#39;ATAILC&#39;, &#39;ACALKG&#39;], ...]``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: If alpha is not in [0,1].</span>
+
+<span class="sd">    .. todo:: Should the sequences be sequence instances instead of just strings?</span>
+<span class="sd">    .. todo:: Check example for returns.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">alpha</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+    <span class="c"># Find the first match state index used by all paths (add None if None)</span>
+    <span class="n">lTerminal_Indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lTRPresent</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">lPath</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">iP</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">iP</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;M&quot;</span><span class="p">):</span>
+                <span class="n">lTerminal_Indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">iP</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+                <span class="n">lTRPresent</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lTRPresent</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">iP</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">iP</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;M&quot;</span><span class="p">):</span>
+                <span class="n">lTerminal_Indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">iP</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span><span class="o">%</span><span class="n">lD</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="c"># Find the max distance between two indices</span>
+    <span class="n">lUsed_indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">lTerminal_Indices</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lUsed_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">lUsed_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">lUsed_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lUsed_indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">lUsed_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span> <span class="o">+</span> <span class="p">[</span><span class="n">lD</span> <span class="o">-</span> <span class="n">lUsed_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">lUsed_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">max_distance_index</span><span class="p">,</span> <span class="n">max_distance</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">distances</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c"># Define the start_index</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">lUsed_indices</span><span class="p">[(</span><span class="n">max_distance_index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">lUsed_indices</span><span class="p">)]</span>
+
+    <span class="c"># Get all TR units according to shift.</span>
+    <span class="n">lMSA</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">ibPresent</span><span class="p">,</span> <span class="n">iSeq</span><span class="p">,</span> <span class="n">iPath</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lTRPresent</span><span class="p">,</span> <span class="n">lSequence</span><span class="p">,</span> <span class="n">lPath</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ibPresent</span><span class="p">:</span>
+            <span class="n">lMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">msa</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># Intialise the last used index and the first msa_unit</span>
+        <span class="n">current_index</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">msa_unit</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">iP</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iSeq</span><span class="p">,</span> <span class="n">iPath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">iP</span> <span class="o">==</span> <span class="s">&#39;N&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">iP</span> <span class="o">==</span> <span class="s">&#39;C&#39;</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">match_state_index</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">iP</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="p">(</span><span class="n">lD</span> <span class="o">-</span> <span class="n">start_index</span><span class="p">))</span><span class="o">%</span><span class="n">lD</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">match_state_index</span> <span class="o">&gt;=</span> <span class="n">current_index</span><span class="p">:</span>
+                <span class="c"># We are staying within the same repeat unit.</span>
+                <span class="n">msa_unit</span> <span class="o">+=</span> <span class="n">iS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># We are starting a new repeat unit.</span>
+                <span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msa_unit</span><span class="p">)</span>
+                <span class="n">msa_unit</span> <span class="o">=</span> <span class="n">iS</span>
+            <span class="n">current_index</span> <span class="o">=</span> <span class="n">match_state_index</span>
+
+        <span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msa_unit</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">lD</span><span class="p">):</span>
+                <span class="n">msa</span> <span class="o">=</span> <span class="n">msa</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">lD</span><span class="p">):</span>
+                <span class="n">msa</span> <span class="o">=</span> <span class="n">msa</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">lMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msa</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">lMSA</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+
+    <span class="k">return</span> <span class="n">lMSA</span>
+
+</div>
+<div class="viewcode-block" id="hmm_path_to_non_aligned_tandem_repeat_units"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units">[docs]</a><span class="k">def</span> <span class="nf">hmm_path_to_non_aligned_tandem_repeat_units</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">lD</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Convert a viterbi &lt;path&gt; of a hmm of length &lt;lD&gt; on &lt;sequence&gt; into the corresponding tandem repeat</span>
+
+<span class="sd">    Extract the tandem repeat alignment from a sequence given a Viterbi path.</span>
+<span class="sd">    Ignore the alignment information in the Viterbi path. For example, all emissions</span>
+<span class="sd">    labelled with M1 (match state 1) align according to the HMM. However, this method does</span>
+<span class="sd">    not use this information. Therefore, for example the first characters in the repeat</span>
+<span class="sd">    units do not necessarily align, and the repeat units are not necessarily of same length.</span>
+
+<span class="sd">    Assume that all states are counted starting on 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): A sequence as a string.</span>
+<span class="sd">        lPath (list of list of str): A list of Viterbi paths</span>
+<span class="sd">        lD (int): length of the HMM used to create the Viterbi paths.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A multiple sequence alignment (MSA) created from the most likely path</span>
+<span class="sd">        along the hmm in the form of a list of str.</span>
+
+<span class="sd">    .. warning:: [None].</span>
+<span class="sd">    .. todo:: Should the sequence be a sequence instance instead of just a string?</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;N&#39;</span><span class="p">)</span>
+    <span class="c"># If no repeat was found, return None.</span>
+    <span class="k">if</span> <span class="n">begin</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">splitter</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;(\w)(\d+)&quot;</span><span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">[((</span><span class="n">splitter</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">iP</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">splitter</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">iP</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))),</span><span class="n">iS</span><span class="p">)</span> <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">iP</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="n">begin</span><span class="p">:],</span><span class="n">path</span><span class="p">[</span><span class="n">begin</span><span class="p">:])</span> <span class="k">if</span> <span class="n">iP</span> <span class="o">!=</span> <span class="s">&#39;C&#39;</span><span class="p">]</span>
+
+    <span class="n">shift</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">index_shift</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Empty&quot;</span><span class="p">]</span><span class="o">+</span><span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="n">lD</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">shift</span><span class="p">)</span><span class="o">%</span><span class="n">lD</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lD</span><span class="p">)]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;The tandem repeat is shifted by: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">shift</span><span class="p">)))</span>
+
+    <span class="n">repeat_msa</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">repeat_unit</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">last_used_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">lD</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">iM</span><span class="p">,</span><span class="n">iS</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">iM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;I&quot;</span><span class="p">:</span>
+                <span class="n">repeat_unit</span> <span class="o">+=</span> <span class="n">iS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repeat_msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repeat_unit</span><span class="p">)</span>
+                <span class="n">repeat_unit</span> <span class="o">=</span> <span class="n">iS</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">iM</span><span class="p">,</span><span class="n">iS</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="c">#print(&quot;{} {}&quot;.format(iM,iS))</span>
+            <span class="k">if</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&gt;=</span> <span class="n">last_used_index</span><span class="p">:</span>
+                <span class="n">repeat_unit</span> <span class="o">+=</span> <span class="n">iS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repeat_msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repeat_unit</span><span class="p">)</span>
+                <span class="n">repeat_unit</span> <span class="o">=</span> <span class="n">iS</span>
+            <span class="n">last_used_index</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="n">repeat_msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repeat_unit</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">repeat_msa</span>
+
+</div>
+<div class="viewcode-block" id="hmm_path_to_aligned_tandem_repeat_units"><a class="viewcode-back" href="../../../hmm.html#tandemrepeats.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units">[docs]</a><span class="k">def</span> <span class="nf">hmm_path_to_aligned_tandem_repeat_units</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">most_likely_path</span><span class="p">,</span> <span class="n">lD</span><span class="p">,</span>
+                                            <span class="n">translate</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a viterbi path in an hmm of length ``lD`` on the sequence into a</span>
+<span class="sd">    corresponding tandem repeat.</span>
+
+<span class="sd">    Extract the tandem repeat alignment from a sequence given a Viterbi path.</span>
+<span class="sd">    Use alignment information in the Viterbi path. For example, all emissions</span>
+<span class="sd">    labelled with M1 (match state 1) align according to the HMM. Insert gaps</span>
+<span class="sd">    for insertions and deletions accordingly.</span>
+<span class="sd">    Thus, for example the first characters in the repeat units do necessarily</span>
+<span class="sd">    align, albeit some of them may be gaps. Also, all repeat units are</span>
+<span class="sd">    necessarily of same length.</span>
+
+<span class="sd">    Assume that all states are counted starting on 0, unless the ``translate``</span>
+<span class="sd">    flag is set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): A sequence as a string.</span>
+<span class="sd">        most_likely_path (list of str): a Viterbi path.</span>
+<span class="sd">        lD (int): length of the HMM used to create the Viterbi paths.</span>
+<span class="sd">        translate (bool): This function assumes that HMM states are enumerated</span>
+<span class="sd">            starting on 0.</span>
+<span class="sd">            If the HMM states are enumerated starting on 1, set this flag for</span>
+<span class="sd">            transformation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The function returns a tuple consisting of 3 values.</span>
+<span class="sd">        The tuple contains:</span>
+
+<span class="sd">        * ``msa``: A repeat instance.</span>
+<span class="sd">        * ``begin``: The start index of the repeat on the sequence.</span>
+<span class="sd">        * ``shift``: The index of the HMM where the cut between repeat units is set.</span>
+
+
+<span class="sd">    .. warning:: [None].</span>
+<span class="sd">    .. todo:: Should the sequence be a sequence instance instead of just a string?</span>
+<span class="sd">    .. todo:: Check: How is the returned `begin` defined? Starting counting on 0 or 1?</span>
+<span class="sd">        Is it the index of the last flanking character, or the first repeat character?</span>
+<span class="sd">    .. todo:: Can we update this function, e.g. to not assume that HMM states start on 0?</span>
+<span class="sd">    .. todo:: Check the docstring, reformat returns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">begin</span> <span class="o">=</span> <span class="n">most_likely_path</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;N&#39;</span><span class="p">)</span>
+    <span class="c"># If no repeat was found, return None.</span>
+    <span class="k">if</span> <span class="n">begin</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="n">most_likely_path</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="n">translate</span><span class="p">:</span>
+        <span class="c"># In the input data, the states are counted starting on 1. Subtract 1.</span>
+        <span class="n">most_likely_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="s">&quot;N&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">most_likely_path</span><span class="p">]</span>
+
+    <span class="n">splitter</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;(\w)(\d+)&quot;</span><span class="p">)</span>
+
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">[((</span><span class="n">splitter</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">iP</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">splitter</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">iP</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))),</span><span class="n">iS</span><span class="p">)</span> <span class="k">for</span> <span class="n">iS</span><span class="p">,</span><span class="n">iP</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="n">begin</span><span class="p">:],</span><span class="n">most_likely_path</span><span class="p">[</span><span class="n">begin</span><span class="p">:])</span> <span class="k">if</span> <span class="n">iP</span> <span class="o">!=</span> <span class="s">&#39;C&#39;</span><span class="p">]</span>
+
+    <span class="n">shift</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">index_shift</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="n">lD</span><span class="o">-</span><span class="n">shift</span><span class="p">)</span><span class="o">%</span><span class="n">lD</span>  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lD</span><span class="p">)]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;The tandem repeat is shifted by: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">shift</span><span class="p">)))</span>
+
+    <span class="n">insertions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">repeat_text</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">insertions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+    <span class="n">max_used_index_M</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_used_index_I</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">last_used_index</span> <span class="o">=</span> <span class="n">shift</span>
+
+    <span class="k">for</span> <span class="n">iM</span><span class="p">,</span><span class="n">iS</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Iteration iS: {0}, iM: {1}, last_used_index: {2}, max_used_index_M: {3}, max_used_index_I: {4}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">iS</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">iM</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">last_used_index</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">max_used_index_M</span><span class="p">),</span><span class="nb">str</span><span class="p">(</span><span class="n">max_used_index_I</span><span class="p">)))</span>
+
+        <span class="c">## If we have entered a new repeat unit, add a new element to &lt;insertions&gt;</span>
+        <span class="c">## (Including some index magic, e.g. the insertion state index is shifted by one (lowered))</span>
+        <span class="k">if</span> <span class="n">iM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;M&quot;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&lt;=</span> <span class="n">max_used_index_M</span> <span class="ow">or</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&lt;=</span> <span class="n">max_used_index_I</span><span class="p">):</span>
+            <span class="n">insertions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+            <span class="n">max_used_index_M</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">max_used_index_I</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="n">iM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;I&quot;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_used_index_I</span> <span class="ow">or</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_used_index_M</span><span class="p">):</span>
+            <span class="n">insertions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+            <span class="n">max_used_index_I</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">max_used_index_M</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">iM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;M&quot;</span><span class="p">:</span>
+            <span class="n">max_used_index_M</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">max_used_index_I</span> <span class="o">=</span> <span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c"># Save match state and deletion information</span>
+        <span class="k">if</span> <span class="n">iM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;M&quot;</span><span class="p">:</span>
+            <span class="n">n_deletions</span> <span class="o">=</span> <span class="n">distance_index</span><span class="p">(</span><span class="n">last_used_index</span><span class="p">,</span> <span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lD</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">repeat_text</span> <span class="o">+=</span> <span class="s">&quot;-&quot;</span><span class="o">*</span> <span class="n">n_deletions</span> <span class="o">+</span> <span class="n">iS</span>
+            <span class="n">last_used_index</span> <span class="o">=</span> <span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">insertions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">index_shift</span><span class="p">[</span><span class="n">iM</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="o">+=</span> <span class="n">iS</span>
+
+    <span class="n">msa</span> <span class="o">=</span> <span class="p">[</span> <span class="n">repeat_text</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">lD</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">repeat_text</span><span class="p">),</span><span class="n">lD</span><span class="p">)</span> <span class="p">]</span>
+    <span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&quot;-&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">lD</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">msaT</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">msa</span><span class="p">)]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;This tandem repeat has {0} repeat units.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;These insertions were detected: {0}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">insertions</span><span class="p">)))</span>
+
+    <span class="n">msaTemp</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># For each site ...</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lD</span><span class="p">):</span>
+        <span class="n">msaTemp</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">msaT</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c"># ... for each tandem repeat unit, check whether there are insertions.</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">insertions</span><span class="p">):</span>
+            <span class="c"># Backtranslate the index used in insertions (shift by one to the right (increase))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">lD</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">lD</span><span class="p">]:</span>
+                    <span class="n">msaTemp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span> <span class="n">iS</span> <span class="o">+</span> <span class="s">&quot;-&quot;</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">msa</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">msaTemp</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">msa</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">shift</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Elke Schaper.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

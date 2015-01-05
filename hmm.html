@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>HMM code documentation &mdash; tandemrepeats 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Repeat code documentation" href="repeat.html" />
+    <link rel="prev" title="Welcome to tandemrepeats’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repeat.html" title="Repeat code documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to tandemrepeats’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="hmm-code-documentation">
+<h1>HMM code documentation<a class="headerlink" href="#hmm-code-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Initial version of the hmm submodule documentation.</p>
+<div class="section" id="hmm">
+<h2>hmm<a class="headerlink" href="#hmm" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/hmm.rst</tt>, line 8)</p>
+autodoc: failed to import module &#8216;tandemrepeats.hmm.hmm&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/hmm/hmm.py&#8221;, line 21, in &lt;module&gt;
+    from tandemrepeats.hmm import hmm_io, hmm_viterbi
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/hmm/hmm_viterbi.py&#8221;, line 11, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="module-tandemrepeats.hmm.hmm_io">
+<span id="hmm-io"></span><h2>hmm_io<a class="headerlink" href="#module-tandemrepeats.hmm.hmm_io" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tandemrepeats.hmm.hmm_io.read">
+<tt class="descclassname">tandemrepeats.hmm.hmm_io.</tt><tt class="descname">read</tt><big>(</big><em>hmm_filename</em>, <em>id=None</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/hmm/hmm_io.html#read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.hmm.hmm_io.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read HMM file in HMMER3 format.</p>
+<p>HMMER3 file format is described in detail in
+<a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>,
+section 8.</p>
+<p>The general file format is:</p>
+<div class="highlight-python"><div class="highlight"><pre>HMMER3/b [3.0b2 | June 2009]
+NAME fn3
+ACC PF00041.12
+DESC Fibronectin type III domain
+LENG 86
+ALPH amino
+(...)
+
+HMM          A       C       D       E       F       G       H       I    (...)    Y
+            m-&gt;m    m-&gt;i    m-&gt;d    i-&gt;m    i-&gt;i    d-&gt;m    d-&gt;d
+  COMPO   2.70271 4.89246 3.02314 2.64362 3.59817 2.82566 3.74147 3.08574 (...) 3.22607
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.00000       *
+  1       3.16986 5.21447 4.52134 3.29953 4.34285 4.18764 4.30886 3.35801 (...) 3.93889 1 - -
+          2.68629 4.42236 2.77530 2.73088 3.46365 2.40512 3.72505 3.29365 (...) 3.61514
+          0.09796 2.38361 6.81068 0.10064 2.34607 0.48576 0.95510
+  2       2.70230 5.97353 2.24744 2.62947 5.31433 2.60356 4.43584 4.79731 (...) 4.25623 3 - -
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.48576 0.95510
+  (...)
+  86      3.03720 5.94099 3.75455 2.96917 5.26587 2.91682 3.66571 4.11840 (...) 4.99111 121 - E
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00227 6.08723       * 0.61958 0.77255 0.00000       *
+//
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The probabilities in this format are stored as negative
+natural log probabilities, e.g. -ln(0.25) = 1.38629. The special case
+of 0 probability is stored as <tt class="docutils literal"><span class="pre">*</span></tt> which in fact means -∞ (minus
+infinity).</p>
+</div>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">What does this mean: &#8220;Store probabilities as log10arithms. [???]&#8221;</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to the file with model data in the HMMER3
+file format.</li>
+<li><strong>id</strong> (<em>str, optional</em>) &#8211; The identifier for the model to be returned.
+E.g. for Pfam the <tt class="docutils literal"><span class="pre">id</span></tt> can look like this: &#8216;PF00560&#8217;.
+If defined, the function returns only the HMM with an identifier
+that matches the provided id. If a model in the file does not have
+an identifier to check against, it is skipped.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A dictionary of parameters required to initialise the HMM
+including the id, alphabet, emission probabilities and transition
+probabilities.</p>
+<p>Output format:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &#39;id&#39;: &#39;PF08261.7&#39;,
+    &#39;letters&#39;: [&#39;A&#39;, &#39;C&#39;, &#39;D&#39;, ..., &#39;Y&#39;],
+    &#39;COMPO&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+          &#39;emissions&#39;: [2.28205, 5.14899, ..., 1.92022],
+          &#39;transitions&#39;: [0.01467, 4.62483, ..., -inf]},
+    &#39;1&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [1.00089, 4.54999, ..., 5.23581],
+         &#39;transitions&#39;: [0.01467, 4.62483, ..., 0.95510]},
+    ...
+    &#39;8&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [4.12723, 5.39816, ..., 4.58094],
+         &#39;transitions&#39;: [0.00990, 4.62006, ..., -inf]}
+}
+</pre></div>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.hmm.hmm_io.read_HMMER_acc_lengths">
+<tt class="descclassname">tandemrepeats.hmm.hmm_io.</tt><tt class="descname">read_HMMER_acc_lengths</tt><big>(</big><em>hmm_filename</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/hmm/hmm_io.html#read_HMMER_acc_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.hmm.hmm_io.read_HMMER_acc_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.</p>
+<p>Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to HMMER3 file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>(dict of str: int): The number of match states for all HMM models in</dt>
+<dd><tt class="docutils literal"><span class="pre">hmm_filename</span></tt>.</dd>
+</dl>
+<span class="target" id="index-1"></span><div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Decide whether this function is needed.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tandemrepeats.hmm.hmm_io.split_HMMER3_file">
+<tt class="descclassname">tandemrepeats.hmm.hmm_io.</tt><tt class="descname">split_HMMER3_file</tt><big>(</big><em>hmm_filename</em>, <em>resultdir</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/hmm/hmm_io.html#split_HMMER3_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.hmm.hmm_io.split_HMMER3_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Split HMMER3 models from a single file <tt class="docutils literal"><span class="pre">hmm_filename</span></tt> into many files in</dt>
+<dd><tt class="docutils literal"><span class="pre">resultdir</span></tt>.</dd>
+</dl>
+<p>Helper function: split HMMER3 models from a single file <tt class="docutils literal"><span class="pre">hmm_filename</span></tt> into many
+files in <tt class="docutils literal"><span class="pre">resultdir</span></tt>. The models are named after the HMM accession.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to HMMER3 file.</li>
+<li><strong>resultdir</strong> (<em>str</em>) &#8211; Path to directory where result files are stored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="hmm-own-model">
+<h2>hmm_own_model<a class="headerlink" href="#hmm-own-model" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/hmm.rst</tt>, line 18)</p>
+autodoc: failed to import module &#8216;tandemrepeats.hmm.hmm_own_model&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/hmm/hmm_own_model.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="hmm-viterbi">
+<h2>hmm_viterbi<a class="headerlink" href="#hmm-viterbi" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/hmm.rst</tt>, line 23)</p>
+autodoc: failed to import module &#8216;tandemrepeats.hmm.hmm_viterbi&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/hmm/hmm_viterbi.py&#8221;, line 11, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 13, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_score.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HMM code documentation</a><ul>
+<li><a class="reference internal" href="#hmm">hmm</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.hmm.hmm_io">hmm_io</a></li>
+<li><a class="reference internal" href="#hmm-own-model">hmm_own_model</a></li>
+<li><a class="reference internal" href="#hmm-viterbi">hmm_viterbi</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to tandemrepeats&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="repeat.html"
+                        title="next chapter">Repeat code documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/hmm.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="repeat.html" title="Repeat code documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to tandemrepeats’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Elke Schaper.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

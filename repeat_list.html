@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Repeat_list code documentation &mdash; tandemrepeats 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Sequence code documentation" href="sequence.html" />
+    <link rel="prev" title="Repeat code documentation" href="repeat.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequence.html" title="Sequence code documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="repeat.html" title="Repeat code documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="repeat-list-code-documentation">
+<h1>Repeat_list code documentation<a class="headerlink" href="#repeat-list-code-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Initial version of the repeat_list submodule documentation.</p>
+<div class="section" id="repeat-list">
+<h2>repeat_list<a class="headerlink" href="#repeat-list" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat_list.rst</tt>, line 8)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat_list.repeat_list&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat_list/repeat_list.py&#8221;, line 7, in &lt;module&gt;
+    from tandemrepeats.repeat_list import repeat_list_io
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat_list/repeat_list_io.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+<div class="section" id="repeat-list-io">
+<h2>repeat_list_io<a class="headerlink" href="#repeat-list-io" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat_list.rst</tt>, line 13)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat_list.repeat_list_io&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 39, in Instance
+    return self._instance
+AttributeError: &#8216;Singleton&#8217; object has no attribute &#8216;_instance&#8217;
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1942, in _handle_configspec
+    _inspec=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1240, in _load
+    raise IOError(&#8216;Config file not found: &#8220;%s&#8221;.&#8217; % self.filename)
+OSError: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat_list/repeat_list_io.py&#8221;, line 19, in &lt;module&gt;
+    c = configuration.Configuration.Instance()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 41, in Instance
+    self._instance = self._decorated()
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/configuration.py&#8221;, line 53, in __init__
+    self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1229, in __init__
+    self._load(infile, configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1325, in _load
+    self._handle_configspec(configspec)
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 1948, in _handle_configspec
+    raise IOError(&#8216;Reading configspec failed: %s&#8217; % e)
+OSError: Reading configspec failed: Config file not found: &#8220;/I/have/stored/the/code/here/TandemRepeats/tandemrepeats/data/spec.ini&#8221;.
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Repeat_list code documentation</a><ul>
+<li><a class="reference internal" href="#repeat-list">repeat_list</a></li>
+<li><a class="reference internal" href="#repeat-list-io">repeat_list_io</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="repeat.html"
+                        title="previous chapter">Repeat code documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sequence.html"
+                        title="next chapter">Sequence code documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/repeat_list.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequence.html" title="Sequence code documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="repeat.html" title="Repeat code documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Elke Schaper.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

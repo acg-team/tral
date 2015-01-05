@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tandemrepeats.repeat.repeat &mdash; tandemrepeats 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tandemrepeats.repeat.repeat</h1><div class="highlight"><pre>
+<span class="c"># (C) 2011, Alexander Korsunsky</span>
+<span class="c"># (C) 2011-2014 Elke Schaper</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">tandemrepeats.repeat</span> <span class="kn">import</span> <span class="n">repeat_score</span><span class="p">,</span> <span class="n">repeat_pvalue</span><span class="p">,</span> <span class="n">repeat_io</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats.paths</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">configuration</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">Instance</span><span class="p">()</span>
+<span class="n">config_general</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">config</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">config_general</span><span class="p">[</span><span class="s">&quot;repeat&quot;</span><span class="p">]</span>
+
+<span class="c">################################### Repeat class #########################################</span>
+
+<div class="viewcode-block" id="Repeat"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat">[docs]</a><span class="k">class</span> <span class="nc">Repeat</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Tandem repeats are consecutive copies of genomic sequence.</span>
+
+<span class="sd">    A tandem repeat is stored in terms of a multiple sequence alignment of its</span>
+<span class="sd">    tandem repeat units. For example, the amino acid tandem repeat</span>
+<span class="sd">    KLMKLMKLKLM</span>
+<span class="sd">    can be displayed as a multiple sequence alignment (here: &quot;multiple repeat unit alignment&quot;)</span>
+<span class="sd">    KLM</span>
+<span class="sd">    KLM</span>
+<span class="sd">    KL-</span>
+<span class="sd">    KLM</span>
+<span class="sd">    and can be stored as</span>
+<span class="sd">    [&quot;KLM&quot;, &quot;KLM&quot;, &quot;KL-&quot;, &quot;KLM&quot;].</span>
+<span class="sd">    The - char stands for a gap: It indicates that either, there used to be a char at the</span>
+<span class="sd">    same position, but it got deleted. Or, all other chars in the same column got inserted</span>
+<span class="sd">    at some point.</span>
+
+<span class="sd">    For research on tandem repeats, many different statistics need to be calculated on</span>
+<span class="sd">    the multiple sequence alignment of the tandem repeat.</span>
+
+<span class="sd">    [Description of these statistics]</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        msa_original (list of str): The original alignment of repeat units.</span>
+<span class="sd">        msa (list of str):  The alignment of repeat units without rare chars.</span>
+<span class="sd">        msaT (list of str): The transposed alignment of repeat units. E.g.</span>
+<span class="sd">            [&quot;KKKK&quot;, &quot;LLLL&quot;, &quot;MM-M&quot;].</span>
+<span class="sd">        sequence_type (str): &quot;AA&quot; or &quot;DNA&quot;</span>
+<span class="sd">        n (int): The number of repeat units in the original msa. E.g. 4.</span>
+<span class="sd">        l (int): The length of the repeat units in the original msa. E.g. 3.</span>
+<span class="sd">        nD (int):  [Needs explanation]</span>
+<span class="sd">        lD (float): [Needs explanation]</span>
+<span class="sd">        text (str): [Needs explanation]</span>
+<span class="sd">        nGap (int): The number of gaps in ``msa``</span>
+<span class="sd">        sequence_length (int): [Needs explanation]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Repeat.__str__"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .. todo:: Improve output if pValues are only partly calculated.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;pValue&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;begin&#39;</span><span class="p">):</span>
+            <span class="n">first_line</span> <span class="o">=</span> <span class="s">&#39;&gt;begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lD</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;pValue&#39;</span><span class="p">):</span>
+            <span class="n">first_line</span> <span class="o">=</span> <span class="s">&#39;&gt;lD:{} n:{} pValue:{} divergence:{}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">first_line</span> <span class="o">=</span> <span class="s">&#39;&gt;lD:{} n:{}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">first_line</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Repeat.create"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Read tandem repeat from file.</span>
+
+<span class="sd">        Read tandem repeat from file (currently, only pickle is supported)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            format (str):  Currently only &quot;pickle&quot;</span>
+<span class="sd">            file (str): Path to output file</span>
+
+<span class="sd">        .. todo:: Write checks for ``format`` and ``file``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;pickle&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;format is unknown.&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Repeat.write"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Write tandem repeat to file.</span>
+
+<span class="sd">        Write tandem repeat to file using one of three formats.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (str): Path to input file</span>
+<span class="sd">            format (str):  Either &quot;fasta&quot;, &quot;pickle&quot; or &quot;stockholm&quot;</span>
+
+<span class="sd">        .. todo:: Write checks for ``format`` and ``file``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;fasta&#39;</span><span class="p">:</span>
+            <span class="n">repeat_io</span><span class="o">.</span><span class="n">save_repeat_fasta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;pickle&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s">&#39;stockholm&#39;</span><span class="p">:</span>
+            <span class="n">repeat_io</span><span class="o">.</span><span class="n">save_repeat_stockholm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;format is unknown.&#39;</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dScore&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_scores</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="p">[</span><span class="n">score_type</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="n">score_type</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">pValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dPValue&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pValues</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="p">[</span><span class="n">score_type</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="n">score_type</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">divergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dDivergence&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_scores</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="p">[</span><span class="n">score_type</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">score_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="n">score_type</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msa</span><span class="p">,</span> <span class="n">begin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+                 <span class="n">sequence_type</span> <span class="o">=</span> <span class="n">config_general</span><span class="p">[</span><span class="s">&quot;sequence_type&quot;</span><span class="p">],</span>
+                 <span class="n">scoreslist</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">],</span>
+                 <span class="n">calc_score</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as_bool</span><span class="p">(</span><span class="s">&#39;calc_score&#39;</span><span class="p">),</span> <span class="n">calc_pValue</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as_bool</span><span class="p">(</span><span class="s">&#39;calc_pValue&#39;</span><span class="p">)):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .. todo:: if calc_score == False and calc_pValue == True, there is an error.</span>
+<span class="sd">            However, calc_pValue == True should automatically require the score to be</span>
+<span class="sd">            calculated.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msa</span><span class="p">)</span>
+
+        <span class="c"># The index of begin start out on Zero.</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span>
+
+        <span class="c"># Replace underscores and asterisks with scores, transform letters to uppercase, replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with Lysine (K)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="p">[</span><span class="n">repeat_unit</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;_&quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;*&quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">repeat_unit</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">msa_standard_aa</span> <span class="o">=</span> <span class="p">[</span><span class="n">standardize</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">=</span> <span class="n">sequence_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+
+        <span class="c"># Assure every line is equally long</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rep</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&quot;-&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Constructing repeat from MSA:</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+
+        <span class="c">## Transpose MSA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaT</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">)]</span>
+
+        <span class="c"># Get text for MSA.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nGap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nGap</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deleteInsertionColumns</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gapStructure</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">calc_score</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculate_scores</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="n">scoreslist</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">calc_pValue</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculate_pValues</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="n">scoreslist</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Repeat.calc_nD"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.calc_nD">[docs]</a>    <span class="k">def</span> <span class="nf">calc_nD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; what is the number of letters in in all non-insertion columns, divided by lD?&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nD</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">))</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">textD</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">))</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nD</span> <span class="o">=</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="Repeat.calc_index_msa"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.calc_index_msa">[docs]</a>    <span class="k">def</span> <span class="nf">calc_index_msa</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; formerly named: set_begin&#39;&#39;&#39;</span>
+
+        <span class="c">## calculate the transposed MSA with the index in protein sequence instead of letter</span>
+        <span class="c">## to be able to compare two overlapping Repeats within the same sequence region.</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="c">## python 2: range returns list by defaul</span>
+        <span class="c"># Replace every letter with the index in the protein sequence</span>
+        <span class="n">msaI</span> <span class="o">=</span> <span class="p">[[</span><span class="n">j</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">]</span> <span class="c">## the &#39;I&#39; stands for index</span>
+        <span class="c">## Transpose msaI using list-comprehensions/zip/join magic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaIT</span> <span class="o">=</span> <span class="p">[[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">msaI</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaIT</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msaIT</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Repeat.calculate_scores"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.calculate_scores">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scoreslist</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">]):</span>
+
+        <span class="sd">&quot;&quot;&quot; Calculate scores on a Repeat instances for all scores in `scoreslist`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Repeat): An instance of the repeat class.</span>
+
+<span class="sd">        Kwargs:</span>
+<span class="sd">            scoreslist(list of str): A list of the names of the scores (e.g. [&quot;phylo_gap01&quot;])</span>
+<span class="sd">                that are calculated on the Repeat instance `self`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dScore&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dDivergence&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">worst_score</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;entropy&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;parsimony&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s">&#39;pSim&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;phylo&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;phylo_gap01&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s">&#39;phylo_gap001&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># Enter worst score</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span> <span class="o">=</span> <span class="p">{</span><span class="n">iScore</span><span class="p">:</span> <span class="n">worst_score</span><span class="p">[</span><span class="n">iScore</span><span class="p">]</span> <span class="k">for</span> <span class="n">iScore</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span> <span class="c"># Enter None, as a score cannot be calculated if there is just one repeat unit.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span> <span class="o">=</span> <span class="p">{</span><span class="n">iScore</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">iScore</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c"># Calculate score</span>
+            <span class="k">if</span> <span class="s">&#39;entropy&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;entropy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">meanSimilarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">entropy</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;parsimony&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;parsimony&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round_</span><span class="p">(</span><span class="n">repeat_score</span><span class="o">.</span><span class="n">meanSimilarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">parsimony</span><span class="p">),</span> <span class="n">decimals</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as_int</span><span class="p">(</span><span class="s">&#39;precision&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;pSim&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;pSim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round_</span><span class="p">(</span><span class="n">repeat_score</span><span class="o">.</span><span class="n">meanSimilarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">pSim</span><span class="p">),</span> <span class="n">decimals</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">as_int</span><span class="p">(</span><span class="s">&#39;precision&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap01&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap01&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;row_wise&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_trailing_gaps&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_coherent_deletions&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap001&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap001&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;row_wise&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_trailing_gaps&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_coherent_deletions&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dDivergence</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_score</span><span class="o">.</span><span class="n">phyloStarTopology_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gaps</span> <span class="o">=</span> <span class="s">&#39;ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">,</span> <span class="n">indelRatePerSite</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Repeat.calculate_pValues"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.calculate_pValues">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_pValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scoreslist</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s">&#39;scoreslist&#39;</span><span class="p">]):</span>
+
+        <span class="sd">&quot;&quot;&quot; Calculate pValues on a Repeat instances for all scores in `scoreslist`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Repeat): An instance of the repeat class.</span>
+
+<span class="sd">        Kwargs:</span>
+<span class="sd">            scoreslist(list of Str): A list of the names of the scores (e.g. [&quot;phylo_gap01&quot;])</span>
+<span class="sd">                for which p-Values are calculated on the Repeat instance `self`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s">&#39;dPValue&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">if</span>  <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># Enter worst p-value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span> <span class="o">=</span> <span class="p">{</span><span class="n">iScore</span><span class="p">:</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">iScore</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span> <span class="c"># Enter None, as a pValue cannot be calculated if there is just one repeat unit.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span> <span class="o">=</span> <span class="p">{</span><span class="n">iScore</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">iScore</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c"># Calculate score</span>
+            <span class="k">if</span> <span class="s">&#39;entropy&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;entropy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;entropy&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;parsimony&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;parsimony&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValuePars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;pSim&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;pSim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValuePSim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap01&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap01&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap01&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap01&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap01_ignore_coherent_deletions&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap01&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap01_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap001&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap001&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap001&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap001&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap001_ignore_coherent_deletions&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dPValue</span><span class="p">[</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeat_pvalue</span><span class="o">.</span><span class="n">pValueFromEmpiricialList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;phylo_gap001&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="s">&#39;phylo_gap001_ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Repeat.deleteInsertionColumns"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.deleteInsertionColumns">[docs]</a>    <span class="k">def</span> <span class="nf">deleteInsertionColumns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Create the tandem repeat attributes `msa`, `masT`, `l` and `n` without</span>
+<span class="sd">            insertion columns.</span>
+
+<span class="sd">        We define insertion columns as columns where there are more or equal gaps</span>
+<span class="sd">        compared to chars.</span>
+<span class="sd">        These columns are removed from both `msa` to create `msaD` and `msaT` to create</span>
+<span class="sd">        `msaTD`.</span>
+
+<span class="sd">        todo:: Check: is `totD` needed anywhere else? Is `textD` needed?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c">## We define insertion columns as columns where there are more or equal gaps</span>
+        <span class="c">## compared to chars.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaTD</span> <span class="o">=</span> <span class="p">[</span><span class="n">column</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msaT</span> <span class="k">if</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">column</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;-+&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&#39;p&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">column</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">))</span> <span class="k">else</span> <span class="s">&#39;-&#39;</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msaT</span>
+            <span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaTD_standard_aa</span> <span class="o">=</span> <span class="p">[</span><span class="n">standardize</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msaTD</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaD</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">msaTD</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaTD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textD</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textD_standard_aa</span> <span class="o">=</span> <span class="n">standardize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">textD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">totD</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">textD</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">textD</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nD</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">))</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">textD</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">))</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nD</span> <span class="o">=</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="Repeat.gapStructure"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.gapStructure">[docs]</a>    <span class="k">def</span> <span class="nf">gapStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Calculate the number and length of insertions and deletions for this tandem repeat.&#39;&#39;&#39;</span>
+
+        <span class="c">## Needed: Number and size of insertions, number and size of deletions</span>
+        <span class="c"># row_wise: (standard case) column wise coherence is ignored, the indels are summarised over the columns.</span>
+        <span class="c"># ignore_trailing_gaps: In addition to the standard case, trailing gaps on either side of the tandem repeat are replaced with letters, and hence ignored.</span>
+        <span class="c"># The separation into insertions and deletions comes before ignoring trailing gaps.</span>
+        <span class="c"># ignore_coherent_deletions : In addition to the standard case, same size deletions spanning the same columns are only counted once.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c">## row_wise</span>
+        <span class="c"># 1. Detect insertions</span>
+        <span class="c"># First, name columns either &#39;-&#39; if they are insertion columns, or &#39;p&#39;, if they are not.</span>
+        <span class="c"># Concetanate the string of &#39;p&#39;s and &#39;-&#39;, and double it, to consider insertions in the last column</span>
+        <span class="c"># and the first column as associated (= of the same origin)</span>
+        <span class="c"># Lastly, detect the length of all insertions.</span>
+        <span class="n">insertions</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;-+&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&#39;p&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">column</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">))</span> <span class="k">else</span> <span class="s">&#39;-&#39;</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msaT</span>
+                <span class="p">])))</span>
+        <span class="n">insertions</span> <span class="o">=</span> <span class="n">insertions</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">insertions</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">insertions</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">insertions</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">insertions</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">):]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">insertions</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">]</span>
+
+        <span class="c"># 2. Detect deletions</span>
+        <span class="c"># CHECK this lines. you used msaTD before, but swapped to msaD</span>
+        <span class="n">deletions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;-+&quot;</span><span class="p">),</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;row_wise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">deletions</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">[</span><span class="s">&#39;row_wise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;row_wise&#39;</span><span class="p">]</span>
+
+        <span class="c">## ignore_coherent_deletions</span>
+        <span class="c"># Remove duplicates from the list of tuples(index of deletion, deletion length)</span>
+        <span class="n">deletions_ignore_coherent</span> <span class="o">=</span> <span class="p">{</span><span class="n">iD</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">iD</span> <span class="ow">in</span> <span class="n">deletions</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">deletions_ignore_coherent</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">[</span><span class="s">&#39;ignore_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_coherent_deletions&#39;</span><span class="p">]</span>
+
+        <span class="c">## ignore_trailing_gaps</span>
+        <span class="c"># To be precise, we should ignore_trailing_gaps only, if we have ascertained that there were no letters</span>
+        <span class="c"># in possible insertion columns before the first deletion column. For now, this case is ignored.</span>
+        <span class="n">msaD</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">sub_trailing_gap</span><span class="p">(</span><span class="n">match_object</span><span class="p">):</span>
+            <span class="k">return</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">match_object</span><span class="o">.</span><span class="n">group</span><span class="p">()))</span>
+        <span class="n">msaD</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;^-+&#39;</span><span class="p">,</span> <span class="n">sub_trailing_gap</span><span class="p">,</span> <span class="n">msaD</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">msaD</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;-+$&#39;</span><span class="p">,</span> <span class="n">sub_trailing_gap</span><span class="p">,</span> <span class="n">msaD</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c"># CHECK this lines. you used msaTD before, but swapped to msaD</span>
+        <span class="c">#msaTD = [&quot;&quot;.join(c) for c in zip(*msaD)]</span>
+        <span class="n">deletions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;-+&quot;</span><span class="p">),</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msaD</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">deletions</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps&#39;</span><span class="p">]</span>
+
+        <span class="c">## ignore_trailing_gaps &amp; ignore_coherent_deletions</span>
+        <span class="n">deletions_ignore_coherent</span> <span class="o">=</span> <span class="p">{</span><span class="n">iD</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">iD</span> <span class="ow">in</span> <span class="n">deletions</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">deletions_ignore_coherent</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insertions</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="s">&#39;ignore_trailing_gaps_and_coherent_deletions&#39;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Repeat.gap_structure_HMM"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.gap_structure_HMM">[docs]</a>    <span class="k">def</span> <span class="nf">gap_structure_HMM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Calculate for each column in the transposed multiple repeat unit alignment</span>
+<span class="sd">            `msaTD`</span>
+
+<span class="sd">            *   how many deletions of what length begin in this column?:</span>
+<span class="sd">                 `deletion_lengths`[`iColumn`] = list of deletion lengths</span>
+<span class="sd">            *   how many insertions of what length begin in potential insertion columns</span>
+<span class="sd">                 before this column?: `insertion_lengths`[`iColumn`] = list of insertion lengths</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Repeat): An instance of the repeat class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c">## Insertions: In which column (with reference to self.msaTD) do how many insertions of what length start?</span>
+        <span class="c"># In which columns are insertions?</span>
+        <span class="n">insertions</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaT</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">column</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">))]</span>
+
+        <span class="c"># Which insertions are neighboring == form a block, and on which index with reference to self.msaTD do they start?</span>
+        <span class="n">insertion_blocks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">nInsertion_columns</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">insertions</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">insertions</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">:[</span><span class="n">current</span><span class="p">]}</span>
+            <span class="k">while</span> <span class="n">insertions</span> <span class="ow">and</span> <span class="n">insertions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">insertions</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;index_self.msaTD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">nInsertion_columns</span>
+            <span class="n">nInsertion_columns</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">])</span>
+
+        <span class="c"># If an insertions ranges over the repeat unit border, take the insertion on both parts together:</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">insertion_blocks</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaT</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">insertion_blocks</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">insertion_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">])</span>
+            <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">current</span><span class="p">][</span><span class="s">&#39;index_self.msaTD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;index_self.msaTD&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># Restructure insertion_blocks: We are only interested in the index with reference to self.msaTD, and the start and end index with reference to self.msaT:</span>
+        <span class="n">insertion_blocks</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">[</span><span class="s">&#39;index_self.msaTD&#39;</span><span class="p">]:</span> <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">i</span><span class="p">[</span><span class="s">&#39;indices_self.msaT&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">insertion_blocks</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+
+        <span class="c"># Go to each insertion block, and see how many insertion it includes, and of what length.</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaT</span><span class="p">)</span>
+        <span class="n">insertion_lengths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span><span class="p">):</span>
+            <span class="n">insertion_lengths</span><span class="p">[</span><span class="n">iL</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">iL</span> <span class="ow">in</span> <span class="n">insertion_blocks</span><span class="p">:</span>
+                <span class="n">begin</span> <span class="o">=</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">iL</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">insertion_blocks</span><span class="p">[</span><span class="n">iL</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">begin</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="c"># In case the insertion blocks bridges over then end of the repeat unit:</span>
+                <span class="k">if</span> <span class="n">begin</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+                    <span class="n">length</span> <span class="o">+=</span> <span class="n">l</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+
+                <span class="n">repeat_sequence</span> <span class="o">=</span> <span class="n">get_repeat_sequence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+                    <span class="n">insertion</span> <span class="o">=</span> <span class="n">repeat_sequence</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">begin</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">repeat_sequence</span><span class="p">),</span><span class="n">i</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">begin</span><span class="o">+</span><span class="n">length</span><span class="p">)]</span>
+                    <span class="n">insertion_lengths</span><span class="p">[</span><span class="n">iL</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">iI</span><span class="p">)</span> <span class="k">for</span> <span class="n">iI</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;\w+&#39;</span><span class="p">,</span><span class="n">insertion</span><span class="p">)])</span>
+
+                <span class="c"># In case the insertion blocks bridges over then end of the repeat unit:</span>
+                <span class="k">if</span> <span class="n">begin</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+                    <span class="n">insertion</span> <span class="o">=</span> <span class="n">repeat_sequence</span><span class="p">[:</span><span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">insertion_lengths</span><span class="p">[</span><span class="n">iL</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">iI</span><span class="p">)</span> <span class="k">for</span> <span class="n">iI</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;\w+&#39;</span><span class="p">,</span><span class="n">insertion</span><span class="p">)])</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;The insertion_lengths of the current TR are: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">insertion_lengths</span><span class="p">))</span>
+
+        <span class="c">## Deletions are much easier to handle than insertions, as they are already in the right coordinate system (self.msaTD)</span>
+        <span class="c"># Find all deletions, and note their start index, and their length</span>
+        <span class="n">deletions_all</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="s">&#39;-+&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msaD</span><span class="p">))]</span>
+        <span class="c"># Group the deletions with respect to the column in which they start:</span>
+        <span class="n">deletion_lengths</span> <span class="o">=</span> <span class="p">{</span><span class="n">iL</span><span class="p">:</span> <span class="p">[</span><span class="n">iD</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">iD</span> <span class="ow">in</span> <span class="n">deletions_all</span> <span class="k">if</span> <span class="n">iD</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span> <span class="o">==</span> <span class="n">iL</span><span class="p">]</span> <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lD</span><span class="p">)}</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;The deletion_lengths of the current TR are: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">deletion_lengths</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">insertion_lengths</span><span class="p">,</span> <span class="n">deletion_lengths</span>
+</div>
+<div class="viewcode-block" id="Repeat.save_original_msa"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.Repeat.save_original_msa">[docs]</a>    <span class="k">def</span> <span class="nf">save_original_msa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39; recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.)</span>
+<span class="sd">        This function might be obsolete when the original MSA is saved from the beginning.&#39;&#39;&#39;</span>
+        <span class="n">repeat_sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">begin</span><span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">]</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msa_original</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">:</span>
+            <span class="n">unit_original</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">unit</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="n">unit_original</span> <span class="o">+=</span> <span class="s">&#39;-&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">unit_original</span> <span class="o">+=</span> <span class="n">repeat_sequence</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msa_original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unit_original</span><span class="p">)</span>
+
+<span class="c">################################## Standardize MSA ######################################</span>
+</div></div>
+<span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">original</span><span class="p">,</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">config_general</span><span class="p">[</span><span class="s">&#39;dAmbiguous_amino_acid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">blob</span> <span class="o">=</span> <span class="n">blob</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">replacement</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">blob</span>
+
+<span class="k">def</span> <span class="nf">get_repeat_sequence</span><span class="p">(</span><span class="n">msa</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;_&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">])</span>
+
+
+<span class="c">################################### Localize repeat ######################################</span>
+
+<div class="viewcode-block" id="calculate_position_in_alignment"><a class="viewcode-back" href="../../../repeat.html#tandemrepeats.repeat.repeat.calculate_position_in_alignment">[docs]</a><span class="k">def</span> <span class="nf">calculate_position_in_alignment</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">alignment</span><span class="p">):</span>
+
+    <span class="sd">&#39;&#39;&#39; calculate the index of the begin and the end of a TR within an alignment</span>
+<span class="sd">        returns</span>
+<span class="sd">     &#39;&#39;&#39;</span>
+
+    <span class="c"># a alignment.seq (hopefully!) is a string of letters, with many gaps &quot;-&quot;, as it this particular case is an alignment sequence.</span>
+    <span class="n">seq_indexed</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">alignment</span><span class="p">))</span> <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;begin: {0}; length: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">begin</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">length</span><span class="p">)))</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;alignment: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">alignment</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;begin&#39;</span><span class="p">:</span> <span class="n">seq_indexed</span><span class="p">[</span><span class="n">begin</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;end&#39;</span><span class="p">:</span> <span class="n">seq_indexed</span><span class="p">[</span><span class="n">begin</span> <span class="o">+</span> <span class="n">length</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]}</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Elke Schaper.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
