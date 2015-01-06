@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='tandemrepeats',
-    version='0.1.0',
+    version='0.3.0',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['hmm', 'hmm.test', 'repeat', 'repeat.test', 'repeat_list', 'repeat_list.test', 'sequence', 'sequence.test'],
@@ -33,13 +33,7 @@ setup(
         "scipy >=0.12.0",
         "setuptools >= 5.1",
         "Sphinx >= 1.2.2",
-        "MAFFT >= 7.017b",
-        "HMMER >= 3.0"
-        "XSTREAM >= 1.72",
-        "T-REKS >= 1.3",
-        "HHrepID >= 1.1.0",
-        "TRUST >= 1.0",
     ],
     package_data={'tandemrepeats': ['data/*']},
-    package_dir={'tandemrepeats': 'src/tandemrepeats'},
+    package_dir={'tandemrepeats': 'tandemrepeats'},
 )
