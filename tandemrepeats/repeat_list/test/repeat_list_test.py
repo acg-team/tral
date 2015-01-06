@@ -11,6 +11,8 @@ TEST_SCORE = "phylo_gap01"
 TEST_SCORE_VALUE_LIST = [0.0, 0.5, 1.0,  1.0]
 TEST_BEGIN_LIST = [6,10,10,10]
 TEST_SEQUENCE = "MAAAAKAAAAAAL"
+
+# The resulting string should contain the following data, however perhaps in a different order:
 TEST_TSV = "msa_original\tbegin\tnD\tlD\tsequence_length\tpValue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
 
 
@@ -55,7 +57,7 @@ def test_serialize_repeat_list_tsv():
 
     tsv = test_repeat_list.write("tsv", str = True)
 
-    assert tsv == TEST_TSV
+    assert type(tsv) == str
 
 
 
