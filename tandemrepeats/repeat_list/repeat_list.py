@@ -1,4 +1,5 @@
 import logging
+import pickle
 import sys
 
 log = logging.getLogger(__name__)
@@ -26,24 +27,60 @@ class Repeat_list:
     def __init__(self, repeats):
         self.repeats = repeats
 
+
     def __add__(self, rl):
-        return Repeat_list(self.repeats + rl.repeats)
+        if rl:
+            return Repeat_list(self.repeats + rl.repeats)
+        else:
+            return self
 
-    def write(self, format, file = None, *args):
+    def intersection(self, rl):
+        if rl:
+            return Repeat_list([i for i in self.repeats if i in rl.repeats])
+        else:
+            return self
 
-        """ Serialize repeat_lists
+    def create(file, format):
 
-        Serialize ``Repeat_list`` instance using the stated ``format`` into a ``Str``.
-        If a ``file`` is specified, save the ``Str``. Else, give back the ``Str``.
+        """ Read ``Repeat_list`` from file.
+
+        Read ``Repeat_list`` from file (currently, only pickle is supported)
 
         Args:
-            format (str):  "tsv"
+            format (str):  Currently only "pickle"
+            file (str): Path to output file
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
+        else:
+            raise Exception('format is unknown.')
+
+
+    def write(self, format, file = None, str = None, *args):
+
+        """ Serialize and write ``Repeat_list`` instances.
+
+        Serialize ``Repeat_list`` instance using the stated ``format``.
+        If a ``file`` is specified, save the String. If ``str`` is specified, give back
+        the String (not possible for pickles).
+
+        Args:
+            format (str):  The input format: Either "pickle" or "tsv"
             file (str): Path to output file
 
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
-        if format == 'tsv':
+        if format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
+            file = False
+        elif format == 'tsv':
             output = repeat_list_io.serialize_repeat_list_tsv(self)
         else:
             raise Exception('format is unknown.')
@@ -51,15 +88,15 @@ class Repeat_list:
         if file:
             with open(file, 'w') as fh:
                 fh.write(output)
-        else:
+        if str:
             return output
 
-    def filter(self, func_name, *args):
+    def filter(self, func_name, *args, **kwargs):
 
         # Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?
 
         func = getattr(sys.modules[__name__], func_name)
-        return Repeat_list( func(self, *args) )
+        return Repeat_list( func(self, *args, **kwargs) )
 
     def cluster(self, overlap_type, *args):
 
@@ -125,6 +162,8 @@ def pValue(rl, score, threshold):
 
     """
 
+    threshold = float(threshold)
+
     res = []
     for iRepeat in rl.repeats:
         if iRepeat.pValue(score) <= threshold:
@@ -165,6 +204,8 @@ def attribute(rl, attribute, type, threshold):
             are filtered out.
     """
 
+    threshold = float(threshold)
+
     res = []
     for iRepeat in rl.repeats:
         value = getattr(iRepeat, attribute)
@@ -174,6 +215,8 @@ def attribute(rl, attribute, type, threshold):
         elif type == "max":
             if value <= threshold:
                 res.append(iRepeat)
+        else:
+            raise Exception("type must either be 'min' or 'max'. Instead, it is {}.".format(type))
     return(res)
 
 
@@ -202,24 +245,24 @@ def none_overlapping_fixed_repeats(rl, rl_fixed, overlap_type):
     return(res)
 
 
-def none_overlapping(rl, overlap, dCriterion):
+def none_overlapping(rl, overlap, lCriterion):
 
     """ Returns all none-overlapping repeats in ``rl``.
 
     Returns all none-overlapping repeats in ``rl``. Repeats are clustered according to
     ``overlap``. Of each cluster, only the best repeat is returned according to
-    ``lCriterion``.
+    ``dCriterion``.
 
     Args:
         rl (Repeat_list): An instance of the Repeat_list class.
-        overlap (list): First list element: Name (str) of an overlap method in repeat_list.
+        overlap (tuple): First element: Name (str) of an overlap method in repeat_list. Second element: **kwargs
         All remaining elements are additional arguments for this class.
         lCriterion (list): list of (criterion (str), criterion arguments) tuples. Until
         only one repeat is remainining in a cluster, the criteria are applied in order.
     """
 
     overlap_type = overlap[0]
-    overlap_args = overlap[1:]
+    overlap_args = overlap[1]
 
     if not (hasattr(rl,'dCluster') and overlap_type in rl.dCluster):
         rl.cluster(overlap_type, overlap_args)
@@ -229,7 +272,8 @@ def none_overlapping(rl, overlap, dCriterion):
 
         iRepeat = [rl.repeats[i] for i in iCluster]
 
-        for criterion_type, criterion_value in dCriterion.items():
+        for iC in lCriterion:
+            criterion_type, criterion_value = iC
             if len(iRepeat) == 1:
                 res.append(iRepeat[0])
                 break

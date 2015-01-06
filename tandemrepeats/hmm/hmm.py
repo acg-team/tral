@@ -13,6 +13,7 @@ import datetime
 import logging
 import numpy as np
 import os
+import pickle
 import shutil
 import subprocess
 import tempfile
@@ -20,8 +21,13 @@ import tempfile
 from tandemrepeats.hmm import hmm_io, hmm_viterbi
 from tandemrepeats.repeat import repeat_io
 from tandemrepeats.repeat.repeat import Repeat
+from tandemrepeats import configuration
 
 log = logging.getLogger(__name__)
+
+c = configuration.Configuration.Instance()
+config_general = c.config
+config = config_general["hmm"]
 
 ################################### HMM class #########################################
 
@@ -97,6 +103,7 @@ class HMM:
             hmmer_probabilities (dict): A dictionary with HMM parameters.
         """
         self.hmmer = hmmer_probabilities
+        self.id = hmmer_probabilities['id']
         self.alphabet = self.hmmer['letters']
 
         self.lD = max([int(key) for key in hmmer_probabilities.keys()
@@ -153,7 +160,7 @@ class HMM:
         del self.deletion_states
 
 
-    def create(hmmer_file = None, repeat = None):
+    def create(format, file = None, repeat = None):
         """ Creates a HMM instance from 2 possible input formats.
 
         A `HMM` instance is created from one of the two possible inputs:
@@ -183,15 +190,19 @@ class HMM:
 
         """
 
-        if hmmer_file:
-            if not os.path.exists(hmmer_file):
+        if format == 'hmmer':
+            # Read only first element from HMMER3 file.
+            if not os.path.exists(file):
                 raise Exception('HMMER3 file does not exist.')
-            hmmer_probabilities = HMM.read(hmmer_file)[0]
-        elif repeat:
+            hmmer_probabilities = next(HMM.read(file))
+        elif format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
+        elif format == 'repeat':
             if not isinstance(repeat, Repeat):
                 raise Exception('The repeat value is not a valid instance of '
                                 'the Repeat class.')
-            hmmer_probabilities = HMM.create_from_repeat(repeat)[0]
+            hmmer_probabilities = HMM.create_from_repeat(repeat)
         else:
             raise Exception("Neither of the required inputs provided!")
 
@@ -240,7 +251,7 @@ class HMM:
         tandem_repeat.write(file=stockholm_file, format = "stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen(["hmmbuild", "--amino", tmp_id + ".hmm",
+        p = subprocess.Popen([config["hmmbuild"], "--amino", tmp_id + ".hmm",
                               tmp_id + ".sto"],
                              stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
         p.wait()
@@ -257,12 +268,32 @@ class HMM:
                 else:
                     shutil.copy(hmm_file, hmm_copy_path)
 
-        hmmer_probabilities = HMM.read(hmm_filename = hmm_file, id = hmm_copy_id)
+        hmmer_probabilities = next(HMM.read(hmm_filename = hmm_file, id = hmm_copy_id))
 
         shutil.rmtree(tmp_dir)
 
         return hmmer_probabilities
 
+
+    def write(self, file, format, *args):
+
+        """ Write ``HMM`` to file.
+
+        Write ``HMM`` to file. Currently, only pickle is implemented.
+
+        Args:
+            file (str): Path to input file
+            format (str):  Either "fasta", "pickle" or "stockholm"
+
+        .. todo:: Write checks for ``format`` and ``file``.
+
+        """
+
+        if format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
+        else:
+            raise Exception('format is unknown.')
 
     def HMM_example(self):
 

@@ -4,16 +4,14 @@
 import itertools
 import logging
 import os
-import queue
 import re
+import resource
 import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 
 from collections import OrderedDict
-from Bio import SeqIO
 
 from tandemrepeats import configuration
 from tandemrepeats.sequence import repeat_detection_io
@@ -22,8 +20,10 @@ from tandemrepeats.paths import *
 log = logging.getLogger(__name__)
 
 c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["sequence"]["repeat_detection"]
+general_config = c.config
+repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
+
+MAX_MEMORY_USAGE = str(10000000)
 
 class BinaryExecutable:
     def __init__(self, binary=None):
@@ -129,20 +129,18 @@ def check_java_errors(outfile, errfile, log=None, procname=None):
 
     if (errfile_size != 0 and outfile_size == 0):
         has_error = True
-        if log:
-            log.warning(
-                "Process \"%s\" has empty STDOUT but non-empty STDERR",
-                procname)
+        log.warning(
+            "Process \"%s\" has empty STDOUT but non-empty STDERR",
+            procname)
 
     pat_javaexc = re.compile(r'Exception in thread ".+" \S+:.*$(\s+at .+)+', re.M)
 
     m = pat_javaexc.search(errfile_str)
     if m:
         has_error = True
-        if log:
-            log.warning(
-                "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
-                procname, m.group(0))
+        log.warning(
+            "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
+            procname, m.group(0))
 
     return has_error
 
@@ -151,6 +149,7 @@ class TRFFinder(object):
 
     def __init__(self, executable):
         """Construct a TRFFinder object with executable als executable object"""
+        log.debug(executable)
         self.__executable = executable
 
     def run_process(self, working_dir, *args):
@@ -190,10 +189,9 @@ class TRFFinder(object):
             self.__executable.get_execute_tokens(*args), working_dir)
         # launch process
         __process = subprocess.Popen(
-            self.__executable.get_execute_tokens(*args),
-            cwd=working_dir, stdout=__stdout_file, stderr=__stderr_file, close_fds=True
+            self.__executable.get_execute_tokens(*args), cwd=working_dir,
+            stdout=__stdout_file, stderr=__stderr_file, close_fds=True,
         )
-
         __process.wait()
 
         __stdout_file.close()
@@ -219,7 +217,7 @@ class FinderHHrepID(TRFFinder):
 
             self.valopts = {
                 "-i"      :None,        # <file> input query alignment  (fasta/a2m/a3m) or HMM file (.hhm)
-                "-d"      :os.path.join(DATAROOT,'hhrepid','dummyHMM.hmm'),   # <path> dummy hmm database file
+                "-d"      :repeat_detector_path['HHrepID_dummyhmm'],   # <path> dummy hmm database file
                 "-o"      :'hhrepID.o',    # <file> write results and multiple sequence alignment to file (default=none)
                 "-v"      :0,           # -v: verbose mode (default: show only warnings)  ;  -v 0: suppress all screen outpu
                 "-P"      :None,        # <float> max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)
@@ -254,8 +252,8 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"hhrepid_64")),
-        config = None
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
+        config = Configuration()
     ):
         """Construct FinderHHrepID object.
 
@@ -358,7 +356,7 @@ class FinderPhobos(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"phobos")),
+        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"phobos")),
         config = None
     ):
         """Construct FinderPhobos object.
@@ -430,7 +428,7 @@ class FinderTRED(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"tred")),
+        executable=BinaryExecutable(binary=repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTRED object.
@@ -513,7 +511,7 @@ class FinderTREKS(TRFFinder):
             return bool_toks + value_toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'], jars=[os.path.join(EXECROOT,"T-Reks.jar")]),
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTREKS object.
@@ -605,7 +603,7 @@ class FinderTRF(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(EXECROOT,"trf")),
+        executable=BinaryExecutable(binary=repeat_detector_path[name]),
         config = None
     ):
         """Construct FinderTRF object.
@@ -658,7 +656,7 @@ class FinderTrust(TRFFinder):
             }
 
             self.valopts = {
-                "-matrix" : os.path.join(EXECROOT, "trust", "BLOSUM50"),
+                "-matrix" : repeat_detector_path['TRUST_substitutionmatrix'],
                 "-gapo" : "8",
                 "-gapx" : "2",
                 "-procTotal": "1",
@@ -684,11 +682,8 @@ class FinderTrust(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx512m'],
-            javaclass='nl.vu.cs.align.SelfSimilarity',
-            classpaths=[os.path.join(EXECROOT,"trust")]
-        ),
-        config=Configuration()
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
+        config = Configuration()
     ):
         """Construct FinderTrust object.
 
@@ -781,7 +776,7 @@ class FinderXStream(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=JavaExecutable(javaopts = ['-mx1024m'], jars=[os.path.join(EXECROOT,"xstream.jar")]),
+        executable=BinaryExecutable(binary = repeat_detector_path[name]),
         config = Configuration()
     ):
         """Construct FinderXStream object.
@@ -863,11 +858,11 @@ def Finders(lFinder = None, sequence_type = None):
     global finders
 
     if not sequence_type:
-        sequence_type = config_general["sequence_type"]
+        sequence_type = general_config["sequence_type"]
     if not lFinder:
-        lFinder = config[sequence_type]
+        lFinder = general_config["sequence"]["repeat_detection"][sequence_type]
     else:
-        if any(i not in list(itertools.chain(*config.values())) for i in lFinder):
+        if any(i not in list(itertools.chain(*general_config["sequence"]["repeat_detection"].values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
     finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
@@ -902,46 +897,6 @@ class FinderJob:
         self.infile = infile
         self.job_id = job_id
         self.protein_id = protein_id
-
-def finder_worker(working_dir, job_queue, result_list, result_lock):
-    def clear_queue(q):
-        """Eat all items in job queue.
-        To be called if you wish to terminate execution."""
-        while not q.empty():
-            try:
-                q.get_nowait()
-                q.task_done()
-            except:
-                break
-
-    # Run infinitely, because this should be called as a daemon thread
-    while True:
-        job = job_queue.get()
-
-        try:
-            wd = os.path.join(working_dir, "{0:03}".format(job.job_id+1))
-
-            log.debug("Launching finder \"%s\" in directory %s",
-                job.finder.name, os.path.join(wd, job.finder.name))
-
-            result = job.finder.run_process(wd, job.infile)
-
-            # lock the mutex for results, append resul
-            with result_lock:
-                result_list[job.job_id][job.finder.name].extend(result)
-
-
-            log.debug("Finder \"%s\" returned from job %d",
-                job.finder.name, job.job_id)
-        except:
-            # On errors, kill all jobs in queue, cry to the logfile and return
-            clear_queue(job_queue)
-            log.exception(
-                "Exception occured in worker while processing %s with %s",
-                job.infile, job.finder.name)
-            # raise
-        finally:
-            job_queue.task_done()
 
 
 
@@ -1016,11 +971,6 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
             for i in range(len(infiles))
     ]
 
-    result_lock = threading.Lock()
-
-    # A queue for all jobs we have to run
-    job_queue = queue.Queue()
-
     # Create a list for our jobs
     joblist = [
         FinderJob(
@@ -1033,28 +983,30 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         for job_id, infile in enumerate(infiles)
     ]
 
-    # launch worker daemon thread
-    for i in range(num_threads):
-        t = threading.Thread(
-            target=finder_worker,
-            args=(working_dir, job_queue, results, result_lock)
-        )
-        t.daemon = True
-        t.start()
-
-    log.debug("Threads active after launching workers: %d",
-        threading.active_count())
-
-
     log.info("Processing %d input files in %d jobs.",
         len(infiles), len(joblist))
 
     # put joblist into job queue, thus starting actual work
     for job in joblist:
-        job_queue.put(job)
+        try:
+            wd = os.path.join(working_dir, "{0:03}".format(job.job_id+1))
 
+            log.debug("Launching finder \"%s\" in directory %s",
+                job.finder.name, os.path.join(wd, job.finder.name))
 
-    job_queue.join()
+            result = job.finder.run_process(wd, job.infile)
+
+            # lock the mutex for results, append result
+            #with result_lock:
+            results[job.job_id][job.finder.name].extend(result)
+
+            log.debug("Finder \"%s\" returned from job %d",
+                job.finder.name, job.job_id)
+        except:
+            log.exception(
+                "Exception occured in worker while processing %s with %s",
+                job.infile, job.finder.name)
+
     log.info("All jobs returned.")
 
     # delete temporary directory
@@ -1064,7 +1016,6 @@ def run_TRD(seq_records, lFinders = None, sequence_type = 'AA', default = True, 
         except: # I guess the error type is known, and you could be more precise :)
             logging.error("Unexpected error: {0}".format(sys.exc_info()[0]))
             raise
-
 
     return results
 

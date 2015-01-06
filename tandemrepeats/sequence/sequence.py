@@ -1,6 +1,7 @@
 # (C) 2014 Elke Schaper
 
 import logging
+import pickle
 import os
 import re
 
@@ -31,7 +32,7 @@ class Sequence:
     """
 
 
-    def __init__(self, seq):
+    def __init__(self, seq, id = None):
 
         if not isinstance(seq, str):
                 raise Exception('The seq value is not a String')
@@ -42,28 +43,32 @@ class Sequence:
 
         self.seq_standard_aa = repeat.standardize(self.seq)
 
-    def read(file, format = 'fasta'):
+        if id:
+            self.id = id
 
-        """ Read sequence(s) from file.
+    def create(file, format):
 
-        Read sequence(s) from file.
+        """ Create sequence(s) from file.
+
+        Create sequence(s) from file.
 
         Args:
             file (str): Path to input file
-            format (str):  Either "stockholm" or "fasta"
+            format (str):  Either "fasta" or "pickle"
 
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
         if format == 'fasta':
             lSeq = sequence_io.read_fasta(file)
+            return [Sequence(iSeq, iID) for iSeq, iID in lSeq]
+        if format == 'pickle':
+            with open(file, 'rb') as fh:
+                return pickle.load(fh)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
 
-        return [Sequence(iSeq) for iSeq in lSeq]
-
-
-    def write(self, file, format = 'fasta'):
+    def write(self, file, format):
 
         """ Write sequence to file.
 
@@ -71,7 +76,7 @@ class Sequence:
 
         Args:
             file (str): Path to output file
-            format (str):  Either "stockholm" or "fasta"
+            format (str):  Either "fasta" or "pickle"
 
         .. todo:: Write checks for ``format`` and ``file``.
 
@@ -79,6 +84,9 @@ class Sequence:
 
         if format == 'fasta':
             sequence_io.write(self.seq, file)
+        elif format == 'pickle':
+            with open(file, 'wb') as fh:
+                pickle.dump(self, fh)
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(format))
 
@@ -100,10 +108,7 @@ class Sequence:
                 E.g. ``calc_score = True``
 
         Returns:
-            A list of ``Repeat`` instances.
-
-        .. todo:: Return ``repeat_list`` instance instead of a list of repeats
-
+            A ``Repeat_list`` instance
         """
 
         if lHMM:
@@ -118,7 +123,9 @@ class Sequence:
             for iHMM in lHMM:
                 # Detect TRs on self.seq with hmm using the Viterbi algorithm.
                 most_likely_path = iHMM.viterbi(self.seq)
-                logging.debug(most_likely_path)
+                logging.debug("most_likely_path: {}".format(most_likely_path))
+                if not most_likely_path:
+                    continue
                 unaligned_msa = hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units(self.seq, most_likely_path, iHMM.lD)
                 if len(unaligned_msa) > 1:
                     # Align the msa
@@ -141,12 +148,12 @@ class Sequence:
             return None
 
         elif denovo:
-
             if 'detection' in kwargs:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self], **kwargs['detection'])[0]
             else:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
 
+            log.debug("lPredicted_repeat: {}".format(lPredicted_repeat))
             lRepeat = []
 
             for jTRD,jlTR in lPredicted_repeat.items():
@@ -191,6 +198,21 @@ class Sequence:
             self.dRepeat_list = {}
 
         self.dRepeat_list[tag] = repeat_list
+
+    def annotate(self, data, tag):
+
+        if not hasattr(self,"dAnnotations"):
+            self.dAnnotations = {}
+
+        self.dAnnotations[tag] = data
+
+
+    def get_annotation(self, tag):
+
+        if hasattr(self,"dAnnotations") and tag in self.dAnnotations:
+            return self.dAnnotations[tag]
+        else:
+            return []
 
     def repeat_in_sequence(self, myRepeat):
 

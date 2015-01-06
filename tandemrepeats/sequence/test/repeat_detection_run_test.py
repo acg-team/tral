@@ -15,17 +15,19 @@ TEST_SEQUENCE_Q9BRR0 = "MARELSESTALDAQSTEDQMELLVIKVEEEEAGFPSSPDLGSEGSRERFRGFRYPE
 
 def test_detect_TRUST():
 
+    # Warning: TRUST finds these results ONLY with the BLOSUM50 substitution matrix.
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
     predicted_repeats = repeat_detection_run.run_TRD(seq_records = [test_seq], lFinders = ["TRUST"])[0]['TRUST']
     assert len(predicted_repeats) == 3
     assert predicted_repeats[0].msa == ['HLREDIAQIP---TCAEAGE---QEGRLQR', 'KQKNATGGRR--HICHECGKSFAQSSGLSK', 'HRRIHTGEKP--YECEECGKAFIGSSALVI', 'HQRVHTGEKP--YECEECGKAFSHSSDLIK', 'HQRTHTGEKP--YECDDCGKTFSQSCSLLE', 'HHRIHTGEKP--YQCSMCGKAFRRSSHLLR', 'HQRIHTGDKN--VQEPEQGEAW--KSRM--', 'ESQLENVETPmsYKCNECERSFTQNTGLIE', 'HQKIHTGEKP--YQCNACGKGFTRISYLVQ']
 
-def test_detect_XSTREAM():
 
+def test_detect_XSTREAM():
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
     predicted_repeats = repeat_detection_run.run_TRD(seq_records = [test_seq], lFinders = ["XSTREAM"])[0]['XSTREAM']
     assert len(predicted_repeats) == 1
     assert predicted_repeats[0].msa == ['ECGKSFAQS-SGLSK-HRRIHTGEKPYECE', 'ECGKAFIGS-SALVI-HQRVHTGEKPYECE', 'ECGKAFSHS-SDL-IKHQRTHTGEKPYECD', 'DCGKTFSQSCSLLEH-H-RIHTGEKPY']
+
 
 def test_detect_TREKS():
 
@@ -40,4 +42,4 @@ def test_detect_HHrepID():
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
     predicted_repeats = repeat_detection_run.run_TRD(seq_records = [test_seq], lFinders = ["HHrepID"])[0]['HHrepID']
     assert len(predicted_repeats) == 1
-    assert predicted_repeats[0].msa == ['--------------TCAEAGEQEG----R-', 'LQRKQKNATGGRRHICHECGKSFAQSSG--', 'LSKHRRIHTGEKPYECEECGKAFIGSSA--', 'LVIHQRVHTGEKPYECEECGKAFSHSSD--', 'LIKHQRTHTGEKPYECDDCGKTFSQSCS--', 'LLEHHRIHTGEKPYQCSMCGKAFRRSSH--', 'LLRHQRIHTGDKNVQEPEQGEAWKSRM-ES', '---QLENVETPMSYKCNECERSFTQNTG--', 'LIEHQKIHTGEKPYQCNACGKGFTRISY--', 'LVQHQRSHVG--------------------']
+    assert predicted_repeats[0].msa == ['------------------IPTCAEAGEQ----', 'EGRLQRKQKNATGGRRHICHECGKSFAQ----', 'SSGLSKHRRIHTGEKPYECEECGKAFIG----', 'SSALVIHQRVHTGEKPYECEECGKAFSH----', 'SSDLIKHQRTHTGEKPYECDDCGKTFSQ----', 'SCSLLEHHRIHTGEKPYQCSMCGKAFRR----', 'SSHLLRHQRIHTGDKNVQEPEQGEAWKSRMES', '------QLENVETPMSYKCNECERSFTQ----', 'NTGLIEHQKIHTGEKPYQCNACGKGFTR----', 'ISYLVQHQRSHVG-------------------']

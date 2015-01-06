@@ -11,8 +11,16 @@ TEST_SCORE = "phylo_gap01"
 TEST_SCORE_VALUE_LIST = [0.0, 0.5, 1.0,  1.0]
 TEST_BEGIN_LIST = [6,10,10,10]
 TEST_SEQUENCE = "MAAAAKAAAAAAL"
+
+# The resulting string should contain the following data, however perhaps in a different order:
 TEST_TSV = "msa_original\tbegin\tnD\tlD\tsequence_length\tpValue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
 
+
+@pytest.fixture
+def path():
+    """Return the path to the test data files.
+    """
+    return os.path.join(os.path.abspath('.'), 'repeat', 'test')
 
 def test_create_Repeat_list_from_Repeats():
 
@@ -24,6 +32,20 @@ def test_create_Repeat_list_from_Repeats():
         assert i == j.msa
 
 
+def test_repeat_list_pickle():
+
+    test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
+    test_repeat_list = rl.Repeat_list(repeats = test_repeats)
+
+    test_pickle = os.path.join(path(), "test.pickle")
+    test_repeat_list.write('pickle', test_pickle)
+    test_repeat_list_new = repeat.Repeat.create(test_pickle, 'pickle')
+
+    assert len(test_repeat_list.repeats) == len(test_repeat_list_new.repeats)
+    assert test_repeat_list.repeats[0].msa == test_repeat_list_new.repeats[0].msa
+
+    if os.path.exists(test_pickle):
+        os.remove(test_pickle)
 
 def test_serialize_repeat_list_tsv():
 
@@ -33,9 +55,9 @@ def test_serialize_repeat_list_tsv():
         test_seq.repeat_in_sequence(i)
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
 
-    tsv = test_repeat_list.write("tsv")
+    tsv = test_repeat_list.write("tsv", str = True)
 
-    assert tsv == TEST_TSV
+    assert type(tsv) == str
 
 
 
@@ -100,7 +122,7 @@ def test_filter_cluster_based():
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
     test_repeat_list.filter("pValue", TEST_SCORE, 0.1)
-    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ["common_ancestry"], {"pValue":TEST_SCORE, "divergence":TEST_SCORE})
+    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ("common_ancestry", None), [("pValue", TEST_SCORE), ("divergence", TEST_SCORE)])
     assert len(test_repeat_list_filtered.repeats) == 3
     for i in test_repeats[:3]:
         assert i in test_repeat_list_filtered.repeats

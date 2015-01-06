@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 from tandemrepeats.paths import *
 
-path_score = join(DATAROOT, 'pvalue')
+path_score = join(DATAROOT, 'pValue')
 
 ########################## REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ####################
 
