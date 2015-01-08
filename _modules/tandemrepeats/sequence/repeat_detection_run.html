@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>tandemrepeats.sequence.repeat_detection_run &mdash; tandemrepeats 0.1.0 documentation</title>
+    <title>tandemrepeats.sequence.repeat_detection_run &mdash; TandemRepeats 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.1.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="tandemrepeats 0.1.0 documentation" href="../../../index.html" />
+    <link rel="top" title="TandemRepeats 0.3.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">TandemRepeats 0.3.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -238,8 +238,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">working_dir</span><span class="p">)</span>
         <span class="c"># launch process</span>
         <span class="n">__process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-            <span class="p">[</span><span class="s">&quot;ulimit -d {0} -m {0} -v {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MAX_MEMORY_USAGE</span><span class="p">)]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">cwd</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">__stdout_file</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">__stderr_file</span><span class="p">,</span> <span class="n">close_fds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">shell</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">cwd</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">__stdout_file</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">__stderr_file</span><span class="p">,</span> <span class="n">close_fds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">__process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
 
@@ -1188,12 +1188,12 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">tandemrepeats 0.1.0 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">TandemRepeats 0.3.0 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2014, Elke Schaper.
+        &copy; Copyright 2015, Elke Schaper.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
