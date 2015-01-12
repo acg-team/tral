@@ -54,7 +54,7 @@ def annotate_seq_pickles(sequence_dir, output_path, annotation_pickle):
     print("DONE")
 
 
-def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_file = None):
+def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_file = None, lFiles = None):
 
     ''' Create ``Sequence`` instances from fasta files and annotate with data.
 
@@ -77,23 +77,26 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
         except:
             raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
 
-    for file in os.listdir(sequence_dir):
-        if file.endswith(".fasta"):
-            lSeq = sequence.Sequence.create(file = os.path.join(sequence_dir, file), format = 'fasta')
+    if not lFiles:
+        lFiles = list(os.listdir(sequence_dir))
+        lFiles = [file for file in lFiles if file.endswith(".fasta")]
 
-            if annotation_data_file:
-                for iS in lSeq:
-                    # The fasta files sequence ID follow the pattern "sp|SPID|SPNAME"
-                    # Here, we extract SPID
-                    iS.id_long = iS.id
-                    iS.id = iS.id.split("|")[1]
-                    if iS.id in annotations.keys():
-                        print(annotations[iS.id])
-                        iS.annotate(annotations[iS.id], "PFAM")
+    for file in lFiles:
+        lSeq = sequence.Sequence.create(file = os.path.join(sequence_dir, file), format = 'fasta')
 
-            output_file = os.path.join(output_path, file.replace("fasta", "pickle"))
-            with open(output_file, 'wb') as fh:
-                pickle.dump(lSeq, fh)
+        if annotation_data_file:
+            for iS in lSeq:
+                # The fasta files sequence ID follow the pattern "sp|SPID|SPNAME"
+                # Here, we extract SPID
+                iS.id_long = iS.id
+                iS.id = iS.id.split("|")[1]
+                if iS.id in annotations.keys():
+                    print(annotations[iS.id])
+                    iS.annotate(annotations[iS.id], "PFAM")
+
+        output_file = os.path.join(output_path, file.replace("fasta", "pickle"))
+        with open(output_file, 'wb') as fh:
+            pickle.dump(lSeq, fh)
 
     print("DONE")
 
@@ -101,10 +104,15 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
 def main():
 
     pars = read_commandline_arguments()
+
+    kwargs = {"sequence_dir": pars["input"], "output_path": pars["output_path"]}
+
     if "annotation_file" in pars:
-        create_and_annotate_seq_pickles(pars["input"], pars["output_path"], pars["annotation_file"])
-    else:
-        create_and_annotate_seq_pickles(pars["input"], pars["output_path"])
+        kwargs["annotation_file"] = pars["annotation_file"]
+    if "file_list" in pars:
+        kwargs["lFiles"] = pars["file_list"]
+
+    create_and_annotate_seq_pickles(**kwargs)
 
 
 def read_commandline_arguments():
@@ -116,6 +124,8 @@ def read_commandline_arguments():
                        help='The path to the output files, e.g. /path/to/output')
     parser.add_argument('-a', '--annotation_file', type=str,
                        help='The path to the annotation data tab-separated file.')
+    parser.add_argument('-f', '--file_list', type=str,
+                       help='A list of files to work on.')
 
     pars = vars(parser.parse_args())
     pars = {key: value for key, value in pars.items() if value != None}
