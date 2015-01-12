@@ -3,8 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to tandemrepeats's documentation!
-=========================================
+Annotating with TandemRepeats
+=============================
+
+
+Installing TandemRepeats
+========================
+
+Try:
+::
+
+    $ pip install tandemrepeats
+
+
+Modules
+=======
 
 Contents:
 

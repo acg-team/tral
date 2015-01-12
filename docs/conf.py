@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'tandemrepeats'
-copyright = '2014, Elke Schaper'
+project = 'TandemRepeats'
+copyright = '2015, Elke Schaper'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -207,7 +207,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'tandemrepeats.tex', 'tandemrepeats Documentation',
+  ('index', 'TandemRepeats.tex', 'TandemRepeats Documentation',
    'Elke Schaper', 'manual'),
 ]
 
@@ -237,7 +237,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tandemrepeats', 'tandemrepeats Documentation',
+    ('index', 'TandemRepeats', 'TandemRepeats Documentation',
      ['Elke Schaper'], 1)
 ]
 
@@ -251,8 +251,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'tandemrepeats', 'tandemrepeats Documentation',
-   'Elke Schaper', 'tandemrepeats', 'One line description of project.',
+  ('index', 'TandemRepeats', 'TandemRepeats Documentation',
+   'Elke Schaper', 'TandemRepeats', 'One line description of project.',
    'Miscellaneous'),
 ]
 
