@@ -54,7 +54,7 @@ def annotate_seq_pickles(sequence_dir, output_path, annotation_pickle):
     print("DONE")
 
 
-def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_file = None, lFiles = None):
+def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_file = None, lFiles = None):
 
     ''' Create ``Sequence`` instances from fasta files and annotate with data.
 
@@ -63,19 +63,19 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_data_f
     Args:
          sequence_dir (str): Path to the dir containing *.fasta sequence files.
          output_path (str): Path to directory where the output files are saved.
-         annotation_data_file (str): Path to a tab separated file with annotations to the
+         annotation_file (str): Path to a tab separated file with annotations to the
             sequences.
 
     Raises:
-        Exception: If the pickle ``annotation_data_file`` cannot be loaded.
+        Exception: If the pickle ``annotation_file`` cannot be loaded.
     '''
 
-    if annotation_data_file:
+    if annotation_file:
         try:
-            with open(annotation_data_file, 'rb') as fh:
+            with open(annotation_file, 'rb') as fh:
                 annotations = pickle.load(fh)
         except:
-            raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
+            raise Exception("Cannot load sequence annotation file annotation_file: {}".format(annotation_file))
 
     if not lFiles:
         lFiles = list(os.listdir(sequence_dir))
