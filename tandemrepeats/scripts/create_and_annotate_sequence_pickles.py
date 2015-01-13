@@ -124,7 +124,7 @@ def read_commandline_arguments():
                        help='The path to the output files, e.g. /path/to/output')
     parser.add_argument('-a', '--annotation_file', type=str,
                        help='The path to the annotation data tab-separated file.')
-    parser.add_argument('-f', '--file_list', type=str,
+    parser.add_argument('-f', '--file_list', type=str, nargs='+',
                        help='A list of files to work on.')
 
     pars = vars(parser.parse_args())
