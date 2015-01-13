@@ -84,7 +84,7 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_file =
     for file in lFiles:
         lSeq = sequence.Sequence.create(file = os.path.join(sequence_dir, file), format = 'fasta')
 
-        if annotation_data_file:
+        if annotation_file:
             for iS in lSeq:
                 # The fasta files sequence ID follow the pattern "sp|SPID|SPNAME"
                 # Here, we extract SPID
