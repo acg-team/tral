@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tandem Repeat annotation library &mdash; TandemRepeats 0.3.0 documentation</title>
+    <title>Perform overlap filtering of redundant tandem repeat annotations. &mdash; TandemRepeats 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,15 +23,13 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TandemRepeats 0.3.0 documentation" href="#" />
+    <link rel="top" title="TandemRepeats 0.3.0 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700'
           rel='stylesheet' type='text/css' />
  
     <style type="text/css">
       table.right { float: right; margin-left: 20px; }
       table.right td { border: 1px solid #ccc; }
-      
-      .related { display: none; }
       
     </style>
     <script type="text/javascript">
@@ -67,12 +65,12 @@
   <body>
 <div class="pageheader">
   <ul>
-    <li><a href="#">Home</a></li>
+    <li><a href="index.html">Home</a></li>
     <li><a href="installation.html">Install</a></li>
     <li><a href="code_docs.html">Code docs</a></li>
   </ul>
   <div>
-    <a href="#">
+    <a href="index.html">
       <img src="_static/sphinxheader.png" alt="SPHINX" />
     </a>
   </div>
@@ -87,33 +85,26 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">Sphinx home</a>&nbsp;|</li>
+        <li><a href="index.html">Sphinx home</a>&nbsp;|</li>
         <li><a href="contents.html">Documentation</a> &raquo;</li>
  
       </ul>
     </div>
       <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper"><h3>Download</h3>
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Perform overlap filtering of redundant tandem repeat annotations.</a><ul>
+<li><a class="reference internal" href="#read-tr-annotations">Read TR annotations.</a></li>
+</ul>
+</li>
+</ul>
 
-<p>Current version: <b>0.3</b></p>
-<p>Get TandemRepeats from the <a href="http://pypi.python.org/pypi/tandemrepeats">Python Package
-Index</a>, or install it with:</p>
-<pre>pip install tandemrepeats</pre>
-
-
-<h3>Questions? Suggestions?</h3>
-
-<p>Join the <a href="http://groups.google.com/group/tandemrepeats">Google group</a>:</p>
-<form action="http://groups.google.com/group/tandemrepeats/boxsubscribe"
-      style="padding-left: 0.5em">
-  <input type="text" name="email" value="your@email" style="font-size: 90%; width: 120px"
-         onfocus="$(this).val('');"/>
-  <input type="submit" name="sub" value="Subscribe" style="font-size: 90%; width: 70px"/>
-</form>
-<p>You can also open an issue at the
-  <a href="https://github.com/elkeschaper/tandemrepeats/issues">tracker</a>.</p>
-
-<h3><a href="contributors.html">Contributors</a></h3>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/overlap_filtering.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -135,50 +126,19 @@ Index</a>, or install it with:</p>
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="tandem-repeat-annotation-library">
-<h1>Tandem Repeat annotation library<a class="headerlink" href="#tandem-repeat-annotation-library" title="Permalink to this headline">¶</a></h1>
-<p>Hi, we are great. We do stuff. Here is our code. Here is our paper.</p>
+  <div class="section" id="perform-overlap-filtering-of-redundant-tandem-repeat-annotations">
+<span id="overlap-filtering"></span><h1>Perform overlap filtering of redundant tandem repeat annotations.<a class="headerlink" href="#perform-overlap-filtering-of-redundant-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h1>
+<p>Here you learn how to detect tandem repeat annotations from multiple sources for different
+types of overlap, and filter them accordingly.</p>
+<p>[INCOMPLETE]</p>
+<div class="section" id="read-tr-annotations">
+<h2>Read TR annotations.<a class="headerlink" href="#read-tr-annotations" title="Permalink to this headline">¶</a></h2>
+<p>Try:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">sequence_list</span>
+<span class="c"># Do more stuff</span>
+</pre></div>
 </div>
-<div class="section" id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="install.html#install"><em>1. Installing TRAL</em></a></li>
-<li><a class="reference internal" href="install_external.html#install-external"><em>2. Installing tandem repeat detection software (inside: link to configuration to adapt paths there)</em></a></li>
-<li><a class="reference internal" href="configure.html#configure"><em>3. Adapt configuration files</em></a></li>
-</ul>
 </div>
-<div class="section" id="tutorials">
-<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="denovo.html#denovo"><em>Run and parse de novo repeat detection software.</em></a></li>
-<li><a class="reference internal" href="cphmm.html#cphmm"><em>Annotate tandem repeats from sequence domain models.</em></a></li>
-<li><a class="reference internal" href="significance_test.html#significance-test"><em>Perform statistical significance test of tandem repeats.</em></a></li>
-<li><a class="reference internal" href="overlap_filtering.html#overlap-filtering"><em>Perform overlap filtering of redundant tandem repeat annotations.</em></a></li>
-<li><a class="reference internal" href="proteome_annotation.html#proteome-annotation"><em>Use GC3Pie to annotate your large sequence dataset.</em></a></li>
-</ul>
-</div>
-<div class="section" id="reference-guide">
-<h1>Reference Guide<a class="headerlink" href="#reference-guide" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference external" href="https://pypi.python.org/pypi/tandemrepeats/">Code base on GitHub</a></li>
-<li><a class="reference internal" href="code_docs.html#code-docs"><em>Class documentation</em></a></li>
-<li><a class="reference external" href="https://code.google.com/p/gc3pie/">GC3Pie</a></li>
-</ul>
-</div>
-<div class="section" id="how-to-cite-us">
-<h1>How to cite us.<a class="headerlink" href="#how-to-cite-us" title="Permalink to this headline">¶</a></h1>
-<dl class="docutils">
-<dt><em>TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).</em></dt>
-<dd>A longer list of the <a class="reference internal" href="contributors.html#contributors"><em>contributors and background</em></a> of this project.</dd>
-</dl>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
 </div>
 
 
@@ -196,7 +156,7 @@ Index</a>, or install it with:</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">Sphinx home</a>&nbsp;|</li>
+        <li><a href="index.html">Sphinx home</a>&nbsp;|</li>
         <li><a href="contents.html">Documentation</a> &raquo;</li>
  
       </ul>

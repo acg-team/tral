@@ -1,0 +1,30 @@
+.. _cphmm:
+
+Annotate tandem repeats from sequence domain models.
+====================================================
+
+Here you learn how to annotate sequences with your favourite sequence profile model.
+
+
+
+
+Read in your sequences.
+-----------------------
+
+Try:
+::
+
+    from tandemrepeats import sequence_list, sequence
+    sequences = sequence_list.load("path_to_fasta_file")
+
+
+Read in your sequence profile model.
+------------------------------------
+
+
+
+Output the detected tandem repeats.
+-----------------------------------
+
+
+

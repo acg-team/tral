@@ -3,31 +3,47 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Annotating with TandemRepeats
-=============================
+Tandem Repeat annotation library
+================================
+
+Hi, we are great. We do stuff. Here is our code. Here is our paper.
 
 
-Installing TandemRepeats
-========================
+Getting started
+===============
 
-Try:
-::
+- :ref:`1. Installing TRAL <install>`
+- :ref:`2. Installing tandem repeat detection software (inside: link to configuration to adapt paths there) <install_external>`
+- :ref:`3. Adapt configuration files <configure>`
 
-    $ pip install tandemrepeats
+
+Tutorials
+=========
+
+- :ref:`Run and parse de novo repeat detection software. <denovo>`
+- :ref:`Annotate tandem repeats from sequence domain models. <cphmm>`
+- :ref:`Perform statistical significance test of tandem repeats. <significance_test>`
+- :ref:`Perform overlap filtering of redundant tandem repeat annotations. <overlap_filtering>`
+- :ref:`Use GC3Pie to annotate your large sequence dataset. <proteome_annotation>`
 
 
-Modules
-=======
 
-Contents:
 
-.. toctree::
-   :maxdepth: 2
+Reference Guide
+===============
 
-   hmm
-   repeat
-   repeat_list
-   sequence
+- `Code base on GitHub <https://pypi.python.org/pypi/tandemrepeats/>`_
+- :ref:`Class documentation <code_docs>`
+- `GC3Pie <https://code.google.com/p/gc3pie/>`_
+
+
+
+How to cite us.
+===============
+
+*TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).*
+ A longer list of the :ref:`contributors and background <contributors>` of this project.
+
 
 Indices and tables
 ==================

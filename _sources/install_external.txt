@@ -1,0 +1,54 @@
+.. _install_external:
+
+Installation of external software
+=================================
+
+[INCOMPLETE]
+
+
+Available tandem repeat detection software
+------------------------------------------
+
+-> Refer to citations of review papers.
+Or, find an extensive list here.
+
+
+Currently integrated detectors
+------------------------------
+
+HHrepID
+*******
+
+- Linkout
+- Local script
+
+TRED
+****
+
+- Linkout
+- Local script
+
+
+T-REKS
+******
+
+- Linkout
+- Local script
+
+TRF
+***
+
+- Linkout
+- Local script
+
+TRUST
+*****
+
+- Linkout
+- Local script
+
+XSTREAM
+*******
+
+- Linkout
+- Local script

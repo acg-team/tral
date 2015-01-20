@@ -8,7 +8,7 @@
     
     <title>Repeat code documentation &mdash; TandemRepeats 0.3.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,10 +24,58 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="TandemRepeats 0.3.0 documentation" href="index.html" />
-    <link rel="next" title="Repeat_list code documentation" href="repeat_list.html" />
-    <link rel="prev" title="HMM code documentation" href="hmm.html" /> 
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
   </head>
   <body>
+<div class="pageheader">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="installation.html">Install</a></li>
+    <li><a href="code_docs.html">Code docs</a></li>
+  </ul>
+  <div>
+    <a href="index.html">
+      <img src="_static/sphinxheader.png" alt="SPHINX" />
+    </a>
+  </div>
+</div>
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -37,15 +85,46 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="repeat_list.html" title="Repeat_list code documentation"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="hmm.html" title="HMM code documentation"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">TandemRepeats 0.3.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Sphinx home</a>&nbsp;|</li>
+        <li><a href="contents.html">Documentation</a> &raquo;</li>
+ 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Repeat code documentation</a><ul>
+<li><a class="reference internal" href="#repeat">repeat</a></li>
+<li><a class="reference internal" href="#repeat-exon">repeat_exon</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_io">repeat_io</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_pvalue">repeat_pvalue</a></li>
+<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_score">repeat_score</a></li>
+<li><a class="reference internal" href="#test-dependencies">test_dependencies</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/repeat.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -55,316 +134,41 @@
   <div class="section" id="repeat-code-documentation">
 <h1>Repeat code documentation<a class="headerlink" href="#repeat-code-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Initial version of the repeat submodule documentation.</p>
-<div class="section" id="module-tandemrepeats.repeat.repeat">
-<span id="repeat"></span><h2>repeat<a class="headerlink" href="#module-tandemrepeats.repeat.repeat" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="tandemrepeats.repeat.repeat.Repeat">
-<em class="property">class </em><tt class="descclassname">tandemrepeats.repeat.repeat.</tt><tt class="descname">Repeat</tt><big>(</big><em>msa, begin=None, sequence_type='AA', scoreslist=['phylo_gap01'], calc_score=False, calc_pValue=False</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tandem repeats are consecutive copies of genomic sequence.</p>
-<p>A tandem repeat is stored in terms of a multiple sequence alignment of its
-tandem repeat units. For example, the amino acid tandem repeat
-KLMKLMKLKLM
-can be displayed as a multiple sequence alignment (here: &#8220;multiple repeat unit alignment&#8221;)
-KLM
-KLM
-KL-
-KLM
-and can be stored as
-[&#8220;KLM&#8221;, &#8220;KLM&#8221;, &#8220;KL-&#8221;, &#8220;KLM&#8221;].
-The - char stands for a gap: It indicates that either, there used to be a char at the
-same position, but it got deleted. Or, all other chars in the same column got inserted
-at some point.</p>
-<p>For research on tandem repeats, many different statistics need to be calculated on
-the multiple sequence alignment of the tandem repeat.</p>
-<p>[Description of these statistics]</p>
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.msa_original">
-<tt class="descname">msa_original</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msa_original" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of str</em></p>
-<p>The original alignment of repeat units.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.msa">
-<tt class="descname">msa</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msa" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of str</em></p>
-<p>The alignment of repeat units without rare chars.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.msaT">
-<tt class="descname">msaT</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.msaT" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of str</em></p>
-<p>The transposed alignment of repeat units. E.g.
-[&#8220;KKKK&#8221;, &#8220;LLLL&#8221;, &#8220;MM-M&#8221;].</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.sequence_type">
-<tt class="descname">sequence_type</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.sequence_type" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em></p>
-<p>&#8220;AA&#8221; or &#8220;DNA&#8221;</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.n">
-<tt class="descname">n</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.n" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-<p>The number of repeat units in the original msa. E.g. 4.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.l">
-<tt class="descname">l</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.l" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-<p>The length of the repeat units in the original msa. E.g. 3.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.nD">
-<tt class="descname">nD</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.nD" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-<p>[Needs explanation]</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.lD">
-<tt class="descname">lD</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.lD" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em></p>
-<p>[Needs explanation]</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.text">
-<tt class="descname">text</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.text" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em></p>
-<p>[Needs explanation]</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.nGap">
-<tt class="descname">nGap</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.nGap" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-<p>The number of gaps in <tt class="docutils literal"><span class="pre">msa</span></tt></p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="tandemrepeats.repeat.repeat.Repeat.sequence_length">
-<tt class="descname">sequence_length</tt><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.sequence_length" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-<p>[Needs explanation]</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.__str__">
-<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><div class="admonition-todo admonition" id="index-0">
-<p class="first admonition-title">Todo</p>
-<p class="last">Improve output if pValues are only partly calculated.</p>
+<div class="section" id="repeat">
+<h2>repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 8)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 25, in &lt;module&gt;
+    class Repeat:
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 143, in Repeat
+    sequence_type = config_general[&#8220;sequence_type&#8221;],
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 554, in __getitem__
+    val = dict.__getitem__(self, key)
+KeyError: &#8216;sequence_type&#8217;
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.calc_index_msa">
-<tt class="descname">calc_index_msa</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calc_index_msa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calc_index_msa" title="Permalink to this definition">¶</a></dt>
-<dd><p>formerly named: set_begin</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.calc_nD">
-<tt class="descname">calc_nD</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calc_nD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calc_nD" title="Permalink to this definition">¶</a></dt>
-<dd><p>what is the number of letters in in all non-insertion columns, divided by lD?</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.calculate_pValues">
-<tt class="descname">calculate_pValues</tt><big>(</big><em>scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calculate_pValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calculate_pValues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate pValues on a Repeat instances for all scores in <cite>scoreslist</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd><dl class="first last docutils">
-<dt>scoreslist(list of Str): A list of the names of the scores (e.g. [&#8220;phylo_gap01&#8221;])</dt>
-<dd>for which p-Values are calculated on the Repeat instance <cite>self</cite></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.calculate_scores">
-<tt class="descname">calculate_scores</tt><big>(</big><em>scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.calculate_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.calculate_scores" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate scores on a Repeat instances for all scores in <cite>scoreslist</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Kwargs:</dt>
-<dd><dl class="first last docutils">
-<dt>scoreslist(list of str): A list of the names of the scores (e.g. [&#8220;phylo_gap01&#8221;])</dt>
-<dd>that are calculated on the Repeat instance <cite>self</cite></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.create">
-<tt class="descname">create</tt><big>(</big><em>file</em>, <em>format</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read tandem repeat from file.</p>
-<p>Read tandem repeat from file (currently, only pickle is supported)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>format</strong> (<em>str</em>) &#8211; Currently only &#8220;pickle&#8221;</li>
-<li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition-todo admonition" id="index-1">
-<p class="first admonition-title">Todo</p>
-<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.deleteInsertionColumns">
-<tt class="descname">deleteInsertionColumns</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.deleteInsertionColumns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.deleteInsertionColumns" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Create the tandem repeat attributes <cite>msa</cite>, <cite>masT</cite>, <cite>l</cite> and <cite>n</cite> without</dt>
-<dd>insertion columns.</dd>
-</dl>
-<p>We define insertion columns as columns where there are more or equal gaps
-compared to chars.
-These columns are removed from both <cite>msa</cite> to create <cite>msaD</cite> and <cite>msaT</cite> to create
-<cite>msaTD</cite>.</p>
-<p>todo:: Check: is <cite>totD</cite> needed anywhere else? Is <cite>textD</cite> needed?</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.gapStructure">
-<tt class="descname">gapStructure</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.gapStructure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.gapStructure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the number and length of insertions and deletions for this tandem repeat.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.gap_structure_HMM">
-<tt class="descname">gap_structure_HMM</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.gap_structure_HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.gap_structure_HMM" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Calculate for each column in the transposed multiple repeat unit alignment</dt>
-<dd><p class="first"><cite>msaTD</cite></p>
-<ul class="last">
-<li><dl class="first docutils">
-<dt>how many deletions of what length begin in this column?:</dt>
-<dd><p class="first last"><cite>deletion_lengths`[`iColumn</cite>] = list of deletion lengths</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>how many insertions of what length begin in potential insertion columns</dt>
-<dd><p class="first last">before this column?: <cite>insertion_lengths`[`iColumn</cite>] = list of insertion lengths</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> (<em>Repeat</em>) &#8211; An instance of the repeat class.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.save_original_msa">
-<tt class="descname">save_original_msa</tt><big>(</big><em>sequence</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.save_original_msa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.save_original_msa" title="Permalink to this definition">¶</a></dt>
-<dd><p>recalculate the original msa, assuming that begin is defined correctly (index starting counting on 1.)
-This function might be obsolete when the original MSA is saved from the beginning.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="tandemrepeats.repeat.repeat.Repeat.write">
-<tt class="descname">write</tt><big>(</big><em>file</em>, <em>format</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#Repeat.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.Repeat.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write tandem repeat to file.</p>
-<p>Write tandem repeat to file using one of three formats.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file</strong> (<em>str</em>) &#8211; Path to input file</li>
-<li><strong>format</strong> (<em>str</em>) &#8211; Either &#8220;fasta&#8221;, &#8220;pickle&#8221; or &#8220;stockholm&#8221;</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition-todo admonition" id="index-2">
-<p class="first admonition-title">Todo</p>
-<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
+<div class="section" id="repeat-exon">
+<h2>repeat_exon<a class="headerlink" href="#repeat-exon" title="Permalink to this headline">¶</a></h2>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/docs/repeat.rst</tt>, line 13)</p>
+autodoc: failed to import module &#8216;tandemrepeats.repeat.repeat_exon&#8217;; the following exception was raised:
+Traceback (most recent call last):
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
+    __import__(self.modname)
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat_exon.py&#8221;, line 9, in &lt;module&gt;
+    from tandemrepeats.repeat import repeat
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 25, in &lt;module&gt;
+    class Repeat:
+  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/TandemRepeats/tandemrepeats/repeat/repeat.py&#8221;, line 143, in Repeat
+    sequence_type = config_general[&#8220;sequence_type&#8221;],
+  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/configobj.py&#8221;, line 554, in __getitem__
+    val = dict.__getitem__(self, key)
+KeyError: &#8216;sequence_type&#8217;
 </div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="tandemrepeats.repeat.repeat.calculate_position_in_alignment">
-<tt class="descclassname">tandemrepeats.repeat.repeat.</tt><tt class="descname">calculate_position_in_alignment</tt><big>(</big><em>begin</em>, <em>length</em>, <em>alignment</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat.html#calculate_position_in_alignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat.calculate_position_in_alignment" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculate the index of the begin and the end of a TR within an alignment
-returns</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-tandemrepeats.repeat.repeat_exon">
-<span id="repeat-exon"></span><h2>repeat_exon<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_exon" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="tandemrepeats.repeat.repeat_exon.get_exon_measures">
-<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">get_exon_measures</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#get_exon_measures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.get_exon_measures" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate diverse exon measures</p>
-<p>Exon structure parameters:
-# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="tandemrepeats.repeat.repeat_exon.get_exon_structure">
-<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">get_exon_structure</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#get_exon_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.get_exon_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exon structure parameters:
-# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="tandemrepeats.repeat.repeat_exon.logger">
-<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">logger</tt><em class="property"> = &lt;logging.Logger object at 0x114ca0a58&gt;</em><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Functions to check whether the exon structure and the repeat unit structure are correlated.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="tandemrepeats.repeat.repeat_exon.print_exon_structure">
-<tt class="descclassname">tandemrepeats.repeat.repeat_exon.</tt><tt class="descname">print_exon_structure</tt><big>(</big><em>my_TR</em>, <em>exon_structure</em><big>)</big><a class="reference internal" href="_modules/tandemrepeats/repeat/repeat_exon.html#print_exon_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tandemrepeats.repeat.repeat_exon.print_exon_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exon structure parameters:
-# exon_structure = [{&#8216;Exon Chr End (bp)&#8217;: &#8216;43478424&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43477252&#8217;, &#8216;CDS End&#8217;: &#8216;272&#8217;, &#8216;CDS Start&#8217;: &#8216;1&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476658&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476498&#8217;, &#8216;CDS End&#8217;: &#8216;433&#8217;, &#8216;CDS Start&#8217;: &#8216;273&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43476158&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43476036&#8217;, &#8216;CDS End&#8217;: &#8216;556&#8217;, &#8216;CDS Start&#8217;: &#8216;434&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475664&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475564&#8217;, &#8216;CDS End&#8217;: &#8216;657&#8217;, &#8216;CDS Start&#8217;: &#8216;557&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475416&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43475194&#8217;, &#8216;CDS End&#8217;: &#8216;880&#8217;, &#8216;CDS Start&#8217;: &#8216;658&#8217;}, {&#8216;Exon Chr End (bp)&#8217;: &#8216;43475046&#8217;, &#8216;Exon Chr Start (bp)&#8217;: &#8216;43474707&#8217;, &#8216;CDS End&#8217;: &#8216;951&#8217;, &#8216;CDS Start&#8217;: &#8216;881&#8217;}]</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-tandemrepeats.repeat.repeat_io">
 <span id="repeat-io"></span><h2>repeat_io<a class="headerlink" href="#module-tandemrepeats.repeat.repeat_io" title="Permalink to this headline">¶</a></h2>
@@ -571,7 +375,7 @@ nRepeatStructure (int)</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-3">
+<div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">Include exact definition of returned values.</p>
 </div>
@@ -616,11 +420,11 @@ a given <tt class="docutils literal"><span class="pre">n</span></tt> the closest
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-4">
+<div class="admonition-todo admonition" id="index-1">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check return type.</p>
 </div>
-<div class="admonition-todo admonition" id="index-5">
+<div class="admonition-todo admonition" id="index-2">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check how this method concurs with the <tt class="docutils literal"><span class="pre">empiricalList</span></tt> method.</p>
 </div>
@@ -659,7 +463,7 @@ Nucleic Acids Research (2012).</p>
 <p class="last">if precision higher than max(uint32) use uint64 instead.
 CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
 </div>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe return value.</p>
 </div>
@@ -781,11 +585,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-4">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define &#8220;phylo&#8221; model.</p>
 </div>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Perhaps add distributions beyond lMax, nMax.</p>
 </div>
@@ -810,11 +614,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define <tt class="docutils literal"><span class="pre">mu</span></tt> more precisely.</p>
 </div>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is this function called from anywhere? In case, consider refactoring.</p>
 </div>
@@ -865,16 +669,16 @@ pSim score of <tt class="docutils literal"><span class="pre">myTR</span></tt>.</
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
-<div class="admonition-todo admonition" id="index-13">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe <tt class="docutils literal"><span class="pre">precision</span></tt>.</p>
 </div>
@@ -897,12 +701,12 @@ parsimony score of <tt class="docutils literal"><span class="pre">myTR</span></t
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-14">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">myTR</span></tt> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-15">
+<div class="admonition-todo admonition" id="index-12">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
@@ -1009,7 +813,7 @@ simple poisson model with rate parameter <tt class="docutils literal"><span clas
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-16">
+<div class="admonition-todo admonition" id="index-13">
 <p class="first admonition-title">Todo</p>
 <p class="last">USE LOG EARLIER, NOT JUST IN RETURN STATEMENT</p>
 </div>
@@ -1069,7 +873,7 @@ in <tt class="docutils literal"><span class="pre">repeat</span></tt> according t
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-17">
+<div class="admonition-todo admonition" id="index-14">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is <tt class="docutils literal"><span class="pre">rep_and_meas</span></tt> used at current.</p>
 </div>
@@ -1107,15 +911,15 @@ nIteration (int): Number of iterations until optimisation results are returned.<
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (Maximum of function: float, Corresponding function parameter: float)<span class="target" id="index-18"></span><div class="admonition-todo admonition">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple (Maximum of function: float, Corresponding function parameter: float)<span class="target" id="index-15"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <tt class="docutils literal"><span class="pre">regionBounded</span></tt> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-19"></span><div class="admonition-todo admonition">
+<span class="target" id="index-16"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <tt class="docutils literal"><span class="pre">stepsize</span></tt> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-20"></span><div class="admonition-todo admonition">
+<span class="target" id="index-17"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Generalise hard-coded optimisation parameter boundaries.</p>
 </div>
@@ -1173,7 +977,7 @@ Nucleic Acids Research (2012).</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-21">
+<div class="admonition-todo admonition" id="index-18">
 <p class="first admonition-title">Todo</p>
 <p class="last">At which step should we assert that the length of <tt class="docutils literal"><span class="pre">column</span></tt> &gt; 1?</p>
 </div>
@@ -1197,47 +1001,6 @@ ImportError: No module named &#8216;tandemrepeats.repeat.test_dependencies&#8217
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Repeat code documentation</a><ul>
-<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat">repeat</a></li>
-<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_exon">repeat_exon</a></li>
-<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_io">repeat_io</a></li>
-<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_pvalue">repeat_pvalue</a></li>
-<li><a class="reference internal" href="#module-tandemrepeats.repeat.repeat_score">repeat_score</a></li>
-<li><a class="reference internal" href="#test-dependencies">test_dependencies</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="hmm.html"
-                        title="previous chapter">HMM code documentation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="repeat_list.html"
-                        title="next chapter">Repeat_list code documentation</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/repeat.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -1249,13 +1012,9 @@ ImportError: No module named &#8216;tandemrepeats.repeat.test_dependencies&#8217
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="repeat_list.html" title="Repeat_list code documentation"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="hmm.html" title="HMM code documentation"
-             >previous</a> |</li>
-        <li><a href="index.html">TandemRepeats 0.3.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Sphinx home</a>&nbsp;|</li>
+        <li><a href="contents.html">Documentation</a> &raquo;</li>
+ 
       </ul>
     </div>
     <div class="footer">

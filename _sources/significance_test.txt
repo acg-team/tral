@@ -1,0 +1,18 @@
+.. _significance_test:
+
+Perform statistical significance test of tandem repeats.
+========================================================
+
+Here you learn run statistical significance tests on your candidate set of tandem repeats.
+
+[INCOMPLETE]
+
+Read in your tandem repeat annotations.
+---------------------------------------
+
+Try:
+::
+
+    from tandemrepeats import sequence_list
+    #Do stuff
+

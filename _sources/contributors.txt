@@ -1,0 +1,27 @@
+.. _contributors:
+
+Contributors & Background.
+==========================
+
+The who's who of the tandem repeat annotation library.
+
+[INCOMPLETE]
+
+
+People
+------
+A,B,C
+
+
+Journal publications
+--------------------
+A,B,C
+
+
+
+Acknowledgements
+----------------
+A,B,C
+
+
+

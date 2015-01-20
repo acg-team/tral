@@ -1,0 +1,7 @@
+.. _configure:
+
+Configuration
+=============
+
+[INCOMPLETE]
+

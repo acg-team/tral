@@ -1,0 +1,31 @@
+.. _denovo:
+
+Run and parse de novo repeat detection software.
+================================================
+
+Here you learn how to run external repeat detection software on your favourite sequence
+file and output the results in your favourite format.
+
+
+
+
+Read in your sequences.
+-----------------------
+
+Try:
+::
+
+    from tandemrepeats import sequence_list, sequence
+    sequences = sequence_list.load("path_to_fasta_file")
+
+
+Run the external repeat detector.
+---------------------------------
+
+
+
+Output the detected tandem repeats.
+-----------------------------------
+
+
+
