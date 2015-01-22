@@ -96,6 +96,7 @@
   <ul>
 <li><a class="reference internal" href="#">Perform statistical significance test of tandem repeats.</a><ul>
 <li><a class="reference internal" href="#read-in-your-tandem-repeat-annotations">Read in your tandem repeat annotations.</a></li>
+<li><a class="reference internal" href="#perform-a-statistical-significance-test">Perform a statistical significance test</a></li>
 </ul>
 </li>
 </ul>
@@ -128,13 +129,26 @@
             
   <div class="section" id="perform-statistical-significance-test-of-tandem-repeats">
 <span id="significance-test"></span><h1>Perform statistical significance test of tandem repeats.<a class="headerlink" href="#perform-statistical-significance-test-of-tandem-repeats" title="Permalink to this headline">¶</a></h1>
-<p>Here you learn run statistical significance tests on your candidate set of tandem repeats.</p>
+<p>Here you learn run statistical significance tests on your candidate set of tandem repeats.
+TRAL currently provides a variety of model-based and none-model based tests. They are
+described in a <a class="reference internal" href="contributors.html#publications"><em>NAR publication (2012)</em></a>.</p>
 <p>[INCOMPLETE]</p>
 <div class="section" id="read-in-your-tandem-repeat-annotations">
 <h2>Read in your tandem repeat annotations.<a class="headerlink" href="#read-in-your-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h2>
 <p>Try:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">sequence_list</span>
-<span class="c">#Do stuff</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">repeat_list</span>
+
+<span class="n">path_to_tandemrepeats</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/TandemRepeats/tandemrepeats&quot;</span>
+<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_tandemrepeats</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;repeat.hmm&quot;</span><span class="p">)</span>
+
+<span class="c"># Do stuff</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="perform-a-statistical-significance-test">
+<h2>Perform a statistical significance test<a class="headerlink" href="#perform-a-statistical-significance-test" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Do stuff</span>
 </pre></div>
 </div>
 </div>

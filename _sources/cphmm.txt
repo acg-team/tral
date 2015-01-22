@@ -5,7 +5,7 @@ Annotate tandem repeats from sequence domain models.
 
 Here you learn how to annotate sequences with your favourite sequence profile model.
 The sequence profile model is transformed into a circular profile HMM, as described in
-a recent MBE publication :ref:`recent MBE publication <publications>`. Next, the sequence
+a :ref:`recent MBE publication <publications>`. Next, the sequence
 is searched for tandem repeats using the circular profile HMM.
 
 

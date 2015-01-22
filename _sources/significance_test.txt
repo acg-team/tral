@@ -4,6 +4,8 @@ Perform statistical significance test of tandem repeats.
 ========================================================
 
 Here you learn run statistical significance tests on your candidate set of tandem repeats.
+TRAL currently provides a variety of model-based and none-model based tests. They are
+described in a :ref:`NAR publication (2012) <publications>`.
 
 [INCOMPLETE]
 
@@ -13,6 +15,20 @@ Read in your tandem repeat annotations.
 Try:
 ::
 
-    from tandemrepeats import sequence_list
-    #Do stuff
+    import os
+    from tandemrepeats import repeat_list
 
+    path_to_tandemrepeats = "/my/path/to/TandemRepeats/tandemrepeats"
+    fRepeat_Pickle = os.path.join(path_to_tandemrepeats,"test","repeat.hmm")
+
+    # Do stuff
+
+
+
+
+Perform a statistical significance test
+---------------------------------------
+
+::
+
+    # Do stuff
