@@ -47,6 +47,8 @@ TRUST
 - Linkout
 - Local script
 
+.. _XSTREAM:
+
 XSTREAM
 *******
 

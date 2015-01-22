@@ -95,8 +95,9 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Annotate tandem repeats from sequence domain models.</a><ul>
-<li><a class="reference internal" href="#read-in-your-sequences">Read in your sequences.</a></li>
 <li><a class="reference internal" href="#read-in-your-sequence-profile-model">Read in your sequence profile model.</a></li>
+<li><a class="reference internal" href="#read-in-your-sequences">Read in your sequences.</a></li>
+<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm">Annotate tandem repeats with the circular profile HMM</a></li>
 <li><a class="reference internal" href="#output-the-detected-tandem-repeats">Output the detected tandem repeats.</a></li>
 </ul>
 </li>
@@ -130,20 +131,58 @@
             
   <div class="section" id="annotate-tandem-repeats-from-sequence-domain-models">
 <span id="cphmm"></span><h1>Annotate tandem repeats from sequence domain models.<a class="headerlink" href="#annotate-tandem-repeats-from-sequence-domain-models" title="Permalink to this headline">¶</a></h1>
-<p>Here you learn how to annotate sequences with your favourite sequence profile model.</p>
-<div class="section" id="read-in-your-sequences">
-<h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
-<p>Try:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats</span> <span class="kn">import</span> <span class="n">sequence_list</span><span class="p">,</span> <span class="n">sequence</span>
-<span class="n">sequences</span> <span class="o">=</span> <span class="n">sequence_list</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;path_to_fasta_file&quot;</span><span class="p">)</span>
+<p>Here you learn how to annotate sequences with your favourite sequence profile model.
+The sequence profile model is transformed into a circular profile HMM, as described in
+a recent MBE publication <a class="reference internal" href="contributors.html#publications"><em>recent MBE publication</em></a>. Next, the sequence
+is searched for tandem repeats using the circular profile HMM.</p>
+<div class="section" id="read-in-your-sequence-profile-model">
+<h2>Read in your sequence profile model.<a class="headerlink" href="#read-in-your-sequence-profile-model" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats.hmm</span> <span class="kn">import</span> <span class="n">hmm</span>
+
+<span class="n">path_to_tandemrepeats</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/TandemRepeats/tandemrepeats&quot;</span>
+<span class="n">fPfam_profile_hmm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_tandemrepeats</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;zf-CCHC.hmm&quot;</span><span class="p">)</span>
+
+<span class="n">circular_profile_HMM_zfCCHC</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&#39;hmmer&#39;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">fPfam_profile_hmm</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">circular_profile_HMM_zfCCHC</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="read-in-your-sequence-profile-model">
-<h2>Read in your sequence profile model.<a class="headerlink" href="#read-in-your-sequence-profile-model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="read-in-your-sequences">
+<h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
+
+<span class="n">human_HCFC1_fasta</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_tandemrepeats</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;P62633.fasta&quot;</span><span class="p">)</span>
+<span class="n">human_HCFC1_sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">human_HCFC1_fasta</span><span class="p">,</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm">
+<h2>Annotate tandem repeats with the circular profile HMM<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_zfCCHC</span><span class="p">])</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="output-the-detected-tandem-repeats">
 <h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this headline">¶</a></h2>
+<p>Write a singe repeat_list to .tsv format:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">path_to_output_tsv_file</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/the/outputfile.tsv&quot;</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;tsv&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Write a singe repeat_list to .pickle format:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">path_to_output_pickle_file</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/the/outputfile.pickle&quot;</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A repeat_list in pickle format can easily be read in again:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats.repeat_list</span> <span class="kn">import</span> <span class="n">repeat_list</span>
+<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">Repeat_list</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
