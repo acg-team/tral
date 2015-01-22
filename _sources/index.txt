@@ -17,9 +17,9 @@ A manuscript describing TRAL is soon to be submitted.
 Getting started
 ===============
 
-- :ref:`1. Installing TRAL <install>`
-- :ref:`2. Installing tandem repeat detection software (inside: link to configuration to adapt paths there) <install_external>`
-- :ref:`3. Adapt configuration files <configure>`
+#. :ref:`Install TRAL <install>`
+#. :ref:`Install tandem repeat detection software <install_external>`
+#. :ref:`Adapt configuration files <configure>`
 
 
 Tutorials
@@ -46,8 +46,7 @@ Reference Guide
 How to cite us.
 ===============
 
-*TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).*
- A longer list of the :ref:`contributors and background <contributors>` of this project.
+*TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).* - you can have a look at all :ref:`contributors and the background <contributors>` of this project.
 
 
 Indices and tables
