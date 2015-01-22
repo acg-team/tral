@@ -40,8 +40,8 @@ Read in your sequences.
 
 
 
-Annotate tandem repeats with the circular profile HMM
------------------------------------------------------
+Annotate tandem repeats with the circular profile HMM.
+------------------------------------------------------
 
 ::
 
