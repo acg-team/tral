@@ -142,7 +142,7 @@ detailed in a <a class="reference internal" href="contributors.html#publications
 <span class="n">path_to_tandemrepeats</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/TandemRepeats/tandemrepeats&quot;</span>
 <span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_tandemrepeats</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_output_pickle_file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 
 <span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">)</span>

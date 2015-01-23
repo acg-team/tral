@@ -8,7 +8,7 @@ Tandem Repeat annotation library
 
 TRAL makes annotation of tandem repeats in amino acid and nucleic data simple. TRAL includes
 modules for detecting tandem repeats with both de novo software and sequence profile HMMs;
-statistical signifiance analysis of putative tandem repeats, and filterting of redundant predictions.
+statistical significance analysis of putative tandem repeats, and filterting of redundant predictions.
 
 A manuscript describing TRAL is soon to be submitted.
 

@@ -18,7 +18,7 @@ Read in tandem repeat annotations.
     path_to_tandemrepeats = "/my/path/to/TandemRepeats/tandemrepeats"
     fRepeat_Pickle = os.path.join(path_to_tandemrepeats,"test","HIV-1_388796.pickle")
 
-    with open(path_to_output_pickle_file, 'rb') as fh:
+    with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)
 
     print(lHIV_Sequence)
