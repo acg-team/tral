@@ -154,12 +154,11 @@ file and output the results.</p>
 </div>
 <p>Detect tandem repeats on all sequences with all <em>de novo</em> tandem repeat detection algorithms
 defined in the <a class="reference internal" href="configure.html#configure"><em>configuration file</em></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">dTandem_repeats</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
-    <span class="n">iTandem_repeats</span> <span class="o">=</span> <span class="n">iS</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-    <span class="n">dTandem_repeats</span><span class="p">[</span><span class="n">iS</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">iTandem_repeats</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
+    <span class="n">iTandem_repeats</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeat_list</span><span class="p">(</span><span class="n">iTandem_repeats</span><span class="p">,</span> <span class="s">&quot;denovo&quot;</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">dTandem_repeats</span><span class="p">[</span><span class="s">&#39;sp|Q75006|REV_HV1ET&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -178,6 +177,13 @@ defined in the <a class="reference internal" href="configure.html#configure"><em
 <p>A repeat_list in pickle format can easily be read in again:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tandemrepeats.repeat_list</span> <span class="kn">import</span> <span class="n">repeat_list</span>
 <span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">Repeat_list</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Save multiple sequence together with tandem repeat annotations as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="n">path_to_output_pickle_file</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/the/outputfile.pickle&quot;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_output_pickle_file</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

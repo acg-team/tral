@@ -209,13 +209,22 @@
         <span class="k">if</span> <span class="nb">str</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">output</span>
 </div>
-    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Repeat_list.filter"><a class="viewcode-back" href="../../../repeat_list.html#tandemrepeats.repeat_list.repeat_list.Repeat_list.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Filter ``repeats`` according to ``func_name``.</span>
+
+<span class="sd">        Filter ``repeats`` according to ``func_name``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name (str): The name of a local filtering method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c"># Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?</span>
 
         <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">],</span> <span class="n">func_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Repeat_list</span><span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span>
-
+</div>
 <div class="viewcode-block" id="Repeat_list.cluster"><a class="viewcode-back" href="../../../repeat_list.html#tandemrepeats.repeat_list.repeat_list.Repeat_list.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot; Cluster ``repeats`` according to ``overlap_type``.</span>
