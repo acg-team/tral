@@ -29,7 +29,7 @@ Tutorials
 - :ref:`Annotate tandem repeats from sequence domain models. <cphmm>`
 - :ref:`Perform statistical significance test of tandem repeats. <significance_test>`
 - :ref:`Perform overlap filtering of redundant tandem repeat annotations. <overlap_filtering>`
-- :ref:`Use GC3Pie to annotate your large sequence dataset. <proteome_annotation>`
+- :ref:`Use GC3Pie to annotate your large sequence dataset. <workflow>`
 
 
 
@@ -47,6 +47,13 @@ How to cite us.
 ===============
 
 *TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).* - you can have a look at all :ref:`contributors and the background <contributors>` of this project.
+
+
+How to contribute.
+==================
+
+
+- :ref:`Technical hints <contribute>` for contributors to TRAL.
 
 
 Indices and tables
