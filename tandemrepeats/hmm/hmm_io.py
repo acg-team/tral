@@ -1,4 +1,4 @@
-# (C) 2014 Elke Schaper
+# (C) 2015 Elke Schaper
 
 import logging
 import os, re
@@ -6,7 +6,6 @@ import os, re
 log = logging.getLogger(__name__)
 
 ################################## READ HMMMER3  #########################################
-
 
 def read(hmm_filename, id = None):
 

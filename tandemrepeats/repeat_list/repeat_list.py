@@ -93,6 +93,15 @@ class Repeat_list:
 
     def filter(self, func_name, *args, **kwargs):
 
+        """ Filter ``repeats`` according to ``func_name``.
+
+        Filter ``repeats`` according to ``func_name``
+
+        Args:
+            func_name (str): The name of a local filtering method.
+
+        """
+
         # Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?
 
         func = getattr(sys.modules[__name__], func_name)
@@ -121,6 +130,7 @@ class Repeat_list:
         if not hasattr(self,'dCluster'):
             self.dCluster = {}
 
+        # Is the next line used here?
         is_overlapping = getattr(sys.modules[__name__], overlap_type)
         lCluster = []
 
