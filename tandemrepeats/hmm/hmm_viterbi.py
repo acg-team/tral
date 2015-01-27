@@ -294,7 +294,6 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
         A multiple sequence alignment (MSA) created from the most likely path
         along the hmm in the form of a list of str.
 
-    .. warning:: [None].
     .. todo:: Should the sequence be a sequence instance instead of just a string?
 
     """
