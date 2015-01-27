@@ -1,6 +1,6 @@
 .. _contributors:
 
-Contributors & Background.
+Contributors & Background
 ==========================
 
 The who's who of the tandem repeat annotation library.
@@ -12,6 +12,7 @@ People
 ------
 
 - `Maria Anisimova <https://code.google.com/p/gc3pie/>`_
+- `Riccardo Murri <http://www.gc3.uzh.ch/people/rm/>`_
 - `Julia Pecerska <http://www.bsse.ethz.ch/department/people/detail-person.html?persid=192596>`_
 - `Elke Schaper <http://www.inf.ethz.ch/personal/eschaper/>`_
 - `Ioannis Xenarios <http://www.isb-sib.ch/groups/lausanne/vital-it-xenarios.html#Xenarios>`_

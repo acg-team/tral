@@ -38,12 +38,11 @@ Detect tandem repeats on all sequences with all *de novo* tandem repeat detectio
 defined in the :ref:`configuration file <configure>`:
 ::
 
-    dTandem_repeats = {}
-    for iS in lHIV_Sequence:
-        iTandem_repeats = iS.detect(denovo = True)
-        dTandem_repeats[iS.id] = iTandem_repeats
+    for iSequence in lHIV_Sequence:
+        iTandem_repeats = iSequence.detect(denovo = True)
+        iSequence.set_repeat_list(iTandem_repeats, "denovo")
 
-    print(dTandem_repeats['sp|Q75006|REV_HV1ET'].repeats[0])
+    print(lHIV_Sequence[0].dRepeat_list['denovo'].repeats[0])
 
 
 Output the detected tandem repeats.
@@ -68,3 +67,12 @@ A repeat_list in pickle format can easily be read in again:
 
     from tandemrepeats.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)
+
+
+Save multiple sequence together with tandem repeat annotations as:
+::
+
+    import pickle
+    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    with open(path_to_output_pickle_file, 'wb') as fh:
+        pickle.dump(lHIV_Sequence, fh)
