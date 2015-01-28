@@ -33,7 +33,6 @@ Tutorials
 
 
 
-
 Reference Guide
 ===============
 
@@ -43,13 +42,13 @@ Reference Guide
 
 
 
-How to cite us.
+How to cite us
 ===============
 
 *TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).* - you can have a look at all :ref:`contributors and the background <contributors>` of this project.
 
 
-How to contribute.
+How to contribute
 ==================
 
 
