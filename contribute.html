@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Technical hints for contributors. &mdash; TandemRepeats 0.3.0 documentation</title>
+    <title>Technical hints for contributors &mdash; TandemRepeats 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -94,7 +94,15 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Technical hints for contributors.</a><ul>
+<li><a class="reference internal" href="#">Technical hints for contributors</a><ul>
+<li><a class="reference internal" href="#how-to-contribute">How to contribute</a><ul>
+<li><a class="reference internal" href="#fork-the-repository">1. Fork the repository</a></li>
+<li><a class="reference internal" href="#clone-the-repository-from-your-fork">2. Clone the repository from your fork</a></li>
+<li><a class="reference internal" href="#create-your-feature-branch">3. Create your feature branch</a></li>
+<li><a class="reference internal" href="#push-your-feature-branch-to-your-github-fork">4. Push your feature branch to your github fork</a></li>
+<li><a class="reference internal" href="#create-a-pull-request">5. Create a pull request.</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#how-to-help-on-the-homepage">How to help on the homepage</a></li>
 </ul>
 </li>
@@ -127,11 +135,61 @@
           <div class="body">
             
   <div class="section" id="technical-hints-for-contributors">
-<span id="contribute"></span><h1>Technical hints for contributors.<a class="headerlink" href="#technical-hints-for-contributors" title="Permalink to this headline">¶</a></h1>
-<p>[UNFINISHED]</p>
+<span id="contribute"></span><h1>Technical hints for contributors<a class="headerlink" href="#technical-hints-for-contributors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-contribute">
+<h2>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fork-the-repository">
+<h3>1. Fork the repository<a class="headerlink" href="#fork-the-repository" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://help.github.com/articles/fork-a-repo/">Forking</a> a repository on github means creating a clone of a repository on github. Simply
+click on &#8220;Fork&#8221; in the TRAL repos <a class="reference external" href="https://github.com/elkeschaper/TandemRepeats/">TRAL repository</a>
+once you have a Github account.</p>
+</div>
+<div class="section" id="clone-the-repository-from-your-fork">
+<h3>2. Clone the repository from your fork<a class="headerlink" href="#clone-the-repository-from-your-fork" title="Permalink to this headline">¶</a></h3>
+<p>From the command line, create a clone of your fork:</p>
+<div class="highlight-python"><div class="highlight"><pre>git clone https://github.com/&lt;YOUR_USER_NAME&gt;/TandemRepeats
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-your-feature-branch">
+<h3>3. Create your feature branch<a class="headerlink" href="#create-your-feature-branch" title="Permalink to this headline">¶</a></h3>
+<p>If you use git-flow, start a new feature:</p>
+<div class="highlight-python"><div class="highlight"><pre>git-flow start feature &lt;YOUR_FEATURE&gt;
+</pre></div>
+</div>
+<p>Otherwise, create a new branch as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>git checkout -b feature/&lt;YOUR_FEATURE&gt;
+</pre></div>
+</div>
+<p>Next, add the necessary changes and commit them:</p>
+<div class="highlight-python"><div class="highlight"><pre>git add &lt;CHANGED_FILE&gt;
+git commit -m &#39;CHANGED_FILE: DESCRIPTION OF YOUR CHANGES’
+</pre></div>
+</div>
+</div>
+<div class="section" id="push-your-feature-branch-to-your-github-fork">
+<h3>4. Push your feature branch to your github fork<a class="headerlink" href="#push-your-feature-branch-to-your-github-fork" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>git push origin feature/&lt;FEATURE_NAME&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-pull-request">
+<h3>5. Create a pull request.<a class="headerlink" href="#create-a-pull-request" title="Permalink to this headline">¶</a></h3>
+<p>Create the <a class="reference external" href="https://help.github.com/articles/using-pull-requests/">pull request</a> online on github.
+For this, go to your github page and click on &#8220;Pull Request&#8221;.</p>
+<div class="highlight-python"><div class="highlight"><pre>https://github.com/&lt;YOUR_USER_NAME&gt;/TandemRepeats
+</pre></div>
+</div>
+<p>Do a pull request on the develop branch of  elkeschaper/Tandemrepeats.</p>
+<div class="highlight-python"><div class="highlight"><pre>base fork: elkeschaper/Tandemrepeats
+base: develop
+</pre></div>
+</div>
+</div>
+</div>
 <div class="section" id="how-to-help-on-the-homepage">
 <h2>How to help on the homepage<a class="headerlink" href="#how-to-help-on-the-homepage" title="Permalink to this headline">¶</a></h2>
-<p>Check out the current version of TRAL as follows:</p>
+<p>Check out the current version of the TRAL homepage as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre>git clone --single-branch -b gh-pages https://&lt;your_git_name&gt;@github.com/elkeschaper/TandemRepeats.git
 </pre></div>
 </div>

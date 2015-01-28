@@ -8,7 +8,6 @@ Here you learn how to run an entire proteome annotation workflow.
 [INCOMPLETE]
 
 
-
 Basic Idea
 ----------
 [MISSING]
