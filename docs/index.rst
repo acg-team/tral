@@ -25,11 +25,11 @@ Getting started
 Tutorials
 =========
 
-- :ref:`Run and parse de novo repeat detection software. <denovo>`
-- :ref:`Annotate tandem repeats from sequence domain models. <cphmm>`
-- :ref:`Perform statistical significance test of tandem repeats. <significance_test>`
-- :ref:`Perform overlap filtering of redundant tandem repeat annotations. <overlap_filtering>`
-- :ref:`Use GC3Pie to annotate your large sequence dataset. <proteome_annotation>`
+- :ref:`Run and parse <denovo>` de novo repeat detection software.
+- :ref:`Annotate tandem repeats<cphmm>` from sequence domain models. 
+- :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
+- :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
+- :ref:`Use GC3Pie <proteome_annotation>` to annotate your large sequence dataset. 
 
 
 
@@ -37,7 +37,7 @@ Tutorials
 Reference Guide
 ===============
 
-- `Code base on GitHub <https://pypi.python.org/pypi/tandemrepeats/>`_
+- Code base on `GitHub <https://pypi.python.org/pypi/tandemrepeats/>`_
 - :ref:`Class documentation <code_docs>`
 - `GC3Pie <https://code.google.com/p/gc3pie/>`_
 
