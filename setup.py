@@ -6,9 +6,11 @@ def read(*paths):
     with open(os.path.join(*paths), 'r') as f:
         return f.read()
 
+HOME=os.path.expanduser('~')
+
 setup(
     name='tandemrepeats',
-    version='0.3.0',
+    version='0.3.3',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tandemrepeats', 'tandemrepeats.hmm', 'tandemrepeats.hmm.test', 'tandemrepeats.repeat', 'tandemrepeats.repeat.test', 'tandemrepeats.repeat_list', 'tandemrepeats.repeat_list.test', 'tandemrepeats.sequence', 'tandemrepeats.sequence.test'],
@@ -40,6 +42,7 @@ setup(
         "setuptools >= 5.1",
         "Sphinx >= 1.2.2",
     ],
+    data_files=[(os.path.join(HOME, ".tral"), ['tandemrepeats/data/config.ini'])],
     package_data={'tandemrepeats': ['data/*']},
     package_dir={'tandemrepeats': 'tandemrepeats'},
 )

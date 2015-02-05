@@ -2,8 +2,8 @@ import configobj
 import os
 from tandemrepeats.paths import *
 
-pDefaults = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'defaults.ini')
-pSpec = os.path.join(CODEROOT, 'tandemrepeats', 'data', 'spec.ini')
+pDefaults = config()
+pSpec = os.path.join(DATAROOT, 'spec.ini')
 
 class Singleton:
     """
