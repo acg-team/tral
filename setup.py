@@ -1,3 +1,4 @@
+import glob
 import os
 from distutils.core import setup
 
@@ -10,7 +11,7 @@ HOME=os.path.expanduser('~')
 
 setup(
     name='tandemrepeats',
-    version='0.3.3',
+    version='0.3.9',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tandemrepeats', 'tandemrepeats.hmm', 'tandemrepeats.hmm.test', 'tandemrepeats.repeat', 'tandemrepeats.repeat.test', 'tandemrepeats.repeat_list', 'tandemrepeats.repeat_list.test', 'tandemrepeats.sequence', 'tandemrepeats.sequence.test'],
@@ -42,7 +43,10 @@ setup(
         "setuptools >= 5.1",
         "Sphinx >= 1.2.2",
     ],
-    data_files=[(os.path.join(HOME, ".tral"), ['tandemrepeats/data/config.ini'])],
-    package_data={'tandemrepeats': ['data/*']},
+    data_files=[(os.path.join(HOME, ".tral"), glob.glob("tandemrepeats/data/*.ini")),
+                (os.path.join(HOME, ".tral", "data", "hhrepid"), glob.glob("tandemrepeats/data/hhrepid/*")),
+                (os.path.join(HOME, ".tral", "data", "pValue"), []),
+                (os.path.join(HOME, ".tral", "data", "substitution_rate_matrices"), glob.glob("tandemrepeats/data/substitution_rate_matrices/*"))],
+    package_data={'tandemrepeats': ['data/*.ini', 'data/paml/*', 'data/hhrepid/*']},
     package_dir={'tandemrepeats': 'tandemrepeats'},
 )

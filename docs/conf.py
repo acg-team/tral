@@ -108,11 +108,7 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-<<<<<<< HEAD
-html_theme = 'sphinx13'
-=======
 html_theme = 'tral'
->>>>>>> a9889251d3dfdc21f159bfccd17c5742451bc55d
 #html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme

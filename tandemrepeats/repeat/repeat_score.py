@@ -417,7 +417,7 @@ def loglikelihood_random(repeat,
         if parameters:
             equilibrium_freq = parameters
         else:
-            aaRatefilename = join(DATAROOT, "paml", evolution_model + ".dat") # load equilibrium frequencies
+            aaRatefilename = join(DATAROOT, "substitution_rate_matrices", evolution_model + ".dat") # load equilibrium frequencies
             equilibrium_freq = load_equilibrium_freq(aaRatefilename)
 
         loglikelihoodRandom = 0.
@@ -460,7 +460,7 @@ def calc_score(repeats, result_path, result_filename,
     parameters = [Q,eqFreq,alphabet]
 
     if sequence_type == 'AA':
-        aaRatefilename = join(DATAROOT, "paml", evolution_model + ".dat") # load equilibrium frequencies
+        aaRatefilename = join(DATAROOT, "substitution_rate_matrices", evolution_model + ".dat") # load equilibrium frequencies
         equilibrium_freq = load_equilibrium_freq(aaRatefilename)
     else:
         equilibrium_freq = {i: 0.25 for i in ['A','C','G','T']}

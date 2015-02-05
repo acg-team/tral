@@ -12,6 +12,6 @@ DATAROOT = os.path.join(PACKAGE_DIRECTORY, "data")
 def config():
 
     if os.path.isfile(os.path.join(os.path.expanduser('~'), ".tral", "config.ini")):
-        return os.path.join(os.path.expanduser('~'), ".tral", "config.ini"))
+        return os.path.join(os.path.expanduser('~'), ".tral", "config.ini")
     else:
-        return os.path.join(DATAROOT, "config.ini"))
+        return os.path.join(DATAROOT, "config.ini")
