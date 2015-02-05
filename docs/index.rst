@@ -12,6 +12,7 @@ statistical significance analysis of putative tandem repeats, and filterting of 
 
 A manuscript describing TRAL is soon to be submitted.
 
+CHANGE
 
 
 Getting started

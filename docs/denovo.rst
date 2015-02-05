@@ -14,10 +14,9 @@ Read in your sequences.
 
     import os
     from tandemrepeats.sequence import sequence
+    from tandemrepeats.paths import *
 
-    path_to_tandemrepeats = "/my/path/to/TandemRepeats/tandemrepeats"
-
-    fHIV_proteome = os.path.join(path_to_tandemrepeats,"test","HIV-1_388796.faa")
+    fHIV_proteome = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.faa")
     lHIV_Sequence = sequence.Sequence.create(file = fHIV_proteome, format = 'fasta')
 
 
