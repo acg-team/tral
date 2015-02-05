@@ -14,7 +14,7 @@
 {% block sidebar2 %}{% endblock %}
 
 {% block extrahead %}
-    <link href='http://fonts.googleapis.com/css?family=Source+Code+Sans+Pro:300,400,700'
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
 {{ super() }}
 {%- if not embedded %}
@@ -69,10 +69,9 @@
 
 {% block header %}
 <div class="pageheader">
-  <div>
       <span class="siblogo"><a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="{{ pathto('_static/sib.png', 1) }}" alt="SIB" /></a></span>
     <a href="{{ pathto('index') }}">
-      <img class="headlogo" src="{{ pathto('_static/singlebike.png', 1) }}" alt="TRAL" />
+      <img class="headlogo" src="{{ pathto('_static/trallogo.png', 1) }}" alt="TRAL" />
       <span class="head">Tandem Repeat Annotation Library</span>
     </a>
     <div class="headlinks">
@@ -80,7 +79,6 @@
         <a href="{{ pathto('installation') }}">Install</a>
         <a href="{{ pathto('code_docs') }}">Code docs</a>
     </div>
-  </div>
 </div>
 {% endblock %}
 

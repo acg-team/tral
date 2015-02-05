@@ -1,3 +1,13 @@
+{% set tbcolor = '#BF161D' %}
+{% set ttfcolor = '#666' %}
+{% set tfcolor = '#333' %}
+{% set tlcolor = ttfcolor %}
+{% set tlcolor2 = tbcolor %}
+{% set tlhcolor = '#F00' %}
+{% set tback = '#FFF' %}
+{% set tborder = '2px dotted ' + tbcolor %}
+{% set thfont = 'IM Fell English' %}
+
 /*
  * tral.css
  * ~~~~~~~~~~~~
@@ -14,33 +24,39 @@
 /* -- page layout ----------------------------------------------------------- */
 
 body {
-    font-family: 'Source Code Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
+    font-family: 'Source Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
                  'Verdana', sans-serif;
-    font-size: 18px;
+    font-size: 14px;
     text-align: center;
     background: url('red_python.png');
     background-attachment: fixed;
-    color: #4F4F4F;
     padding: 0;
-    border-right: 2px dotted #f00;
-    border-left: 2px dotted #f00;
 
     margin: 0 auto;
-    min-width: 780px;
+    margin-top: 1em;
+    min-width: 840px;
     max-width: 1080px;
+    
+    border: {{tborder}};
+    color: {{tfcolor}}
+}
+
+ul, ol {
+    line-height: 175%;
 }
 
 .pageheader {
-    /*background: url('headbg.jpg');*/
-    background-color: #fff;
     text-align: left;
     padding: 10px 15px;
-    border-bottom: 2px dotted red;
+    color: {{ttfcolor}};
+    border-bottom: {{tborder}};
+    background-color: {{tback}};
+    vertical-align: baseline;
 }
 
 .pageheader .headlinks {
     float: right;
-    color: #333;
+    color: {{ttfcolor}};
     padding-left: 0;
     margin-top: 30px;
     margin-right: 10px;
@@ -50,20 +66,19 @@ body {
 .pageheader .headlinks a {
     border-radius: 1px;
     padding: 8px 12px;
-    color: #333;
+    color: {{ttfcolor}};
 }
 
 .pageheader .headlinks a:hover {
-    background-color: #f9f9f0;
-    color: #A67676;
-    text-shadow: none;
+    color: {{tback}};
+    background-color: {{tbcolor}};
 }
 
 .pageheader span.head {
-    padding-left: 0.5em;
-    color: #555;
+    font-family: '{{thfont}}';
+    padding-left: 10px;
     font-size: 28px;
-    font-weight: 300;
+    color: {{ttfcolor}};
 }
 
 .pageheader img.headlogo {
@@ -71,13 +86,13 @@ body {
 }
 
 div.document {
-    background-color: #fff;
+    background-color: {{tback}};
     text-align: left;
 }
 
 div.bodywrapper {
     margin: 0 240px 0 0;
-    border-right: 1px solid #f9f9f9;
+    border-right: {{tborder}};
 }
 
 div.body {
@@ -91,8 +106,8 @@ div.related {
 
 div.related ul {
     height: 1.9em;
-    border-top: 1px solid #002e50;
-    border-bottom: 1px solid #002e50;
+    /*border-top: 1px solid #002e50;
+    border-bottom: 1px solid #002e50;*/
 }
 
 div.related ul li {
@@ -110,7 +125,7 @@ div.related ul li a {
     margin: 0;
     padding: 0 5px 0 5px;
     line-height: 1.75em;
-    color: #f9f9f0;
+    color: {{tlcolor2}};
     font-weight: 300;
 }
 
@@ -133,7 +148,6 @@ div.sphinxsidebar {
 }
 
 div.sphinxsidebar .logo {
-    color: #A67676;
     font-weight: 300;
     text-align: center;
 }
@@ -145,15 +159,13 @@ div.sphinxsidebar .logo img {
 
 div.sphinxsidebar input {
     border: 1px solid #aaa;
-    font-family: 'Source Code Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
+    font-family: 'Source Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
                  'Verdana', sans-serif;
 }
 
 div.sphinxsidebar h3 {
     font-weight: 300;
     font-size: 22px;
-    /*background-color: #f9f9f9;*/
-    /*border-top: 1px solid #A67676;*/
     margin-bottom: 1em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
@@ -170,8 +182,9 @@ div.sphinxsidebar h3, div.sphinxsidebar h4 {
     margin-left: -15px;
     padding-right: 14px;
     padding-left: 14px;
-    color: #C4C4C4;
+    color: {{ttfcolor}};
     font-weight: 300;
+    border-top: 1px dotted {{tbcolor}}
 }
 
 div.sphinxsidebarwrapper > h3:first-child {
@@ -181,11 +194,11 @@ div.sphinxsidebarwrapper > h3:first-child {
 
 
 div.sphinxsidebar h3 a {
-    color: #C4C4C4;
+    color: {{ttfcolor}};
 }
 
 div.sphinxsidebar ul {
-    color: #444;
+    color: {{ttfcolor}};
     margin-top: 7px;
     padding: 0;
     line-height: 130%;
@@ -194,6 +207,10 @@ div.sphinxsidebar ul {
 div.sphinxsidebar ul ul {
     margin-left: 20px;
     list-style-image: url(listitem.png);
+}
+
+div.sphinxsidebar a {
+    color: {{tlcolor2}};
 }
 
 div.footer {
@@ -211,47 +228,65 @@ p {
 }
 
 a {
-    color: #A2881D;
+    color: {{tlcolor2}};
     text-decoration: none;
 }
 
+li a {
+    /*color: {{tlcolor}};*/
+}
+
 a:hover {
-    color: #E1C13F;
+    color: {{tlhcolor}};
 }
 
 div.body a {
     text-decoration: none;
+    font-style: normal;
+}
+
+em {
+    font-style: normal;
+}
+
+h1, h2, h3 {
+    font-family: '{{thfont}}';
+    font-weight: 300;
 }
 
 h1 {
-    margin: 10px 0 0 0;
-    font-size: 36px;
-    color: #555;
-    font-weight: 300;
+    margin: 20px 0 0 0;
+    padding-bottom: 5px;
+    font-size: 24px;
+    color: {{tbcolor}};
+    border-bottom: 1px dotted {{tbcolor}};
 }
 
 h2 {
     margin: 1.em 0 0.2em 0;
-    font-size: 28px;
-    font-weight: 300;
+    padding-top: 10px;
+    font-size: 20px;
     padding: 0;
-    color: #555;
+    color: {{tbcolor}};
+    border-top: 1px dotted {{tbcolor}};
 }
 
 h3 {
     margin: 1em 0 -0.3em 0;
-    font-size: 24px;
-    font-weight: 300;
+    font-size: 16px;
+    color: {{tbcolor}};
 }
 
 div.body h1 a, div.body h2 a, div.body h3 a, div.body h4 a, div.body h5 a, div.body h6 a {
     text-decoration: none;
+    font-style: normal;
 }
 
 div.body h1 a tt, div.body h2 a tt, div.body h3 a tt, div.body h4 a tt, div.body h5 a tt, div.body h6 a tt {
-    color: #A67676 !important;
+    color: {{ttfcolor}} !important;
     font-size: inherit !important;
     text-decoration: none !important;
+    font-style: normal;
 }
 
 a.headerlink {
@@ -269,7 +304,7 @@ a.headerlink:hover {
 }
 
 cite, code, tt {
-    font-family: 'Consolas', 'DejaVu Sans Mono',
+    font-family: 'Source Code Pro', 'Consolas', 'DejaVu Sans Mono',
                  'Bitstream Vera Sans Mono', monospace;
     font-size: 14px;
     letter-spacing: -0.02em;
@@ -279,7 +314,7 @@ tt {
     background-color: #f2f2f2;
     border: 1px solid #ddd;
     border-radius: 2px;
-    color: #333;
+    color: {{tfcolor}};
     padding: 1px;
 }
 
@@ -302,7 +337,7 @@ a tt:hover {
 }
 
 pre {
-    font-family: 'Consolas', 'DejaVu Sans Mono',
+    font-family: 'Source Code Pro', 'Consolas', 'DejaVu Sans Mono',
                  'Bitstream Vera Sans Mono', monospace;
     font-size: 13px;
     letter-spacing: 0.015em;
@@ -384,7 +419,7 @@ div.warning ul, div.warning ol {
 }
 
 .viewcode-back {
-    font-family: 'Source Code Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
+    font-family: 'Source Sans Pro', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
                  'Verdana', sans-serif;
 }
 
