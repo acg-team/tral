@@ -3,7 +3,7 @@
 Perform statistical significance test of tandem repeats.
 ========================================================
 
-Here you learn run statistical significance tests on your candidate set of tandem repeats.
+Here you learn how to perform statistical significance tests on your candidate set of tandem repeats.
 TRAL currently provides a variety of model-based and none-model based tests. They are
 detailed in a :ref:`NAR publication (2012) <publications>`.
 
