@@ -11,7 +11,7 @@ The who's who of the tandem repeat annotation library.
 People
 ------
 
-- `Maria Anisimova <https://code.google.com/p/gc3pie/>`_
+- `Maria Anisimova <http://www.inf.ethz.ch/personal/anmaria/>`_
 - `Riccardo Murri <http://www.gc3.uzh.ch/people/rm/>`_
 - `Julia Pecerska <http://www.bsse.ethz.ch/department/people/detail-person.html?persid=192596>`_
 - `Elke Schaper <http://www.inf.ethz.ch/personal/eschaper/>`_

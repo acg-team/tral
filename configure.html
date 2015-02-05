@@ -8,7 +8,7 @@
     
     <title>Configuration &mdash; TandemRepeats 0.3.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="TandemRepeats 0.3.0 documentation" href="index.html" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700'
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
     <style type="text/css">
@@ -64,32 +64,19 @@
   </head>
   <body>
 <div class="pageheader">
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="installation.html">Install</a></li>
-    <li><a href="code_docs.html">Code docs</a></li>
-  </ul>
-  <div>
+      <span class="siblogo"><a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" /></a></span>
     <a href="index.html">
-      <img src="_static/tralheader.png" alt="TRAL" />
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="head">Tandem Repeat Annotation Library</span>
     </a>
-  </div>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="installation.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
 </div>
 
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="index.html">TRAL home</a>&nbsp;|</li>
-        <li><a href="contents.html">Documentation</a> &raquo;</li>
- 
-      </ul>
-    </div>
+
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
@@ -105,6 +92,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#logging-ini">logging.ini</a></li>
+<li><a class="reference internal" href="#p-value-distribution-files">p-Value distribution files</a></li>
 </ul>
 </li>
 </ul>
@@ -138,8 +126,8 @@
   <div class="section" id="configuration">
 <span id="configure"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
 <p>Here you learn how to configure TRAL after installation. All configuration files are located
-in</p>
-<div class="highlight-python"><div class="highlight"><pre>/path/to/TandemRepeats/tandemrepeats/data
+in your home directory:</p>
+<div class="highlight-python"><div class="highlight"><pre>~/.tral/
 </pre></div>
 </div>
 <div class="section" id="defaults-ini">
@@ -242,7 +230,22 @@ begin = True  # Is the position in sequence calculated?</dd>
 <div class="section" id="logging-ini">
 <h2>logging.ini<a class="headerlink" href="#logging-ini" title="Permalink to this headline">¶</a></h2>
 <p>In this file, you can define the level of debugging per module (DEBUG, INFO, WARNING), and
-the format of the debugging message. Defaults to WARNING.</p>
+the format of the debugging message. Defaults to WARNING. The path to the file needs to be
+defined as</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="s">&quot;path/to/your/home/.tral/logging.ini&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="p-value-distribution-files">
+<h2>p-Value distribution files<a class="headerlink" href="#p-value-distribution-files" title="Permalink to this headline">¶</a></h2>
+<p>In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
+need to be downloaded and placed in <em>./tral/pValue</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/pValue
+svn checkout https://github.com/elkeschaper/TandemRepeats/trunk/tandemrepeats/data/pValue .
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -252,23 +255,7 @@ the format of the debugging message. Defaults to WARNING.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="index.html">TRAL home</a>&nbsp;|</li>
-        <li><a href="contents.html">Documentation</a> &raquo;</li>
- 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2015, Elke Schaper.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
+
+
   </body>
 </html>

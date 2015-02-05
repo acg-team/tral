@@ -17,9 +17,9 @@ Read in your sequence profile model.
 
     import os
     from tandemrepeats.hmm import hmm
+    from tandemrepeats.paths import *
 
-    path_to_tandemrepeats = "/my/path/to/TandemRepeats/tandemrepeats"
-    fPfam_profile_hmm = os.path.join(path_to_tandemrepeats,"test","zf-CCHC.hmm")
+    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","zf-CCHC.hmm")
 
     circular_profile_HMM_zfCCHC = hmm.HMM.create(format = 'hmmer', file = fPfam_profile_hmm)
 

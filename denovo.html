@@ -8,7 +8,7 @@
     
     <title>Run and parse de novo repeat detection software. &mdash; TandemRepeats 0.3.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/sphinx13.css" type="text/css" />
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="TandemRepeats 0.3.0 documentation" href="index.html" />
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700'
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
     <style type="text/css">
@@ -64,32 +64,19 @@
   </head>
   <body>
 <div class="pageheader">
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="installation.html">Install</a></li>
-    <li><a href="code_docs.html">Code docs</a></li>
-  </ul>
-  <div>
+      <span class="siblogo"><a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" /></a></span>
     <a href="index.html">
-      <img src="_static/tralheader.png" alt="TRAL" />
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="head">Tandem Repeat Annotation Library</span>
     </a>
-  </div>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="installation.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
 </div>
 
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="index.html">TRAL home</a>&nbsp;|</li>
-        <li><a href="contents.html">Documentation</a> &raquo;</li>
- 
-      </ul>
-    </div>
+
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
@@ -136,10 +123,9 @@ file and output the results.</p>
 <h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">tandemrepeats.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
+<span class="kn">from</span> <span class="nn">tandemrepeats.paths</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">path_to_tandemrepeats</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/TandemRepeats/tandemrepeats&quot;</span>
-
-<span class="n">fHIV_proteome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_tandemrepeats</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.faa&quot;</span><span class="p">)</span>
+<span class="n">fHIV_proteome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.faa&quot;</span><span class="p">)</span>
 <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">fHIV_proteome</span><span class="p">,</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -195,23 +181,7 @@ defined in the <a class="reference internal" href="configure.html#configure"><em
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="index.html">TRAL home</a>&nbsp;|</li>
-        <li><a href="contents.html">Documentation</a> &raquo;</li>
- 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2015, Elke Schaper.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
+
+
   </body>
 </html>

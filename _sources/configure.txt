@@ -4,10 +4,10 @@ Configuration
 =============
 
 Here you learn how to configure TRAL after installation. All configuration files are located
-in
+in your home directory:
 ::
 
-    /path/to/TandemRepeats/tandemrepeats/data
+    ~/.tral/
 
 
 defaults.ini
@@ -124,7 +124,27 @@ logging.ini
 -----------
 
 In this file, you can define the level of debugging per module (DEBUG, INFO, WARNING), and
-the format of the debugging message. Defaults to WARNING.
+the format of the debugging message. Defaults to WARNING. The path to the file needs to be
+defined as
+::
+
+
+    import logging
+    import logging.config
+    logging.config.fileConfig("path/to/your/home/.tral/logging.ini")
+
+
+
+p-Value distribution files
+--------------------------
+
+In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
+need to be downloaded and placed in *./tral/pValue*:
+::
+
+    cd ~/.tral/pValue
+    svn checkout https://github.com/elkeschaper/TandemRepeats/trunk/tandemrepeats/data/pValue .
+
 
 
 
