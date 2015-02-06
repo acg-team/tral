@@ -27,8 +27,3 @@ repeat_score
 =============================
 .. automodule:: tandemrepeats.repeat.repeat_score
     :members:
-
-test_dependencies
-=============================
-.. automodule:: tandemrepeats.repeat.test_dependencies
-    :members:
