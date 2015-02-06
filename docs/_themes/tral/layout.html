@@ -9,6 +9,7 @@
 #}
 {%- extends "basic/layout.html" %}
 
+
 {# put the sidebar before the body #}
 {% block sidebar1 %}{{ sidebar() }}{% endblock %}
 {% block sidebar2 %}{% endblock %}
@@ -69,10 +70,10 @@
 
 {% block header %}
 <div class="pageheader">
-      <span class="siblogo"><a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="{{ pathto('_static/sib.png', 1) }}" alt="SIB" /></a></span>
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="{{ pathto('_static/sib.png', 1) }}" alt="SIB" class="sib_logo" /></a>
     <a href="{{ pathto('index') }}">
       <img class="headlogo" src="{{ pathto('_static/trallogo.png', 1) }}" alt="TRAL" />
-      <span class="head">Tandem Repeat Annotation Library</span>
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
     </a>
     <div class="headlinks">
         <a href="{{ pathto('index') }}">Home</a>
