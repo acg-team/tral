@@ -30,6 +30,7 @@ body {
     text-align: center;
     background: url('red_python.png');
     background-attachment: fixed;
+    background-repeat: no-repeat;
     padding: 0;
 
     margin: 0 auto;
@@ -54,7 +55,10 @@ ul, ol {
     color: {{ttfcolor}};
     border-bottom: {{tborder}};
     background-color: {{tback}};
-    vertical-align: bottom;
+}
+
+.pageheader .sib_logo, .pageheader .headlogo {
+    vertical-align: textbottom;
 }
 
 .pageheader .headlinks {
@@ -63,6 +67,7 @@ ul, ol {
     padding-left: 0;
     margin-top: 30px;
     margin-right: 10px;
+    vertical-align: bottom;
 }
 
 
@@ -77,14 +82,20 @@ ul, ol {
     background-color: {{tbcolor}};
 }
 
-.pageheader span.head {
+.pageheader .headlogo {
     font-family: '{{thfont}}';
-    padding-left: 10px;
+    padding-left: 0.5em;
     font-size: 28px;
     color: black;
 }
 
 .pageheader img.headlogo {
+    height: 34px;
+    margin-bottom: -2px;
+}
+
+.pageheader a.sib_logo img {
+    padding-right: 0.5em;
     height: 36px;
 }
 
@@ -109,8 +120,6 @@ div.related {
 
 div.related ul {
     height: 1.9em;
-    /*border-top: 1px solid #002e50;
-    border-bottom: 1px solid #002e50;*/
 }
 
 div.related ul li {
@@ -156,7 +165,6 @@ div.sphinxsidebar .logo {
 }
 
 div.sphinxsidebar .logo img {
-    vertical-align: middle;
     margin-top: 1em;
 }
 
@@ -432,13 +440,3 @@ div.viewcode-block:target {
     border-bottom: 1px solid #ac9;
 }
 
-
-/* SIB corporate identity stuff */
-
-span.siblogo {
-    padding-right: 1em;
-}
-
-span.siblogo img {
-    height: 36px;
-}
