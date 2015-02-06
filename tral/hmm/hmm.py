@@ -84,6 +84,20 @@ class HMM:
         p_e (dict of dict of float): A dictionary of emission probabilities for every state and every letter in `alphabet`: {`states[0]`: {`alphabet[0]`: emission probability, ...}, ...}
         hmmer (dict of dict of float): A dictionary of all information extracted from a Hmmer model.
     """
+
+    def __str__(self):
+
+        """
+            Create string for HMM instance.
+        """
+        try:
+            hmm = "".format(self.id, self.lD)
+        except:
+            hmm = None
+            log.warning("Could not create string of HMM instance.")
+
+        return hmm
+
     # Use functions defined in other methods as class functions.
     # Static function (declare as @static ?):
     read = hmm_io.read
