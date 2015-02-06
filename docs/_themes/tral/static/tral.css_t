@@ -34,12 +34,15 @@ body {
 
     margin: 0 auto;
     margin-top: 1em;
+    margin-bottom: 1em;
     min-width: 840px;
     max-width: 1080px;
     
     border: {{tborder}};
-    color: {{tfcolor}}
+    box-shadow: 0px 0px 1px 1px white;
+    color: {{tfcolor}};
 }
+
 
 ul, ol {
     line-height: 175%;
@@ -51,7 +54,7 @@ ul, ol {
     color: {{ttfcolor}};
     border-bottom: {{tborder}};
     background-color: {{tback}};
-    vertical-align: baseline;
+    vertical-align: bottom;
 }
 
 .pageheader .headlinks {
@@ -78,7 +81,7 @@ ul, ol {
     font-family: '{{thfont}}';
     padding-left: 10px;
     font-size: 28px;
-    color: {{ttfcolor}};
+    color: black;
 }
 
 .pageheader img.headlogo {
