@@ -64,16 +64,26 @@ class Repeat:
     def __str__(self):
 
         """
-        .. todo:: Improve output if pValues are only partly calculated.
-
+            Create string for Repeat instance.
         """
-
-        if hasattr(self, 'pValue') and hasattr(self, 'begin'):
-            first_line = '>begin:{0} lD:{1} n:{2} pValue:{3} divergence:{4}\n'.format(self.begin, self.lD, self.n, self.dPValue[config['scoreslist'][-1]], self.dDivergence[config['scoreslist'][-1]])
-        elif hasattr(self, 'pValue'):
-            first_line = '>lD:{} n:{} pValue:{} divergence:{}\n'.format(self.lD, self.n, self.dPValue[config['scoreslist'][-1]], self.dDivergence[config['scoreslist'][-1]])
-        else:
-            first_line = '>lD:{} n:{}\n'.format(self.lD, self.n)
+        first_line = ">"
+        if hasattr(self, 'begin'):
+            first_line += " begin:{0}".format(self.begin)
+        if hasattr(self, 'lD'):
+            first_line += " lD:{0}".format(self.lD)
+        if hasattr(self, 'n'):
+            first_line += " n:{0}".format(self.n)
+        if hasattr(self, 'pValue') and len(self.dPValue) >= 1:
+            if config['scoreslist'][-1] in self.dPValue:
+                pValue = self.dPValue[config['scoreslist'][-1]]
+                type = config['scoreslist'][-1]
+            else:
+                type, pValue  = next (iter (self.dPValue.items()))
+            try:
+                divergence =  self.dDivergence[type]
+            except:
+                divergence = None
+            first_line += " pValue:{0} divergence:{1} type:{}".format(pValue, divergence, type)
 
         return first_line + "\n".join(self.msa)
 
