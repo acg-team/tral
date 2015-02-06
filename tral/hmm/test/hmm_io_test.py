@@ -1,9 +1,9 @@
 import os
 import pytest
 
-from tandemrepeats.hmm.hmm import HMM
-from tandemrepeats.hmm import hmm_io
-from tandemrepeats.repeat.repeat import Repeat
+from tral.hmm.hmm import HMM
+from tral.hmm import hmm_io
+from tral.repeat.repeat import Repeat
 
 
 NUM_STATES = 8
