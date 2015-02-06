@@ -11,7 +11,7 @@ HOME=os.path.expanduser('~')
 
 setup(
     name='tral',
-    version='0.3.10',
+    version='0.3.0',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tral', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],
@@ -44,7 +44,7 @@ setup(
         "Sphinx >= 1.2.2",
     ],
     data_files=[(os.path.join(HOME, ".tral"), glob.glob("tral/data/*.ini")),
-                (os.path.join(HOME, ".tral", "data", "hhrepid"), glob.glob("tandemrepeats/data/hhrepid/*")),
+                (os.path.join(HOME, ".tral", "data", "hhrepid"), glob.glob("tral/data/hhrepid/*")),
                 (os.path.join(HOME, ".tral", "data", "pValue"), []),
                 (os.path.join(HOME, ".tral", "data", "substitution_rate_matrices"), glob.glob("tral/data/substitution_rate_matrices/*"))],
     package_data={'tral': ['data/*.ini', 'data/paml/*', 'data/hhrepid/*']},

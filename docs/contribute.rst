@@ -1,15 +1,15 @@
 .. _contribute:
 
 Technical hints for contributors
-===================================
+=================================
 
 
 How to contribute
----------------------------
+-----------------
 
 
 1. Fork the repository
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 `Forking <https://help.github.com/articles/fork-a-repo/>`_ a repository on github means creating a clone of a repository on github. Simply
 click on "Fork" in the TRAL repos `TRAL repository <https://github.com/elkeschaper/tral/>`_
@@ -27,7 +27,7 @@ From the command line, create a clone of your fork:
 
 
 3. Create your feature branch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you use git-flow, start a new feature:
 ::
@@ -56,7 +56,7 @@ Next, add the necessary changes and commit them:
 
 
 5. Create a pull request.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Create the `pull request <https://help.github.com/articles/using-pull-requests/>`_ online on github.
 For this, go to your github page and click on "Pull Request".
