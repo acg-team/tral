@@ -1,6 +1,0 @@
-Phyloscore on random data - AA based on 3mers
-sequenceType: AA
-nTotalRuns: 10000
-batchID: PhyloScore_AA_Empirical_MolecularClock_SameRateOnBranches_10000
-CODEML: Empirical, molecular clock assumption, star tree, constant branch lengths
-SamplesPerRun: 10000
