@@ -4,12 +4,12 @@ import logging.config
 import os
 from Bio import SeqIO
 
-from tandemrepeats.paths import *
-from tandemrepeats.hmm import hmm
-from tandemrepeats.hmm import hmm_io
+from tral.paths import *
+from tral.hmm import hmm
+from tral.hmm import hmm_io
 
 
-logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
+logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
 log = logging.getLogger('root')
 
 

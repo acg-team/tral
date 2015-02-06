@@ -4,7 +4,6 @@ Technical hints for contributors
 ===================================
 
 
-
 How to contribute
 ---------------------------
 
@@ -13,7 +12,7 @@ How to contribute
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 `Forking <https://help.github.com/articles/fork-a-repo/>`_ a repository on github means creating a clone of a repository on github. Simply
-click on "Fork" in the TRAL repos `TRAL repository <https://github.com/elkeschaper/TandemRepeats/>`_
+click on "Fork" in the TRAL repos `TRAL repository <https://github.com/elkeschaper/tral/>`_
 once you have a Github account.
 
 
@@ -24,7 +23,7 @@ From the command line, create a clone of your fork:
 
 ::
 
-    git clone https://github.com/<YOUR_USER_NAME>/TandemRepeats
+    git clone https://github.com/<YOUR_USER_NAME>/tral
 
 
 3. Create your feature branch
@@ -63,14 +62,14 @@ Create the `pull request <https://help.github.com/articles/using-pull-requests/>
 For this, go to your github page and click on "Pull Request".
 ::
 
-    https://github.com/<YOUR_USER_NAME>/TandemRepeats
+    https://github.com/<YOUR_USER_NAME>/tral
 
 
-Do a pull request on the develop branch of  elkeschaper/Tandemrepeats.
+Do a pull request on the develop branch of  elkeschaper/tral.
 
 ::
 
-    base fork: elkeschaper/Tandemrepeats
+    base fork: elkeschaper/tral
     base: develop
 
 
@@ -84,7 +83,7 @@ Check out the current version of the TRAL homepage as follows:
 
 ::
 
-    git clone --single-branch -b gh-pages https://<your_git_name>@github.com/elkeschaper/TandemRepeats.git
+    git clone --single-branch -b gh-pages https://<your_git_name>@github.com/elkeschaper/tral.git
 
 
 

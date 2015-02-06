@@ -3,7 +3,7 @@ import os
 # Where are the executables stored? E.g. the tandem repeat detection algorithms?
 EXECROOT = "/usr/local/bin"
 
-# What is the path to the package? E.g. path/to/TandemRepeats
+# What is the path to the package? E.g. path/to/Tral/tral
 PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 # Where are the data-files, e.g. for pValue calculation stored?

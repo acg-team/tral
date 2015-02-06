@@ -1,4 +1,12 @@
-# (C) 2014 Elke Schaper
+# (C) 2015 Elke Schaper
+
+"""
+
+    :synopsis: Input/output for sequences
+
+    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+
+"""
 
 import Bio.Seq
 import logging

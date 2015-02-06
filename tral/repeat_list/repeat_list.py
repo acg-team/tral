@@ -1,10 +1,20 @@
+# (C) 2015 Elke Schaper
+
+"""
+
+    :synopsis: Repeat_list class
+
+    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+
+"""
+
 import logging
 import pickle
 import sys
 
 log = logging.getLogger(__name__)
 
-from tandemrepeats.repeat_list import repeat_list_io
+from tral.repeat_list import repeat_list_io
 
 class Repeat_list:
 
@@ -131,6 +141,7 @@ class Repeat_list:
             self.dCluster = {}
 
         # Is the next line used here?
+
         is_overlapping = getattr(sys.modules[__name__], overlap_type)
         lCluster = []
 

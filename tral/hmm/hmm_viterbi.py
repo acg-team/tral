@@ -1,4 +1,4 @@
-# (C) 2012-2014 Elke Schaper
+# (C) 2012-2015 Elke Schaper
 from collections import defaultdict
 import logging
 import numpy as np
@@ -6,9 +6,9 @@ import operator
 import os
 import re
 
-from tandemrepeats import configuration
-from tandemrepeats.paths import *
-from tandemrepeats.repeat import repeat
+from tral import configuration
+from tral.paths import *
+from tral.repeat import repeat
 
 log = logging.getLogger(__name__)
 

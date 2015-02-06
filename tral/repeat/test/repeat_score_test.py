@@ -1,7 +1,7 @@
 import pytest
 
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat import repeat_io
+from tral.repeat import repeat
+from tral.repeat import repeat_io
 
 
 TEST_MSA = ['HPFGFV-------------AVPTKNP-DGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPS---SPPKCKFEPPLFHPNV', 'YPSGTVCLsileedkdwrpAITIKQIlLGIQELLN-E---PNIQ-DPAQAEAYTIYCQNRVEYEKrvrAQAK-KFAP-------']

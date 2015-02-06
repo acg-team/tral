@@ -7,11 +7,11 @@ import os
 import pickle
 from Bio import SeqIO
 
-from tandemrepeats.paths import *
-from tandemrepeats.sequence import sequence
+from tral.paths import *
+from tral.sequence import sequence
 
 
-logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
+logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
 log = logging.getLogger('root')
 
 

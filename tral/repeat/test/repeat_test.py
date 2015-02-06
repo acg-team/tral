@@ -2,8 +2,8 @@ import numpy as np
 import os
 import pytest
 
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat import repeat_io
+from tral.repeat import repeat
+from tral.repeat import repeat_io
 
 
 TEST_MSA_O = ['OCC', 'OOO']

@@ -11,8 +11,8 @@ import re
 import scipy as sp
 import scipy.stats, scipy.special, scipy.linalg
 
-from tandemrepeats import configuration
-from tandemrepeats.paths import *
+from tral import configuration
+from tral.paths import *
 
 log = logging.getLogger(__name__)
 

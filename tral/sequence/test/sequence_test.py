@@ -1,10 +1,10 @@
 import os
 import pytest
 
-from tandemrepeats.hmm.hmm import HMM
-from tandemrepeats.sequence import sequence
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat_list import repeat_list
+from tral.hmm.hmm import HMM
+from tral.sequence import sequence
+from tral.repeat import repeat
+from tral.repeat_list import repeat_list
 
 
 TEST_SEQUENCE = "FFAAAAAAFF"

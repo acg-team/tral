@@ -2,10 +2,10 @@ import collections
 import os
 import pytest
 
-from tandemrepeats.repeat_list import repeat_list as rl
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat_list import repeat_list_io as rl_io
-from tandemrepeats.sequence import sequence
+from tral.repeat_list import repeat_list as rl
+from tral.repeat import repeat
+from tral.repeat_list import repeat_list_io as rl_io
+from tral.sequence import sequence
 
 TEST_REPEATS = [["AA","AA"],["AAA","AAA"]]
 TEST_SEQUENCE = "MAAAAKAAAAAAL"

@@ -6,5 +6,5 @@ Installation
 Try:
 ::
 
-    $ pip install tandemrepeats
+    $ pip install tral
 

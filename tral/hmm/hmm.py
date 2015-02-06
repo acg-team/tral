@@ -1,4 +1,4 @@
-# (C) 2012-2014 Elke Schaper
+# (C) 2012-2015 Elke Schaper
 # (C) 2014 Julia Pecerska
 
 """
@@ -18,10 +18,10 @@ import shutil
 import subprocess
 import tempfile
 
-from tandemrepeats.hmm import hmm_io, hmm_viterbi
-from tandemrepeats.repeat import repeat_io
-from tandemrepeats.repeat.repeat import Repeat
-from tandemrepeats import configuration
+from tral.hmm import hmm_io, hmm_viterbi
+from tral.repeat import repeat_io
+from tral.repeat.repeat import Repeat
+from tral import configuration
 
 log = logging.getLogger(__name__)
 

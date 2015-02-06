@@ -10,9 +10,9 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.ERROR)
 
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat.repeat_score import loadModel
-from tandemrepeats.hmm import hmm_io
+from tral.repeat import repeat
+from tral.repeat.repeat_score import loadModel
+from tral.hmm import hmm_io
 
 ################################### HMM class #########################################
 

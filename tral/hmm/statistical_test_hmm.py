@@ -1,7 +1,7 @@
 import itertools, logging
 
-from tandemrepeats.hmm import hmm, hmm_viterbi
-from tandemrepeats.repeat import repeat, repeat_io
+from tral.hmm import hmm, hmm_viterbi
+from tral.repeat import repeat, repeat_io
 
 logger = logging.getLogger('root')
 logger.setLevel(logging.WARNING)

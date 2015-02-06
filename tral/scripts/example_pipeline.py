@@ -2,11 +2,11 @@ import logging
 import logging.config
 import os
 
-from tandemrepeats.paths import *
-from tandemrepeats.sequence import repeat_detection_run, sequence
-from tandemrepeats.hmm import hmm
+from tral.paths import *
+from tral.sequence import repeat_detection_run, sequence
+from tral.hmm import hmm
 
-logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
+logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
 log = logging.getLogger('root')
 
 TEST_FAA_FILE_MBE_2014 = "P51610.fasta"

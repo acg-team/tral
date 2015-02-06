@@ -1,5 +1,13 @@
 # (C) 2011, Alexander Korsunsky
-# (C) 2011-2014 Elke Schaper
+# (C) 2011-2015 Elke Schaper
+
+"""
+
+    :synopsis: Execution of repeat detection algorithms
+
+    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+
+"""
 
 import itertools
 import logging
@@ -13,9 +21,9 @@ import tempfile
 
 from collections import OrderedDict
 
-from tandemrepeats import configuration
-from tandemrepeats.sequence import repeat_detection_io
-from tandemrepeats.paths import *
+from tral import configuration
+from tral.sequence import repeat_detection_io
+from tral.paths import *
 
 log = logging.getLogger(__name__)
 

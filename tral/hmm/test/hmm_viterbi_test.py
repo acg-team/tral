@@ -1,10 +1,10 @@
 import os
 import pytest
 
-from tandemrepeats.hmm.hmm import HMM
-from tandemrepeats.hmm.hmm_viterbi import *
-from tandemrepeats.repeat import repeat
-from tandemrepeats.repeat import repeat_align
+from tral.hmm.hmm import HMM
+from tral.hmm.hmm_viterbi import *
+from tral.repeat import repeat
+from tral.repeat import repeat_align
 
 
 notfixed = pytest.mark.notfixed

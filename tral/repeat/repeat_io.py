@@ -11,7 +11,7 @@ import tempfile
 import subprocess
 import numpy as np
 
-from tandemrepeats.paths import *
+from tral.paths import *
 
 log = logging.getLogger(__name__)
 

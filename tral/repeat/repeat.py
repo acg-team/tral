@@ -10,9 +10,9 @@ from os.path import join
 import pickle
 import re
 
-from tandemrepeats.repeat import repeat_score, repeat_pvalue, repeat_io
-from tandemrepeats.paths import *
-from tandemrepeats import configuration
+from tral.repeat import repeat_score, repeat_pvalue, repeat_io
+from tral.paths import *
+from tral import configuration
 
 log = logging.getLogger(__name__)
 

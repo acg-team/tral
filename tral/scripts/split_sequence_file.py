@@ -4,9 +4,9 @@ import logging.config
 import os
 from Bio import SeqIO
 
-from tandemrepeats.paths import *
+from tral.paths import *
 
-logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
+logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
 log = logging.getLogger('root')
 
 

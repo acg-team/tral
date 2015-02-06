@@ -1,16 +1,24 @@
-# (C) 2014 Elke Schaper
+# (C) 2015 Elke Schaper
+
+"""
+
+    :synopsis: The Sequence Class.
+
+    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+
+"""
 
 import logging
 import pickle
 import os
 import re
 
-from tandemrepeats import configuration
-from tandemrepeats.repeat import repeat, repeat_align
-from tandemrepeats.repeat_list import repeat_list
-from tandemrepeats.hmm import hmm, hmm_viterbi
-from tandemrepeats.sequence import repeat_detection_run, sequence_io
-from tandemrepeats.paths import *
+from tral import configuration
+from tral.repeat import repeat, repeat_align
+from tral.repeat_list import repeat_list
+from tral.hmm import hmm, hmm_viterbi
+from tral.sequence import repeat_detection_run, sequence_io
+from tral.paths import *
 
 c = configuration.Configuration.Instance()
 config = c.config

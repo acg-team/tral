@@ -9,11 +9,11 @@ import os
 import pickle
 import sys
 
-from tandemrepeats import configuration
-from tandemrepeats.paths import *
-from tandemrepeats.repeat_list import repeat_list
-from tandemrepeats.sequence import sequence
-from tandemrepeats.hmm import hmm
+from tral import configuration
+from tral.paths import *
+from tral.repeat_list import repeat_list
+from tral.sequence import sequence
+from tral.hmm import hmm
 
 logging.config.fileConfig(os.path.join(CODEROOT,'tandemrepeats','data','logging.ini'))
 log = logging.getLogger('root')

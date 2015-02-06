@@ -1,6 +1,6 @@
 import configobj
 import os
-from tandemrepeats.paths import *
+from tral.paths import *
 
 pDefaults = config()
 pSpec = os.path.join(DATAROOT, 'spec.ini')

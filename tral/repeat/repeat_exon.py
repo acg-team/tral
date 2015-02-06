@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from collections import defaultdict
 
-from tandemrepeats.repeat import repeat
+from tral.repeat import repeat
 
 logger = logging.getLogger(__name__)
 

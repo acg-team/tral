@@ -11,7 +11,7 @@ import scipy.stats, scipy.special
 
 log = logging.getLogger(__name__)
 
-from tandemrepeats.paths import *
+from tral.paths import *
 
 path_score = join(DATAROOT, 'pValue')
 

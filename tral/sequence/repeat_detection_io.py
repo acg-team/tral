@@ -1,5 +1,13 @@
 # (C) 2011, Alexander Korsunsky
-# (C) 2011-2014 Elke Schaper
+# (C) 2011-2015 Elke Schaper
+
+"""
+
+    :synopsis: Input/output for repeat detection algorithms
+
+    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+
+"""
 
 import logging
 import re

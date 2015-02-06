@@ -3,7 +3,7 @@
 Perform statistical significance test of tandem repeats.
 ========================================================
 
-Here you learn run statistical significance tests on your candidate set of tandem repeats.
+Here you learn how to perform statistical significance tests on your candidate set of tandem repeats.
 TRAL currently provides a variety of model-based and none-model based tests. They are
 detailed in a :ref:`NAR publication (2012) <publications>`.
 
@@ -13,10 +13,10 @@ Read in tandem repeat annotations.
 ::
 
     import os, pickle
-    from tandemrepeats import sequence
+    from tral import sequence
+    from tral.paths import *
 
-    path_to_tandemrepeats = "/my/path/to/TandemRepeats/tandemrepeats"
-    fRepeat_Pickle = os.path.join(path_to_tandemrepeats,"test","HIV-1_388796.pickle")
+    fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
 
     with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)

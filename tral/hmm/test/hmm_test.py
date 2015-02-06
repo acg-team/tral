@@ -1,8 +1,8 @@
 import os
 import pytest
 
-from tandemrepeats.hmm.hmm import HMM
-from tandemrepeats.repeat import repeat
+from tral.hmm.hmm import HMM
+from tral.repeat import repeat
 
 TEST_SEQUENCE = "GYEDEDEDRPFYALGLGKRPRTYSFGL"
 

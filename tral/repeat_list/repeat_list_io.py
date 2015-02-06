@@ -1,4 +1,4 @@
-# (C) 2014 Elke Schaper
+# (C) 2015 Elke Schaper
 
 
 """
@@ -11,8 +11,8 @@
 import logging
 import os
 
-from tandemrepeats import configuration
-from tandemrepeats.paths import *
+from tral import configuration
+from tral.paths import *
 
 log = logging.getLogger(__name__)
 
