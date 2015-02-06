@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Tandem Repeat annotation library
+Tandem Repeat Annotation Library
 ================================
 
 TRAL makes annotation of tandem repeats in amino acid and nucleic data simple. TRAL includes
@@ -34,7 +34,7 @@ Tutorials
 Reference Guide
 ===============
 
-- `Code base on GitHub <https://github.com/elkeschaper/TandemRepeats>`_
+- `Code base on GitHub <https://github.com/elkeschaper/tral>`_
 - :ref:`Class documentation <code_docs>`
 - `GC3Pie <https://code.google.com/p/gc3pie/>`_
 

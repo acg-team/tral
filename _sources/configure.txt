@@ -143,7 +143,7 @@ need to be downloaded and placed in *./tral/pValue*:
 ::
 
     cd ~/.tral/pValue
-    svn checkout https://github.com/elkeschaper/TandemRepeats/trunk/tandemrepeats/data/pValue .
+    svn checkout https://github.com/elkeschaper/tral/trunk/tral/data/pValue .
 
 
 

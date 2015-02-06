@@ -16,8 +16,8 @@ Read in your sequence profile model.
 ::
 
     import os
-    from tandemrepeats.hmm import hmm
-    from tandemrepeats.paths import *
+    from tral.hmm import hmm
+    from tral.paths import *
 
     fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","zf-CCHC.hmm")
 
@@ -32,7 +32,7 @@ Read in your sequences.
 
 ::
 
-    from tandemrepeats.sequence import sequence
+    from tral.sequence import sequence
 
     human_HCFC1_fasta = os.path.join(path_to_tandemrepeats,"test","P62633.fasta")
     human_HCFC1_sequence = sequence.Sequence.create(file = human_HCFC1_fasta, format = 'fasta')[0]
@@ -71,5 +71,5 @@ Write a singe repeat_list to .pickle format:
 A repeat_list in pickle format can easily be read in again:
 ::
 
-    from tandemrepeats.repeat_list import repeat_list
+    from tral.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)

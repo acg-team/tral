@@ -13,8 +13,8 @@ Read in your sequences.
 ::
 
     import os
-    from tandemrepeats.sequence import sequence
-    from tandemrepeats.paths import *
+    from tral.sequence import sequence
+    from tral.paths import *
 
     fHIV_proteome = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.faa")
     lHIV_Sequence = sequence.Sequence.create(file = fHIV_proteome, format = 'fasta')
@@ -64,7 +64,7 @@ Write a singe repeat_list to .pickle format:
 A repeat_list in pickle format can easily be read in again:
 ::
 
-    from tandemrepeats.repeat_list import repeat_list
+    from tral.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)
 
 

@@ -3,8 +3,7 @@
 Contributors & Background
 ==========================
 
-The who's who of the tandem repeat annotation library.
-
+The who's who of TRAL.
 
 
 

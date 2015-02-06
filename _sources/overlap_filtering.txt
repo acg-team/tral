@@ -13,8 +13,8 @@ Read in tandem repeat annotations.
 ::
 
     import os, pickle
-    from tandemrepeats import sequence
-    from tandemrepeats.paths import *
+    from tral import sequence
+    from tral.paths import *
 
     fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
 
