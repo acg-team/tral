@@ -15,3 +15,17 @@ def config():
         return os.path.join(os.path.expanduser('~'), ".tral", "config.ini")
     else:
         return os.path.join(DATAROOT, "config.ini")
+
+def config_spec():
+
+    if os.path.isfile(os.path.join(os.path.expanduser('~'), ".tral", "spec.ini")):
+        return os.path.join(os.path.expanduser('~'), ".tral", "spec.ini")
+    else:
+        return os.path.join(DATAROOT, "spec.ini")
+
+def logging_spec():
+
+    if os.path.isfile(os.path.join(os.path.expanduser('~'), ".tral", "logging.ini")):
+        return os.path.join(os.path.expanduser('~'), ".tral", "logging.ini")
+    else:
+        return os.path.join(DATAROOT, "logging.ini")

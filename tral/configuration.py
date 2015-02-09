@@ -3,7 +3,7 @@ import os
 from tral.paths import *
 
 pDefaults = config()
-pSpec = os.path.join(DATAROOT, 'spec.ini')
+pSpec = config_spec()
 
 class Singleton:
     """
