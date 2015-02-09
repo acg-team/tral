@@ -14,21 +14,21 @@ DATA_DIR = os.path.join(CONFIG_DIR, "data")
 
 def config():
 
-    if os.path.isfile(CONFIG_DIR, "config.ini")):
-        return os.path.join(os.path.expanduser('~'), ".tral", "config.ini")
+    if os.path.isfile(os.path.join(CONFIG_DIR, "config.ini")):
+        return os.path.isfile(os.path.join(CONFIG_DIR, "config.ini"))
     else:
         return os.path.join(DATAROOT, "config.ini")
 
 def config_spec():
 
-    if os.path.isfile(CONFIG_DIR, "spec.ini")):
-        return os.path.join(os.path.expanduser('~'), ".tral", "spec.ini")
+    if os.path.isfile(os.path.join(CONFIG_DIR, "spec.ini")):
+        return os.path.isfile(os.path.join(CONFIG_DIR, "spec.ini"))
     else:
         return os.path.join(DATAROOT, "spec.ini")
 
 def logging_spec():
 
-    if os.path.isfile(CONFIG_DIR, "logging.ini")):
-        return os.path.join(os.path.expanduser('~'), ".tral", "logging.ini")
+    if os.path.isfile(os.path.join(CONFIG_DIR, "logging.ini")):
+        return os.path.isfile(os.path.join(CONFIG_DIR, "logging.ini"))
     else:
         return os.path.join(DATAROOT, "logging.ini")
