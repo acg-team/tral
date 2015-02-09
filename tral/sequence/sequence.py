@@ -112,8 +112,8 @@ class Sequence:
         Args:
             hmm (HMM): A list of ``HMM`` instances.
             denovo (bool): boolean
-            *args: Parameters fed to denovo TR prediction and/or Repeat instantiation.
-                E.g. ``calc_score = True``
+            *kwargs: Parameters fed to denovo TR prediction and/or Repeat instantiation.
+                E.g. ``repeat = {"calc_score": True}``
 
         Returns:
             A ``Repeat_list`` instance

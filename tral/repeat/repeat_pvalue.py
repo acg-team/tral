@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 from tral.paths import *
 
-path_score = join(DATAROOT, 'pValue')
+path_score = join(DATA_DIR, 'pValue')
 
 ########################## REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ####################
 

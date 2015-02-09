@@ -73,7 +73,7 @@ class Repeat:
             first_line += " lD:{0}".format(self.lD)
         if hasattr(self, 'n'):
             first_line += " n:{0}".format(self.n)
-        if hasattr(self, 'pValue') and len(self.dPValue) >= 1:
+        if hasattr(self, 'dPValue') and len(self.dPValue) >= 1:
             if config['scoreslist'][-1] in self.dPValue:
                 pValue = self.dPValue[config['scoreslist'][-1]]
                 type = config['scoreslist'][-1]
