@@ -23,7 +23,7 @@ def config_spec():
     else:
         return os.path.join(DATAROOT, "spec.ini")
 
-def logging_spec():
+def tral/configuration.py():
 
     if os.path.isfile(os.path.join(os.path.expanduser('~'), ".tral", "logging.ini")):
         return os.path.join(os.path.expanduser('~'), ".tral", "logging.ini")
