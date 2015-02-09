@@ -12,23 +12,9 @@ CONFIG_DIR = os.path.join(os.path.expanduser('~'), ".tral")
 # Where are the data-files, e.g. for pValue calculation stored?
 DATA_DIR = os.path.join(CONFIG_DIR, "data")
 
-def config():
+def config_file(name):
 
-    if os.path.isfile(os.path.join(CONFIG_DIR, "config.ini")):
-        return os.path.isfile(os.path.join(CONFIG_DIR, "config.ini"))
+    if os.path.isfile(os.path.join(CONFIG_DIR, name)):
+        return os.path.join(CONFIG_DIR, name)
     else:
-        return os.path.join(DATAROOT, "config.ini")
-
-def config_spec():
-
-    if os.path.isfile(os.path.join(CONFIG_DIR, "spec.ini")):
-        return os.path.isfile(os.path.join(CONFIG_DIR, "spec.ini"))
-    else:
-        return os.path.join(DATAROOT, "spec.ini")
-
-def logging_spec():
-
-    if os.path.isfile(os.path.join(CONFIG_DIR, "logging.ini")):
-        return os.path.isfile(os.path.join(CONFIG_DIR, "logging.ini"))
-    else:
-        return os.path.join(DATAROOT, "logging.ini")
+        return os.path.join(DATAROOT, name)

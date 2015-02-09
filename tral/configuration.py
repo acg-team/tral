@@ -2,8 +2,8 @@ import configobj
 import os
 from tral.paths import *
 
-pDefaults = config()
-pSpec = config_spec()
+pDefaults = config_file("config.ini")
+pSpec = config_file("spec.ini")
 
 class Singleton:
     """

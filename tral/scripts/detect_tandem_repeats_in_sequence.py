@@ -18,7 +18,7 @@ from tral.repeat_list import repeat_list
 from tral.sequence import sequence
 from tral.hmm import hmm
 
-logging.config.fileConfig(logging_spec())
+logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
 c = configuration.Configuration.Instance()
