@@ -6,6 +6,7 @@ import logging.config
 import os
 import pickle
 from Bio import SeqIO
+from pyfaidx import Fasta
 
 from tral.paths import *
 from tral.sequence import sequence
@@ -14,6 +15,20 @@ from tral.sequence import sequence
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
+
+def split_pfam_annotations(main_pickle, sequence_dir, results_dir):
+
+    with open(main_pickle, 'rb') as fh:
+        p = pickle.load(fh)
+
+    lFiles = [i for i in os.listdir(sequence_dir) if not i.endswith("fai")]
+    for iFile in lFiles:
+        lSequence = Fasta(os.path.join(sequence_dir, iFile))
+
+        dP = {i:p[i[3:9]] for i in lSequence.keys() if i[3:9] in p}
+        results_file = os.path.join(results_dir, iFile + "_PFAM.pickle")
+        with open(results_file, "wb") as fh2:
+            pickle.dump(dP, fh2)
 
 def read_pfam_uniprot(annotation_data_file, output_file):
     ''' annotation_file from:

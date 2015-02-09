@@ -34,7 +34,8 @@ DE_NOVO_REFINED_TAG = "denovo_refined"
 DE_NOVO_FINAL_TAG = "denovo_final"
 FINAL_TAG = "final"
 
-def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, max_time, **kwargs):
+
+def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, format, max_time, **kwargs):
 
     ''' Annotate sequences with TRs from multiple sources, test and refine annotations.
 
@@ -206,7 +207,7 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, max_time
 
                 fh_o.write("\n" + "\t".join(data))
 
-
+    print("DONE")
 
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
@@ -610,6 +611,9 @@ def main():
         refine_denovo(pars["input"], pars["output"])
     elif pars["method"] == "serialize_annotations":
         serialize_annotations(pars["input"], pars["output"], pars["format"])
+    elif pars["method"] == "workflow":
+        workflow(pars["input"], pars["hmm_annotation"], pars["hmm"], pars["output"], pars["format"], pars["time"])
+
 
 def read_commandline_arguments():
     parser = argparse.ArgumentParser(description='Process tandem repeat detection options')
@@ -625,12 +629,16 @@ def read_commandline_arguments():
                        help='The repeat files')
     parser.add_argument('-f','--format', type=str,
                        help='The serialization format, e.g. tsv')
+    parser.add_argument('-t','--time', type=str,
+                       help='The maximum runtime')
     parser.add_argument('-ov','--overlap_type', nargs='+', type=str,
                        help='The overlap type, e.g. "common_ancestry shared_char"')
     parser.add_argument('-d', '--detector', type=str,
                         help='The de novo tandem repeat detectors. For example: -d T-REKS')
     parser.add_argument('-hmm', '--hmm', type=str,
                         help='The path to the dir with HMMER pickles')
+    parser.add_argument('-hmm_annotation', '--hmm_annotation', type=str,
+                        help='The path to pickle with HMM annotations')
     parser.add_argument("-test", "--significance_test", type=str, required=False,
                         help='The significance tests and cut-off values used. For example: -test \'{"phylo_gap01":0.01}\'')
     parser.add_argument("-c", "--cluster", type=str, required=False,
