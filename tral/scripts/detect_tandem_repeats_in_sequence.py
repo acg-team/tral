@@ -85,7 +85,7 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, format, 
         log.debug("Could not load previous results file. Perhaps non existant.")
         dResults = {}
 
-
+    dHMM = {}
     for iS_pyfaidx in lSequence:
 
         elapsed_time = (datetime.datetime.now() - start).seconds
