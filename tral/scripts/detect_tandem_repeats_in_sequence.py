@@ -1,6 +1,7 @@
 #!python
 
 import argparse
+import datetime
 import itertools
 import json
 import logging
@@ -8,6 +9,8 @@ import logging.config
 import os
 import pickle
 import sys
+
+from pyfaidx import Fasta
 
 from tral import configuration
 from tral.paths import *
@@ -30,6 +33,182 @@ PFAM_TAG = "pfam"
 DE_NOVO_REFINED_TAG = "denovo_refined"
 DE_NOVO_FINAL_TAG = "denovo_final"
 FINAL_TAG = "final"
+
+def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, max_time, **kwargs):
+
+    ''' Annotate sequences with TRs from multiple sources, test and refine annotations.
+
+     Save the annotations in a pickle.
+
+     Args:
+         sequences_file (str): Path to the pickle file containing a list of ``Sequence``
+            instances.
+         hmm_dir (str): Path to directory where all HMMs are stored as .pickles
+         result_file (str): Path to the result file.
+         max_time (str): Max run time in seconds
+
+     Raises:
+        Exception: If the pickle ``sequences_file`` cannot be loaded
+        Exception: if the hmm_dir does not exist
+
+     ToDo: Make sure the pValue is automatically calculated!!!!!
+    '''
+
+    start = datetime.datetime.now()
+    max_time = int(max_time)
+    time_interval = 3600
+    next_time = 3600
+
+    try:
+        lSequence = Fasta(sequences_file)
+    except:
+        raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
+
+    if not os.path.isdir(hmm_dir):
+        raise Exception("hmm_dir does not exists: {}".format(hmm_dir))
+
+    try:
+        with open(hmm_annotation_file, 'rb') as fh:
+            dHMM_annotation = pickle.load(fh)
+    except:
+        raise Exception("Cannot load hmm_annotation_file: {}".format(hmm_annotation_file))
+
+    basic_filter = config['filter']['basic']['dict']
+    basic_filter_tag = config['filter']['basic']['tag']
+
+    # Load previous results:
+    try:
+        with open(result_file, 'rb') as fh:
+            dResults = pickle.load(fh)
+    except:
+        log.debug("Could not load previous results file. Perhaps non existant.")
+        dResults = {}
+
+
+    for iS_pyfaidx in lSequence:
+
+        elapsed_time = (datetime.datetime.now() - start).seconds
+        if elapsed_time > max_time or elapsed_time > next_time:
+            with open(result_file, 'wb') as fh:
+                pickle.dump(dResults,fh)
+            next_time = next_time + time_interval
+
+        iS = sequence.Sequence(seq = str(iS_pyfaidx), id = iS_pyfaidx.name)
+
+        log.debug("Work on sequence {}".format(iS))
+        ### 1. annotate_de_novo()
+        denovo_repeat_list = iS.detect(denovo = True)
+        log.debug(denovo_repeat_list.repeats)
+        for iTR in denovo_repeat_list.repeats:
+            iTR.TRD = detector
+            iTR.model = None
+
+        ### 2. annotate_TRs_from_hmmer()
+        lHMM = dHMM_annotation[iS.id]
+        infoNRuns = len(lHMM)
+        log.debug("{} Viterbi runs need to be performed.".format(infoNRuns))
+        lHMM = set(lHMM)
+        infoNHMM = len(lHMM)
+        log.debug("These derive from {} independent HMMs.".format(infoNHMM))
+         # Load all HMM pickles needed for the particular sequence.
+        if infoNRuns >= 1:
+            for hmm_ID in lHMM:
+                if hmm_ID not in dHMM:
+                    dHMM[hmm_ID] = hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID + ".pickle"))
+
+            pfam_repeat_list = iS.detect([dHMM[hmm_ID] for hmm_ID in lHMM])
+            for iTR, hmm_ID in zip(pfam_repeat_list.repeats, lHMM):
+                iTR.model = hmm_ID
+                iTR.TRD = "PFAM"
+
+        ### 3. merge_and_basic_filter()
+        all_repeat_list = denovo_repeat_list + pfam_repeat_list
+        iS.set_repeat_list(all_repeat_list, REPEAT_LIST_TAG)
+        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_ALL_TAG)
+        iS.set_repeat_list(pfam_repeat_list, PFAM_ALL_TAG)
+
+
+        rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
+        if iS.dRepeat_list[REPEAT_LIST_TAG]:
+            for iB in basic_filter.values():
+                rl_tmp = rl_tmp.filter(**iB)
+        else:
+            rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
+        iS.set_repeat_list(rl_tmp, basic_filter_tag)
+        iS.set_repeat_list(rl_tmp.intersection(iS.dRepeat_list[PFAM_ALL_TAG]), PFAM_TAG)
+        iS.set_repeat_list(rl_tmp.intersection(iS.dRepeat_list[DE_NOVO_ALL_TAG]), DE_NOVO_TAG)
+
+        ### 4. calculate_overlap()
+
+        # Perform common ancestry overlap filter and keep PFAMs
+        criterion_pfam_fixed = {"func_name": "none_overlapping_fixed_repeats", "rl_fixed": iS.dRepeat_list[PFAM_TAG], "overlap_type": "common_ancestry"}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_pfam_fixed)
+
+        # Choose only the most convincing de novo TRs
+        criterion_filter_order = {"func_name": "none_overlapping", "overlap": ("common_ancestry", None), "lCriterion": [("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
+        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_filter_order)
+
+        ### 5. refine_denovo()
+        denovo_final = []
+        denovo_refined = [None] * len(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats)
+        for i,iTR in enumerate(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats):
+            if not iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+                continue
+            # Create HMM from TR
+            denovo_hmm = hmm.HMM.create(format = 'repeat', repeat = iTR)
+            # Run HMM on sequence
+            denovo_refined_rl = iS.detect(lHMM = [denovo_hmm])
+            append_refined = False
+            if denovo_refined_rl and denovo_refined_rl.repeats:
+                iTR_refined = denovo_refined_rl.repeats[0]
+                iTR_refined.TRD = iTR.TRD
+                iTR_refined.model = "cpHMM"
+                denovo_refined[i] = iTR_refined
+                # Check whether new and old TR overlap. Check whether new TR is significant. If not both, put unrefined TR into final.
+                if repeat_list.two_repeats_overlap("shared_char", iTR, iTR_refined):
+                    rl_tmp = repeat_list.Repeat_list([iTR_refined])
+                    log.debug(iTR_refined.msa)
+                    for iB in basic_filter.values():
+                        rl_tmp = rl_tmp.filter(**iB)
+                    if rl_tmp.repeats:
+                        append_refined = True
+            else:
+                denovo_refined[i] = False
+            if append_refined:
+                denovo_final.append(iTR_refined)
+            else:
+                denovo_final.append(iTR)
+
+        iS.set_repeat_list(repeat_list.Repeat_list(denovo_refined), DE_NOVO_REFINED_TAG)
+        iS.set_repeat_list(repeat_list.Repeat_list(denovo_final), DE_NOVO_FINAL_TAG)
+        iS.set_repeat_list(iS.dRepeat_list[DE_NOVO_FINAL_TAG] + iS.dRepeat_list[PFAM_TAG], FINAL_TAG)
+
+        dResults[iS.id] = iS
+
+    ### 6.a Save results as pickle
+    with open(result_file, 'wb') as fh:
+        pickle.dump(dResults,fh)
+
+    ### 6.b Save serialized results
+    with open(result_file_serialized, 'w') as fh_o:
+
+        if format == 'tsv':
+            header = ["ID", "MSA", "begin", "pValue", "lD", "n", "nD", "TRD", "model"]
+        fh_o.write("\t".join(header))
+
+        for iS in dResults.values():
+            for iTR in iS.dRepeat_list[FINAL_TAG].repeats:
+                if format == 'tsv':
+                    try:
+                        data = [str(i) for i in [iS.id, " ".join(iTR.msa), iTR.begin, iTR.pValue("phylo_gap01"), iTR.lD, iTR.n, iTR.nD, iTR.TRD, iTR.model]]
+                    except:
+                        print(iTR)
+                        raise Exception("(Could not save data for the above TR.)")
+
+                fh_o.write("\n" + "\t".join(data))
+
+
+
 
 def annotate_TRs_from_hmmer(sequences_file, hmm_dir, result_file, **kwargs):
     ''' Annotate sequences with TRs from HMMer models.
