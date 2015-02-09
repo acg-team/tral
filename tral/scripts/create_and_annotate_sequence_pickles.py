@@ -11,7 +11,7 @@ from tral.paths import *
 from tral.sequence import sequence
 
 
-logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
+logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
 

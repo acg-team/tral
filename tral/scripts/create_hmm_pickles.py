@@ -9,9 +9,8 @@ from tral.hmm import hmm
 from tral.hmm import hmm_io
 
 
-logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
+logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
-
 
 
 def main():

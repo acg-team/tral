@@ -6,7 +6,7 @@ from tral.paths import *
 from tral.sequence import repeat_detection_run, sequence
 from tral.hmm import hmm
 
-logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
+logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
 TEST_FAA_FILE_MBE_2014 = "P51610.fasta"

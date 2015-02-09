@@ -97,10 +97,9 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, max_time
 
         log.debug("Work on sequence {}".format(iS))
         ### 1. annotate_de_novo()
-        denovo_repeat_list = iS.detect(denovo = True)
+        denovo_repeat_list = iS.detect(denovo = True, repeat = {"calc_pValue": True})
         log.debug(denovo_repeat_list.repeats)
         for iTR in denovo_repeat_list.repeats:
-            iTR.TRD = detector
             iTR.model = None
 
         ### 2. annotate_TRs_from_hmmer()
@@ -116,7 +115,7 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, max_time
                 if hmm_ID not in dHMM:
                     dHMM[hmm_ID] = hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID + ".pickle"))
 
-            pfam_repeat_list = iS.detect([dHMM[hmm_ID] for hmm_ID in lHMM])
+            pfam_repeat_list = iS.detect([dHMM[hmm_ID] for hmm_ID in lHMM], repeat = {"calc_pValue": True})
             for iTR, hmm_ID in zip(pfam_repeat_list.repeats, lHMM):
                 iTR.model = hmm_ID
                 iTR.TRD = "PFAM"
