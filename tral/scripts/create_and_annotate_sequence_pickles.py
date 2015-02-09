@@ -16,9 +16,9 @@ logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
 
-def split_pfam_annotations(main_pickle, sequence_dir, results_dir):
+def split_pfam_annotations(annotation_file, sequence_dir, results_dir):
 
-    with open(main_pickle, 'rb') as fh:
+    with open(annotation_file, 'rb') as fh:
         p = pickle.load(fh)
 
     lFiles = [i for i in os.listdir(sequence_dir) if not i.endswith("fai")]
@@ -48,7 +48,7 @@ def read_pfam_uniprot(annotation_data_file, output_file):
        pickle.dump(p,fh)
 
 
-def annotate_seq_pickles(sequence_dir, output_path, annotation_pickle):
+def annotate_seq_pickles(sequence_dir, results_dir, annotation_pickle):
 
     with open(annotation_pickle, 'rb') as fh:
         annotations = pickle.load(fh)
@@ -62,14 +62,14 @@ def annotate_seq_pickles(sequence_dir, output_path, annotation_pickle):
                 if iS.id in annotations.keys():
                     iS.annotate(annotations[iS.id], "PFAM")
 
-            output_file = os.path.join(output_path, file)
+            output_file = os.path.join(results_dir, file)
             with open(output_file, 'wb') as fh:
                 pickle.dump(lSeq, fh)
 
     print("DONE")
 
 
-def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_file = None, lFiles = None):
+def create_and_annotate_seq_pickles(sequence_dir, results_dir, annotation_file = None, lFiles = None):
 
     ''' Create ``Sequence`` instances from fasta files and annotate with data.
 
@@ -77,7 +77,7 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_file =
 
     Args:
          sequence_dir (str): Path to the dir containing *.fasta sequence files.
-         output_path (str): Path to directory where the output files are saved.
+         results_dir (str): Path to directory where the output files are saved.
          annotation_file (str): Path to a tab separated file with annotations to the
             sequences.
 
@@ -109,7 +109,7 @@ def create_and_annotate_seq_pickles(sequence_dir, output_path, annotation_file =
                     print(annotations[iS.id])
                     iS.annotate(annotations[iS.id], "PFAM")
 
-        output_file = os.path.join(output_path, file.replace("fasta", "pickle"))
+        output_file = os.path.join(results_dir, file.replace("fasta", "pickle"))
         with open(output_file, 'wb') as fh:
             pickle.dump(lSeq, fh)
 
@@ -120,22 +120,29 @@ def main():
 
     pars = read_commandline_arguments()
 
-    kwargs = {"sequence_dir": pars["input"], "output_path": pars["output_path"]}
+    kwargs = {"sequence_dir": pars["input"], "results_dir": pars["results_dir"]}
 
     if "annotation_file" in pars:
         kwargs["annotation_file"] = pars["annotation_file"]
     if "file_list" in pars:
         kwargs["lFiles"] = pars["file_list"]
 
-    create_and_annotate_seq_pickles(**kwargs)
+
+    if pars["method"] == "create_and_annotate_seq_pickles":
+        create_and_annotate_seq_pickles(**kwargs)
+    elif pars["method"] == "annotate_TRs_from_hmmer":
+        split_pfam_annotations(**kwargs)
+
 
 
 def read_commandline_arguments():
 
     parser = argparse.ArgumentParser(description='Process create hmm pickles options')
+    parser.add_argument('method', metavar='method_name', type=str,
+                       help='The name of the method to be executed.')
     parser.add_argument('-i','--input', type=str, required=True,
                        help='The path to the sequence directory containing .fasta files, e.g. /path/to/sequence_dir')
-    parser.add_argument('-o','--output_path', type=str, required=True,
+    parser.add_argument('-o','--results_dir', type=str, required=True,
                        help='The path to the output files, e.g. /path/to/output')
     parser.add_argument('-a', '--annotation_file', type=str,
                        help='The path to the annotation data tab-separated file.')
