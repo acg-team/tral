@@ -106,29 +106,28 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, format, 
         ### 2. annotate_TRs_from_hmmer()
         if iS.id in dHMM_annotation:
             lHMM = dHMM_annotation[iS.id]
-        else:
-            lHMM = []
-        infoNRuns = len(lHMM)
-        log.debug("{} Viterbi runs need to be performed.".format(infoNRuns))
-        lHMM = set(lHMM)
-        infoNHMM = len(lHMM)
-        log.debug("These derive from {} independent HMMs.".format(infoNHMM))
-         # Load all HMM pickles needed for the particular sequence.
-        for hmm_ID in lHMM:
-            if hmm_ID not in dHMM:
-                dHMM[hmm_ID] = hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID + ".pickle"))
+            infoNRuns = len(lHMM)
+            log.debug("{} Viterbi runs need to be performed.".format(infoNRuns))
+            lHMM = set(lHMM)
+            infoNHMM = len(lHMM)
+            log.debug("These derive from {} independent HMMs.".format(infoNHMM))
+             # Load all HMM pickles needed for the particular sequence.
+            for hmm_ID in lHMM:
+                if hmm_ID not in dHMM:
+                    dHMM[hmm_ID] = hmm.HMM.create(format = "pickle", file = os.path.join(hmm_dir, hmm_ID + ".pickle"))
 
-        pfam_repeat_list = iS.detect([dHMM[hmm_ID] for hmm_ID in lHMM], repeat = {"calc_pValue": True})
-        for iTR, hmm_ID in zip(pfam_repeat_list.repeats, lHMM):
-            iTR.model = hmm_ID
-            iTR.TRD = "PFAM"
+            pfam_repeat_list = iS.detect([dHMM[hmm_ID] for hmm_ID in lHMM], repeat = {"calc_pValue": True})
+            for iTR, hmm_ID in zip(pfam_repeat_list.repeats, lHMM):
+                iTR.model = hmm_ID
+                iTR.TRD = "PFAM"
+        else:
+            pfam_repeat_list = None
 
         ### 3. merge_and_basic_filter()
         all_repeat_list = denovo_repeat_list + pfam_repeat_list
         iS.set_repeat_list(all_repeat_list, REPEAT_LIST_TAG)
         iS.set_repeat_list(denovo_repeat_list, DE_NOVO_ALL_TAG)
         iS.set_repeat_list(pfam_repeat_list, PFAM_ALL_TAG)
-
 
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
         if iS.dRepeat_list[REPEAT_LIST_TAG]:
