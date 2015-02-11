@@ -85,8 +85,14 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, format, 
         log.debug("Could not load previous results file. Perhaps non existant.")
         dResults = {}
 
+    tmpseqcount = 0
+
     dHMM = {}
     for iS_pyfaidx in lSequence:
+
+        tmpseqcount += 1
+        if tmpseqcount > 6:
+            break
 
         elapsed_time = (datetime.datetime.now() - start).seconds
         if elapsed_time > max_time or elapsed_time > next_time:
