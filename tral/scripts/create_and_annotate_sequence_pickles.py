@@ -130,7 +130,7 @@ def main():
 
     if pars["method"] == "create_and_annotate_seq_pickles":
         create_and_annotate_seq_pickles(**kwargs)
-    elif pars["method"] == "split_pfam_annotations":
+    elif pars["method"] == "annotate_TRs_from_hmmer":
         split_pfam_annotations(**kwargs)
 
 

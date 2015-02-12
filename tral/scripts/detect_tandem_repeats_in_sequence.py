@@ -35,7 +35,7 @@ DE_NOVO_FINAL_TAG = "denovo_final"
 FINAL_TAG = "final"
 
 
-def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, result_file_serialized, format, max_time, **kwargs):
+def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, format, max_time, **kwargs):
 
     ''' Annotate sequences with TRs from multiple sources, test and refine annotations.
 
@@ -619,7 +619,7 @@ def main():
     elif pars["method"] == "serialize_annotations":
         serialize_annotations(pars["input"], pars["output"], pars["format"])
     elif pars["method"] == "workflow":
-        workflow(pars["input"], pars["hmm_annotation"], pars["hmm"], pars["output"], pars["output_serialized"], pars["format"], pars["time"])
+        workflow(pars["input"], pars["hmm_annotation"], pars["hmm"], pars["output"], pars["format"], pars["time"])
 
 
 def read_commandline_arguments():
@@ -630,8 +630,6 @@ def read_commandline_arguments():
                        help='The path to the input file.')
     parser.add_argument('-o', '--output', type=str, required=True,
                        help='The path to the output file.')
-    parser.add_argument('-os', '--output_serialized', type=str, required=True,
-                       help='The path to the serialized output file.')
     parser.add_argument('-seq','--sequence_type', type=str,
                        help='The sequence type: -seq AA or -seq DNA')
     parser.add_argument('-rep','--repeat_files', nargs='+', type=str,
