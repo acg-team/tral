@@ -15,6 +15,8 @@ from tral.sequence import sequence
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
+PFAM_deleted = ['PF11206', 'PF13666']
+PFAM_replaced = {'PF11930': 'PF00501', 'PF08959': 'PF04969'}
 
 def split_pfam_annotations(annotation_file, sequence_dir, results_dir):
 
@@ -26,6 +28,10 @@ def split_pfam_annotations(annotation_file, sequence_dir, results_dir):
         lSequence = Fasta(os.path.join(sequence_dir, iFile))
 
         dP = {i:p[i[3:9]] for i in lSequence.keys() if i[3:9] in p}
+
+        # Replace or remove outdated PFAM annotations
+        dP = {i:[k if not k in PFAM_replaced else PFAM_replaced[k] for k in j if not k in PFAM_deleted] for i,j in dP.items()}
+
         results_file = os.path.join(results_dir, iFile + "_PFAM.pickle")
         with open(results_file, "wb") as fh2:
             pickle.dump(dP, fh2)
