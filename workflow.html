@@ -82,11 +82,16 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Use GC3Pie to annotate your large sequence dataset.</a><ul>
-<li><a class="reference internal" href="#basic-idea">Basic Idea</a></li>
-<li><a class="reference internal" href="#prepare-your-data">Prepare your data.</a></li>
-<li><a class="reference internal" href="#configure-the-tandem-repeats-workflow">Configure the tandem repeats workflow.</a></li>
+<li><a class="reference internal" href="#configure-tral">Configure TRAL.</a></li>
+<li><a class="reference internal" href="#prepare-your-data">Prepare your data.</a><ul>
+<li><a class="reference internal" href="#sequence-data">Sequence data</a></li>
+<li><a class="reference internal" href="#sequence-profile-model-to-sequence-data-mapping">Sequence profile model to sequence data mapping</a></li>
+<li><a class="reference internal" href="#sequence-profile-models">Sequence profile models</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#perform-a-test-run">Perform a test run.</a></li>
 <li><a class="reference internal" href="#install-gc3pie">Install GC3PIE.</a></li>
-<li><a class="reference internal" href="#configure-the-gc3pie">Configure the GC3Pie.</a></li>
+<li><a class="reference internal" href="#configure-gc3pie">Configure GC3Pie.</a></li>
 <li><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
@@ -120,35 +125,98 @@
             
   <div class="section" id="use-gc3pie-to-annotate-your-large-sequence-dataset">
 <span id="workflow"></span><h1>Use GC3Pie to annotate your large sequence dataset.<a class="headerlink" href="#use-gc3pie-to-annotate-your-large-sequence-dataset" title="Permalink to this headline">¶</a></h1>
-<p>Here you learn how to run an entire proteome annotation workflow.</p>
-<p>[INCOMPLETE]</p>
-<div class="section" id="basic-idea">
-<h2>Basic Idea<a class="headerlink" href="#basic-idea" title="Permalink to this headline">¶</a></h2>
-<p>[MISSING]</p>
+<p>This tutorial will work you through an example of annotating tandem repeats on a very
+large sequence data set: We will annotate tandem repeats with sequence profile models,
+and with <em>de novo</em> detection algorithms, perform significance testing and overlap
+filtering all in one.</p>
+<p>For very large sequence sets (&gt; 6000 sequences ~ 10h runtime), you may wish to perform the
+annotation on several computing  nodes in parallel. Here, we provide a system to automise
+the distribution and collection of tandem repeat annotation jobs with
+<a class="reference external" href="https://code.google.com/p/gc3pie/">GC3Pie</a>.</p>
+<p>Everything is explained with a toy example located in the TRAL package directory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">workflow_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;workflow&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">workflow_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="configure-tral">
+<h2>Configure TRAL.<a class="headerlink" href="#configure-tral" title="Permalink to this headline">¶</a></h2>
+<p>We start by <a class="reference internal" href="configure.html#configure"><em>adapting the TRAL configuration files</em></a> to choose for
+example which external tandem repeat detection algorithms you would like to run on the
+sequence data.</p>
+<p>Now, let&#8217;s move ahead to data acquisition:</p>
 </div>
 <div class="section" id="prepare-your-data">
 <h2>Prepare your data.<a class="headerlink" href="#prepare-your-data" title="Permalink to this headline">¶</a></h2>
-<p>[MISSING]</p>
+<p>To annotate sequences with tandem repeats, we acquired the following data:</p>
+<div class="section" id="sequence-data">
+<h3>Sequence data<a class="headerlink" href="#sequence-data" title="Permalink to this headline">¶</a></h3>
+<p>We downloaded all <a class="reference external" href="http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&amp;sort=score">UniprotKB/Swissprot human PRDM genes</a>
+in fasta format...</p>
+<div class="highlight-python"><div class="highlight"><pre>cd path/to/tral/examples/workflow
+less uniprot_PRDM.fasta
+</pre></div>
 </div>
-<div class="section" id="configure-the-tandem-repeats-workflow">
-<h2>Configure the tandem repeats workflow.<a class="headerlink" href="#configure-the-tandem-repeats-workflow" title="Permalink to this headline">¶</a></h2>
-<p>[MISSING]</p>
+<p>... and split the sequence file into subsets on which the tandem repeat annotation can be
+performed in parallel.</p>
+<div class="highlight-python"><div class="highlight"><pre>ls /split_sequence_data/*
+</pre></div>
+</div>
+<p>On a sidenote, <a class="reference external" href="ftp://saf.bio.caltech.edu/pub/software/molbio/fastasplitn.c">fastasplitn</a>
+is a useful tool for splitting large data files.</p>
+</div>
+<div class="section" id="sequence-profile-model-to-sequence-data-mapping">
+<h3>Sequence profile model to sequence data mapping<a class="headerlink" href="#sequence-profile-model-to-sequence-data-mapping" title="Permalink to this headline">¶</a></h3>
+<p>We downloaded the mapping to PFAM annotations for these sequence also from www.uniprot.org.</p>
+<div class="highlight-python"><div class="highlight"><pre>less uniprot_PRDM_annotation.tsv
+</pre></div>
+</div>
+</div>
+<div class="section" id="sequence-profile-models">
+<h3>Sequence profile models<a class="headerlink" href="#sequence-profile-models" title="Permalink to this headline">¶</a></h3>
+<p>We downloaded all needed PFAM sequence profile models, e.g. for the <a class="reference external" href="http://pfam.xfam.org/family/PF01352/hmm">Zinc finger</a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>less PRDM_PFAM_models.hmm
+</pre></div>
+</div>
+<p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
+to Python pickle objects:</p>
+<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw path/to/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm_raw path/to/workflow/PRDM_PFAM_models.hmm --hmm path/to/workflow/hmm
+</pre></div>
+</div>
+<p>On the small toy example, this file preparation step should run fast.</p>
+</div>
+</div>
+<div class="section" id="perform-a-test-run">
+<h2>Perform a test run.<a class="headerlink" href="#perform-a-test-run" title="Permalink to this headline">¶</a></h2>
+<p>With the following command, annotation is performed on <em>uniprot_PRDM_1.fasta</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py workflow -i path/to/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o path/to/workflow/results/uniprot_PRDM_1.pickle -os path/to/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm path/to/workflow/hmm
+</pre></div>
+</div>
+<p>If this runs fine, you should see annotation results in:</p>
+<div class="highlight-python"><div class="highlight"><pre>less results/uniprot_PRDM_1.tsv
+</pre></div>
+</div>
+<p>Now, we can move ahead to automated distributed annotation with GC3PIE.</p>
 </div>
 <div class="section" id="install-gc3pie">
 <h2>Install GC3PIE.<a class="headerlink" href="#install-gc3pie" title="Permalink to this headline">¶</a></h2>
 <p>[MISSING]</p>
 </div>
-<div class="section" id="configure-the-gc3pie">
-<h2>Configure the GC3Pie.<a class="headerlink" href="#configure-the-gc3pie" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configure-gc3pie">
+<h2>Configure GC3Pie.<a class="headerlink" href="#configure-gc3pie" title="Permalink to this headline">¶</a></h2>
 <p>[MISSING]</p>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre>$ /.tandemrepeatannotationworkflow -s &lt;session_name&gt;
+<div class="highlight-python"><div class="highlight"><pre>$ ./tandemrepeatannotationworkflow -s &lt;session_name&gt;
 $ gselect
 $ gresub
 $ gstat
 $ ...
+
+
+$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf /path/to/workflow/tandem_repeat_annotation_workflow.ini
 </pre></div>
 </div>
 </div>

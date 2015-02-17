@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Modules &mdash; TRAL 0.3.0 documentation</title>
+    <title>&lt;no title&gt; &mdash; TRAL 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -72,7 +72,7 @@
     <div class="headlinks">
         <a href="index.html">Home</a>
         <a href="installation.html">Install</a>
-        <a href="#">Code docs</a>
+        <a href="code_docs.html">Code docs</a>
     </div>
 </div>
 
@@ -81,7 +81,7 @@
         <div class="sphinxsidebarwrapper">
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/code_docs.txt"
+    <li><a href="_sources/technical_backbone.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -105,40 +105,30 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="modules">
-<span id="code-docs"></span><h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="hmm.html">HMM code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hmm.html#module-tral.hmm.hmm">hmm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hmm.html#module-tral.hmm.hmm_io">hmm_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hmm.html#module-tral.hmm.hmm_own_model">hmm_own_model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hmm.html#module-tral.hmm.hmm_viterbi">hmm_viterbi</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="repeat.html">Repeat code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="repeat.html#module-tral.repeat.repeat">repeat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="repeat.html#module-tral.repeat.repeat_exon">repeat_exon</a></li>
-<li class="toctree-l2"><a class="reference internal" href="repeat.html#module-tral.repeat.repeat_io">repeat_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="repeat.html#module-tral.repeat.repeat_pvalue">repeat_pvalue</a></li>
-<li class="toctree-l2"><a class="reference internal" href="repeat.html#module-tral.repeat.repeat_score">repeat_score</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="repeat_list.html">Repeat_list code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="repeat_list.html#module-tral.repeat_list.repeat_list">repeat_list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="repeat_list.html#module-tral.repeat_list.repeat_list_io">repeat_list_io</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sequence.html">Sequence code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sequence.html#module-tral.sequence.sequence">sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sequence.html#module-tral.sequence.sequence_io">sequence_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sequence.html#module-tral.sequence.repeat_detection_io">repeat_detection_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sequence.html#module-tral.sequence.repeat_detection_run">repeat_detection_run</a></li>
-</ul>
-</li>
-</ul>
+  <p>Add a class inheritance diagram within .rst files:</p>
+<p>::
+.. inheritance-diagram:: tral.repeat.repeat tral.sequence.sequence tral.repeat_list.repeat_list tral.hmm.hmm</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/docs/technical_backbone.rst</tt>, line 5)</p>
+Unexpected indentation.</div>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">parts:</th><td class="field-body">2</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Create a UML-like diagram from the codebase with pylint&#8217;s pyreverse:</p>
+<div class="highlight-python"><div class="highlight"><pre>pyreverse -o svg -p Tral tral/
+</pre></div>
 </div>
+<p>Prettify the produces graphs following <a class="reference external" href="http://www.hokstad.com/making-graphviz-output-pretty-with-xsl">http://www.hokstad.com/making-graphviz-output-pretty-with-xsl</a></p>
+<div class="highlight-python"><div class="highlight"><pre>xsltproc notugly.xsl _static/packages_Tral.svg &gt; _static/packages_Tral_notugly.svg
+xsltproc notugly.xsl _static/classes_Tral.svg &gt; _static/classes_Tral_notugly.svg
+</pre></div>
 </div>
 
 

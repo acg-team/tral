@@ -3,29 +3,122 @@
 Use GC3Pie to annotate your large sequence dataset.
 ===================================================
 
-Here you learn how to run an entire proteome annotation workflow.
+This tutorial will work you through an example of annotating tandem repeats on a very
+large sequence data set: We will annotate tandem repeats with sequence profile models,
+and with *de novo* detection algorithms, perform significance testing and overlap
+filtering all in one.
 
-[INCOMPLETE]
+For very large sequence sets (> 6000 sequences ~ 10h runtime), you may wish to perform the
+annotation on several computing  nodes in parallel. Here, we provide a system to automise
+the distribution and collection of tandem repeat annotation jobs with
+`GC3Pie <https://code.google.com/p/gc3pie/>`_.
+
+Everything is explained with a toy example located in the TRAL package directory:
+
+::
+
+    import os
+    from tral.paths import *
+    workflow_path = os.path.join(PACKAGE_DIRECTORY, "examples", "workflow")
+    print(workflow_path)
 
 
-Basic Idea
-----------
-[MISSING]
+Configure TRAL.
+---------------
+
+We start by :ref:`adapting the TRAL configuration files <configure>` to choose for
+example which external tandem repeat detection algorithms you would like to run on the
+sequence data.
+
+Now, let's move ahead to data acquisition:
 
 
 Prepare your data.
 ------------------
-[MISSING]
+To annotate sequences with tandem repeats, we acquired the following data:
 
-Configure the tandem repeats workflow.
---------------------------------------
-[MISSING]
+Sequence data
+^^^^^^^^^^^^^^^^
+
+We downloaded all `UniprotKB/Swissprot human PRDM genes
+<http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&sort=score>`_
+in fasta format...
+
+::
+
+    cd path/to/tral/examples/workflow
+    less uniprot_PRDM.fasta
+
+
+... and split the sequence file into subsets on which the tandem repeat annotation can be
+performed in parallel.
+
+::
+
+    ls /split_sequence_data/*
+
+
+On a sidenote, `fastasplitn <ftp://saf.bio.caltech.edu/pub/software/molbio/fastasplitn.c>`_
+is a useful tool for splitting large data files.
+
+
+Sequence profile model to sequence data mapping
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We downloaded the mapping to PFAM annotations for these sequence also from www.uniprot.org.
+
+::
+
+    less uniprot_PRDM_annotation.tsv
+
+
+Sequence profile models
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+We downloaded all needed PFAM sequence profile models, e.g. for the `Zinc finger
+<http://pfam.xfam.org/family/PF01352/hmm>`_.
+
+::
+
+    less PRDM_PFAM_models.hmm
+
+
+To allow fast access to the data for the tandem repeat annotation steps, it is transformed
+to Python pickle objects:
+
+
+::
+
+    python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw path/to/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm_raw path/to/workflow/PRDM_PFAM_models.hmm --hmm path/to/workflow/hmm
+
+
+On the small toy example, this file preparation step should run fast.
+
+
+
+Perform a test run.
+-------------------
+With the following command, annotation is performed on *uniprot_PRDM_1.fasta*:
+
+::
+
+    python3 tandem_repeat_annotation_scripts.py workflow -i path/to/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o path/to/workflow/results/uniprot_PRDM_1.pickle -os path/to/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm path/to/workflow/hmm
+
+
+If this runs fine, you should see annotation results in:
+::
+
+    less results/uniprot_PRDM_1.tsv
+
+
+Now, we can move ahead to automated distributed annotation with GC3PIE.
+
 
 Install GC3PIE.
 ---------------
 [MISSING]
 
-Configure the GC3Pie.
+Configure GC3Pie.
 ---------------------
 [MISSING]
 
@@ -35,12 +128,14 @@ Usage
 
 ::
 
-    $ /.tandemrepeatannotationworkflow -s <session_name>
+    $ ./tandemrepeatannotationworkflow -s <session_name>
     $ gselect
     $ gresub
     $ gstat
     $ ...
 
+
+    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf /path/to/workflow/tandem_repeat_annotation_workflow.ini
 
 
 
