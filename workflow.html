@@ -87,6 +87,8 @@
 <li><a class="reference internal" href="#sequence-data">Sequence data</a></li>
 <li><a class="reference internal" href="#sequence-profile-model-to-sequence-data-mapping">Sequence profile model to sequence data mapping</a></li>
 <li><a class="reference internal" href="#sequence-profile-models">Sequence profile models</a></li>
+<li><a class="reference internal" href="#pyfaidx">pyfaidx</a></li>
+<li><a class="reference internal" href="#test-the-file-preprocessing">Test the file preprocessing.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#perform-a-test-run">Perform a test run.</a></li>
@@ -175,10 +177,21 @@ is a useful tool for splitting large data files.</p>
 </div>
 <div class="section" id="sequence-profile-models">
 <h3>Sequence profile models<a class="headerlink" href="#sequence-profile-models" title="Permalink to this headline">¶</a></h3>
-<p>We downloaded all needed PFAM sequence profile models, e.g. for the <a class="reference external" href="http://pfam.xfam.org/family/PF01352/hmm">Zinc finger</a>.</p>
+<p>We downloaded all needed PFAM sequence profile models, for example of the <a class="reference external" href="http://pfam.xfam.org/family/PF00096/hmm">Zinc finger</a>.</p>
 <div class="highlight-python"><div class="highlight"><pre>less PRDM_PFAM_models.hmm
 </pre></div>
 </div>
+</div>
+<div class="section" id="pyfaidx">
+<h3>pyfaidx<a class="headerlink" href="#pyfaidx" title="Permalink to this headline">¶</a></h3>
+<p>The toy example requires the Python package <a class="reference external" href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>
+for .fasta file indexing.</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install pyfaidx
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-the-file-preprocessing">
+<h3>Test the file preprocessing.<a class="headerlink" href="#test-the-file-preprocessing" title="Permalink to this headline">¶</a></h3>
 <p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:</p>
 <div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw path/to/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm_raw path/to/workflow/PRDM_PFAM_models.hmm --hmm path/to/workflow/hmm
