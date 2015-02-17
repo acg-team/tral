@@ -83,9 +83,21 @@ We downloaded all needed PFAM sequence profile models, for example of the `Zinc 
     less PRDM_PFAM_models.hmm
 
 
+pyfaidx
+^^^^^^^^
+The toy example requires the Python package `pyfaidx <https://github.com/mdshw5/pyfaidx>`_
+for .fasta file indexing.
+
+::
+
+    pip install pyfaidx
+
+
+Test the file preprocessing.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:
-
 
 ::
 
