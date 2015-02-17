@@ -5,22 +5,22 @@ Initial version of the sequence submodule documentation.
 
 sequence
 =============================
-.. automodule:: tandemrepeats.sequence.sequence
+.. automodule:: tral.sequence.sequence
     :members:
 
 sequence_io
 =============================
-.. automodule:: tandemrepeats.sequence.sequence_io
+.. automodule:: tral.sequence.sequence_io
     :members:
 
 repeat_detection_io
 =============================
-.. automodule:: tandemrepeats.sequence.repeat_detection_io
+.. automodule:: tral.sequence.repeat_detection_io
     :members:
 
 repeat_detection_run
 =============================
-.. automodule:: tandemrepeats.sequence.repeat_detection_run
+.. automodule:: tral.sequence.repeat_detection_run
     :members:
 
 
