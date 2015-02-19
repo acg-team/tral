@@ -50,7 +50,7 @@ def read_pfam_uniprot(annotation_data_file, output_file):
         except:
             raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(annotation_data_file))
 
-    with open('d.pickle', 'wb') as fh:
+    with open(output_file, 'wb') as fh:
        pickle.dump(p,fh)
 
 
