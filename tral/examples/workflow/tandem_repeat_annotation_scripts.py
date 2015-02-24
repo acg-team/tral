@@ -85,6 +85,10 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, result_f
     dHMM = {}
     for iS_pyfaidx in lSequence:
 
+        # If sequence is already included in results: continue.
+        if iS_pyfaidx.name in dResults:
+            continue
+
         elapsed_time = (datetime.datetime.now() - start).seconds
         if elapsed_time > max_time or elapsed_time > next_time:
             with open(result_file, 'wb') as fh:
