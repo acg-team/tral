@@ -82,7 +82,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Configuration</a><ul>
-<li><a class="reference internal" href="#defaults-ini">defaults.ini</a><ul>
+<li><a class="reference internal" href="#configs-ini">configs.ini</a><ul>
 <li><a class="reference internal" href="#de-novo-repeat-detection"><em>De novo</em> repeat detection</a></li>
 <li><a class="reference internal" href="#build-hmmer-models">Build Hmmer models</a></li>
 <li><a class="reference internal" href="#parameters-of-the-default-filter">Parameters of the default filter</a></li>
@@ -130,13 +130,15 @@ in your home directory:</p>
 <div class="highlight-python"><div class="highlight"><pre>~/.tral/
 </pre></div>
 </div>
-<div class="section" id="defaults-ini">
-<h2>defaults.ini<a class="headerlink" href="#defaults-ini" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configs-ini">
+<h2>configs.ini<a class="headerlink" href="#configs-ini" title="Permalink to this headline">¶</a></h2>
 <p>In this file, you need to define all paths and calculation defaults for using TRAL.</p>
 <div class="section" id="de-novo-repeat-detection">
 <h3><em>De novo</em> repeat detection<a class="headerlink" href="#de-novo-repeat-detection" title="Permalink to this headline">¶</a></h3>
 <p>Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
-scripts or binaries needed is detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.</p>
+scripts or binaries needed is detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.
+Only paths for algorithms defined under [[repeat_detection]] are used, all other paths are
+ignored.</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detection]]
         AA = *List of default de novo detectors on amino acid data*
@@ -216,15 +218,15 @@ scripts or binaries needed is detailed in <a class="reference internal" href="in
 </div>
 <div class="section" id="default-behaviour-when-new-repeat-list-instances-are-created">
 <h3>Default behaviour when new Repeat list instances are created<a class="headerlink" href="#default-behaviour-when-new-repeat-list-instances-are-created" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt>[repeat_list]</dt>
-<dd>msa_original = True  # Is msa_original calculated?
-lD = True  # Is lD calculated?
-nD = True  # Is nD calculated?
-sequence_length = True  # Is the sequence_length calculated?
-pValue = phylo_gap01
-begin = True  # Is the position in sequence calculated?</dd>
-</dl>
+<div class="highlight-python"><div class="highlight"><pre>[repeat_list]
+    msa_original = True  # Is msa_original calculated?
+    lD = True  # Is lD calculated?
+    nD = True  # Is nD calculated?
+    sequence_length = True  # Is the sequence_length calculated?
+    pValue = phylo_gap01
+    begin = True  # Is the position in sequence calculated?
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="logging-ini">
@@ -241,8 +243,8 @@ defined as</p>
 <div class="section" id="p-value-distribution-files">
 <h2>p-Value distribution files<a class="headerlink" href="#p-value-distribution-files" title="Permalink to this headline">¶</a></h2>
 <p>In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in <em>./tral/pValue</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/pValue
+need to be downloaded and placed in <em>./tral/data/pValue</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/data/pValue
 svn checkout https://github.com/elkeschaper/tral/trunk/tral/data/pValue .
 </pre></div>
 </div>

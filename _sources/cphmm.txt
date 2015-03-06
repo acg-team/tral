@@ -19,11 +19,11 @@ Read in your sequence profile model.
     from tral.hmm import hmm
     from tral.paths import *
 
-    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","zf-CCHC.hmm")
+    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","Kelch_1.hmm")
 
-    circular_profile_HMM_zfCCHC = hmm.HMM.create(format = 'hmmer', file = fPfam_profile_hmm)
+    circular_profile_HMM_Kelch_1 = hmm.HMM.create(format = 'hmmer', file = fPfam_profile_hmm)
 
-    print(circular_profile_HMM_zfCCHC)
+    print(circular_profile_HMM_Kelch_1)
 
 
 
@@ -34,7 +34,7 @@ Read in your sequences.
 
     from tral.sequence import sequence
 
-    human_HCFC1_fasta = os.path.join(path_to_tandemrepeats,"test","P62633.fasta")
+    human_HCFC1_fasta = os.path.join(PACKAGE_DIRECTORY,"test","P51610.fasta")
     human_HCFC1_sequence = sequence.Sequence.create(file = human_HCFC1_fasta, format = 'fasta')[0]
 
 
@@ -45,7 +45,7 @@ Annotate tandem repeats with the circular profile HMM.
 
 ::
 
-    tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_zfCCHC])
+    tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_Kelch_1])
 
     print(tandem_repeats.repeats[0])
 

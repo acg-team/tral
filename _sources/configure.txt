@@ -10,7 +10,7 @@ in your home directory:
     ~/.tral/
 
 
-defaults.ini
+configs.ini
 ------------
 
 In this file, you need to define all paths and calculation defaults for using TRAL.
@@ -21,6 +21,8 @@ In this file, you need to define all paths and calculation defaults for using TR
 
 Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
 scripts or binaries needed is detailed in :ref:`Installation of external software <install_external>`.
+Only paths for algorithms defined under [[repeat_detection]] are used, all other paths are
+ignored.
 
 ::
 
@@ -111,13 +113,16 @@ Default parameters for the model of repeat evolution used for statistical signif
 
 Default behaviour when new Repeat list instances are created
 ************************************************************
-[repeat_list]
-    msa_original = True  # Is msa_original calculated?
-    lD = True  # Is lD calculated?
-    nD = True  # Is nD calculated?
-    sequence_length = True  # Is the sequence_length calculated?
-    pValue = phylo_gap01
-    begin = True  # Is the position in sequence calculated?
+
+::
+
+    [repeat_list]
+        msa_original = True  # Is msa_original calculated?
+        lD = True  # Is lD calculated?
+        nD = True  # Is nD calculated?
+        sequence_length = True  # Is the sequence_length calculated?
+        pValue = phylo_gap01
+        begin = True  # Is the position in sequence calculated?
 
 
 logging.ini
@@ -126,8 +131,8 @@ logging.ini
 In this file, you can define the level of debugging per module (DEBUG, INFO, WARNING), and
 the format of the debugging message. Defaults to WARNING. The path to the file needs to be
 defined as
-::
 
+::
 
     import logging
     import logging.config
@@ -139,10 +144,10 @@ p-Value distribution files
 --------------------------
 
 In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in *./tral/pValue*:
+need to be downloaded and placed in *./tral/data/pValue*:
 ::
 
-    cd ~/.tral/pValue
+    cd ~/.tral/data/pValue
     svn checkout https://github.com/elkeschaper/tral/trunk/tral/data/pValue .
 
 
