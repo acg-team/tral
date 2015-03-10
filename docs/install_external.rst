@@ -16,7 +16,16 @@ At current, only support for HMMER is integrated `published in Bioinformatics (2
 
 ::
 
-    /my/path/to/hhrepid_64
+    /my/path/to/hmmbuild
+
+
+Alignment of tandem repeat units
+---------------------------------
+INSTALL MAFFT
+
+::
+
+    /my/path/to/ginsi
 
 
 
@@ -32,7 +41,7 @@ HHrepID is a profile self alignment *de novo* tandem repeat detection software
 The executable is the binary *hmmbuild*:
 ::
 
-    /my/path/to/hmmbuild
+    /my/path/to/hhrepid_64
 
 
 TRED
