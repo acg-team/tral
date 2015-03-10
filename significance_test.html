@@ -155,13 +155,14 @@ of tandem repeat evolution:</p>
 </pre></div>
 </div>
 <p>Whereas this putative tandem repeat is considered significant:</p>
-<div class="highlight-python"><div class="highlight"><pre>&gt;begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164
-RRN
-RR-
-RRW
-RA-
-RQ-
-RQI
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">&gt;begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164</span>
+<span class="go">RRN</span>
+<span class="go">RR-</span>
+<span class="go">RRW</span>
+<span class="go">RA-</span>
+<span class="go">RQ-</span>
+<span class="go">RQI</span>
 </pre></div>
 </div>
 <p>Besides, parameters can also be directly supplied to <em>calculate_pValues</em>:</p>
@@ -184,9 +185,9 @@ RQI
 <p>The resulting <em>result_list</em> now only contains tandem repeats with a p-Value below
 0.05, and is shorter than the original tandem repeat list:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">27</span>
+<span class="go">22</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo_filtered&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">21</span>
+<span class="go">17</span>
 </pre></div>
 </div>
 </div>

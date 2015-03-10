@@ -1,3 +1,4 @@
+
 .. _significance_test:
 
 Perform statistical significance test of tandem repeats.
@@ -50,6 +51,7 @@ of tandem repeat evolution:
 Whereas this putative tandem repeat is considered significant:
 ::
 
+    >>> print(lHIV_Sequence[4].dRepeat_list['denovo'].repeats[1])
     >begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164
     RRN
     RR-
@@ -87,9 +89,9 @@ The resulting *result_list* now only contains tandem repeats with a p-Value belo
 ::
 
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    27
+    22
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_filtered"].repeats])
-    21
+    17
 
 
 

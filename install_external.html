@@ -83,8 +83,10 @@
   <ul>
 <li><a class="reference internal" href="#">Installation of external software</a><ul>
 <li><a class="reference internal" href="#sequence-profile-model-generation">Sequence profile model generation</a></li>
+<li><a class="reference internal" href="#alignment-of-tandem-repeat-units">Alignment of tandem repeat units</a></li>
 <li><a class="reference internal" href="#currently-integrated-detectors">Currently integrated detectors</a><ul>
 <li><a class="reference internal" href="#hhrepid">HHrepID</a></li>
+<li><a class="reference internal" href="#phobos">PHOBOS</a></li>
 <li><a class="reference internal" href="#tred">TRED</a></li>
 <li><a class="reference internal" href="#t-reks">T-REKS</a></li>
 <li><a class="reference internal" href="#trf">TRF</a></li>
@@ -131,7 +133,14 @@ executable shell script needs to be indicated in the TRAL configuration file <a 
 <div class="section" id="sequence-profile-model-generation">
 <h2>Sequence profile model generation<a class="headerlink" href="#sequence-profile-model-generation" title="Permalink to this headline">¶</a></h2>
 <p>At current, only support for HMMER is integrated <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/24/6/807.long">published in Bioinformatics (2008)</a> (<a class="reference external" href="http://hmmer.janelia.org/">Installation instructions</a>).</p>
-<div class="highlight-python"><div class="highlight"><pre>/my/path/to/hmmbuild
+<div class="highlight-python"><div class="highlight"><pre>hmmbuild = /my/path/to/hmmbuild
+</pre></div>
+</div>
+</div>
+<div class="section" id="alignment-of-tandem-repeat-units">
+<h2>Alignment of tandem repeat units<a class="headerlink" href="#alignment-of-tandem-repeat-units" title="Permalink to this headline">¶</a></h2>
+<p>Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (<a class="reference external" href="http://mafft.cbrc.jp/alignment/software/">Installation instructions</a>).</p>
+<div class="highlight-python"><div class="highlight"><pre>ginsi = /my/path/to/ginsi
 </pre></div>
 </div>
 </div>
@@ -139,25 +148,33 @@ executable shell script needs to be indicated in the TRAL configuration file <a 
 <h2>Currently integrated detectors<a class="headerlink" href="#currently-integrated-detectors" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="hhrepid">
 <h3>HHrepID<a class="headerlink" href="#hhrepid" title="Permalink to this headline">¶</a></h3>
-<p>HHrepID is a profile self alignment <em>de novo</em> tandem repeat detection software
+<p>HHrepID is a profile self alignment <em>de novo</em> amino acid tandem repeat detection software
 <a class="reference external" href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002195">published e.g. in PLOS Computational Biology (2011)</a> (<a class="reference external" href="http://toolkit.tuebingen.mpg.de/hhrepid">Installation instructions</a>).</p>
 <p>The executable is the binary <em>hmmbuild</em>:</p>
 <div class="highlight-python"><div class="highlight"><pre>/my/path/to/hhrepid_64
 </pre></div>
 </div>
 </div>
+<div class="section" id="phobos">
+<h3>PHOBOS<a class="headerlink" href="#phobos" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://www.ruhr-uni-bochum.de/ecoevo/cm/cm_phobos.htm">PHOBOS</a>  is an unpublished <em>k</em>-mer based <em>de novo</em> DNA tandem repeat detection software.</p>
+<p>The executable is the binary:</p>
+<div class="highlight-python"><div class="highlight"><pre>/my/path/to/phobos
+</pre></div>
+</div>
+</div>
 <div class="section" id="tred">
 <h3>TRED<a class="headerlink" href="#tred" title="Permalink to this headline">¶</a></h3>
-<p>TRED is a sequence self alignment <em>de novo</em> tandem repeat detection software
+<p>TRED is a sequence self alignment <em>de novo</em> amino acid tandem repeat detection software
 <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/23/2/e30.short">published in Bioinformatics (2007)</a> (The software is available on request).</p>
-<p>The executable should look as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">UNFINISHED</span><span class="p">]</span>
+<p>The executable is the binary:</p>
+<div class="highlight-python"><div class="highlight"><pre>/my/path/to/tred
 </pre></div>
 </div>
 </div>
 <div class="section" id="t-reks">
 <h3>T-REKS<a class="headerlink" href="#t-reks" title="Permalink to this headline">¶</a></h3>
-<p>T-REKS is a <em>k</em>-mer based <em>de novo</em> tandem repeat detection software
+<p>T-REKS is a <em>k</em>-mer based <em>de novo</em> DNA/AA tandem repeat detection software
 <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/25/20/2632.short">published in Bioinformatics (2009)</a> (<a class="reference external" href="http://bioinfo.montp.cnrs.fr/?r=t-reks">Installation instructions</a>).</p>
 <p>The executable is a shell script with the following content:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh
@@ -167,16 +184,16 @@ java -jar /my/path/to/T-Reks.jar $@
 </div>
 <div class="section" id="trf">
 <h3>TRF<a class="headerlink" href="#trf" title="Permalink to this headline">¶</a></h3>
-<p>TRF is a <em>k</em>-mer based self alignment <em>de novo</em> tandem repeat detection software
+<p>TRF is a <em>k</em>-mer based self alignment <em>de novo</em> DNA tandem repeat detection software
 <a class="reference external" href="http://nar.oxfordjournals.org/content/27/2/573.full">published in Nucleic Acids Research (1999)</a> (<a class="reference external" href="http://tandem.bu.edu/trf/trf.html">Installation instructions</a>).</p>
-<p>The executable should look as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">UNFINISHED</span><span class="p">]</span>
+<p>The executable is the binary:</p>
+<div class="highlight-python"><div class="highlight"><pre>/my/path/to/trf
 </pre></div>
 </div>
 </div>
 <div class="section" id="trust">
 <h3>TRUST<a class="headerlink" href="#trust" title="Permalink to this headline">¶</a></h3>
-<p>TRUST is a sequence self alignment <em>de novo</em> tandem repeat detection software
+<p>TRUST is a sequence self alignment <em>de novo</em> amino acid tandem repeat detection software
 <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/20/suppl_1/i311.short">published in Bioinformatics (2004)</a> (<a class="reference external" href="http://www.ibi.vu.nl/programs/trustwww/">Installation instructions</a>).</p>
 <p>The executable is a shell script with the following content (you can amend the java memory consumption restrictions):</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh
@@ -185,8 +202,8 @@ java -Xmx30G -cp /my/path/to/TRUST/1.0.0/Align nl.vu.cs.align.SelfSimilarity $@
 </div>
 </div>
 <div class="section" id="xstream">
-<span id="id1"></span><h3>XSTREAM<a class="headerlink" href="#xstream" title="Permalink to this headline">¶</a></h3>
-<p>XSTREAM is a <em>k</em>-mer based <em>de novo</em> tandem repeat detection software
+<span id="id2"></span><h3>XSTREAM<a class="headerlink" href="#xstream" title="Permalink to this headline">¶</a></h3>
+<p>XSTREAM is a <em>k</em>-mer based <em>de novo</em> DNA/AA tandem repeat detection software
 <a class="reference external" href="http://www.biomedcentral.com/1471-2105/8/382/">published in BMC Bioinformatics (2007)</a> (<a class="reference external" href="http://jimcooperlab.mcdb.ucsb.edu/xstream/download.jsp">Installation instructions</a>).</p>
 <p>The executable is a shell script with the following content:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh

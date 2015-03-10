@@ -81,6 +81,7 @@ Default behaviour when new Repeat instances are created
         calc_score = False  # Is the score calculated?
         calc_pValue = False # Is the pValue calculated?
         precision = 10
+        GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
 
 
 Default parameters for the model of repeat evolution used for statistical significance calculation
