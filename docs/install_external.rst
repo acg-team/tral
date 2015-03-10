@@ -16,16 +16,16 @@ At current, only support for HMMER is integrated `published in Bioinformatics (2
 
 ::
 
-    /my/path/to/hmmbuild
+    hmmbuild = /my/path/to/hmmbuild
 
 
 Alignment of tandem repeat units
 ---------------------------------
-INSTALL MAFFT
+Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
 
 ::
 
-    /my/path/to/ginsi
+    ginsi = /my/path/to/ginsi
 
 
 
