@@ -83,9 +83,9 @@ class Repeat:
                 divergence =  self.dDivergence[type]
             except:
                 divergence = None
-            first_line += " pValue:{0} divergence:{1} type:{}".format(pValue, divergence, type)
+            first_line += " pValue:{0} divergence:{1} type:{2}".format(pValue, divergence, type)
 
-        return first_line + "\n".join(self.msa)
+        return first_line + "\n" + "\n".join(self.msa)
 
     def create(file, format):
 
