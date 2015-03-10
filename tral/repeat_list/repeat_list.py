@@ -33,10 +33,15 @@ class Repeat_list:
         repeats (list of Repeat): The list of tandem repats.
     """
 
+    def __str__(self):
+
+        """
+            Create string for Repeat_list instance.
+        """
+        return str(self.repeats)
 
     def __init__(self, repeats):
         self.repeats = repeats
-
 
     def __add__(self, rl):
         if rl:
