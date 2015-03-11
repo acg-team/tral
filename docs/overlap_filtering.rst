@@ -6,6 +6,11 @@ Perform overlap filtering of redundant tandem repeat annotations.
 Here you learn how to detect tandem repeat annotations from multiple sources for different
 types of overlap, and filter them accordingly.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`.
+- :ref:`Download p-Value distribution files <pValuefiles>`.
+
 
 Read in tandem repeat annotations.
 ----------------------------------

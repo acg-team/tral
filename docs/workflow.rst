@@ -13,17 +13,15 @@ annotation on several computing  nodes in parallel. Here, we provide a system to
 the distribution and collection of tandem repeat annotation jobs with
 `GC3Pie <https://code.google.com/p/gc3pie/>`_.
 
-Everything is explained with a `toy workflow`_ located in directory
-``examples``:file: within the TRAL sources.
-
-.. _`toy workflow`: https://github.com/elkeschaper/tral/examples/workflow
-
-You can print the path to the local copy included in TRAL with this Python code::
+Everything is explained with a `toy workflow located in the TRAL source`_. You can print
+the path to the local copy included in TRAL with this Python code::
 
     import os
     from tral.paths import PACKAGE_DIRECTORY
-    workflow_path = os.path.join(PACKAGE_DIRECTORY, "examples", "workflow")
-    print(workflow_path)
+    print(os.path.join(PACKAGE_DIRECTORY, "examples", "workflow"))
+
+.. _`toy workflow located in the TRAL source`: https://github.com/elkeschaper/tral/tree/develop/tral/examples/workflow
+
 
 
 Configure TRAL.

@@ -8,7 +8,7 @@ Here you learn how to perform statistical significance tests on your candidate s
 TRAL currently provides a variety of model-based and none-model based tests. They are
 detailed in a :ref:`NAR publication (2012) <publications>`.
 
-The requirements for this tutorial are:
+Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`.
 - :ref:`Download p-Value distribution files <pValuefiles>`.

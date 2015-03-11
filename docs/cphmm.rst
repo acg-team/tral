@@ -8,6 +8,10 @@ The sequence profile model is transformed into a circular profile HMM, as descri
 a :ref:`recent MBE publication <publications>`. Next, the sequence
 is searched for tandem repeats using the circular profile HMM.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`.
+- :ref:`Install Mafft/ginsi for tandem repeat unit alignment <MAFFT>`.
 
 
 Read in your sequence profile model.
@@ -49,8 +53,7 @@ Annotate tandem repeats with the circular profile HMM.
     print(tandem_repeats.repeats[0])
 
 
-The result is a tandem repeat:
-::
+The result is a tandem repeat::
 
     >>> print(tandem_repeats.repeats[0])
     > begin:31 lD:49 n:5
@@ -64,22 +67,19 @@ The result is a tandem repeat:
 Output the detected tandem repeats.
 -----------------------------------
 
-Write a singe repeat_list to .tsv format:
-::
+Write a singe repeat_list to .tsv format::
 
     path_to_output_tsv_file = "/my/path/to/the/outputfile.tsv"
     tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
 
 
-Write a singe repeat_list to .pickle format:
-::
+Write a singe repeat_list to .pickle format::
 
     path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
     tandem_repeats.write(format = "pickle", file = path_to_output_pickle_file)
 
 
-A repeat_list in pickle format can easily be read in again:
-::
+A repeat_list in pickle format can easily be read in again::
 
     from tral.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)
