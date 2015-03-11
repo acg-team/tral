@@ -76,8 +76,8 @@ Do a pull request on the develop branch of  elkeschaper/tral.
 
 
 
-How to help on the homepage
----------------------------
+How to contribute to the homepage
+---------------------------------
 
 Check out the current version of the TRAL homepage as follows:
 
@@ -86,6 +86,13 @@ Check out the current version of the TRAL homepage as follows:
     git clone --single-branch -b gh-pages https://<your_git_name>@github.com/elkeschaper/tral.git
 
 
+How to test a package on pypitest
+---------------------------------
 
+Install the package from pypitest as follows:
+
+::
+
+    pip install -i https://testpypi.python.org/pypi
 
 

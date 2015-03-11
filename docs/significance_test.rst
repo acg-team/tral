@@ -8,6 +8,12 @@ Here you learn how to perform statistical significance tests on your candidate s
 TRAL currently provides a variety of model-based and none-model based tests. They are
 detailed in a :ref:`NAR publication (2012) <publications>`.
 
+The requirements for this tutorial are:
+
+- :ref:`Install TRAL <install>`.
+- :ref:`Download p-Value distribution files <pValuefiles>`.
+
+
 Read in tandem repeat annotations.
 ----------------------------------
 
@@ -15,7 +21,7 @@ Read in tandem repeat annotations.
 
     import os, pickle
     from tral import sequence
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
 
