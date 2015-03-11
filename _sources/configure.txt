@@ -159,12 +159,13 @@ defined as
     logging.config.fileConfig("path/to/your/home/.tral/logging.ini")
 
 
+.. _pValuefiles:
 
 p-Value distribution files
 --------------------------
 
 In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in *./tral/data/pValue*:
+need to be downloaded and placed in ~/.tral/data/pValue*:
 ::
 
     cd ~/.tral/data/pValue

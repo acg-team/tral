@@ -119,6 +119,11 @@
 <span id="denovo"></span><h1>Run and parse de novo repeat detection software.<a class="headerlink" href="#run-and-parse-de-novo-repeat-detection-software" title="Permalink to this headline">¶</a></h1>
 <p>Here you learn how to run external repeat detection software on your favourite sequence
 file and output the results.</p>
+<p>Requirements for this tutorial:</p>
+<ul class="simple">
+<li><a class="reference internal" href="install.html#install"><em>Install TRAL</em></a>.</li>
+<li>Install <a class="reference internal" href="install_external.html#xstream"><em>XSTREAM</em></a>. If preferred, install one or more other <a class="reference internal" href="install_external.html#install-denovo"><em>tandem repeat detectors</em></a> instead.</li>
+</ul>
 <div class="section" id="read-in-your-sequences">
 <h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
@@ -132,10 +137,17 @@ file and output the results.</p>
 </div>
 <div class="section" id="run-the-external-repeat-detector">
 <h2>Run the external repeat detector.<a class="headerlink" href="#run-the-external-repeat-detector" title="Permalink to this headline">¶</a></h2>
-<p>Detect tandem repeats on a single sequence with <a class="reference internal" href="install_external.html#xstream"><em>XSTREAM</em></a>:</p>
+<p>Detect tandem repeats on a single sequence with <a class="reference internal" href="install_external.html#xstream"><em>XSTREAM</em></a>. If you did not
+install XSTREAM, you can use any of the other <em>de novo</em> detection algorithms, but will see
+different results.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">detection</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;lFinders&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;XSTREAM&quot;</span><span class="p">]})</span>
-<span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>As an example, the first detected putative tandem repeat looks as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&gt; begin:316 lD:4 n:2</span>
+<span class="go">GDII</span>
+<span class="go">GDIR</span>
 </pre></div>
 </div>
 <p>Detect tandem repeats on all sequences with all <em>de novo</em> tandem repeat detection algorithms
@@ -143,8 +155,16 @@ defined in the <a class="reference internal" href="configure.html#configure"><em
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
     <span class="n">iTandem_repeats</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
     <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeat_list</span><span class="p">(</span><span class="n">iTandem_repeats</span><span class="p">,</span> <span class="s">&quot;denovo&quot;</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>As an example, the first detected putative tandem repeat looks as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&gt; begin:31 lD:53 n:5</span>
+<span class="go">R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-</span>
+<span class="go">P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---</span>
+<span class="go">TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL</span>
+<span class="go">---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-</span>
+<span class="go">R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------</span>
 </pre></div>
 </div>
 </div>
@@ -153,6 +173,13 @@ defined in the <a class="reference internal" href="configure.html#configure"><em
 <p>Write a singe repeat_list to .tsv format:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">path_to_output_tsv_file</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/the/outputfile.tsv&quot;</span>
 <span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;tsv&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The created .tsv looks as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ cat /my/path/to/the/outputfile.tsv
+msa_original        lD      pValue  nD      sequence_length begin
+GDII,GDIR   4       None    2.0     8       316
+FLG,FLG     3       None    2.0     6       507
 </pre></div>
 </div>
 <p>Write a singe repeat_list to .pickle format:</p>
@@ -165,7 +192,7 @@ defined in the <a class="reference internal" href="configure.html#configure"><em
 <span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">Repeat_list</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Save multiple sequence together with tandem repeat annotations as:</p>
+<p>Save multiple sequence together with tandem repeat annotations:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pickle</span>
 <span class="n">path_to_output_pickle_file</span> <span class="o">=</span> <span class="s">&quot;/my/path/to/the/outputfile.pickle&quot;</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_to_output_pickle_file</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>

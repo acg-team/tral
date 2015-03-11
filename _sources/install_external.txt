@@ -19,6 +19,8 @@ At current, only support for HMMER is integrated `published in Bioinformatics (2
     hmmbuild = /my/path/to/hmmbuild
 
 
+.. _MAFFT:
+
 Alignment of tandem repeat units
 ---------------------------------
 Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
@@ -28,6 +30,7 @@ Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat uni
     ginsi = /my/path/to/ginsi
 
 
+.. _install_denovo:
 
 Currently integrated detectors
 ------------------------------
@@ -107,7 +110,6 @@ Create an executable text file with the following content (you can amend the jav
 
 
 .. _XSTREAM:
-
 
 XSTREAM
 *******
