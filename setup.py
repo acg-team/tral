@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import sys
 
 try:
@@ -49,7 +50,6 @@ setup(
         "Operating System :: OS Independent",
         ],
     install_requires=[
-        "argparse >= 1.2.1",
         "Biopython >= 1.64",
         "configobj >= 5.0.6",
         "docutils >= 0.11",
@@ -59,13 +59,14 @@ setup(
         "setuptools >= 5.1",
         "Sphinx >= 1.2.2",
     ],
-    data_files=[(os.path.join(HOME, ".tral"), glob.glob("tral/data/*.ini")),
-                (os.path.join(HOME, ".tral", "data", "hhrepid"), glob.glob("tral/data/hhrepid/*")),
-                (os.path.join(HOME, ".tral", "data", "pValue"), []),
-                (os.path.join(HOME, ".tral", "data", "substitution_rate_matrices"), glob.glob("tral/data/substitution_rate_matrices/*"))],
-    package_data={'tral': ['data/*.ini', 'data/paml/*', 'data/hhrepid/*']},
+    package_data={'tral': ['data/*.ini', 'data/hhrepid/*', 'data/substitution_rate_matrices/*']},
     package_dir={'tral': 'tral'},
 )
 
 
-print("The TRAL configuration files are now located in {}".format(os.path.join(HOME, ".tral")))
+TRAL = os.path.join(HOME, ".tral")
+if os.path.exists(TRAL):
+    print("Beware: The TRAL configuration directory {} already exists. The template configuration and datafiles are not copied to the already existing directory".format(TRAL))
+else:
+    shutil.copytree("tral/data", TRAL)
+    print("The TRAL configuration files and data files are now located in {}".format(TRAL))
