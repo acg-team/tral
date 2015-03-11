@@ -18,7 +18,7 @@ Everything is explained with a toy example located in the TRAL package directory
 ::
 
     import os
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
     workflow_path = os.path.join(PACKAGE_DIRECTORY, "examples", "workflow")
     print(workflow_path)
 

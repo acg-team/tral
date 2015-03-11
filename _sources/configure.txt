@@ -3,17 +3,17 @@
 Configuration
 =============
 
-Here you learn how to configure TRAL after installation. All configuration files are located
+Here you see how to configure TRAL after installation. All configuration files are located
 in your home directory:
 ::
 
     ~/.tral/
 
 
-configs.ini
-------------
+configs.ini: Required changes
+-----------------------------
 
-In this file, you need to define all paths and calculation defaults for using TRAL.
+In configs.ini you need to set the paths to all external software used in TRAL.
 
 
 *De novo* repeat detection
@@ -28,8 +28,8 @@ ignored.
 
     [sequence]
         [[repeat_detection]]
-            AA = *List of default de novo detectors on amino acid data*
-            DNA = *List of default de novo detectors on nucleic data*
+            AA = *List of default de novo detectors on amino acid data that you wish to use*
+            DNA = *List of default de novo detectors on nucleic data that you wish to you*
         [[repeat_detector_path]]
             PHOBOS = path/to/PHOBOS
             HHrepID = path/to/HHREPID
@@ -48,6 +48,25 @@ Build Hmmer models
     [hmm]
         hmmbuild = path/to/hmmbuild
         lDMax = 50  # maximum size of HMM for which the Viterbi algorithm is performed
+
+
+Realign tandem repeat units
+***************************
+At current, tandem repeat units are realigned with Mafft's ginsi global aligner. If tandem
+repeat unit realignment is required, for example, if you annotate tandem repeats from profile models,
+set the path to ginsi:
+
+
+::
+
+    [repeat]
+        ginsi = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+
+
+
+configs.ini: Defaults
+---------------------
+In configs.ini you can additionally change TRAL's default behaviour.
 
 
 Parameters of the default filter

@@ -82,9 +82,13 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Configuration</a><ul>
-<li><a class="reference internal" href="#configs-ini">configs.ini</a><ul>
+<li><a class="reference internal" href="#configs-ini-required-changes">configs.ini: Required changes</a><ul>
 <li><a class="reference internal" href="#de-novo-repeat-detection"><em>De novo</em> repeat detection</a></li>
 <li><a class="reference internal" href="#build-hmmer-models">Build Hmmer models</a></li>
+<li><a class="reference internal" href="#realign-tandem-repeat-units">Realign tandem repeat units</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configs-ini-defaults">configs.ini: Defaults</a><ul>
 <li><a class="reference internal" href="#parameters-of-the-default-filter">Parameters of the default filter</a></li>
 <li><a class="reference internal" href="#default-behaviour-when-new-repeat-instances-are-created">Default behaviour when new Repeat instances are created</a></li>
 <li><a class="reference internal" href="#default-parameters-for-the-model-of-repeat-evolution-used-for-statistical-significance-calculation">Default parameters for the model of repeat evolution used for statistical significance calculation</a></li>
@@ -125,14 +129,14 @@
             
   <div class="section" id="configuration">
 <span id="configure"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<p>Here you learn how to configure TRAL after installation. All configuration files are located
+<p>Here you see how to configure TRAL after installation. All configuration files are located
 in your home directory:</p>
 <div class="highlight-python"><div class="highlight"><pre>~/.tral/
 </pre></div>
 </div>
-<div class="section" id="configs-ini">
-<h2>configs.ini<a class="headerlink" href="#configs-ini" title="Permalink to this headline">¶</a></h2>
-<p>In this file, you need to define all paths and calculation defaults for using TRAL.</p>
+<div class="section" id="configs-ini-required-changes">
+<h2>configs.ini: Required changes<a class="headerlink" href="#configs-ini-required-changes" title="Permalink to this headline">¶</a></h2>
+<p>In configs.ini you need to set the paths to all external software used in TRAL.</p>
 <div class="section" id="de-novo-repeat-detection">
 <h3><em>De novo</em> repeat detection<a class="headerlink" href="#de-novo-repeat-detection" title="Permalink to this headline">¶</a></h3>
 <p>Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
@@ -141,8 +145,8 @@ Only paths for algorithms defined under [[repeat_detection]] are used, all other
 ignored.</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detection]]
-        AA = *List of default de novo detectors on amino acid data*
-        DNA = *List of default de novo detectors on nucleic data*
+        AA = *List of default de novo detectors on amino acid data that you wish to use*
+        DNA = *List of default de novo detectors on nucleic data that you wish to you*
     [[repeat_detector_path]]
         PHOBOS = path/to/PHOBOS
         HHrepID = path/to/HHREPID
@@ -162,6 +166,20 @@ ignored.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="realign-tandem-repeat-units">
+<h3>Realign tandem repeat units<a class="headerlink" href="#realign-tandem-repeat-units" title="Permalink to this headline">¶</a></h3>
+<p>At current, tandem repeat units are realigned with Mafft&#8217;s ginsi global aligner. If tandem
+repeat unit realignment is required, for example, if you annotate tandem repeats from profile models,
+set the path to ginsi:</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    ginsi = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="configs-ini-defaults">
+<h2>configs.ini: Defaults<a class="headerlink" href="#configs-ini-defaults" title="Permalink to this headline">¶</a></h2>
+<p>In configs.ini you can additionally change TRAL&#8217;s default behaviour.</p>
 <div class="section" id="parameters-of-the-default-filter">
 <h3>Parameters of the default filter<a class="headerlink" href="#parameters-of-the-default-filter" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre>[filter]

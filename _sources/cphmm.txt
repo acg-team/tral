@@ -17,7 +17,7 @@ Read in your sequence profile model.
 
     import os
     from tral.hmm import hmm
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","Kelch_1.hmm")
 
