@@ -11,7 +11,7 @@ is searched for tandem repeats using the circular profile HMM.
 Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
-- :ref:`Install Mafft/ginsi for tandem repeat unit alignment <MAFFT>` and update the :ref:`config.ini <configure>` accordingly.
+- :ref:`Install Mafft/ginsi <MAFFT>` for tandem repeat unit alignment.
 
 
 Read in your sequence profile model.

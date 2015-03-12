@@ -9,7 +9,7 @@ file and output the results.
 Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
-- Install :ref:`XSTREAM <XSTREAM>` and update the :ref:`config.ini <configure>` accordingly. If preferred, install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+- Install :ref:`XSTREAM <XSTREAM>`. If preferred, install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
 
 
 Read in your sequences.
