@@ -34,13 +34,18 @@ repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 MAX_MEMORY_USAGE = str(10000000)
 
 class BinaryExecutable:
-    def __init__(self, binary=None):
+    def __init__(self, binary=None, name = None):
         """Construct a BinaryExecutable object.
 
         """
 
         if not binary:
             raise TypeError("A binary executable must be provided :) ")
+        if not os.path.isfile(binary):
+            raise ValueError("The executable {} does not exist. Please make sure that a) "
+                    "you wish to run {} and b) the executable is in the system path, or "
+                    "the path to the executable is correctly set in config.ini".format(binary, name))
+
         self.binary = binary
 
     def get_execute_tokens(self, *args):
@@ -161,7 +166,7 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
+        executable=BinaryExecutable(binary = repeat_detector_path[name], name = name),
         config = Configuration()
     ):
         """Construct FinderHHrepID object.
