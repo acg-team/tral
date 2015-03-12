@@ -139,14 +139,18 @@ in your home directory:</p>
 <p>In configs.ini you need to set the paths to all external software used in TRAL.</p>
 <div class="section" id="de-novo-repeat-detection">
 <h3><em>De novo</em> repeat detection<a class="headerlink" href="#de-novo-repeat-detection" title="Permalink to this headline">¶</a></h3>
-<p>Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
-scripts or binaries needed is detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.
-Only paths for algorithms defined under [[repeat_detection]] are used, all other paths are
-ignored.</p>
+<p>Here, define the paths to all de novo detection algorithms you wish to use.  The makeup of the
+scripts or binaries needed is detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.</p>
+<p>Enlist all <em>de novo</em> detection algorithms you wish to use. All other algorithms are ignored.</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detection]]
-        AA = *List of default de novo detectors on amino acid data that you wish to use*
-        DNA = *List of default de novo detectors on nucleic data that you wish to you*
+        AA = HHrepID,  # List of default de novo detectors on amino acid data that you wish to use.
+        DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
+</pre></div>
+</div>
+<p>Set the absolute path to all <em>de novo</em> detection algorithm scripts or binaries you wish to use.
+The makeup of the scripts or binaries needed is detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         PHOBOS = path/to/PHOBOS
         HHrepID = path/to/HHREPID

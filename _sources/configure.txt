@@ -19,17 +19,23 @@ In configs.ini you need to set the paths to all external software used in TRAL.
 *De novo* repeat detection
 **************************
 
-Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
+Here, define the paths to all de novo detection algorithms you wish to use.  The makeup of the
 scripts or binaries needed is detailed in :ref:`Installation of external software <install_external>`.
-Only paths for algorithms defined under [[repeat_detection]] are used, all other paths are
-ignored.
 
+Enlist all *de novo* detection algorithms you wish to use. All other algorithms are ignored.
 ::
 
     [sequence]
         [[repeat_detection]]
-            AA = *List of default de novo detectors on amino acid data that you wish to use*
-            DNA = *List of default de novo detectors on nucleic data that you wish to you*
+            AA = HHrepID,  # List of default de novo detectors on amino acid data that you wish to use.
+            DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
+
+
+Set the absolute path to all *de novo* detection algorithm scripts or binaries you wish to use.
+The makeup of the scripts or binaries needed is detailed in :ref:`Installation of external software <install_external>`.
+::
+
+    [sequence]
         [[repeat_detector_path]]
             PHOBOS = path/to/PHOBOS
             HHrepID = path/to/HHREPID
