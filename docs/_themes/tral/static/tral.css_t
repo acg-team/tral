@@ -257,6 +257,10 @@ div.body a {
 }
 
 em {
+    font-style: italic;
+}
+
+a em {
     font-style: normal;
 }
 
