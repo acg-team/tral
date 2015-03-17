@@ -41,8 +41,7 @@ class BinaryExecutable:
         if not binary:
             raise TypeError("A binary executable must be provided.")
         if not os.path.isfile(binary):
-            raise ValueError("The executable {} does not exist, although {} was selected run_TRD
-            "
+            raise ValueError("The executable {} does not exist, although {} was selected "
                     "to be executed. Please make sure the executable is in the system path, or "
                     "the path to the executable is correctly set in config.ini".format(binary, name))
 
