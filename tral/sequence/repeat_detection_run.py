@@ -41,8 +41,8 @@ class BinaryExecutable:
         if not binary:
             raise TypeError("A binary executable must be provided.")
         if not os.path.isfile(binary):
-            raise ValueError("The executable {} does not exist. Please make sure that a) "
-                    "you wish to run {} and b) the executable is in the system path, or "
+            raise ValueError("The executable {} does not exist, although {} was selected "
+                    "to be executed. Please make sure the executable is in the system path, or "
                     "the path to the executable is correctly set in config.ini".format(binary, name))
 
         self.binary = binary
@@ -165,20 +165,18 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name], name = name),
-        config = Configuration()
+        name = name,
     ):
         """Construct FinderHHrepID object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderHHrepID, self).__init__(executable)
-        if config == None:
-            self.config = FinderHHrepID.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -269,21 +267,18 @@ class FinderPhobos(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"phobos")),
-        config = None
+        name = name,
     ):
         """Construct FinderPhobos object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
 
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderPhobos, self).__init__(executable)
-        if config == None:
-            self.config = FinderPhobos.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -341,20 +336,18 @@ class FinderTRED(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTRED object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTRED, self).__init__(executable)
-        if config == None:
-            self.config = FinderTRED.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -424,20 +417,17 @@ class FinderTREKS(TRFFinder):
             return bool_toks + value_toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTREKS object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTREKS, self).__init__(executable)
-        if config == None:
-            self.config = FinderTREKS.Configuration()
-        else:
-            self.config = config
 
 
     def run_process(self, working_dir, infile):
@@ -516,20 +506,18 @@ class FinderTRF(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTRF object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTRF, self).__init__(executable)
-        if config == None:
-            self.config = FinderTRF.Configuration()
-        else:
-            self.config = config
+
 
 
     def run_process(self, working_dir, infile):
@@ -595,17 +583,17 @@ class FinderTrust(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = Configuration()
+        name = name
     ):
         """Construct FinderTrust object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTrust, self).__init__(executable)
-        self.config = config
 
 
     def run_process(self, working_dir, infile):
@@ -689,17 +677,17 @@ class FinderXStream(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = Configuration()
+        name = name
     ):
         """Construct FinderXStream object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderXStream, self).__init__(executable)
-        self.config = config
 
     def find_chartfile(self, searchdir):
         """Look for XSTREAM output xls file and return filepath"""
@@ -765,7 +753,6 @@ def Finders(lFinder = None, sequence_type = None):
     Raises:
         Exception: if at least one of the provided finders in ``lFinder`` does not exist.
 
-    .. ToDo:: Is FINDER_LIST defined correctly?
     """
 
     global finders
