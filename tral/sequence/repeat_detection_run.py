@@ -31,7 +31,6 @@ c = configuration.Configuration.Instance()
 general_config = c.config
 repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
-MAX_MEMORY_USAGE = str(10000000)
 
 class BinaryExecutable:
     def __init__(self, binary=None, name = None):
@@ -40,7 +39,7 @@ class BinaryExecutable:
         """
 
         if not binary:
-            raise TypeError("A binary executable must be provided :) ")
+            raise TypeError("A binary executable must be provided.")
         if not os.path.isfile(binary):
             raise ValueError("The executable {} does not exist. Please make sure that a) "
                     "you wish to run {} and b) the executable is in the system path, or "
@@ -779,7 +778,7 @@ def Finders(lFinder = None, sequence_type = None):
         if any(i not in list(itertools.chain(*general_config["sequence"]["repeat_detection"].values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
-    finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
+    finders = {FINDER_LIST[i].name:FINDER_LIST[i]() for i in lFinder}
 
 
 def split_sequence(seq_records, working_dir):
@@ -1003,20 +1002,11 @@ def set_xstream_config_open():
 
 ######################## HARDCODED OVERVIEW DICTIONARIES #################################
 
-FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
-                "Phobos": FinderPhobos(),
-                "TRED": FinderTRED(),
-                "T-REKS": FinderTREKS(),
-                "TRF": FinderTRF(),
-                "TRUST": FinderTrust(),
-                "XSTREAM": FinderXStream()
-                }
-
-FINDER_LIST = { "HHrepID": FinderHHrepID.name,
-                "Phobos": FinderPhobos.name,
-                "TRED": FinderTRED.name,
-                "T-REKS": FinderTREKS.name,
-                "TRF": FinderTRF.name,
-                "TRUST": FinderTrust.name,
-                "XSTREAM": FinderXStream.name
+FINDER_LIST = { "HHrepID": FinderHHrepID,
+                "Phobos": FinderPhobos,
+                "TRED": FinderTRED,
+                "T-REKS": FinderTREKS,
+                "TRF": FinderTRF,
+                "TRUST": FinderTrust,
+                "XSTREAM": FinderXStream
                 }
