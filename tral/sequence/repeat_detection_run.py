@@ -41,7 +41,8 @@ class BinaryExecutable:
         if not binary:
             raise TypeError("A binary executable must be provided.")
         if not os.path.isfile(binary):
-            raise ValueError("The executable {} does not exist, although {} was selected "
+            raise ValueError("The executable {} does not exist, although {} was selected run_TRD
+            "
                     "to be executed. Please make sure the executable is in the system path, or "
                     "the path to the executable is correctly set in config.ini".format(binary, name))
 
@@ -56,6 +57,54 @@ class BinaryExecutable:
     def get_execute_line(self, *args):
         """Return the command line to invoke the program with the arguments args"""
         return " ".join(self.get_execute_tokens(*args))
+
+
+def check_java_errors(outfile, errfile, log=None, procname=None):
+
+    """ Check for java problems. Return True if there were problems, else False.
+
+    Check for these java errors:
+
+     * Stdout file is empty but stderr file is not.
+     * Java Exception string is indicated in the errfile
+
+     Return True if there were problems, else False.
+
+    Args:
+        outfile (file handle):  Redirected standard output channel file.
+        errfile (file handle): Redirected standard error channel file
+            If None, no copies are saved.
+        log (?): Name of the log to issue log messages to. If none, no log
+                messages will be issued.
+
+    .. todo:: Complete docstring
+    """
+
+
+    has_error = False
+
+    with open(outfile, mode='r') as of, open(errfile, mode='r') as ef:
+        outfile_size = of.seek(0, os.SEEK_END)
+        errfile_str = ef.read()
+
+    errfile_size = len(errfile_str)
+
+    if (errfile_size != 0 and outfile_size == 0):
+        has_error = True
+        log.warning(
+            "Process \"%s\" has empty STDOUT but non-empty STDERR",
+            procname)
+
+    pat_javaexc = re.compile(r'Exception in thread ".+" \S+:.*$(\s+at .+)+', re.M)
+
+    m = pat_javaexc.search(errfile_str)
+    if m:
+        has_error = True
+        log.warning(
+            "Java Exception probably occured in process \"%s\"! Exception information:\n%s",
+            procname, m.group(0))
+
+    return has_error
 
 
 class TRFFinder(object):
@@ -686,7 +735,7 @@ class FinderXStream(TRFFinder):
         """
 
         self.config = self.Configuration()
-        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
+        executable = BinaryExecutable(binary=repeat_detector_path[name], name=name)
         super(FinderXStream, self).__init__(executable)
 
     def find_chartfile(self, searchdir):
