@@ -10,8 +10,9 @@ detailed in a :ref:`NAR publication (2012) <publications>`.
 
 Requirements for this tutorial:
 
-- :ref:`Install TRAL <install>`.
+- :ref:`Install TRAL <install>`. TRAL ships with the sequence data needed for this tutorial.
 - :ref:`Download p-Value distribution files <pValuefiles>`.
+
 
 
 Read in tandem repeat annotations.

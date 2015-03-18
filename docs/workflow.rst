@@ -41,7 +41,7 @@ To annotate sequences with tandem repeats, we acquired the following data:
 Sequence data
 ^^^^^^^^^^^^^^^^
 
-We downloaded all `UniprotKB/Swissprot human PRDM genes
+We downloaded all `UniProtKB/Swiss-Prot human PRDM genes
 <http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&sort=score>`_
 in fasta format...
 

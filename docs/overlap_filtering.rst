@@ -8,7 +8,7 @@ types of overlap, and filter them accordingly.
 
 Requirements for this tutorial:
 
-- :ref:`Install TRAL <install>`.
+- :ref:`Install TRAL <install>`. TRAL ships with the tandem repeat data needed for this tutorial.
 - :ref:`Download p-Value distribution files <pValuefiles>`.
 
 

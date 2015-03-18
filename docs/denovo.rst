@@ -8,8 +8,8 @@ file and output the results.
 
 Requirements for this tutorial:
 
-- :ref:`Install TRAL <install>`.
-- Install :ref:`XSTREAM <XSTREAM>`. If preferred, install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+- :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
+- :ref:`Install XSTREAM <XSTREAM>`. If preferred, install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
 
 
 Read in your sequences.
@@ -71,13 +71,13 @@ Output the detected tandem repeats.
 
 Write a singe repeat_list to .tsv format::
 
-    path_to_output_tsv_file = "/my/path/to/the/outputfile.tsv"
+    path_to_output_tsv_file = "outputfile.tsv" # Choose your path and filename
     tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
 
 
 The created .tsv looks as follows::
 
-    $ cat /my/path/to/the/outputfile.tsv
+    $ cat outputfile.tsv
     msa_original	lD	pValue	nD	sequence_length	begin
     GDII,GDIR	4	None	2.0	8	316
     FLG,FLG	3	None	2.0	6	507
@@ -85,7 +85,7 @@ The created .tsv looks as follows::
 
 Write a singe repeat_list to .pickle format::
 
-    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    path_to_output_pickle_file = "outputfile.pickle"  # Choose your path and filename
     tandem_repeats.write(format = "pickle", file = path_to_output_pickle_file)
 
 
@@ -98,6 +98,6 @@ A repeat_list in pickle format can easily be read in again::
 Save multiple sequence together with tandem repeat annotations::
 
     import pickle
-    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    path_to_output_pickle_file = "outputfile.pickle" # Choose your path and filename
     with open(path_to_output_pickle_file, 'wb') as fh:
         pickle.dump(lHIV_Sequence, fh)

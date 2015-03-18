@@ -15,9 +15,9 @@ People
 - `Riccardo Murri <http://www.gc3.uzh.ch/people/rm/>`_
 - `Julia Pecerska <http://www.bsse.ethz.ch/department/people/detail-person.html?persid=192596>`_
 - `Elke Schaper <http://www.inf.ethz.ch/personal/eschaper/>`_
+- `Heinz Stockinger <http://people.isb-sib.ch/Heinz.Stockinger/>`_
 - `Ioannis Xenarios <http://www.isb-sib.ch/groups/lausanne/vital-it-xenarios.html#Xenarios>`_
 - `Stefan Zoller <http://people.inf.ethz.ch/zollers/>`_
-- [INCOMPLETE]
 
 
 .. _publications:
