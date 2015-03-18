@@ -9,6 +9,7 @@
 
 """
 
+import distutils
 import itertools
 import logging
 import os
@@ -40,12 +41,11 @@ class BinaryExecutable:
 
         if not binary:
             raise TypeError("A binary executable must be provided.")
-        if not os.path.isfile(binary):
+        self.binary = distutils.spawn.find_executable(binary) # Python3.3: shutil.which()
+        if not self.binary:
             raise ValueError("The executable {} does not exist, although {} was selected "
                     "to be executed. Please make sure the executable is in the system path, or "
                     "the path to the executable is correctly set in config.ini".format(binary, name))
-
-        self.binary = binary
 
     def get_execute_tokens(self, *args):
         """Return the tokens to invoke the program with the arguments args"""
@@ -496,6 +496,7 @@ class FinderTREKS(TRFFinder):
         with open(stdoutfname, "r") as outfile:
             tmp = list(repeat_detection_io.treks_get_repeats(outfile))
         return tmp
+
 
 class FinderTRF(TRFFinder):
     name = 'TRF'
@@ -1021,7 +1022,6 @@ def set_trust_config_open():
     log.debug("%s config tokens: %s", finders['trust'].displayname,
                         ", ".join(finders['trust'].config.tokens()))
     return config
-
 
 def set_xstream_config_open():
     # construct open configuration for XStream
