@@ -41,7 +41,10 @@ class BinaryExecutable:
 
         if not binary:
             raise TypeError("A binary executable must be provided.")
-        self.binary = distutils.spawn.find_executable(binary) # Python3.3: shutil.which()
+        try:
+            self.binary = shutil.which(binary)
+        except:
+            self.binary = distutils.spawn.find_executable(binary)
         if not self.binary:
             raise ValueError("The executable {} does not exist, although {} was selected "
                     "to be executed. Please make sure the executable is in the system path, or "
