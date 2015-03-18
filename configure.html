@@ -276,9 +276,10 @@ defined as</p>
 <div class="section" id="p-value-distribution-files">
 <span id="pvaluefiles"></span><h2>p-Value distribution files<a class="headerlink" href="#p-value-distribution-files" title="Permalink to this headline">¶</a></h2>
 <p>In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in ~/.tral/data/pValue*:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/data/pValue
-svn checkout https://github.com/elkeschaper/tral/trunk/tral/data/pValue .
+need to be downloaded and placed in ~/.tral/data/pValue:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/data
+wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pValue.tar.gz
+tar -xvzf pValue.tar.gz
 </pre></div>
 </div>
 </div>

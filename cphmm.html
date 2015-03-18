@@ -153,7 +153,6 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm">
 <h2>Annotate tandem repeats with the circular profile HMM.<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>The result is a tandem repeat:</p>
