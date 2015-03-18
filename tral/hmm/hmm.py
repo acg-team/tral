@@ -91,9 +91,12 @@ class HMM:
             Create string for HMM instance.
         """
         try:
-            hmm = "".format(self.id, self.lD)
+            tmp = [self.p_e[i] for i in self.match_states]
+            tmp = "".join([max(i.keys(), key=(lambda key: i[key])) for i in tmp])
+            hmm = "cpHMM ID:          {}\ncpHMM length: {}\n".format(self.id, self.lD)
+            hmm += "Most likely motif:      {}".format(tmp)
         except:
-            hmm = None
+            hmm = "<HMM instance>"
             log.warning("Could not create string of HMM instance.")
 
         return hmm
