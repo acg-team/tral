@@ -155,7 +155,7 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>The result is a tandem repeat:</p>
+<p>The result is a tandem repeat <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">&gt; begin:31 lD:49 n:5</span>
 <span class="go">R--------PRHGHRAVAIKELIVVFGGG---------------------------------------------------------------------NEGIVDELHVYNTATNQW---FIPAVRGDIP-</span>

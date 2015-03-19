@@ -136,8 +136,11 @@ detailed in a <a class="reference internal" href="contributors.html#publications
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are nine proteins in the HIV proteome:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">)</span>
+<span class="go">9</span>
 </pre></div>
 </div>
 </div>
@@ -152,7 +155,7 @@ p-Value with parameters defined in the <a class="reference internal" href="confi
 </pre></div>
 </div>
 <p>For example, the following putative tandem repeat is found to be non-significant with the used model
-of tandem repeat evolution:</p>
+of tandem repeat evolution <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">&gt;begin:94 lD:7 n:2 pValue:1.0 divergence:1.656005859375</span>
 <span class="go">EKGGLEGLIYSKKRQE</span>

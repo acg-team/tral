@@ -142,27 +142,34 @@ the path to the local copy included in TRAL with this Python code:</p>
 <span class="k">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;workflow&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
+<p>To follow this tutorial, set a shell variable $MYTRAL to the package variable PACKAGE_DIRECTORY. In bash and sh, this can be done with:</p>
+<blockquote>
+<div>export MYTRAL=/path/to/your/package/directory</div></blockquote>
+<p>For csh or tcsh, use:</p>
+<blockquote>
+<div>setenv MYTRAL /path/to/your/package/directory</div></blockquote>
 <div class="section" id="configure-tral">
 <h2>Configure TRAL.<a class="headerlink" href="#configure-tral" title="Permalink to this headline">¶</a></h2>
 <p>We start by <a class="reference internal" href="configure.html#configure"><em>adapting the TRAL configuration files</em></a> to choose for
 example which external tandem repeat detection algorithms you would like to run on the
-sequence data.</p>
+sequence data. Don&#8217;t forget to add a comma behind the last entry in this list, otherwise the
+file format is violated.</p>
 <p>Now, let&#8217;s move ahead to data acquisition:</p>
 </div>
 <div class="section" id="prepare-your-data">
 <h2>Prepare your data.<a class="headerlink" href="#prepare-your-data" title="Permalink to this headline">¶</a></h2>
-<p>To annotate sequences with tandem repeats, we acquired the following data:</p>
+<p>To annotate sequences with tandem repeats, we already acquired the following data and stored it in $MYTRAL/examples/workflow :</p>
 <div class="section" id="sequence-data">
 <h3>Sequence data<a class="headerlink" href="#sequence-data" title="Permalink to this headline">¶</a></h3>
 <p>We downloaded all <a class="reference external" href="http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&amp;sort=score">UniProtKB/Swiss-Prot human PRDM genes</a>
 in fasta format...</p>
-<div class="highlight-python"><div class="highlight"><pre>cd path/to/tral/examples/workflow
+<div class="highlight-python"><div class="highlight"><pre>cd $MYTRAL/examples/workflow
 less uniprot_PRDM.fasta
 </pre></div>
 </div>
 <p>... and split the sequence file into subsets on which the tandem repeat annotation can be
 performed in parallel.</p>
-<div class="highlight-python"><div class="highlight"><pre>ls /split_sequence_data/*
+<div class="highlight-python"><div class="highlight"><pre>ls split_sequence_data/*
 </pre></div>
 </div>
 <p>On a sidenote, <a class="reference external" href="ftp://saf.bio.caltech.edu/pub/software/molbio/fastasplitn.c">fastasplitn</a>
@@ -194,7 +201,8 @@ for .fasta file indexing.</p>
 <h3>Test the file preprocessing.<a class="headerlink" href="#test-the-file-preprocessing" title="Permalink to this headline">¶</a></h3>
 <p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:</p>
-<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw path/to/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm_raw path/to/workflow/PRDM_PFAM_models.hmm --hmm path/to/workflow/hmm
+<div class="highlight-python"><div class="highlight"><pre>mkdir $MYTRAL/hmm
+python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/example/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/example/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/example/workflow/hmm
 </pre></div>
 </div>
 <p>On the small toy example, this file preparation step should run fast.</p>
@@ -203,7 +211,7 @@ to Python pickle objects:</p>
 <div class="section" id="perform-a-test-run">
 <h2>Perform a test run.<a class="headerlink" href="#perform-a-test-run" title="Permalink to this headline">¶</a></h2>
 <p>With the following command, annotation is performed on <em>uniprot_PRDM_1.fasta</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py workflow -i path/to/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o path/to/workflow/results/uniprot_PRDM_1.pickle -os path/to/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm path/to/workflow/hmm
+<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/example/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/example/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/example/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/example/workflow/hmm
 </pre></div>
 </div>
 <p>If this runs fine, you should see annotation results in:</p>
@@ -229,7 +237,7 @@ $ gstat
 $ ...
 
 
-$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf /path/to/workflow/tandem_repeat_annotation_workflow.ini
+$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini
 </pre></div>
 </div>
 </div>
