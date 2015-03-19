@@ -813,6 +813,10 @@ def Finders(lFinder = None, sequence_type = None):
         sequence_type = general_config["sequence_type"]
     if not lFinder:
         lFinder = general_config["sequence"]["repeat_detection"][sequence_type]
+    if not isinstance(lFinder, list):
+        raise TypeError(""" lFinder is not of type list. Please supply a list of TR detectors
+        (e.g. lFinder = ['HHrepID']). If you use TR detectors defined in config.ini, make
+        sure the TR detector name is followed by a comma. E.g.: HHrepID,""")
     else:
         if any(i not in list(itertools.chain(*general_config["sequence"]["repeat_detection"].values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
