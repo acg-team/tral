@@ -52,7 +52,7 @@ Annotate tandem repeats with the circular profile HMM.
     tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_Kelch_1])
 
 
-The result is a tandem repeat::
+The result is a tandem repeat :ref:`(interpretation) <background>`::
 
     >>> print(tandem_repeats.repeats[0])
     > begin:31 lD:49 n:5

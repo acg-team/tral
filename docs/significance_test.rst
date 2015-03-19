@@ -29,8 +29,12 @@ Read in tandem repeat annotations.
     with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)
 
-    print(lHIV_Sequence)
 
+
+There are nine proteins in the HIV proteome::
+
+    >>> print(lHIV_Sequence)
+    9
 
 
 Perform a statistical significance test.
@@ -46,7 +50,7 @@ p-Value with parameters defined in the :ref:`configuration file <configure>`:
                 iTandemRepeat.calculate_pValues()
 
 For example, the following putative tandem repeat is found to be non-significant with the used model
-of tandem repeat evolution:
+of tandem repeat evolution :ref:`(interpretation) <background>`:
 ::
 
     >>> print(lHIV_Sequence[2].dRepeat_list['denovo'].repeats[0])

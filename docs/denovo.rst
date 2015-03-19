@@ -9,7 +9,7 @@ file and output the results.
 Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
-- :ref:`Install XSTREAM <XSTREAM>`. If preferred, install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+- :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
 
 
 Read in your sequences.
@@ -37,7 +37,7 @@ different results.
     tandem_repeats = lHIV_Sequence[0].detect(denovo = True, detection = {"lFinders": ["XSTREAM"]})
 
 
-As an example, the first detected putative tandem repeat looks as follows::
+As an example, the first detected putative tandem repeat looks as follows :ref:`(interpretation) <background>`::
 
     >>> print(tandem_repeats.repeats[0])
     > begin:316 lD:4 n:2
@@ -54,17 +54,25 @@ defined in the :ref:`configuration file <configure>`::
         iSequence.set_repeat_list(iTandem_repeats, "denovo")
 
 
-As an example, the first detected putative tandem repeat looks as follows:
-::
+Different different algorithms usually detect different tandem repeats. This the the
+absolute number of detections in the HIV proteome for a couple of algorithms::
 
-    >>> print(lHIV_Sequence[0].dRepeat_list['denovo'].repeats[0])
-    > begin:31 lD:53 n:5
-    R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-
-    P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---
-    TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL
-    ---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-
-    R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "HHrepID"])
+    9
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "T-REKS"])
+    4
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "TRUST"])
+    0
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "XSTREAM"])
+    9
 
+
+As an example, T-REKS detects the following repeat in the second HIV sequence :ref:`(interpretation) <background>`::
+
+    >>> print([i for i in lHIV_Sequence[1].dRepeat_list['denovo'].repeats if i.TRD == "T-REKS"][0])
+    > begin:449 lD:10 n:2
+    RPEPTAPP-ESL
+    RPEPTAPPPES-
 
 Output the detected tandem repeats.
 -----------------------------------
@@ -75,7 +83,7 @@ Write a singe repeat_list to .tsv format::
     tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
 
 
-The created .tsv looks as follows::
+The created .tsv looks as follows :ref:`(interpretation) <background>`::
 
     $ cat outputfile.tsv
     msa_original	lD	pValue	nD	sequence_length	begin
