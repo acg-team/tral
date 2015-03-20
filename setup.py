@@ -30,7 +30,7 @@ SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_re
 
 setup(
     name='tral',
-    version='0.3.11',
+    version='0.3.12',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tral', 'tral.test', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],
@@ -60,7 +60,7 @@ setup(
         "scipy >=0.12.0",
         #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
-    package_data={'tral': ['data/*.ini', 'data/data/hhrepid/*', 'data/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', 'examples/workflow/*']},
+    package_data={'tral': ['tral_configuration/*.ini', 'tral_configuration/data/hhrepid/*', 'tral_configuration/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', 'examples/workflow/*']},
     package_dir={'tral': 'tral'},
 )
 
@@ -69,5 +69,5 @@ TRAL = os.path.join(HOME, ".tral")
 if os.path.exists(TRAL):
     print("The TRAL configuration directory {} already exists. The template configuration and datafiles are not copied to the already existing directory at this step.".format(TRAL))
 else:
-    shutil.copytree("tral/data", TRAL)
+    shutil.copytree("tral/tral_configuration", TRAL)
     print("The TRAL configuration files and data files are now located in {}".format(TRAL))
