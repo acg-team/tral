@@ -1,4 +1,4 @@
-.. _configure:
+background.rst.. _configure:
 
 Configuration
 =============
@@ -173,7 +173,7 @@ p-Value distribution files
 --------------------------
 
 In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in ~/.tral/data/pValue:
+need to be downloaded (2.6Gb) and placed in ~/.tral/data/pValue:
 ::
 
     cd ~/.tral/data
@@ -181,6 +181,5 @@ need to be downloaded and placed in ~/.tral/data/pValue:
     tar -xvzf pValue.tar.gz
 
 
-
-
-
+Instead of downloading all p-Value distributions, it is possible to download only the
+`distributions for particular models of sequence evolution <ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/>`_.

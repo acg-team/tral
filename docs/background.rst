@@ -3,10 +3,9 @@
 Background
 ==========
 
-Printing tandem repeats
------------------------
+
 When printing a tandem repeat, you will see a lot of information. Here is what it means.
-(You get this example from :ref:`the significance test tutorials <significance test>`) ::
+(You get this example from :ref:`the significance test tutorials <significance_test>`) ::
 
     >>> print(lHIV_Sequence[4].dRepeat_list['denovo'].repeats[1])
     > begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164 type:phylo_gap01
