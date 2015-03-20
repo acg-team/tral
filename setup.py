@@ -30,7 +30,7 @@ SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_re
 
 setup(
     name='tral',
-    version='0.3.12',
+    version='0.3.2',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tral', 'tral.test', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],
@@ -39,7 +39,7 @@ setup(
     url='http://pypi.python.org/pypi/tral/',
     license='LICENSE.txt',
     description='Detect and evaluate tandem repeats in genomic sequence data.',
-    long_description=read('README.markdown'),
+    long_description=read('README.rst'),
     #include_package_data=True, # If you want files mentioned in MANIFEST.in also to be installed, i.e. copied to usr/local/bin
     classifiers = [
         "Intended Audience :: Science/Research",
@@ -56,11 +56,12 @@ setup(
         "configobj >= 5.0.6",
         #"docutils >= 0.11", # Uncomment if you wish to create the documentation locally.
         "numpy >= 1.6.1",
-        "pytest >= 2.5.2",
+        #"pypandoc >= 0.9.6" # Uncomment if you wish to convert the markdown readme to a rest readme for upload on Pypi.
+        #"pytest >= 2.5.2", # Uncomment if you wish to run the tests locally.
         "scipy >=0.12.0",
         #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
-    package_data={'tral': ['tral_configuration/*.ini', 'tral_configuration/data/hhrepid/*', 'tral_configuration/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', 'examples/workflow/*']},
+    package_data={'tral': ['tral_configuration/*.ini', 'tral_configuration/data/hhrepid/*', 'tral_configuration/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', "tral/examples/workflow/*.py","tral/examples/workflow/*.tsv","tral/examples/workflow/*.ini","tral/examples/workflow/*.hmm","tral/examples/workflow/*.fasta","tral/examples/workflow/split_sequence_data/*.fasta"]},
     package_dir={'tral': 'tral'},
 )
 
