@@ -10,12 +10,12 @@ TRAL is a highly modularized, flexible sequence tandem repeats annotation Python
 The source code is [documented on GitHub IO].
 
 ### Version
-0.3.0
+0.3.2
 
 
 ### Installation
 
-TRAL is available on [Pypi] and can be installed with [pip] for Python>2.7 and Python>3.2:
+TRAL is available on [Pypi] and can be installed with [pip] for Python>3.2 [(installation instructions)]:
 
 ```sh
 $ pip install tral
@@ -27,5 +27,6 @@ $ pip install tral
 GNU
 
 [documented on GitHub IO]:http://elkeschaper.github.io/tral/
+[(installation instructions)]:http://elkeschaper.github.io/tral/install.html#install
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
