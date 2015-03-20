@@ -15,11 +15,13 @@ The source code is [documented on GitHub IO].
 
 ### Installation
 
-TRAL is available on [Pypi] and can be installed with [pip] for Python>3.2 [(installation instructions)]:
+TRAL is available on [Pypi] and can be installed with [pip] for Python>=3.2:
 
 ```sh
 $ pip install tral
 ```
+
+See also more extensive [Installation instructions].
 
 
 ### License
@@ -27,6 +29,6 @@ $ pip install tral
 GNU
 
 [documented on GitHub IO]:http://elkeschaper.github.io/tral/
-[(installation instructions)]:http://elkeschaper.github.io/tral/install.html#install
+[Installation instructions]:http://elkeschaper.github.io/tral/install.html#install
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
