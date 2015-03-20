@@ -86,9 +86,9 @@ Write a singe repeat_list to .tsv format::
 The created .tsv looks as follows :ref:`(interpretation) <background>`::
 
     $ cat outputfile.tsv
-    msa_original	lD	pValue	nD	sequence_length	begin
-    GDII,GDIR	4	None	2.0	8	316
-    FLG,FLG	3	None	2.0	6	507
+    begin   msa_original    lD      nD      sequence_length divergence      pValue
+    316     GDII,GDIR       4       2.0     8       None    None
+    507     FLG,FLG 3       2.0     6       None    None
 
 
 Write a singe repeat_list to .pickle format::

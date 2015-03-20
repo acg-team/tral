@@ -67,15 +67,18 @@ Writing a tandem repeat to .csv
 
 When you write a tandem repeat to .csv with TRAL, the result may look as follows::
 
-    msa_original	lD	pValue	nD	sequence_length	begin
-    GDII,GDIR	4	None	2.0	8	316
-    FLG,FLG	3	None	2.0	6	507
+begin   msa_original    lD      nD      sequence_length divergence      pValue
+316     GDII,GDIR       4       2.0     8       None    None
+507     FLG,FLG 3       2.0     6       None    None
 
 
 Additional to the tandem repeat characteristics explained above, here you can find:
 
 - **msa_original**: The tandem repeat unit alignment, with units separated by commata.
 - **sequence_length**: The number of characters covered by the tandem repeat region.
+
+*None* values indicated that the required characteristics had not been calculated previously
+in the code.
 
 
 
