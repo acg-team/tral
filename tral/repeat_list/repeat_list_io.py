@@ -72,7 +72,7 @@ def serialize_repeat_list_tsv(tandem_repeats, config = config):
                 raise Exception("The attribute {} is not available for tandem_repeats".format(iConfig))
         data.append( "\t".join(str(i) for i in d) )
 
-    return "\n".join(data)
+    return "\n".join(data) + "\n"
 
 
 

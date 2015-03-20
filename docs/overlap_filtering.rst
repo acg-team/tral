@@ -6,6 +6,11 @@ Perform overlap filtering of redundant tandem repeat annotations.
 Here you learn how to detect tandem repeat annotations from multiple sources for different
 types of overlap, and filter them accordingly.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`. TRAL ships with the tandem repeat data needed for this tutorial.
+- :ref:`Download p-Value distribution files <pValuefiles>`.
+
 
 Read in tandem repeat annotations.
 ----------------------------------
@@ -14,7 +19,7 @@ Read in tandem repeat annotations.
 
     import os, pickle
     from tral import sequence
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
 
@@ -36,14 +41,14 @@ Tandem repeats can be clustered according to different types of overlap:
         iSequence.dRepeat_list['denovo'].cluster(overlap_type)
 
 
-In the first sequences, no repeats share any chars, however in the second sequence, four tandem repeats
+In the first sequences, no repeats share any chars, however in the second sequence, three tandem repeats
 overlap:
 ::
 
     >>> print(lHIV_Sequence[0].dRepeat_list['denovo'].dCluster[overlap_type])
     [{4}, {3}, {2}, {1}, {0}]
-    >>> print(lHIV_Sequence[i].dRepeat_list['denovo'].dCluster[overlap_type])
-    [{0, 2, 3, 6}, {5}, {4}, {1}]
+    >>> print(lHIV_Sequence[1].dRepeat_list['denovo'].dCluster[overlap_type])
+    [{1, 2, 4}, {3}, {0}]
 
 
 Tandem repeats can also directly be filtered of overlapping tandem repeats. Here, we need
@@ -64,9 +69,9 @@ the *common ancestry* overlap:
 ::
 
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    27
+    22
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_non_overlapping"].repeats])
-    20
+    18
 
 
 

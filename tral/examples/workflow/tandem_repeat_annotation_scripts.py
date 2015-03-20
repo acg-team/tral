@@ -63,7 +63,10 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, result_f
         raise Exception("Cannot load putative pickle file sequences_file: {}".format(sequences_file))
 
     if not os.path.isdir(hmm_dir):
-        raise Exception("hmm_dir does not exists: {}".format(hmm_dir))
+        try:
+            os.makedirs(hmm_dir)
+        except:
+            raise Exception("hmm_dir does not exists and could not be created: {}".format(hmm_dir))
 
     try:
         with open(hmm_annotation_file, 'rb') as fh:
@@ -74,12 +77,18 @@ def workflow(sequences_file, hmm_annotation_file, hmm_dir, result_file, result_f
     basic_filter = config['filter']['basic']['dict']
     basic_filter_tag = config['filter']['basic']['tag']
 
-    # Load previous results:
+    # Load previous results
+    try:
+        if not os.path.isdir(os.path.dirname(result_file)):
+            os.makedirs(os.path.dirname(result_file))
+    except:
+        raise Exception("Could not create path to result_file directory: {}".format(os.path.dirname(result_file)))
+
     try:
         with open(result_file, 'rb') as fh:
             dResults = pickle.load(fh)
     except:
-        log.debug("Could not load previous results file. Perhaps non existant.")
+        log.debug("Could not load previous results file - perhaps non existant: {}".format(result_file))
         dResults = {}
 
     dHMM = {}

@@ -257,7 +257,11 @@ div.body a {
 }
 
 em {
-    font-style: normal;
+      font-style: italic;
+}
+
+a em {
+      font-style: normal;
 }
 
 h1, h2, h3 {

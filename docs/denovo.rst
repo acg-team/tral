@@ -6,6 +6,11 @@ Run and parse de novo repeat detection software.
 Here you learn how to run external repeat detection software on your favourite sequence
 file and output the results.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
+- :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+
 
 Read in your sequences.
 -----------------------
@@ -14,7 +19,7 @@ Read in your sequences.
 
     import os
     from tral.sequence import sequence
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fHIV_proteome = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.faa")
     lHIV_Sequence = sequence.Sequence.create(file = fHIV_proteome, format = 'fasta')
@@ -24,54 +29,83 @@ Read in your sequences.
 Run the external repeat detector.
 ---------------------------------
 
-
-Detect tandem repeats on a single sequence with :ref:`XSTREAM <XSTREAM>`:
+Detect tandem repeats on a single sequence with :ref:`XSTREAM <XSTREAM>`. If you did not
+install XSTREAM, you can use any of the other *de novo* detection algorithms, but will see
+different results.
 ::
 
     tandem_repeats = lHIV_Sequence[0].detect(denovo = True, detection = {"lFinders": ["XSTREAM"]})
-    print(tandem_repeats.repeats)
-    print(tandem_repeats.repeats[0])
+
+
+As an example, the first detected putative tandem repeat looks as follows :ref:`(interpretation) <background>`::
+
+    >>> print(tandem_repeats.repeats[0])
+    > begin:316 lD:4 n:2
+    GDII
+    GDIR
+
 
 
 Detect tandem repeats on all sequences with all *de novo* tandem repeat detection algorithms
-defined in the :ref:`configuration file <configure>`:
-::
+defined in the :ref:`configuration file <configure>`::
 
     for iSequence in lHIV_Sequence:
         iTandem_repeats = iSequence.detect(denovo = True)
         iSequence.set_repeat_list(iTandem_repeats, "denovo")
 
-    print(lHIV_Sequence[0].dRepeat_list['denovo'].repeats[0])
 
+Different different algorithms usually detect different tandem repeats. This the the
+absolute number of detections in the HIV proteome for a couple of algorithms::
+
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "HHrepID"])
+    9
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "T-REKS"])
+    4
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "TRUST"])
+    0
+    >>> len([i for j in lHIV_Sequence for i in j.dRepeat_list['denovo'].repeats if i.TRD == "XSTREAM"])
+    9
+
+
+As an example, T-REKS detects the following repeat in the second HIV sequence :ref:`(interpretation) <background>`::
+
+    >>> print([i for i in lHIV_Sequence[1].dRepeat_list['denovo'].repeats if i.TRD == "T-REKS"][0])
+    > begin:449 lD:10 n:2
+    RPEPTAPP-ESL
+    RPEPTAPPPES-
 
 Output the detected tandem repeats.
 -----------------------------------
 
-Write a singe repeat_list to .tsv format:
-::
+Write a singe repeat_list to .tsv format::
 
-    path_to_output_tsv_file = "/my/path/to/the/outputfile.tsv"
+    path_to_output_tsv_file = "outputfile.tsv" # Choose your path and filename
     tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
 
 
-Write a singe repeat_list to .pickle format:
-::
+The created .tsv looks as follows :ref:`(interpretation) <background>`::
 
-    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    $ cat outputfile.tsv
+    msa_original	lD	pValue	nD	sequence_length	begin
+    GDII,GDIR	4	None	2.0	8	316
+    FLG,FLG	3	None	2.0	6	507
+
+
+Write a singe repeat_list to .pickle format::
+
+    path_to_output_pickle_file = "outputfile.pickle"  # Choose your path and filename
     tandem_repeats.write(format = "pickle", file = path_to_output_pickle_file)
 
 
-A repeat_list in pickle format can easily be read in again:
-::
+A repeat_list in pickle format can easily be read in again::
 
     from tral.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)
 
 
-Save multiple sequence together with tandem repeat annotations as:
-::
+Save multiple sequence together with tandem repeat annotations::
 
     import pickle
-    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    path_to_output_pickle_file = "outputfile.pickle" # Choose your path and filename
     with open(path_to_output_pickle_file, 'wb') as fh:
         pickle.dump(lHIV_Sequence, fh)

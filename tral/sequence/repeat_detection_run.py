@@ -9,6 +9,7 @@
 
 """
 
+import distutils
 import itertools
 import logging
 import os
@@ -31,17 +32,23 @@ c = configuration.Configuration.Instance()
 general_config = c.config
 repeat_detector_path = general_config["sequence"]["repeat_detector_path"]
 
-MAX_MEMORY_USAGE = str(10000000)
 
 class BinaryExecutable:
-    def __init__(self, binary=None):
+    def __init__(self, binary=None, name = None):
         """Construct a BinaryExecutable object.
 
         """
 
         if not binary:
-            raise TypeError("A binary executable must be provided :) ")
-        self.binary = binary
+            raise TypeError("A binary executable must be provided.")
+        try:
+            self.binary = shutil.which(binary)
+        except:
+            self.binary = distutils.spawn.find_executable(binary)
+        if not self.binary:
+            raise ValueError("The executable {} does not exist, although {} was selected "
+                    "to be executed. Please make sure the executable is in the system path, or "
+                    "the path to the executable is correctly set in config.ini".format(binary, name))
 
     def get_execute_tokens(self, *args):
         """Return the tokens to invoke the program with the arguments args"""
@@ -52,57 +59,6 @@ class BinaryExecutable:
     def get_execute_line(self, *args):
         """Return the command line to invoke the program with the arguments args"""
         return " ".join(self.get_execute_tokens(*args))
-
-
-class JavaExecutable:
-    def __init__(self, javaclass=None, classpaths=[], jars=[],
-                 javabin="java", javaopts=[]):
-        """Construct a JavaExecutable object.
-
-        Arguments:
-        javaclass -- A string denoting the java class to be loaded for the
-            program entry point. If None, don't load any java classe
-        classpaths -- List of directories to search for java classe
-        jars -- List of jars to search for java classe
-        javabin -- java executable location
-        javaopts -- Additional java option
-
-        Either javaclass or at least one jar have to be provided.
-        """
-
-        if not javaclass and len(jars)==0:
-            raise TypeError("Either a javaclass or a jar file\
-                must be provided!")
-
-        # assign object attribute
-        self.__javabin = javabin
-        self.__javaclass = javaclass
-
-        # prepend "-jar" or "-cp" to all jars and classpath
-        jaropts = ["-jar" for i in range(2*len(jars)) ]
-        jaropts[1:len(jaropts):2] = jars
-        cp_opts = ["-cp" for i in range(2*len(classpaths))]
-        cp_opts[1:len(cp_opts):2] = classpaths
-
-        self.__javaopts = javaopts + cp_opts + jaropts
-
-
-    def get_execute_tokens(self, *args):
-        """Return the tokens to invoke the program with the arguments args"""
-
-        # only return the Java class if it is not empty
-        if self.__javaclass:
-            classes = [self.__javaclass]
-        else:
-            classes = []
-
-        return [self.__javabin] + self.__javaopts + classes + list(args)
-
-
-    def get_execute_line(self, *args):
-        """Return the command line to invoke the program with the arguments args"""
-        return " ".join(self.get_execute_tokens(*args))
-
 
 
 def check_java_errors(outfile, errfile, log=None, procname=None):
@@ -260,20 +216,18 @@ class FinderHHrepID(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = Configuration()
+        name = name,
     ):
         """Construct FinderHHrepID object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderHHrepID, self).__init__(executable)
-        if config == None:
-            self.config = FinderHHrepID.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -364,21 +318,18 @@ class FinderPhobos(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=os.path.join(repeat_detector_path[name],"phobos")),
-        config = None
+        name = name,
     ):
         """Construct FinderPhobos object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
 
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderPhobos, self).__init__(executable)
-        if config == None:
-            self.config = FinderPhobos.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -436,20 +387,18 @@ class FinderTRED(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary=repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTRED object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTRED, self).__init__(executable)
-        if config == None:
-            self.config = FinderTRED.Configuration()
-        else:
-            self.config = config
+
 
     def run_process(self, working_dir, infile):
         """Run finder process on infile in working_dir and return all repeats found"""
@@ -519,20 +468,17 @@ class FinderTREKS(TRFFinder):
             return bool_toks + value_toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTREKS object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTREKS, self).__init__(executable)
-        if config == None:
-            self.config = FinderTREKS.Configuration()
-        else:
-            self.config = config
 
 
     def run_process(self, working_dir, infile):
@@ -553,6 +499,7 @@ class FinderTREKS(TRFFinder):
         with open(stdoutfname, "r") as outfile:
             tmp = list(repeat_detection_io.treks_get_repeats(outfile))
         return tmp
+
 
 class FinderTRF(TRFFinder):
     name = 'TRF'
@@ -611,20 +558,18 @@ class FinderTRF(TRFFinder):
 
 
     def __init__(self,
-        executable=BinaryExecutable(binary=repeat_detector_path[name]),
-        config = None
+        name = name,
     ):
         """Construct FinderTRF object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTRF, self).__init__(executable)
-        if config == None:
-            self.config = FinderTRF.Configuration()
-        else:
-            self.config = config
+
 
 
     def run_process(self, working_dir, infile):
@@ -690,17 +635,17 @@ class FinderTrust(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = Configuration()
+        name = name
     ):
         """Construct FinderTrust object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable=BinaryExecutable(binary=repeat_detector_path[name], name = name)
         super(FinderTrust, self).__init__(executable)
-        self.config = config
 
 
     def run_process(self, working_dir, infile):
@@ -784,17 +729,17 @@ class FinderXStream(TRFFinder):
             return toks
 
     def __init__(self,
-        executable=BinaryExecutable(binary = repeat_detector_path[name]),
-        config = Configuration()
+        name = name
     ):
         """Construct FinderXStream object.
 
         Arguments:
-        executable -- Use this executable object instead of default-constructed one
-        config -- Use this configuration object instead of default-constructed one
+        name: The name of the tandem repeat finder.
         """
+
+        self.config = self.Configuration()
+        executable = BinaryExecutable(binary=repeat_detector_path[name], name=name)
         super(FinderXStream, self).__init__(executable)
-        self.config = config
 
     def find_chartfile(self, searchdir):
         """Look for XSTREAM output xls file and return filepath"""
@@ -860,7 +805,6 @@ def Finders(lFinder = None, sequence_type = None):
     Raises:
         Exception: if at least one of the provided finders in ``lFinder`` does not exist.
 
-    .. ToDo:: Is FINDER_LIST defined correctly?
     """
 
     global finders
@@ -869,11 +813,15 @@ def Finders(lFinder = None, sequence_type = None):
         sequence_type = general_config["sequence_type"]
     if not lFinder:
         lFinder = general_config["sequence"]["repeat_detection"][sequence_type]
+    if not isinstance(lFinder, list):
+        raise TypeError(""" lFinder is not of type list. Please supply a list of TR detectors
+        (e.g. lFinder = ['HHrepID']). If you use TR detectors defined in config.ini, make
+        sure the TR detector name is followed by a comma. E.g.: HHrepID,""")
     else:
         if any(i not in list(itertools.chain(*general_config["sequence"]["repeat_detection"].values())) for i in lFinder):
             raise Exception("Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(lFinder, FINDER_LIST))
 
-    finders = {FINDER_LIST[i]:FINDER_FUNCTION_LIST[i] for i in lFinder}
+    finders = {FINDER_LIST[i].name:FINDER_LIST[i]() for i in lFinder}
 
 
 def split_sequence(seq_records, working_dir):
@@ -1082,7 +1030,6 @@ def set_trust_config_open():
                         ", ".join(finders['trust'].config.tokens()))
     return config
 
-
 def set_xstream_config_open():
     # construct open configuration for XStream
     config = FinderXStream.Configuration()
@@ -1097,20 +1044,11 @@ def set_xstream_config_open():
 
 ######################## HARDCODED OVERVIEW DICTIONARIES #################################
 
-FINDER_FUNCTION_LIST = { "HHrepID": FinderHHrepID(),
-                "Phobos": FinderPhobos(),
-                "TRED": FinderTRED(),
-                "T-REKS": FinderTREKS(),
-                "TRF": FinderTRF(),
-                "TRUST": FinderTrust(),
-                "XSTREAM": FinderXStream()
-                }
-
-FINDER_LIST = { "HHrepID": FinderHHrepID.name,
-                "Phobos": FinderPhobos.name,
-                "TRED": FinderTRED.name,
-                "T-REKS": FinderTREKS.name,
-                "TRF": FinderTRF.name,
-                "TRUST": FinderTrust.name,
-                "XSTREAM": FinderXStream.name
+FINDER_LIST = { "HHrepID": FinderHHrepID,
+                "Phobos": FinderPhobos,
+                "TRED": FinderTRED,
+                "T-REKS": FinderTREKS,
+                "TRF": FinderTRF,
+                "TRUST": FinderTrust,
+                "XSTREAM": FinderXStream
                 }

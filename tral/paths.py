@@ -17,4 +17,4 @@ def config_file(name):
     if os.path.isfile(os.path.join(CONFIG_DIR, name)):
         return os.path.join(CONFIG_DIR, name)
     else:
-        return os.path.join(DATAROOT, name)
+        return os.path.join(PACKAGE_DIRECTORY, 'data', name)

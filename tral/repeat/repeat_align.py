@@ -7,8 +7,12 @@ log = logging.getLogger(__name__)
 
 from tral.repeat import repeat
 from tral.paths import *
+from tral import configuration
 
-SCORESLIST = ['phylo_gap01']
+c = configuration.Configuration.Instance()
+general_config = c.config
+repeat_config = general_config["repeat"]
+
 
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
@@ -28,7 +32,7 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
         # Run Mafft
         # See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.
         # The mafft result is in stdout. Check: Do you need to capture or redirect the stderr?
-        p = subprocess.Popen(["ginsi", "--anysymbol", "--quiet", msa_file], stdout=subprocess.PIPE)
+        p = subprocess.Popen([repeat_config['ginsi'], "--anysymbol", "--quiet", msa_file], stdout=subprocess.PIPE)
         mafft_output = [line.decode('utf8').rstrip() for line in p.stdout]
         msa = []
         for iLine in mafft_output:
@@ -41,22 +45,13 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
         p.wait()
         try:
             return msa
-            #return repeat_info.Repeat(begin=begin, msa = msa, sequence_type = sequence_type, calc_score = True, calc_pValue = True, scoreslist=SCORESLIST)
         except:
-            print("\n".join(my_msa))
-            print('*'*3)
-            print("\n".join(msa))
+            error_note = ("Mafft could not successfully run the realignment for: "
+            "\n".join(my_msa)
+            )
+            logging.error(error_note)
             return None
 
-    elif aligner == 'prograph':
-        print('Haha, not yet.')
-
-
-########################################### MAIN #########################################
-
-if __name__=="__main__":
-
-    msa = ["MGKGYL---------------------------------------ALCSYNCKEA-INILSHLPSHHYN","TG--------------------------------------------------------------WVLCQ","IGRAYF---------------------------------------ELSEYMQAER-IFSEVRRIENYRV","EGMEIYSTTLWHLQK------------------------------DVALSVLSKDLTDMDKNSPEAWCA","AGNCFS---------LQREH-------------------------DIAIKFFQRA-IQVDPNYAYAYTL","LGHEFV--------------LTEEL--------------------DKALACFRNA-IRVNPRHYNAWYG","LGMIYY-------------------KQEKF---------------SLAEMHFQKA-LDINPQSSVLLCH","IGVVQH------------------------ALKKS----------EKALDTLNKA-IVIDPKNPLCKFH","RASVLF-----------------------------ANEKY-----KSALQELEEL-KQIVPKESLVYFL","IGKVYK----------------------------------KLGQTHLALMNFSWA-MDLDPKGAN----"]
-    realign_repeat(msa = msa)
-
+    else:
+        raise ValueError('Currently, the aligner {} is not implemented.'.format(aligner))
 

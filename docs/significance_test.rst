@@ -1,3 +1,4 @@
+
 .. _significance_test:
 
 Perform statistical significance test of tandem repeats.
@@ -7,6 +8,13 @@ Here you learn how to perform statistical significance tests on your candidate s
 TRAL currently provides a variety of model-based and none-model based tests. They are
 detailed in a :ref:`NAR publication (2012) <publications>`.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`. TRAL ships with the sequence data needed for this tutorial.
+- :ref:`Download p-Value distribution files <pValuefiles>`.
+
+
+
 Read in tandem repeat annotations.
 ----------------------------------
 
@@ -14,15 +22,19 @@ Read in tandem repeat annotations.
 
     import os, pickle
     from tral import sequence
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
 
     with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)
 
-    print(lHIV_Sequence)
 
+
+There are nine proteins in the HIV proteome::
+
+    >>> print(lHIV_Sequence)
+    9
 
 
 Perform a statistical significance test.
@@ -38,7 +50,7 @@ p-Value with parameters defined in the :ref:`configuration file <configure>`:
                 iTandemRepeat.calculate_pValues()
 
 For example, the following putative tandem repeat is found to be non-significant with the used model
-of tandem repeat evolution:
+of tandem repeat evolution :ref:`(interpretation) <background>`:
 ::
 
     >>> print(lHIV_Sequence[2].dRepeat_list['denovo'].repeats[0])
@@ -50,6 +62,7 @@ of tandem repeat evolution:
 Whereas this putative tandem repeat is considered significant:
 ::
 
+    >>> print(lHIV_Sequence[4].dRepeat_list['denovo'].repeats[1])
     >begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164
     RRN
     RR-
@@ -87,9 +100,9 @@ The resulting *result_list* now only contains tandem repeats with a p-Value belo
 ::
 
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    27
+    22
     >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_filtered"].repeats])
-    21
+    17
 
 
 

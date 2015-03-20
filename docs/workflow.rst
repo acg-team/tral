@@ -13,14 +13,23 @@ annotation on several computing  nodes in parallel. Here, we provide a system to
 the distribution and collection of tandem repeat annotation jobs with
 `GC3Pie <https://code.google.com/p/gc3pie/>`_.
 
-Everything is explained with a toy example located in the TRAL package directory:
-
-::
+Everything is explained with a `toy workflow located in the TRAL source`_. You can print
+the path to the local copy included in TRAL with this Python code::
 
     import os
-    from tral.paths import *
-    workflow_path = os.path.join(PACKAGE_DIRECTORY, "examples", "workflow")
-    print(workflow_path)
+    from tral.paths import PACKAGE_DIRECTORY
+    print(PACKAGE_DIRECTORY)
+
+To follow this tutorial, set a shell variable $MYTRAL to the package variable PACKAGE_DIRECTORY. In bash and sh, this can be done with::
+
+    export MYTRAL=/path/to/your/package/directory
+
+For csh or tcsh, use::
+
+    setenv MYTRAL /path/to/your/package/directory
+
+.. _`toy workflow located in the TRAL source`: https://github.com/elkeschaper/tral/tree/develop/tral/examples/workflow
+
 
 
 Configure TRAL.
@@ -28,25 +37,26 @@ Configure TRAL.
 
 We start by :ref:`adapting the TRAL configuration files <configure>` to choose for
 example which external tandem repeat detection algorithms you would like to run on the
-sequence data.
+sequence data. Don't forget to add a comma behind the last entry in this list, otherwise the
+file format is violated.
 
 Now, let's move ahead to data acquisition:
 
 
 Prepare your data.
 ------------------
-To annotate sequences with tandem repeats, we acquired the following data:
+To annotate sequences with tandem repeats, we already acquired the following data and stored it in *$MYTRAL/examples/workflow* :
 
 Sequence data
 ^^^^^^^^^^^^^^^^
 
-We downloaded all `UniprotKB/Swissprot human PRDM genes
+We downloaded all `UniProtKB/Swiss-Prot human PRDM genes
 <http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&sort=score>`_
 in fasta format...
 
 ::
 
-    cd path/to/tral/examples/workflow
+    cd $MYTRAL/examples/workflow
     less uniprot_PRDM.fasta
 
 
@@ -55,7 +65,7 @@ performed in parallel.
 
 ::
 
-    ls /split_sequence_data/*
+    ls split_sequence_data/*
 
 
 On a sidenote, `fastasplitn <ftp://saf.bio.caltech.edu/pub/software/molbio/fastasplitn.c>`_
@@ -101,7 +111,8 @@ to Python pickle objects:
 
 ::
 
-    python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw path/to/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm_raw path/to/workflow/PRDM_PFAM_models.hmm --hmm path/to/workflow/hmm
+    mkdir $MYTRAL/hmm
+    python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/example/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/example/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/example/workflow/hmm
 
 
 On the small toy example, this file preparation step should run fast.
@@ -114,7 +125,7 @@ With the following command, annotation is performed on *uniprot_PRDM_1.fasta*:
 
 ::
 
-    python3 tandem_repeat_annotation_scripts.py workflow -i path/to/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o path/to/workflow/results/uniprot_PRDM_1.pickle -os path/to/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation path/to/workflow/uniprot_PRDM_annotation.pickle --hmm path/to/workflow/hmm
+    python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/example/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/example/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/example/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/example/workflow/hmm
 
 
 If this runs fine, you should see annotation results in:
@@ -128,15 +139,22 @@ Now, we can move ahead to automated distributed annotation with GC3PIE.
 
 Install GC3PIE.
 ---------------
-[MISSING]
 
-Configure GC3Pie.
----------------------
-[MISSING]
+You can follow the official
+`GC3Pie installation instructions <http://gc3pie.readthedocs.org/en/latest/users/install.html>`_.
+Upon installation, GC3Pie needs to be `locally configured <http://gc3pie.readthedocs.org/en/latest/users/configuration.html>`_.
 
 
 Usage
 -----
+
+Adapt this command to run the tandem repeat annotation workflow (`more information <http://gc3pie.readthedocs.org/en/latest/users/gc3apps/intro.html>`_)::
+
+
+    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini
+
+
+Control the workflow with `GC3Utils <http://gc3pie.readthedocs.org/en/latest/users/gc3utils.html>`_.
 
 ::
 
@@ -145,9 +163,5 @@ Usage
     $ gresub
     $ gstat
     $ ...
-
-
-    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf /path/to/workflow/tandem_repeat_annotation_workflow.ini
-
 
 

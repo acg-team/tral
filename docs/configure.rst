@@ -1,57 +1,75 @@
-.. _configure:
+background.rst.. _configure:
 
 Configuration
 =============
 
-Here you learn how to configure TRAL after installation. All configuration files are located
+Here you see how to configure TRAL after installation. All configuration files are located
 in your home directory:
 ::
 
     ~/.tral/
 
 
-configs.ini
-------------
+configs.ini - REQUIRED: Supply paths to external software and data.
+-------------------------------------------------------------------
 
-In this file, you need to define all paths and calculation defaults for using TRAL.
+In configs.ini you can set the paths to all external software and data used in TRAL, as well
+as change default thresholds and behaviours.
 
 
 *De novo* repeat detection
 **************************
-
-Here, define the paths to all de novo detection algorithms you wish to use. The makeup of the
-scripts or binaries needed is detailed in :ref:`Installation of external software <install_external>`.
-Only paths for algorithms defined under [[repeat_detection]] are used, all other paths are
-ignored.
-
+Enlist all *de novo* detection algorithms you wish to use. All other algorithms are ignored
+by default.
 ::
 
     [sequence]
         [[repeat_detection]]
-            AA = *List of default de novo detectors on amino acid data*
-            DNA = *List of default de novo detectors on nucleic data*
+            AA = HHrepID,  # List of default de novo detectors on amino acid data that you wish to use.
+            DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
+
+
+If the binaries or executable scripts of any *de novo* detection algorithm are not in the
+system path, set the absolute paths in config.ini. Details for each detector (e.g. to create
+executable scripts) are detailed in :ref:`Installation of external software <install_external>`.
+::
+
+    [sequence]
         [[repeat_detector_path]]
-            PHOBOS = path/to/PHOBOS
-            HHrepID = path/to/HHREPID
-            HHrepID_dummyhmm = path/to/HHREPID_HMM_DB
-            TRUST = path/to/TRUST
-            TRUST_substitutionmatrix = path/to/substitution_matrix/e.g.BLOSUM50 #Recommended: Use matrices packages with TRUST
-            XSTREAM = path/to/XSTREAM
+            PHOBOS = phobos
+            HHrepID = hhrepid_64
+            HHrepID_dummyhmm = /path/to/home/.tral/data/dummyHMM.hmm
+            TRUST = TRUST
+            TRUST_substitutionmatrix = /path/to/TRUST/Align/BLOSUM50  #Recommended: Use matrices packages shipped with TRUST
+            XSTREAM = XSTREAM
             [...]
 
 
 Build Hmmer models
 ******************
 
-::
+If *hmmbuild* is not in your system path, define the absolute path::
 
     [hmm]
         hmmbuild = path/to/hmmbuild
-        lDMax = 50  # maximum size of HMM for which the Viterbi algorithm is performed
 
 
-Parameters of the default filter
-********************************
+Realign tandem repeat units
+***************************
+At current, tandem repeat units are realigned with Mafft's ginsi global aligner. This is
+required for example if you annotate tandem repeats from profile models. If *ginsi* is
+not in your system path, define the absolute path::
+
+    [repeat]
+        ginsi = /path/to/ginsi
+
+
+
+configs.ini - OPTIONAL: Change TRAL's default behaviour
+-----------------------------------------------------------
+
+Define the default filter behaviour.
+*****************************************
 
 ::
 
@@ -71,8 +89,8 @@ Parameters of the default filter
 
 
 
-Default behaviour when new Repeat instances are created
-*******************************************************
+Creation of new Repeat instances
+*********************************
 
 ::
 
@@ -81,10 +99,11 @@ Default behaviour when new Repeat instances are created
         calc_score = False  # Is the score calculated?
         calc_pValue = False # Is the pValue calculated?
         precision = 10
+        GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
 
 
-Default parameters for the model of repeat evolution used for statistical significance calculation
-**************************************************************************************************
+Statistical significance calculation and models of repeat evolution
+*******************************************************************
 
 ::
 
@@ -111,7 +130,7 @@ Default parameters for the model of repeat evolution used for statistical signif
         precision = 10
 
 
-Default behaviour when new Repeat list instances are created
+Creation of new Repeat list instances
 ************************************************************
 
 ::
@@ -125,8 +144,17 @@ Default behaviour when new Repeat list instances are created
         begin = True  # Is the position in sequence calculated?
 
 
-logging.ini
------------
+Restrict Hmmer model size.
+****************************
+
+Set the maximum size of HMM for which the Viterbi algorithm is performed *lDMax* e.g.
+to ensure viable run-times on your system::
+
+    [hmm]
+        lDMax = 50
+
+logging.ini - OPTIONAL
+-----------------------
 
 In this file, you can define the level of debugging per module (DEBUG, INFO, WARNING), and
 the format of the debugging message. Defaults to WARNING. The path to the file needs to be
@@ -139,18 +167,19 @@ defined as
     logging.config.fileConfig("path/to/your/home/.tral/logging.ini")
 
 
+.. _pValuefiles:
 
 p-Value distribution files
 --------------------------
 
 In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in *./tral/data/pValue*:
+need to be downloaded (2.6Gb) and placed in ~/.tral/data/pValue:
 ::
 
-    cd ~/.tral/data/pValue
-    svn checkout https://github.com/elkeschaper/tral/trunk/tral/data/pValue .
+    cd ~/.tral/data
+    wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pValue.tar.gz
+    tar -xvzf pValue.tar.gz
 
 
-
-
-
+Instead of downloading all p-Value distributions, it is possible to download only the
+`distributions for particular models of sequence evolution <ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/>`_.

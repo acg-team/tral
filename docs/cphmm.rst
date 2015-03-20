@@ -8,6 +8,10 @@ The sequence profile model is transformed into a circular profile HMM, as descri
 a :ref:`recent MBE publication <publications>`. Next, the sequence
 is searched for tandem repeats using the circular profile HMM.
 
+Requirements for this tutorial:
+
+- :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
+- :ref:`Install Mafft/ginsi <MAFFT>` for tandem repeat unit alignment.
 
 
 Read in your sequence profile model.
@@ -17,7 +21,7 @@ Read in your sequence profile model.
 
     import os
     from tral.hmm import hmm
-    from tral.paths import *
+    from tral.paths import PACKAGE_DIRECTORY
 
     fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","Kelch_1.hmm")
 
@@ -47,29 +51,34 @@ Annotate tandem repeats with the circular profile HMM.
 
     tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_Kelch_1])
 
-    print(tandem_repeats.repeats[0])
 
+The result is a tandem repeat :ref:`(interpretation) <background>`::
+
+    >>> print(tandem_repeats.repeats[0])
+    > begin:31 lD:49 n:5
+    R--------PRHGHRAVAIKELIVVFGGG---------------------------------------------------------------------NEGIVDELHVYNTATNQW---FIPAVRGDIP-
+    P--------GCAAYGFVCDGTRLLVFGGM-------------------------------------------------------------------VEYGKYSNDLYELQASRWEWKRLKAK--------
+    TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTW---NKPSLSGVAPL
+    ---------PRSLHSATTIGNKMYVFGGW----------VPLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-
+    R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------
 
 
 Output the detected tandem repeats.
 -----------------------------------
 
-Write a singe repeat_list to .tsv format:
-::
+Write a singe repeat_list to .tsv format::
 
-    path_to_output_tsv_file = "/my/path/to/the/outputfile.tsv"
+    path_to_output_tsv_file = "outputfile.tsv"  # Choose your path and filename
     tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
 
 
-Write a singe repeat_list to .pickle format:
-::
+Write a singe repeat_list to .pickle format::
 
-    path_to_output_pickle_file = "/my/path/to/the/outputfile.pickle"
+    path_to_output_pickle_file = "outputfile.pickle"  # Choose your path and filename
     tandem_repeats.write(format = "pickle", file = path_to_output_pickle_file)
 
 
-A repeat_list in pickle format can easily be read in again:
-::
+A repeat_list in pickle format can easily be read in again::
 
     from tral.repeat_list import repeat_list
     tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)

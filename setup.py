@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import sys
 
 try:
@@ -24,20 +25,22 @@ try:
 except:
     HOME=os.path.expanduser('~')
 
+SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['create_and_annotate_sequence_pickles.py', 'create_hmm_pickles.py', 'detect_tandem_repeats_in_sequence.py', 'example_pipeline.py', 'split_sequence_file.py']]
+SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_repeat_annotation_scripts.py', 'tandem_repeat_annotation_workflow.py']]
 
 setup(
     name='tral',
-    version='0.3.0',
+    version='0.3.2',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tral', 'tral.test', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],
     #packages=find_packages(exclude=['tests*']),
-    scripts=[os.path.join('tral', 'examples', i) for i in ['create_and_annotate_sequence_pickles.py', 'create_hmm_pickles.py', 'detect_tandem_repeats_in_sequence.py', 'example_pipeline.py', 'split_sequence_file.py']],
+    scripts= SCRIPTS1 + SCRIPTS2,
     url='http://pypi.python.org/pypi/tral/',
     license='LICENSE.txt',
     description='Detect and evaluate tandem repeats in genomic sequence data.',
-    long_description=read('README.markdown'),
-    #include_package_data=True, # If you want files mentioned in MANIFEST.in also to be installed...
+    long_description=read('README.rst'),
+    #include_package_data=True, # If you want files mentioned in MANIFEST.in also to be installed, i.e. copied to usr/local/bin
     classifiers = [
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
@@ -49,23 +52,23 @@ setup(
         "Operating System :: OS Independent",
         ],
     install_requires=[
-        "argparse >= 1.2.1",
         "Biopython >= 1.64",
         "configobj >= 5.0.6",
-        "docutils >= 0.11",
+        #"docutils >= 0.11", # Uncomment if you wish to create the documentation locally.
         "numpy >= 1.6.1",
-        "pytest >= 2.5.2",
+        #"pypandoc >= 0.9.6" # Uncomment if you wish to convert the markdown readme to a rest readme for upload on Pypi.
+        #"pytest >= 2.5.2", # Uncomment if you wish to run the tests locally.
         "scipy >=0.12.0",
-        "setuptools >= 5.1",
-        "Sphinx >= 1.2.2",
+        #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
-    data_files=[(os.path.join(HOME, ".tral"), glob.glob("tral/data/*.ini")),
-                (os.path.join(HOME, ".tral", "data", "hhrepid"), glob.glob("tral/data/hhrepid/*")),
-                (os.path.join(HOME, ".tral", "data", "pValue"), []),
-                (os.path.join(HOME, ".tral", "data", "substitution_rate_matrices"), glob.glob("tral/data/substitution_rate_matrices/*"))],
-    package_data={'tral': ['data/*.ini', 'data/paml/*', 'data/hhrepid/*']},
+    package_data={'tral': ['tral_configuration/*.ini', 'tral_configuration/data/hhrepid/*', 'tral_configuration/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', "tral/examples/workflow/*.py","tral/examples/workflow/*.tsv","tral/examples/workflow/*.ini","tral/examples/workflow/*.hmm","tral/examples/workflow/*.fasta","tral/examples/workflow/split_sequence_data/*.fasta"]},
     package_dir={'tral': 'tral'},
 )
 
 
-print("The TRAL configuration files are now located in {}".format(os.path.join(HOME, ".tral")))
+TRAL = os.path.join(HOME, ".tral")
+if os.path.exists(TRAL):
+    print("The TRAL configuration directory {} already exists. The template configuration and datafiles are not copied to the already existing directory at this step.".format(TRAL))
+else:
+    shutil.copytree("tral/tral_configuration", TRAL)
+    print("The TRAL configuration files and data files are now located in {}".format(TRAL))
