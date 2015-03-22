@@ -1,14 +1,15 @@
 # (C) 2015 Elke Schaper
 
 import logging
-import os, re
+import os
+import re
 
 log = logging.getLogger(__name__)
 
-################################## READ HMMMER3  #########################################
+################################## READ HMMMER3  #########################
 
-def read(hmm_filename, id = None):
 
+def read(hmm_filename, id=None):
     """Read HMM file in HMMER3 format.
 
     HMMER3 file format is described in detail in
@@ -125,13 +126,13 @@ def read(hmm_filename, id = None):
                     if id:
                         if id in iID:
                             log.debug(" * (0.1->1) Found matching"
-                                         " identifier.")
+                                      " identifier.")
                             hmm['id'] = iID
                             state = 1
                         else:
                             log.debug(" * (0.1->0) Found identifier which "
-                                         "does not the one provided, skipping "
-                                         "model.")
+                                      "does not the one provided, skipping "
+                                      "model.")
                             state = 0
                     else:
                         hmm['id'] = iID
@@ -144,11 +145,11 @@ def read(hmm_filename, id = None):
                     letters = pat_letters.findall(line[3:])
                     if id:
                         log.debug(" * (0.1->0) No identifier found to "
-                                     "compare to, skipping model.")
+                                  "compare to, skipping model.")
                         state = 0
                     else:
                         log.debug(" * (0.1->2) No identifier, found"
-                                     " HMM start")
+                                  " HMM start")
                         log.debug("Letters: %s", letters)
                         hmm['letters'] = letters
                         state = 2
@@ -173,10 +174,10 @@ def read(hmm_filename, id = None):
                     if current_hmm_state == 'COMPO':
                         string_emissions = findall[1:]
                     else:
-                        string_emissions = findall[1:1+size_alphabet]
+                        string_emissions = findall[1:1 + size_alphabet]
                     log.debug(" * (3->4) Found emission probabilities")
                     log.debug("Current HMM state: %s", current_hmm_state)
-                    emissions = [float(i) if i != '*' else -float('inf') \
+                    emissions = [float(i) if i != '*' else -float('inf')
                                  for i in string_emissions]
                     log.debug("Emission probabilities: %s", emissions)
                     hmm[current_hmm_state] = {'emissions': emissions}
@@ -184,7 +185,7 @@ def read(hmm_filename, id = None):
                 elif pat_end_HMM.match(line):
                     if id:
                         log.debug(" * (3->TERMINAL) HMM Found and compiled,"
-                                     " return HMM.")
+                                  " return HMM.")
                         log.info("Yielding {}, stopping".format(hmm['id']))
                         yield hmm
                     else:
@@ -200,11 +201,11 @@ def read(hmm_filename, id = None):
                 findall = pat_insertions.findall(line)
                 if findall:
                     log.debug(" * (4->5) Found insertion emission"
-                                 " probabilities")
-                    emissions = [float(i) if i != '*' else -float('inf') \
+                              " probabilities")
+                    emissions = [float(i) if i != '*' else -float('inf')
                                  for i in findall]
                     log.debug("Insertion emission probabilities: %s",
-                                 emissions)
+                              emissions)
                     hmm[current_hmm_state]['insertion_emissions'] = emissions
                     state = 5
                 else:
@@ -215,7 +216,7 @@ def read(hmm_filename, id = None):
                 findall = pat_transition.findall(line)
                 if findall:
                     log.debug(" * (5->3) Found transition probabilities")
-                    transitions = [float(i) if i != '*' else -float('inf') \
+                    transitions = [float(i) if i != '*' else -float('inf')
                                    for i in findall]
                     log.debug("Transition probabilities: %s", transitions)
                     hmm[current_hmm_state]['transition'] = transitions
@@ -226,7 +227,6 @@ def read(hmm_filename, id = None):
 
 
 def split_HMMER3_file(hmm_filename, resultdir):
-
     """ Split HMMER3 models from a single file ``hmm_filename`` into many files in
      ``resultdir``.
 
@@ -254,7 +254,12 @@ def split_HMMER3_file(hmm_filename, resultdir):
                 if match:
                     if fh:
                         fh.close()
-                        os.rename(tmp_file, os.path.join(resultdir, acc+".hmm"))
+                        os.rename(
+                            tmp_file,
+                            os.path.join(
+                                resultdir,
+                                acc +
+                                ".hmm"))
                     log.debug(" * (0->1) Found HMM start")
                     state = 1
                     fh = open(tmp_file, "w")
@@ -266,6 +271,7 @@ def split_HMMER3_file(hmm_filename, resultdir):
                     acc = match.group(1).split(".")[0]
                     log.debug(" * (1->0) Found accession")
                     state = 0
+
 
 def read_HMMER_acc_lengths(hmm_filename):
     """Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.
@@ -319,4 +325,3 @@ def read_HMMER_acc_lengths(hmm_filename):
 #
 #     ''' Write <hmm> too <hmm_filename> in smart format. '''
 #     # Format not decided yet.
-

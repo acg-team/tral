@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 c = configuration.Configuration.Instance()
 config = c.config
 
-def viterbi(hmm, emission):
 
+def viterbi(hmm, emission):
     """ Calculate the most probable sequence of states given a sequence of emissions
     and a HMM using the Viterbi algorithm
 
@@ -39,21 +39,37 @@ def viterbi(hmm, emission):
          class?) How do they relate to the Sequence class, or the HMM class?
     """
 
-    if len(emission)/hmm.lD < float(config['filter']['basic']['dict']['nD']['threshold']):
-        logging.info("Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min nD ({}).".format(hmm.lD, \
-             len(emission), config['filter']['basic']['dict']['nD']))
+    if len(emission) / \
+            hmm.lD < float(config['filter']['basic']['dict']['nD']['threshold']):
+        logging.info(
+            "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min nD ({}).".format(
+                hmm.lD,
+                len(emission),
+                config['filter']['basic']['dict']['nD']))
         return None
     if hmm.lD > float(config['hmm']['lDMax']):
-        logging.info("Skip the HMM as it is too long ({}) according to the filter criterion max hmm.lD ({}).".format(hmm.lD, config['hmm']['lDMax']))
+        logging.info(
+            "Skip the HMM as it is too long ({}) according to the filter criterion max hmm.lD ({}).".format(
+                hmm.lD,
+                config['hmm']['lDMax']))
         return None
 
     states = hmm.states
-    p_0 = {iS: value for iS,value in hmm.p_0.items()}
-    p_e = {iS: {iE: value for iE,value in emission.items()} for iS,emission in hmm.p_e.items()}
-    p_t = {iS: {iT: value for iT,value in transition.items()} for iS,transition in hmm.p_t.items()}
+    p_0 = {iS: value for iS, value in hmm.p_0.items()}
+    p_e = {
+        iS: {
+            iE: value for iE,
+            value in emission.items()} for iS,
+        emission in hmm.p_e.items()}
+    p_t = {
+        iS: {
+            iT: value for iT,
+            value in transition.items()} for iS,
+        transition in hmm.p_t.items()}
 
     if any([(iS not in config['lAll_amino_acid']) for iS in emission]):
-        raise Exception("There is an unknown amino acid in:\n {}\n".format(emission))
+        raise Exception(
+            "There is an unknown amino acid in:\n {}\n".format(emission))
 
     # In case there are ambiguous amino acids in the sequence, calculate the expected frequencies of the AAs that they could stand for
     # from the emission frequencies of the hmm in the neutral state "N".
@@ -61,7 +77,8 @@ def viterbi(hmm, emission):
     for iA in config['dAmbiguous_amino_acid'].keys():
         dAmbiguous_local[iA] = {}
         if iA in emission:
-            total = np.log10(sum(10 ** p_e['N'][iAmbiguous] for iAmbiguous in config['dAmbiguous_amino_acid'][iA]))
+            total = np.log10(sum(
+                10 ** p_e['N'][iAmbiguous] for iAmbiguous in config['dAmbiguous_amino_acid'][iA]))
             for iAmbiguous in config['dAmbiguous_amino_acid'][iA]:
                 dAmbiguous_local[iA][iAmbiguous] = p_e['N'][iAmbiguous] - total
 
@@ -71,57 +88,95 @@ def viterbi(hmm, emission):
 
     # Initialisation of the probabilities on the first emitted character
     if emission[0] in dAmbiguous_local:
-        path = {iS: {'probability': p_0[iS] , 'path': [iS]} for iS in states}
+        path = {iS: {'probability': p_0[iS], 'path': [iS]} for iS in states}
         for iS in states:
             # Calculate the average emission probability of ambiguity chars.
-            # The numerical trick to calculate the average log values in high precision is reused in the next for-loop and described there.
-            lP_emission = [ dAmbiguous_local[emission[0]][iAmbiguous] + p_e[iS][iAmbiguous] for iAmbiguous in dAmbiguous_local[emission[0]] ]
+            # The numerical trick to calculate the average log values in high
+            # precision is reused in the next for-loop and described there.
+            lP_emission = [
+                dAmbiguous_local[
+                    emission[0]][iAmbiguous] +
+                p_e[iS][iAmbiguous] for iAmbiguous in dAmbiguous_local[
+                    emission[0]]]
             max_p = max(lP_emission)
-            path[iS]['probability'] += np.log10( sum( [ 10 ** (i - max_p) for i in lP_emission]  ) ) + max_p
+            path[iS][
+                'probability'] += np.log10(sum([10 ** (i - max_p) for i in lP_emission])) + max_p
 
     else:
-        path = { iS: {'probability': p_0[iS]+p_e[iS][emission[0]] , 'path': [iS]} for iS in states}
+        path = {
+            iS: {
+                'probability': p_0[iS] +
+                p_e[iS][
+                    emission[0]],
+                'path': [iS]} for iS in states}
     logging.debug("Path: {0}".format(path))
 
     # Viterbi on all remaining emitted characters
     for iE in emission[1:]:
         logging.debug("Emitted: {0}".format(iE))
 
-        ### Determine next most probable state and its probability ...
+        # Determine next most probable state and its probability ...
         for iS in states:
             p = {}
             for iFormer in states:
                 if iE in dAmbiguous_local:
-                    ## Calculate the probability of being in state iS and emitting iAmbiguous for any of the AAs that the ambiguous iE stands for.
-                    # Then, average over these probabilities (taking into account the background frequencies of all iAmbiguous)
-                    dP_Former =  {iAmbiguous: probability_of_the_former_state(iFormer, iS, iAmbiguous, p_e, p_t, path, p) for iAmbiguous in dAmbiguous_local[iE].keys()}
-                    dP_Former = {iAmbiguous:j for iAmbiguous,j in dP_Former.items() if j}
+                    # Calculate the probability of being in state iS and emitting iAmbiguous for any of the AAs that the ambiguous iE stands for.
+                    # Then, average over these probabilities (taking into
+                    # account the background frequencies of all iAmbiguous)
+                    dP_Former = {
+                        iAmbiguous: probability_of_the_former_state(
+                            iFormer,
+                            iS,
+                            iAmbiguous,
+                            p_e,
+                            p_t,
+                            path,
+                            p) for iAmbiguous in dAmbiguous_local[iE].keys()}
+                    dP_Former = {
+                        iAmbiguous: j for iAmbiguous,
+                        j in dP_Former.items() if j}
                     if len(dP_Former) > 0:
                         # Next, we need to calculated a weighted average over log10 probabilities.
                         # For this purpose, we need to transform the log10ps back to ps.
                         # However, the ps might have too small values. We apply a numerical trick:
                         # Instead of sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) ) ) we calculate
                         # sum(w(i)p(i)) = sum ( 10 ** ( log(w(i)) + log(p(i)) + k ) ) / (10 ** k), which can easily be shown to be equivalent.
-                        # For (-k), we choose the maximum value in log(w(i)) + log(p(i)), as it corresponds to the maximum and thus most pronounced probability of the sum.
-                        lP_Former = [ i + dAmbiguous_local[iE][iAmbiguous] for iAmbiguous,i  in dP_Former.items()]
+                        # For (-k), we choose the maximum value in log(w(i)) +
+                        # log(p(i)), as it corresponds to the maximum and thus
+                        # most pronounced probability of the sum.
+                        lP_Former = [
+                            i +
+                            dAmbiguous_local[iE][iAmbiguous] for iAmbiguous,
+                            i in dP_Former.items()]
                         max_p = max(lP_Former)
-                        p[iFormer] =  np.log10( sum( [ 10 ** (i - max_p) for i in lP_Former]  ) ) + max_p
+                        p[iFormer] = np.log10(
+                            sum([10 ** (i - max_p) for i in lP_Former])) + max_p
                 else:
-                    p_Former = probability_of_the_former_state(iFormer, iS, iE, p_e, p_t, path, p)
+                    p_Former = probability_of_the_former_state(
+                        iFormer,
+                        iS,
+                        iE,
+                        p_e,
+                        p_t,
+                        path,
+                        p)
                     if p_Former:
                         p[iFormer] = p_Former
 
-            ## This error will occur when it is not possible to enter a state iS at emission iE. This can happen for more complex HMMs, but should not happen for the simple
-            ## circular HMMs that we consider here. It means that state iS cannot be reached by emission iE. Either iS cannot emit iE, or iS cannot be reached by transitions at this point.
+            # This error will occur when it is not possible to enter a state iS at emission iE. This can happen for more complex HMMs, but should not happen for the simple
+            # circular HMMs that we consider here. It means that state iS
+            # cannot be reached by emission iE. Either iS cannot emit iE, or iS
+            # cannot be reached by transitions at this point.
             if p == {}:
                 logging.error("The dict p is empty. This should never happen.")
             # Detect the most likely path.
-            next_state, p_next_state = max(p.items(), key=operator.itemgetter(1))
+            next_state, p_next_state = max(
+                p.items(), key=operator.itemgetter(1))
             path[iS]['probability_next'] = p_next_state
             path[iS]['path_next'] = path[next_state]['path'][:]
             path[iS]['path_next'].append(iS)
 
-        ### ... and update the path accordingly
+        # ... and update the path accordingly
         for iV in path.values():
             iV['path'] = iV['path_next'][:]
             iV['probability'] = iV['probability_next']
@@ -129,17 +184,23 @@ def viterbi(hmm, emission):
 
     # Which overall path is the most likely?
     path_summary = {iS: path[iS]['probability'] for iS in states}
-    most_likely_terminal_state, p_most_likely_path = max(path_summary.items(), key=operator.itemgetter(1))
+    most_likely_terminal_state, p_most_likely_path = max(
+        path_summary.items(), key=operator.itemgetter(1))
     most_likely_path = path[most_likely_terminal_state]['path']
-    logging.debug("The most likely path is {0}. It has a score of {1}.".format(most_likely_path, p_most_likely_path))
+    logging.debug(
+        "The most likely path is {0}. It has a score of {1}.".format(
+            most_likely_path,
+            p_most_likely_path))
 
     return(most_likely_path)
 
-def probability_of_the_former_state(iFormer, iS, iE, p_e, p_t, path, p):
 
+def probability_of_the_former_state(iFormer, iS, iE, p_e, p_t, path, p):
     ''' Calculate the probability of iFormer, given iS and iE together with the dicts of emission and transition probabilities.'''
-    ## Exclude paths with a zero probability (i.e. a log(probability) set to None)
-    if  iS in p_t[iFormer] and None is not p_t[iFormer][iS] and iE in p_e[iS] and None is not p_e[iS][iE] and None is not path[iFormer]['probability']:
+    # Exclude paths with a zero probability (i.e. a log(probability) set to
+    # None)
+    if iS in p_t[iFormer] and None is not p_t[iFormer][iS] and iE in p_e[
+            iS] and None is not p_e[iS][iE] and None is not path[iFormer]['probability']:
         return path[iFormer]['probability'] + p_t[iFormer][iS] + p_e[iS][iE]
 
     return None
@@ -162,13 +223,16 @@ def distance_index(i, j, length):
         the code at current.
     """
     if j > i:
-        return j-i
+        return j - i
     else:
         return length + j - i
 
 
-def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha = None):
-
+def hmm_path_to_maximal_complete_tandem_repeat_units(
+        lSequence,
+        lPath,
+        lD,
+        alpha=None):
     """ Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
 
     Be ungreedy: Start from the last index in the cluster of all start state and end state indices.
@@ -214,22 +278,28 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
 
         for iP in path[::-1]:
             if iP.startswith("M"):
-                lTerminal_Indices.append((int(iP[1:]))%lD + 1)
+                lTerminal_Indices.append((int(iP[1:])) % lD + 1)
                 break
 
     # Find the max distance between two indices
-    lUsed_indices = sorted([i for i in set(lTerminal_Indices) if i != None])
+    lUsed_indices = sorted(
+        [i for i in set(lTerminal_Indices) if i is not None])
 
     if len(lUsed_indices) == 0:
         return None
     elif len(lUsed_indices) == 1:
         start_index = lUsed_indices[0]
     else:
-        distances = [i-j for j,i in zip(lUsed_indices[:-1],lUsed_indices[1:])] + [lD - lUsed_indices[-1] + lUsed_indices[0]]
-        max_distance_index, max_distance = max(enumerate(distances), key=operator.itemgetter(1))
+        distances = [i - j for j,
+                     i in zip(lUsed_indices[:-1],
+                              lUsed_indices[1:])] + [lD - lUsed_indices[-1] + lUsed_indices[0]]
+        max_distance_index, max_distance = max(
+            enumerate(distances), key=operator.itemgetter(1))
 
         # Define the start_index
-        start_index = lUsed_indices[(max_distance_index+1)%len(lUsed_indices)]
+        start_index = lUsed_indices[
+            (max_distance_index + 1) %
+            len(lUsed_indices)]
 
     # Get all TR units according to shift.
     lMSA = []
@@ -244,12 +314,12 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
         # Intialise the last used index and the first msa_unit
         current_index = 1
         msa_unit = ''
-        for iS,iP in zip(iSeq, iPath):
+        for iS, iP in zip(iSeq, iPath):
             if iP == 'N':
                 continue
             elif iP == 'C':
                 break
-            match_state_index = (int(iP[1:]) + (lD - start_index))%lD + 1
+            match_state_index = (int(iP[1:]) + (lD - start_index)) % lD + 1
             if match_state_index >= current_index:
                 # We are staying within the same repeat unit.
                 msa_unit += iS
@@ -274,7 +344,6 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPath, lD, alpha
 
 
 def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
-
     """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
@@ -304,10 +373,15 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
         return None
 
     splitter = re.compile("(\w)(\d+)")
-    mapping = [((splitter.match(iP).group(1),int(splitter.match(iP).group(2))),iS) for iS,iP in zip(sequence[begin:],path[begin:]) if iP != 'C']
+    mapping = [
+        ((splitter.match(iP).group(1), int(
+            splitter.match(iP).group(2))), iS) for iS, iP in zip(
+            sequence[
+                begin:], path[
+                    begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
-    index_shift = ["Empty"]+[(i+lD+1-shift)%lD  for i in range(lD)]
+    index_shift = ["Empty"] + [(i + lD + 1 - shift) % lD for i in range(lD)]
     logging.debug("The tandem repeat is shifted by: {0}".format(str(shift)))
 
     repeat_msa = []
@@ -315,7 +389,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     last_used_index = 0
 
     if lD == 1:
-        for iM,iS in mapping[1:]:
+        for iM, iS in mapping[1:]:
             if iM[0] == "I":
                 repeat_unit += iS
             else:
@@ -323,7 +397,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
                 repeat_unit = iS
 
     else:
-        for iM,iS in mapping[1:]:
+        for iM, iS in mapping[1:]:
             #print("{} {}".format(iM,iS))
             if index_shift[iM[1]] >= last_used_index:
                 repeat_unit += iS
@@ -338,7 +412,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
 
 
 def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
-                                            translate = False):
+                                            translate=False):
     """Convert a viterbi path in an hmm of length ``lD`` on the sequence into a
     corresponding tandem repeat.
 
@@ -386,14 +460,20 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
 
     if translate:
         # In the input data, the states are counted starting on 1. Subtract 1.
-        most_likely_path = [i if i in ["C","N"] else i[0]+str(int(i[1:])-1) for i in most_likely_path]
+        most_likely_path = [
+            i if i in ["C", "N"] else i[0] + str(int(i[1:]) - 1) for i in most_likely_path]
 
     splitter = re.compile("(\w)(\d+)")
 
-    mapping = [((splitter.match(iP).group(1),int(splitter.match(iP).group(2))),iS) for iS,iP in zip(sequence[begin:],most_likely_path[begin:]) if iP != 'C']
+    mapping = [
+        ((splitter.match(iP).group(1), int(
+            splitter.match(iP).group(2))), iS) for iS, iP in zip(
+            sequence[
+                begin:], most_likely_path[
+                    begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
-    index_shift = [(i+lD-shift)%lD  for i in range(lD)]
+    index_shift = [(i + lD - shift) % lD for i in range(lD)]
     logging.debug("The tandem repeat is shifted by: {0}".format(str(shift)))
 
     insertions = []
@@ -403,53 +483,65 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
     max_used_index_I = -1
     last_used_index = shift
 
-    for iM,iS in mapping[1:]:
+    for iM, iS in mapping[1:]:
 
-        logging.debug("Iteration iS: {0}, iM: {1}, last_used_index: {2}, max_used_index_M: {3}, max_used_index_I: {4}".format(str(iS), str(iM), str(last_used_index),str(max_used_index_M),str(max_used_index_I)))
+        logging.debug(
+            "Iteration iS: {0}, iM: {1}, last_used_index: {2}, max_used_index_M: {3}, max_used_index_I: {4}".format(
+                str(iS),
+                str(iM),
+                str(last_used_index),
+                str(max_used_index_M),
+                str(max_used_index_I)))
 
-        ## If we have entered a new repeat unit, add a new element to <insertions>
-        ## (Including some index magic, e.g. the insertion state index is shifted by one (lowered))
-        if iM[0] == "M" and (index_shift[iM[1]] <= max_used_index_M or index_shift[iM[1]] <= max_used_index_I):
+        # If we have entered a new repeat unit, add a new element to <insertions>
+        # (Including some index magic, e.g. the insertion state index is shifted by one (lowered))
+        if iM[0] == "M" and (
+            index_shift[
+                iM[1]] <= max_used_index_M or index_shift[
+                iM[1]] <= max_used_index_I):
             insertions.append(defaultdict(str))
             max_used_index_M = index_shift[iM[1]]
-            max_used_index_I = index_shift[iM[1]] -1
+            max_used_index_I = index_shift[iM[1]] - 1
 
-        elif iM[0] == "I" and (index_shift[iM[1]-1] < max_used_index_I or index_shift[iM[1]-1] < max_used_index_M):
+        elif iM[0] == "I" and (index_shift[iM[1] - 1] < max_used_index_I or index_shift[iM[1] - 1] < max_used_index_M):
             insertions.append(defaultdict(str))
-            max_used_index_I = index_shift[iM[1]-1]
-            max_used_index_M = index_shift[iM[1]-1]
+            max_used_index_I = index_shift[iM[1] - 1]
+            max_used_index_M = index_shift[iM[1] - 1]
 
         if iM[0] == "M":
             max_used_index_M = index_shift[iM[1]]
         else:
-            max_used_index_I = index_shift[iM[1]-1]
+            max_used_index_I = index_shift[iM[1] - 1]
 
         # Save match state and deletion information
         if iM[0] == "M":
             n_deletions = distance_index(last_used_index, iM[1], lD) - 1
-            repeat_text += "-"* n_deletions + iS
+            repeat_text += "-" * n_deletions + iS
             last_used_index = iM[1]
 
         else:
             insertions[-1][index_shift[iM[1]]] += iS
 
-    msa = [ repeat_text[i:i+lD] for i in range(0,len(repeat_text),lD) ]
-    msa[-1] += "-"*(lD-len(msa[-1]))
+    msa = [repeat_text[i:i + lD] for i in range(0, len(repeat_text), lD)]
+    msa[-1] += "-" * (lD - len(msa[-1]))
     msaT = ["".join(c) for c in zip(*msa)]
     n = len(msa)
     logging.debug("This tandem repeat has {0} repeat units.".format(str(n)))
-    logging.debug("These insertions were detected: {0}.".format(str(insertions)))
+    logging.debug(
+        "These insertions were detected: {0}.".format(
+            str(insertions)))
 
     msaTemp = []
     # For each site ...
     for i in range(lD):
-        msaTemp.extend(msaT[i:i+1])
+        msaTemp.extend(msaT[i:i + 1])
         # ... for each tandem repeat unit, check whether there are insertions.
-        for j,row in enumerate(insertions):
-            # Backtranslate the index used in insertions (shift by one to the right (increase))
-            if (i+1)%lD in row:
-                for iS in row[(i+1)%lD]:
-                    msaTemp.append("-"*j + iS + "-"*(n-j-1))
+        for j, row in enumerate(insertions):
+            # Backtranslate the index used in insertions (shift by one to the
+            # right (increase))
+            if (i + 1) % lD in row:
+                for iS in row[(i + 1) % lD]:
+                    msaTemp.append("-" * j + iS + "-" * (n - j - 1))
     msa = ["".join(c) for c in zip(*msaTemp)]
 
     return msa, begin, shift
