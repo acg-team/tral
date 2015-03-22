@@ -10,7 +10,7 @@ import scipy as sp
 import scipy.stats
 import scipy.special
 
-from paths import DATA_DIR
+from tral.paths import DATA_DIR
 
 log = logging.getLogger(__name__)
 

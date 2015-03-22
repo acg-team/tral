@@ -14,6 +14,7 @@ import scipy.special
 import scipy.linalg
 
 from tral import configuration
+from tral.paths import DATA_DIR
 
 log = logging.getLogger(__name__)
 

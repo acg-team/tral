@@ -11,7 +11,7 @@ import tempfile
 import subprocess
 import numpy as np
 
-from paths import DATA_DIR, EXEC_DIR
+from tral.paths import DATA_DIR, EXEC_DIR
 
 log = logging.getLogger(__name__)
 
