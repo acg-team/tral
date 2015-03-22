@@ -19,7 +19,6 @@ log = logging.getLogger(__name__)
 
 
 def read_fasta(file, indices=None):
-
     """ Read all sequences from a fasta file.
 
     Read all sequences from a fasta file.
@@ -52,7 +51,6 @@ def read_fasta(file, indices=None):
 
 
 def write(sequence, sequence_file, sequence_id="sequence_id_not_defined"):
-
     """ Write a sequence str to fasta format in specified <sequence_file>
 
     Write s sequence str to fasta format in specified <sequence_file>
@@ -65,5 +63,5 @@ def write(sequence, sequence_file, sequence_id="sequence_id_not_defined"):
     """
 
     with open(sequence_file, 'a') as fastafile:
-        fastafile.write(">"+str(sequence_id) + '\n')
+        fastafile.write(">" + str(sequence_id) + '\n')
         fastafile.write(str(sequence) + '\n')

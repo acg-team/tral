@@ -40,7 +40,7 @@ class Sequence:
     def __init__(self, seq, id=None):
 
         if not isinstance(seq, str):
-                raise Exception('The seq value is not a String')
+            raise Exception('The seq value is not a String')
         self.seq = seq.upper()
         for i in self.seq:
             if i not in config['lAll_amino_acid']:
@@ -53,7 +53,6 @@ class Sequence:
             self.id = id
 
     def create(file, format):
-
         """ Create sequence(s) from file.
 
         Create sequence(s) from file.
@@ -76,7 +75,6 @@ class Sequence:
                             "sequence.write()".format(format))
 
     def write(self, file, format):
-
         """ Write sequence to file.
 
         Write sequence to file using one of two formats.
@@ -99,7 +97,6 @@ class Sequence:
                             "sequence.write()".format(format))
 
     def detect(self, lHMM=None, denovo=None, **kwargs):
-
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
         A list of ``Repeat`` instances is created for tandem repeat detections
@@ -136,9 +133,9 @@ class Sequence:
                 if not most_likely_path:
                     continue
                 unaligned_msa = hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units(
-                                                             self.seq,
-                                                             most_likely_path,
-                                                             iHMM.lD)
+                    self.seq,
+                    most_likely_path,
+                    iHMM.lD)
                 if len(unaligned_msa) > 1:
                     # Align the msa
                     aligned_msa = repeat_align.realign_repeat(unaligned_msa)
@@ -162,8 +159,9 @@ class Sequence:
 
         elif denovo:
             if 'detection' in kwargs:
-                lPredicted_repeat = repeat_detection_run.run_TRD([self],
-                                                      **kwargs['detection'])[0]
+                lPredicted_repeat = repeat_detection_run.run_TRD(
+                    [self],
+                    **kwargs['detection'])[0]
             else:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
 
@@ -203,7 +201,6 @@ class Sequence:
                             "HMM")
 
     def set_repeat_list(self, repeat_list, tag):
-
         """ Add `repeat_list` as attribute to this `sequence` instance.
 
         Add `repeat_list` as attribute to this `sequence` instance. Access
@@ -234,7 +231,6 @@ class Sequence:
             return []
 
     def repeat_in_sequence(self, myRepeat):
-
         """ Sanity check whether the `repeat` is part of this `sequence`. In
         case, calculate the position of the `repeat` within the `sequence`.
 
@@ -255,8 +251,8 @@ class Sequence:
         repeat_sequence = repeat.get_repeat_sequence(myRepeat.msa_standard_aa)
         # The first letter in the sequence is counted as 1
         # (not 0, as in Python):
-        starts = [m.start()+1 for m in re.finditer(repeat_sequence,
-                                                   self.seq_standard_aa)]
+        starts = [m.start() + 1 for m in re.finditer(repeat_sequence,
+                                                     self.seq_standard_aa)]
 
         if len(starts) != 0:  # Is the tandem repeat predicted correctly?
             if not hasattr(myRepeat, "begin") or myRepeat.begin not in starts:
