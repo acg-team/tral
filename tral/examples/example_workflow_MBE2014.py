@@ -1,16 +1,24 @@
+
+'''
+Implementation of the workflow used in :
+Schaper,E. et al. (2014) Deep conservation of human protein tandem repeats within the eukaryotes. Molecular Biology and Evolution. 31, 1132–1148 .
+'''
+
 import logging
 import logging.config
 import os
 
 from tral.paths import *
+from tral.paths import PACKAGE_DIRECTORY
+
 from tral.sequence import repeat_detection_run, sequence
 from tral.hmm import hmm
 
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
-TEST_FAA_FILE_MBE_2014 = "P51610.fasta"
-TEST_HMM_FILES_MBE_2014 = ["Kelch_1.hmm", "Kelch_2.hmm"]
+TEST_FAA_FILE_MBE_2014 = os.path.join(PACKAGE_DIRECTORY,"test","P51610.fasta")
+TEST_HMM_FILES_MBE_2014 = [os.path.join(PACKAGE_DIRECTORY,"test","Kelch_1.hmm"), os.path.join(PACKAGE_DIRECTORY,"test","Kelch_2.hmm")]
 TEST_SCORE_MBE_2014 = "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions"
 
 def path():
@@ -21,11 +29,11 @@ def path():
 def sample_MBE_2014_pipeline():
     # The Schaper et al. (MBE, 2014) pipeline is tested on a single sequence.
 
-    test_lSeq = sequence.Sequence.read(os.path.join(path(), TEST_FAA_FILE_MBE_2014))
+    test_lSeq = sequence.Sequence.create(os.path.join(path(), TEST_FAA_FILE_MBE_2014), format = "fasta")
     test_seq = test_lSeq[0]
 
     # Information on sequence domains (here: Pfam) in this sequence are added.
-    test_pfam_hmm = [hmm.HMM.create( hmmer_file = os.path.join(path(),i) ) for i in TEST_HMM_FILES_MBE_2014]
+    test_pfam_hmm = [hmm.HMM.create( format = "hmmer", file = os.path.join(path(),i) ) for i in TEST_HMM_FILES_MBE_2014]
 
     # The sequence is searched for tandem repetitions of the Pfam domain in the sequence
     test_pfam_list = test_seq.detect(lHMM = test_pfam_hmm)
@@ -36,7 +44,8 @@ def sample_MBE_2014_pipeline():
     assert len(test_pfam_list.repeats) == 2
 
     # de novo detection methods (Trust, T-reks, Xstream, HHrepID) are used to search the
-    test_denovo_list = test_seq.detect(denovo = True, **TEST_DENOVO_PARAMETERS)
+    # INSERT OWN PARAMTERS USING: test_denovo_list = test_seq.detect(denovo = True, **TEST_DENOVO_PARAMETERS)
+    test_denovo_list = test_seq.detect(denovo = True)
     # When Trust is part of the detectors, the number of found repeats may differ between runs...
     assert len(test_denovo_list.repeats) == 10
 
@@ -77,7 +86,7 @@ def sample_MBE_2014_pipeline():
     assert len(test_entire_set.repeats) == 3
 
     # Write result set of Pfam TRs
-    #test_entire_set.write(format = "xml,json,csv,...")
+    #test_entire_set.write(format = "tsv,...")
 
 
 if __name__ == "__main__":
