@@ -21,8 +21,7 @@ config_general = c.config
 config = config_general["repeat_list"]
 
 
-def serialize_repeat_list_tsv(tandem_repeats, config = config, *args):
-
+def serialize_repeat_list_tsv(tandem_repeats, config=config, *args):
     ''' Serialize a ``repeat_list`` instance as tsv.
 
         config defines which tandem repeat characteristics are added to the .tsv.
@@ -53,33 +52,34 @@ def serialize_repeat_list_tsv(tandem_repeats, config = config, *args):
         d = []
         for iCharacteristic in output_characteristics:
             if "divergence" == iCharacteristic:
-                if hasattr(iRepeat,"dScore") and model in iRepeat.dScore:
-                    d.append( iRepeat.divergence(model) )
+                if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
+                    d.append(iRepeat.divergence(model))
                 else:
-                    d.append( None )
+                    d.append(None)
             elif "pValue" == iCharacteristic:
-                if hasattr(iRepeat,"dPValue") and model in iRepeat.dPValue:
-                    d.append( iRepeat.pValue(model) )
+                if hasattr(iRepeat, "dPValue") and model in iRepeat.dPValue:
+                    d.append(iRepeat.pValue(model))
                 else:
-                    d.append( None )
+                    d.append(None)
             elif "score" == iCharacteristic:
-                if hasattr(iRepeat,"dScore") and model in iRepeat.dScore:
-                    d.append( iRepeat.score(model) )
+                if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
+                    d.append(iRepeat.score(model))
                 else:
-                    d.append( None )
+                    d.append(None)
             elif "msa_original" == iCharacteristic:
                 try:
-                    d.append( ",".join(iRepeat.msa_original) )
+                    d.append(",".join(iRepeat.msa_original))
                 except:
-                    raise Exception("The attribute msa_original is not available for iRepeat.")
+                    raise Exception(
+                        "The attribute msa_original is not available for iRepeat.")
             elif getattr(iRepeat, iCharacteristic):
-                d.append( getattr(iRepeat, iCharacteristic) )
+                d.append(getattr(iRepeat, iCharacteristic))
             else:
-                raise Exception("The attribute {} is not available for tandem_repeats".format(iCharacteristic))
-        data.append( "\t".join(str(i) for i in d) )
+                raise Exception(
+                    "The attribute {} is not available for tandem_repeats".format(iCharacteristic))
+        data.append("\t".join(str(i) for i in d))
 
     return "\n".join(data) + "\n"
-
 
 
 def save_repeat_fasta(tandem_repeats, file):
@@ -97,7 +97,7 @@ def save_repeat_fasta(tandem_repeats, file):
             GH--
     '''
 
-    with open(file, 'w', newline = '\n') as f:
-        for identifier,msa in tandem_repeats.items():
+    with open(file, 'w', newline='\n') as f:
+        for identifier, msa in tandem_repeats.items():
             f.write(">{0}\n".format(identifier))
-            f.write("\n".join(msa)+"\n\n")
+            f.write("\n".join(msa) + "\n\n")
