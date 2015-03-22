@@ -39,8 +39,8 @@ def test_repeat_ambiguous():
     assert myTR_O.divergence(TEST_SCORE) == myTR_K.divergence(TEST_SCORE)
     assert myTR_O.pValue(TEST_SCORE) == myTR_K.pValue(TEST_SCORE)
 
-    assert myTR_O.divergence(TEST_SCORE) == 2.5986328125
-    assert myTR_K.pValue(TEST_SCORE) == 0.3821
+    assert myTR_O.divergence(TEST_SCORE) == 2.095947265625
+    assert myTR_K.pValue(TEST_SCORE) == 0.3507
 
 
 def test_repeat_pickle():
