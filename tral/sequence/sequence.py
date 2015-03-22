@@ -8,7 +8,6 @@
 
 import logging
 import pickle
-import os
 import re
 
 from tral import configuration
@@ -16,12 +15,9 @@ from tral.repeat import repeat, repeat_align
 from tral.repeat_list import repeat_list
 from tral.hmm import hmm, hmm_viterbi
 from tral.sequence import repeat_detection_run, sequence_io
-from tral.paths import *
 
-c = configuration.Configuration.Instance()
-config = c.config
-
-log = logging.getLogger(__name__)
+CONFIG = configuration.Configuration.Instance().config
+LOG = logging.getLogger(__name__)
 
 
 class Sequence:
@@ -37,22 +33,25 @@ class Sequence:
         seq_standard_aa (str): The sequence with standard amino acids only
     """
 
-    def __init__(self, seq, id=None):
+    def __init__(self, seq, name=None):
 
         if not isinstance(seq, str):
             raise Exception('The seq value is not a String')
         self.seq = seq.upper()
         for i in self.seq:
-            if i not in config['lAll_amino_acid']:
-                raise Exception("{} is not in config['lAll_amino_acid']: {}"
-                                .format(i, config['lAll_amino_acid']))
+            if i not in CONFIG['lAll_amino_acid']:
+                raise Exception("{} is not in CONFIG['lAll_amino_acid']: {}"
+                                .format(i, CONFIG['lAll_amino_acid']))
 
         self.seq_standard_aa = repeat.standardize(self.seq)
 
-        if id:
-            self.id = id
+        if name:
+            self.name = name
 
-    def create(file, format):
+        self.dAnnotations = {}
+        self.dRepeat_list = {}
+
+    def create(file, file_format):
         """ Create sequence(s) from file.
 
         Create sequence(s) from file.
@@ -64,17 +63,17 @@ class Sequence:
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
-        if format == 'fasta':
+        if file_format == 'fasta':
             lSeq = sequence_io.read_fasta(file)
             return [Sequence(iSeq, iID) for iSeq, iID in lSeq]
-        if format == 'pickle':
+        if file_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
         else:
             raise Exception("Output format {} is not implemented for"
-                            "sequence.write()".format(format))
+                            "sequence.write()".format(file_format))
 
-    def write(self, file, format):
+    def write(self, file, file_format):
         """ Write sequence to file.
 
         Write sequence to file using one of two formats.
@@ -87,14 +86,14 @@ class Sequence:
 
         """
 
-        if format == 'fasta':
+        if file_format == 'fasta':
             sequence_io.write(self.seq, file)
-        elif format == 'pickle':
+        elif file_format == 'pickle':
             with open(file, 'wb') as fh:
                 pickle.dump(self, fh)
         else:
             raise Exception("Output format {} is not implemented for",
-                            "sequence.write()".format(format))
+                            "sequence.write()".format(file_format))
 
     def detect(self, lHMM=None, denovo=None, **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
@@ -104,7 +103,6 @@ class Sequence:
 
         * Sequence profile hidden Markov models ``HMM``
         * de novo detection algorithms.
-
 
         Args:
             hmm (HMM): A list of ``HMM`` instances.
@@ -129,7 +127,7 @@ class Sequence:
             for iHMM in lHMM:
                 # Detect TRs on self.seq with hmm using the Viterbi algorithm.
                 most_likely_path = iHMM.viterbi(self.seq)
-                logging.debug("most_likely_path: {}".format(most_likely_path))
+                LOG.debug("most_likely_path: {}".format(most_likely_path))
                 if not most_likely_path:
                     continue
                 unaligned_msa = hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units(
@@ -154,7 +152,7 @@ class Sequence:
             return repeat_list.Repeat_list(lRepeat)
 
         elif lHMM == []:
-            logging.debug("lHMM == []")
+            LOG.debug("lHMM == []")
             return None
 
         elif denovo:
@@ -165,7 +163,7 @@ class Sequence:
             else:
                 lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
 
-            log.debug("lPredicted_repeat: {}".format(lPredicted_repeat))
+            LOG.debug("lPredicted_repeat: {}".format(lPredicted_repeat))
             lRepeat = []
 
             for jTRD, jlTR in lPredicted_repeat.items():
@@ -187,7 +185,7 @@ class Sequence:
                         # Sanity check repeat and set begin coordinate for
                         # all repeats
                         if not self.repeat_in_sequence(iTR):
-                            logging.debug("The tandem repeat is not part of",
+                            LOG.debug("The tandem repeat is not part of",
                                           "the sequence. Detector: {}"
                                           .format(iTR.TRD))
                             continue
@@ -211,26 +209,20 @@ class Sequence:
             tag (str): A identifier for the repeat_list
         """
 
-        if not hasattr(self, "dRepeat_list"):
-            self.dRepeat_list = {}
-
         self.dRepeat_list[tag] = repeat_list
 
     def annotate(self, data, tag):
-
-        if not hasattr(self, "dAnnotations"):
-            self.dAnnotations = {}
 
         self.dAnnotations[tag] = data
 
     def get_annotation(self, tag):
 
-        if hasattr(self, "dAnnotations") and tag in self.dAnnotations:
+        if tag in self.dAnnotations:
             return self.dAnnotations[tag]
         else:
             return []
 
-    def repeat_in_sequence(self, myRepeat):
+    def repeat_in_sequence(self, my_repeat):
         """ Sanity check whether the `repeat` is part of this `sequence`. In
         case, calculate the position of the `repeat` within the `sequence`.
 
@@ -248,16 +240,16 @@ class Sequence:
         .. todo:: Decide whether save_original_msa is needed here.
         """
 
-        repeat_sequence = repeat.get_repeat_sequence(myRepeat.msa_standard_aa)
+        repeat_sequence = repeat.get_repeat_sequence(my_repeat.msa_standard_aa)
         # The first letter in the sequence is counted as 1
         # (not 0, as in Python):
         starts = [m.start() + 1 for m in re.finditer(repeat_sequence,
                                                      self.seq_standard_aa)]
 
         if len(starts) != 0:  # Is the tandem repeat predicted correctly?
-            if not hasattr(myRepeat, "begin") or myRepeat.begin not in starts:
-                myRepeat.begin = starts[0]
-            myRepeat.save_original_msa(self.seq)
+            if not hasattr(my_repeat, "begin") or my_repeat.begin not in starts:
+                my_repeat.begin = starts[0]
+            my_repeat.save_original_msa(self.seq)
             return True
         else:
             return False

@@ -1,19 +1,16 @@
 # (C) 2015 Elke Schaper
 
 """
-
     :synopsis: Input/output for sequences
 
-    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+    .. moduleauthor:: Elke Schaper <elke.schaper@sib-sib.ch>
 
 """
 
-import Bio.Seq
+from Bio import SeqIO
 import logging
-import os
-import re
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 '''  READ SEQUENCE '''
 
@@ -32,8 +29,6 @@ def read_fasta(file, indices=None):
     .. todo:: Write checks for ``format`` and ``file``.
     """
 
-    from Bio import SeqIO
-
     # Making a list out if the generator object might be overhead for huge
     # fastafiles
     count = 0
@@ -47,7 +42,7 @@ def read_fasta(file, indices=None):
         yield str(seq_record.seq), seq_record.id
 
 
-'''  WRITE SEQUENCE '''
+#  WRITE SEQUENCE ##########################################################
 
 
 def write(sequence, sequence_file, sequence_id="sequence_id_not_defined"):
