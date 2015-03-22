@@ -106,8 +106,8 @@ def test_filter_pvalue():
     #test_repeats = [repeat.Repeat(msa = i, scoreslist = ["phylo_gap01"], calc_score = True, calc_pvalue = True) for i in TEST_REPEATS]
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
     for i,j in zip(test_repeats, TEST_SCORE_VALUE_LIST):
-        i.dPValue = {}
-        i.dPValue[TEST_SCORE] = j
+        i.d_pvalue = {}
+        i.d_pvalue[TEST_SCORE] = j
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
 
@@ -120,8 +120,8 @@ def test_filter_cluster_based():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
     for i,j in zip(test_repeats, TEST_SCORE_VALUE_LIST):
-        i.dPValue = {}
-        i.dPValue[TEST_SCORE] = j
+        i.d_pvalue = {}
+        i.d_pvalue[TEST_SCORE] = j
     for i,j in zip(test_repeats, TEST_BEGIN_LIST):
         i.begin = j
 
