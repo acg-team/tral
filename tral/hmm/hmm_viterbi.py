@@ -7,7 +7,6 @@ import os
 import re
 
 from tral import configuration
-from tral.paths import *
 from tral.repeat import repeat
 
 log = logging.getLogger(__name__)

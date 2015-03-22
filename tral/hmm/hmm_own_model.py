@@ -1,4 +1,4 @@
-# (C) 2012-2013 Elke Schaper
+# (C) 2012-2015 Elke Schaper
 # coding: utf-8
 
 import math

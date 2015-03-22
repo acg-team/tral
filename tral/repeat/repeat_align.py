@@ -9,7 +9,6 @@ from Bio import AlignIO
 log = logging.getLogger(__name__)
 
 from tral.repeat import repeat
-from tral.paths import *
 from tral import configuration
 
 c = configuration.Configuration.Instance()

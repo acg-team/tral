@@ -1,6 +1,6 @@
 import configobj
 import os
-from tral.paths import *
+from tral.paths import config_file
 
 pDefaults = config_file("config.ini")
 pSpec = config_file("spec.ini")

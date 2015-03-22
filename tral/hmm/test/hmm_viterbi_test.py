@@ -6,7 +6,6 @@ from tral.hmm.hmm_viterbi import *
 from tral.repeat import repeat
 from tral.repeat import repeat_align
 
-
 notfixed = pytest.mark.notfixed
 
 @pytest.mark.no_external_software_required

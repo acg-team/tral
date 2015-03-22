@@ -10,15 +10,15 @@ import scipy as sp
 import scipy.stats
 import scipy.special
 
-log = logging.getLogger(__name__)
+from paths import DATA_DIR
 
-from tral.paths import *
+log = logging.getLogger(__name__)
 
 path_score = join(DATA_DIR, 'pvalue')
 
-########################## REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ####
+# ######################### REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ########
 
-##################### phylo & entropy ############################
+# #################### phylo & entropy ########################################
 
 
 def empiricalList(l, n, sequence_type='AA', score='phylo'):

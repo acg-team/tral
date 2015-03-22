@@ -1,4 +1,4 @@
-# (C) 2014 Elke Schaper
+# (C) 2015 Elke Schaper
 
 import Bio.Seq
 import random
@@ -10,6 +10,8 @@ import shutil
 import tempfile
 import subprocess
 import numpy as np
+
+from paths import DATA_DIR, EXEC_DIR
 
 log = logging.getLogger(__name__)
 
@@ -197,8 +199,8 @@ def evolved_tandem_repeats(
         Return type depends on ``return_type``: ``Repeat`` or ``Bio.Seq.Seq`` instance.
     """
 
-    runfile_template = os.path.join(DATAROOT, "ALF", "template.drw")
-    alf_exec = os.path.join(EXECROOT, "alfsim")
+    runfile_template = os.path.join(DATA_DIR, "ALF", "template.drw")
+    alf_exec = os.path.join(EXEC_DIR, "alfsim")
     # create temporary directory
     working_dir = tempfile.mkdtemp()
     log.debug("evolvedTR: Created tempfile: %s", working_dir)
@@ -261,7 +263,7 @@ def evolved_tandem_repeats(
             runfile.write(
                 "substModels := [SubstitutionModel('CustomP', ['" +
                 os.path.join(
-                    DATAROOT,
+                    DATA_DIR,
                     'ALF',
                     'lg.dat') +
                 "'])];\n")
@@ -401,7 +403,7 @@ def random_sequence(
             sequence_length = l * n
 
         if equilibrium_frequencies == 'human':
-            file = os.path.join(DATAROOT, 'Random', "_".join(
+            file = os.path.join(DATA_DIR, 'Random', "_".join(
                 [sequence_type, equilibrium_frequencies, '3']) + '.txt')
 
         with open(file, 'r') as f:

@@ -2,9 +2,9 @@ import os
 import pytest
 import logging.config
 
-from tral.paths import *
+from tral.paths import config_file
 
-logging.config.fileConfig( config_file("logging.ini") )
+logging.config.fileConfig(config_file("logging.ini"))
 
 from tral.sequence import repeat_detection_run, sequence
 

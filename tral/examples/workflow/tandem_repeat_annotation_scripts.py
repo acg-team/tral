@@ -12,7 +12,7 @@ import sys
 from pyfaidx import Fasta
 
 from tral import configuration
-from tral.paths import *
+from tral.paths import config_file
 from tral.repeat_list import repeat_list
 from tral.sequence import sequence
 from tral.hmm import hmm

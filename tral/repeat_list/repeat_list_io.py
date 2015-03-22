@@ -2,26 +2,23 @@
 
 
 """
-
     :synopsis: Input/output for the repeat_list class
 
-    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
-
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
+
 import logging
 import os
 
 from tral import configuration
-from tral.paths import *
 
 log = logging.getLogger(__name__)
 
-c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["repeat_list"]
+CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG = CONFIG_GENERAL["repeat_list"]
 
 
-def serialize_repeat_list_tsv(tandem_repeats, config=config, *args):
+def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
     ''' Serialize a ``repeat_list`` instance as tsv.
 
         config defines which tandem repeat characteristics are added to the .tsv.

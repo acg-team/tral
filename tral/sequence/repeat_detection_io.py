@@ -2,10 +2,9 @@
 # (C) 2011-2015 Elke Schaper
 
 """
-
     :synopsis: Input/output for repeat detection algorithms
 
-    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 
 """
 
