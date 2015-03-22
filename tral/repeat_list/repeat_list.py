@@ -53,24 +53,24 @@ class Repeat_list:
         else:
             return self
 
-    def create(file, format):
+    def create(file, input_format):
         """ Read ``Repeat_list`` from file.
 
         Read ``Repeat_list`` from file (currently, only pickle is supported)
 
         Args:
-            format (str):  Currently only "pickle"
+            input_format (str):  Currently only "pickle"
             file (str): Path to output file
 
-        .. todo:: Write checks for ``format`` and ``file``.
+        .. todo:: Write checks for ``input_format`` and ``file``.
 
         """
 
-        if format == 'pickle':
+        if input_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
         else:
-            raise Exception('format is unknown.')
+            raise Exception('input_format is unknown: {}.'format(input_format))
 
     def write(self, output_format, file=None, str=None, *args):
         """ Serialize and write ``Repeat_list`` instances.
