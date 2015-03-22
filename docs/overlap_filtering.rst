@@ -21,7 +21,7 @@ Read in tandem repeat annotations.
     from tral import sequence
     from tral.paths import PACKAGE_DIRECTORY
 
-    fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.pickle")
+    fRepeat_Pickle = os.path.join(PACKAGE_DIRECTORY, "examples", "data", "HIV-1_388796.pickle")
 
     with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)

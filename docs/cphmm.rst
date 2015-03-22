@@ -23,7 +23,7 @@ Read in your sequence profile model.
     from tral.hmm import hmm
     from tral.paths import PACKAGE_DIRECTORY
 
-    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"test","Kelch_1.hmm")
+    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"examples", "data","Kelch_1.hmm")
 
     circular_profile_HMM_Kelch_1 = hmm.HMM.create(format = 'hmmer', file = fPfam_profile_hmm)
 
@@ -38,7 +38,7 @@ Read in your sequences.
 
     from tral.sequence import sequence
 
-    human_HCFC1_fasta = os.path.join(PACKAGE_DIRECTORY,"test","P51610.fasta")
+    human_HCFC1_fasta = os.path.join(PACKAGE_DIRECTORY,"examples", "data", "P51610.fasta")
     human_HCFC1_sequence = sequence.Sequence.create(file = human_HCFC1_fasta, format = 'fasta')[0]
 
 

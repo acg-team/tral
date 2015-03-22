@@ -21,7 +21,7 @@ Read in your sequences.
     from tral.sequence import sequence
     from tral.paths import PACKAGE_DIRECTORY
 
-    fHIV_proteome = os.path.join(PACKAGE_DIRECTORY,"test","HIV-1_388796.faa")
+    fHIV_proteome = os.path.join(PACKAGE_DIRECTORY,"data", "examples","HIV-1_388796.faa")
     lHIV_Sequence = sequence.Sequence.create(file = fHIV_proteome, format = 'fasta')
 
 
