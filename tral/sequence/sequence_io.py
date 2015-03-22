@@ -15,10 +15,10 @@ import re
 
 log = logging.getLogger(__name__)
 
-################################## READ SEQUENCE #########################################
+'''  READ SEQUENCE '''
 
 
-def read_fasta(file, indices = None):
+def read_fasta(file, indices=None):
 
     """ Read all sequences from a fasta file.
 
@@ -27,14 +27,16 @@ def read_fasta(file, indices = None):
 
     Args:
         file (str): Path to input file
-        start ([int, int]): Index of the first returned sequence, and the first not returned sequence.
+        start ([int, int]): Index of the first returned sequence, and the first
+                            not returned sequence.
 
     .. todo:: Write checks for ``format`` and ``file``.
     """
 
     from Bio import SeqIO
 
-    # Making a list out if the generator object might be overhead for huge fastafiles
+    # Making a list out if the generator object might be overhead for huge
+    # fastafiles
     count = 0
     for seq_record in SeqIO.parse(file, "fasta"):
         if indices:
@@ -46,10 +48,21 @@ def read_fasta(file, indices = None):
         yield str(seq_record.seq), seq_record.id
 
 
-############################## WRITE SEQUENCE #############################################
+'''  WRITE SEQUENCE '''
 
-def write(sequence, sequence_file, sequence_id = "sequence_id_not_defined"):
-    ''' save the sequence in fasta format in specified <sequence_file> '''
+
+def write(sequence, sequence_file, sequence_id="sequence_id_not_defined"):
+
+    """ Write a sequence str to fasta format in specified <sequence_file>
+
+    Write s sequence str to fasta format in specified <sequence_file>
+
+    Args:
+        sequence (str): Sequence
+        sequence_file (str): Path to the output file
+        sequence_id (str): ID of the sequence in the output file.
+
+    """
 
     with open(sequence_file, 'a') as fastafile:
         fastafile.write(">"+str(sequence_id) + '\n')
