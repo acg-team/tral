@@ -114,7 +114,7 @@ def test_MBE_2014_workflow():
     assert len(test_denovo_list.repeats) == 10
     test_denovo_list = test_denovo_list.filter("attribute", "n_effective", "min", 2.5)
     assert len(test_denovo_list.repeats) == 5
-    test_denovo_list = test_denovo_list.filter("attribute", "l", "min", 10)
+    test_denovo_list = test_denovo_list.filter("attribute", "l_effective", "min", 10)
     assert len(test_denovo_list.repeats) == 2
 
     # De novo TRs were remastered with HMM

@@ -8,8 +8,7 @@ import logging
 import logging.config
 import os
 
-from tral.paths import *
-from tral.paths import PACKAGE_DIRECTORY
+from tral.paths import config_file, PACKAGE_DIRECTORY
 
 from tral.sequence import repeat_detection_run, sequence
 from tral.hmm import hmm

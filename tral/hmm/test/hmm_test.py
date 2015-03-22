@@ -28,7 +28,7 @@ def path():
 def test_create_HMM_from_Repeat():
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
 
     assert test_hmm.l_effective == 2
     assert set(test_hmm.states) == set(TEST_HMM_STATES_DOUBLE)
@@ -37,7 +37,7 @@ def test_create_HMM_from_Repeat():
 
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_SINGLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
 
     assert test_hmm.l_effective == 1
     assert test_hmm.states == TEST_HMM_STATES_SINGLE
