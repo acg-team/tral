@@ -1,6 +1,7 @@
 import pytest
 import sys
 
+@pytest.mark.no_external_software_required
 def test_imports():
     import argparse
     import Bio
@@ -13,7 +14,7 @@ def test_imports():
     import sphinx
     import scipy.linalg,scipy.special,scipy.stats
 
-
+@pytest.mark.no_external_software_required
 def test_python_version():
 
     # Check if Python3 is used

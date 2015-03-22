@@ -39,14 +39,19 @@ def path():
     """
     return os.path.join(os.path.abspath('.'), 'hmm', 'test')
 
+
+@pytest.mark.no_external_software_required
 def test_initialise_sequence():
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     assert test_seq.seq == TEST_SEQUENCE
 
+
+@pytest.mark.no_external_software_required
 def test_detect_repeats_with_hmm():
     test_hmm = HMM.create(format = 'hmmer', file = os.path.join(path(), TEST_FILE_WITH_ID))
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
+
 
 #@notfixed
 def test_detect_repeats_with_repeat():
@@ -67,6 +72,7 @@ def test_detect_repeats_with_repeat():
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_SINGLE
 
 
+@pytest.mark.no_external_software_required
 def test_too_big_hmms():
 
     test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_LONG)
@@ -95,6 +101,7 @@ def test_detect_repeats_denovo():
     assert len(test_optimized_repeat.repeats) == 3
 
 
+@pytest.mark.no_external_software_required
 def test_sequence_pickle():
 
     test_seq = sequence.Sequence(TEST_SEQUENCE)

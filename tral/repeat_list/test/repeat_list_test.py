@@ -22,6 +22,8 @@ def path():
     """
     return os.path.join(os.path.abspath('.'), 'repeat', 'test')
 
+
+@pytest.mark.no_external_software_required
 def test_create_Repeat_list_from_Repeats():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
@@ -32,6 +34,7 @@ def test_create_Repeat_list_from_Repeats():
         assert i == j.msa
 
 
+@pytest.mark.no_external_software_required
 def test_repeat_list_pickle():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
@@ -60,7 +63,7 @@ def test_serialize_repeat_list_tsv():
     assert type(tsv) == str
 
 
-
+@pytest.mark.no_external_software_required
 def test_pairwise_overlap():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
@@ -74,6 +77,7 @@ def test_pairwise_overlap():
     assert rl.two_repeats_overlap("shared_char", *test_repeats[1:3]) == True
 
 
+@pytest.mark.no_external_software_required
 def test_cluster():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
@@ -96,6 +100,7 @@ def test_cluster():
     assert len(test_repeat_list.dCluster["shared_char"]) == 2
 
 
+@pytest.mark.no_external_software_required
 def test_filter_pValue():
 
     #test_repeats = [repeat.Repeat(msa = i, scoreslist = ["phylo_gap01"], calc_score = True, calc_pValue = True) for i in TEST_REPEATS]
@@ -110,6 +115,7 @@ def test_filter_pValue():
     assert len(test_repeat_list_filtered.repeats) == 1
 
 
+@pytest.mark.no_external_software_required
 def test_filter_cluster_based():
 
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]

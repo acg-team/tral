@@ -16,6 +16,8 @@ def path():
     """
     return os.path.join(os.path.abspath('.'), 'sequence', 'test')
 
+
+@pytest.mark.no_external_software_required
 def test_read_fasta():
 
     test_lSeq = list(sequence_io.read_fasta( os.path.join(path(), TEST_FAA_FILE) ))

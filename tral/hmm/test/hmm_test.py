@@ -27,7 +27,6 @@ def path():
 
 def test_create_HMM_from_Repeat():
 
-
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
     test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
 

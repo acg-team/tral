@@ -38,6 +38,7 @@ def path():
     """
     return os.path.join(os.path.abspath('.'), 'hmm', 'test')
 
+@pytest.mark.no_external_software_required
 def test_single_hmm_with_id_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITH_ID)))
     assert len(test_dict_list) == 1
@@ -47,7 +48,7 @@ def test_single_hmm_with_id_read(path):
 
     assert test_dict[ID_KEY_NAME] == CARCINUSTATIN_ID
 
-
+@pytest.mark.no_external_software_required
 def test_single_hmm_without_id_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID)))
     assert len(test_dict_list) == 1
@@ -58,18 +59,21 @@ def test_single_hmm_without_id_read(path):
     assert test_dict[ID_KEY_NAME] is None
 
 
+@pytest.mark.no_external_software_required
 def test_single_hmm_no_id_with_query_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID),
                               id=CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
+@pytest.mark.no_external_software_required
 def test_single_hmm_with_wrong_query_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITH_ID),
                               id=WRONG_CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
+@pytest.mark.no_external_software_required
 def test_single_hmm_with_short_query_read(path):
     test_dict_list = list(hmm_io.read(os.path.join(path, TEST_FILE_WITH_ID),
                               id=SHORT_CARCINUSTATIN_ID))
@@ -80,6 +84,7 @@ def test_single_hmm_with_short_query_read(path):
 
     assert test_dict[ID_KEY_NAME] == CARCINUSTATIN_ID
 
+@pytest.mark.no_external_software_required
 def compare_carcinustatin(test_dict):
     for i in range(0, NUM_STATES):
         assert str(i + 1) in test_dict.keys()

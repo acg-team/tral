@@ -22,11 +22,13 @@ def path():
     return os.path.join(os.path.abspath('.'), 'repeat', 'test')
 
 
+@pytest.mark.no_external_software_required
 def test_standardize_amino_acids():
 
     assert repeat.standardize("ABDEF-G") == "ADDEF-G"
 
 
+@pytest.mark.no_external_software_required
 def test_repeat_ambiguous():
 
     myTR_O = repeat.Repeat(msa = TEST_MSA_O)
@@ -43,6 +45,7 @@ def test_repeat_ambiguous():
     assert myTR_K.pValue(TEST_SCORE) == 0.3507
 
 
+@pytest.mark.no_external_software_required
 def test_repeat_pickle():
 
     myTR_O = repeat.Repeat(msa = TEST_MSA_O)

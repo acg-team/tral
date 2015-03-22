@@ -10,6 +10,7 @@ TEST_BEGIN = 0
 notfixed = pytest.mark.notfixed
 
 @notfixed
+@pytest.mark.no_external_software_required
 def test_repeat_score():
 
     ### MAKE THIS TEST A TEST!
