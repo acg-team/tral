@@ -1,11 +1,9 @@
 # (C) 2015 Elke Schaper
 
 """
+    :synopsis: The Repeat Class.
 
-    :synopsis: Repeat_list class
-
-    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
-
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
 
 import logging
@@ -15,6 +13,7 @@ import sys
 log = logging.getLogger(__name__)
 
 from tral.repeat_list import repeat_list_io
+
 
 class Repeat_list:
 
@@ -34,7 +33,6 @@ class Repeat_list:
     """
 
     def __str__(self):
-
         """
             Create string for Repeat_list instance.
         """
@@ -56,7 +54,6 @@ class Repeat_list:
             return self
 
     def create(file, format):
-
         """ Read ``Repeat_list`` from file.
 
         Read ``Repeat_list`` from file (currently, only pickle is supported)
@@ -75,9 +72,7 @@ class Repeat_list:
         else:
             raise Exception('format is unknown.')
 
-
-    def write(self, format, file = None, str = None, *args):
-
+    def write(self, format, file=None, str=None, *args):
         """ Serialize and write ``Repeat_list`` instances.
 
         Serialize ``Repeat_list`` instance using the stated ``format``.
@@ -107,7 +102,6 @@ class Repeat_list:
             return output
 
     def filter(self, func_name, *args, **kwargs):
-
         """ Filter ``repeats`` according to ``func_name``.
 
         Filter ``repeats`` according to ``func_name``
@@ -117,13 +111,13 @@ class Repeat_list:
 
         """
 
-        # Check: is func_name a str, or is it a method? if it is a method, it must be in dir(): ``funcname in dir`` == TRUE?
+        # Check: is func_name a str, or is it a method? if it is a method, it
+        # must be in dir(): ``funcname in dir`` == TRUE?
 
         func = getattr(sys.modules[__name__], func_name)
-        return Repeat_list( func(self, *args, **kwargs) )
+        return Repeat_list(func(self, *args, **kwargs))
 
     def cluster(self, overlap_type, *args):
-
         """ Cluster ``repeats`` according to ``overlap_type``.
 
         Cluster ``repeats`` according to ``overlap_type``. We assume that overlap of
@@ -142,7 +136,7 @@ class Repeat_list:
 
         """
 
-        if not hasattr(self,'dCluster'):
+        if not hasattr(self, 'dCluster'):
             self.dCluster = {}
 
         # Is the next line used here?
@@ -159,7 +153,10 @@ class Repeat_list:
                 check = lRepeat_in_cluster_check.pop()
                 remaining_indices = lRepeat_indices[:]
                 for i in remaining_indices:
-                    if two_repeats_overlap(overlap_type, self.repeats[check], self.repeats[i]):
+                    if two_repeats_overlap(
+                            overlap_type,
+                            self.repeats[check],
+                            self.repeats[i]):
                         iCluster.append(i)
                         lRepeat_in_cluster_check.append(i)
                         lRepeat_indices.remove(i)
@@ -170,12 +167,11 @@ class Repeat_list:
         self.dCluster[overlap_type] = lCluster
 
 
-### FILTERING
+# FILTERING
 # Filter methods (func) are all defined in the same way: They return a subset of self.repeats, also as a list.
 #   Return is a (list of `Repeat`).
 
 def pValue(rl, score, threshold):
-
     """ Returns all repeats in ``rl`` with a p-Value below a certain threshold.
 
     Returns all repeats in ``rl`` with a p-Value below a certain threshold.
@@ -198,7 +194,6 @@ def pValue(rl, score, threshold):
 
 
 def divergence(rl, score, threshold):
-
     """ Returns all repeats in ``rl`` with a divergence below a certain threshold.
 
     Returns all repeats in ``rl`` with a divergence below a certain threshold.
@@ -216,8 +211,8 @@ def divergence(rl, score, threshold):
             res.append(iRepeat)
     return(res)
 
-def attribute(rl, attribute, type, threshold):
 
+def attribute(rl, attribute, type, threshold):
     """ Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
 
     Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
@@ -242,7 +237,8 @@ def attribute(rl, attribute, type, threshold):
             if value <= threshold:
                 res.append(iRepeat)
         else:
-            raise Exception("type must either be 'min' or 'max'. Instead, it is {}.".format(type))
+            raise Exception(
+                "type must either be 'min' or 'max'. Instead, it is {}.".format(type))
     return(res)
 
 
@@ -263,16 +259,18 @@ def none_overlapping_fixed_repeats(rl, rl_fixed, overlap_type):
     for iRepeat in rl.repeats:
 
         for iRepeat_fixed in rl_fixed.repeats:
-            if two_repeats_overlap(overlap_type, repeat1 = iRepeat, repeat2 = iRepeat_fixed):
+            if two_repeats_overlap(
+                    overlap_type,
+                    repeat1=iRepeat,
+                    repeat2=iRepeat_fixed):
                 break
         else:
-             res.append(iRepeat)
+            res.append(iRepeat)
 
     return(res)
 
 
 def none_overlapping(rl, overlap, lCriterion):
-
     """ Returns all none-overlapping repeats in ``rl``.
 
     Returns all none-overlapping repeats in ``rl``. Repeats are clustered according to
@@ -290,7 +288,7 @@ def none_overlapping(rl, overlap, lCriterion):
     overlap_type = overlap[0]
     overlap_args = overlap[1]
 
-    if not (hasattr(rl,'dCluster') and overlap_type in rl.dCluster):
+    if not (hasattr(rl, 'dCluster') and overlap_type in rl.dCluster):
         rl.cluster(overlap_type, overlap_args)
 
     res = []
@@ -306,22 +304,24 @@ def none_overlapping(rl, overlap, lCriterion):
 
             if criterion_type == 'pValue':
                 min_value = min(i.pValue(criterion_value) for i in iRepeat)
-                iRepeat = [i for i in iRepeat if i.pValue(criterion_value) == min_value]
+                iRepeat = [
+                    i for i in iRepeat if i.pValue(criterion_value) == min_value]
 
             elif criterion_type == 'divergence':
                 min_value = min(i.divergence(criterion_value) for i in iRepeat)
-                iRepeat = [i for i in iRepeat if i.divergence(criterion_value) == min_value]
+                iRepeat = [
+                    i for i in iRepeat if i.divergence(criterion_value) == min_value]
 
         else:
-            logging.debug("repeat_list.none_overlapping(): > 1 Repeats have the same values...")
+            logging.debug(
+                "repeat_list.none_overlapping(): > 1 Repeats have the same values...")
             res.append(iRepeat[0])
 
     return(res)
 
 
-### OVERLAP DETECTION METHODS
+# OVERLAP DETECTION METHODS
 def two_repeats_overlap(overlap_type, repeat1, repeat2):
-
     """ Helper method to test the overlap of ``repeat1`` and ``repeat2``.
 
     Helper method to test the overlap of ``repeat1`` and ``repeat2``. The overlap is
@@ -343,7 +343,6 @@ def two_repeats_overlap(overlap_type, repeat1, repeat2):
 
 
 def shared_char(repeat1, repeat2):
-
     """ Do two TRs share at least one char?
 
     Return 1 if the two TRs share at least one char (amino acids or nucleotides); else 0.
@@ -356,15 +355,17 @@ def shared_char(repeat1, repeat2):
         Bool: 1 if the repeats share >= 1 char, else 0.
     """
 
-    if (repeat1.begin + repeat1.sequence_length - 1 < repeat2.begin) or (repeat2.begin + repeat2.sequence_length - 1 < repeat1.begin):
+    if (repeat1.begin +
+        repeat1.sequence_length -
+        1 < repeat2.begin) or (repeat2.begin +
+                               repeat2.sequence_length -
+                               1 < repeat1.begin):
         return False
     else:
         return True
 
 
-
 def common_ancestry(repeat1, repeat2):
-
     """ Do two TRs share at least one pair of chars with common ancestry?
 
     Return 1 if the two TRs share at least one pair of chars (amino acids or
@@ -379,7 +380,7 @@ def common_ancestry(repeat1, repeat2):
 
     """
 
-    if not hasattr(repeat1,'msaIT'):
+    if not hasattr(repeat1, 'msaIT'):
         repeat1.calc_index_msa()
     if not hasattr(repeat2, 'msaIT'):
         repeat2.calc_index_msa()
@@ -389,7 +390,7 @@ def common_ancestry(repeat1, repeat2):
     try:
         for p in potential:
             iP = 0
-            for iP in range(len(p)-1):
+            for iP in range(len(p) - 1):
                 i = 0
                 j = 0
                 while original[i][j] != p[iP]:
@@ -402,13 +403,15 @@ def common_ancestry(repeat1, repeat2):
                         break
                 else:
                     for iPRest in range(iP + 1, len(p)):
-                        if p[iPRest] in original[i][j+1:]:
-                           #coverage = repeat1.sequence_length/repeat2.sequence_length
-                           #greediness = repeat1.lD/repeat2.lD
-                           return True
+                        if p[iPRest] in original[i][j + 1:]:
+                            #coverage = repeat1.sequence_length/repeat2.sequence_length
+                            #greediness = repeat1.lD/repeat2.lD
+                            return True
     except:
-        logging.warning('error in shared_char with original %s and potential %s',
-            str(repeat1.msaIT), str(repeat2.msaIT))
+        logging.warning(
+            'error in shared_char with original %s and potential %s', str(
+                repeat1.msaIT), str(
+                repeat2.msaIT))
         logging.warning('original:', str(repeat2.msa))
         logging.warning('original:', str(repeat2.begin))
         logging.warning('potential:', str(repeat1.msa))
