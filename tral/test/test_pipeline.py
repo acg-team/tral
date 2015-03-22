@@ -5,7 +5,7 @@ import pytest
 
 from tral.paths import *
 
-logging.config.fileConfig(os.path.join(PACKAGE_DIRECTORY,'data','logging.ini'))
+logging.config.fileConfig( config_file("logging.ini") )
 log = logging.getLogger('root')
 
 from tral.sequence import repeat_detection_run, sequence
