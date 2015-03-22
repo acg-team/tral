@@ -50,14 +50,14 @@ def load_equilibrium_freq(filename):
         for row in f:
             # print("row %d: " % row_count, row)
             row = row.strip()
-            pat = r"\s*" + patstr_freqline * (row_count+1)
+            pat = r"\s*" + patstr_freqline * (row_count + 1)
             match = re.findall(pat, row)
             if not match:
                 continue
             # store read lines into matrix
-            substitution_matrix[row_count][0:row_count+1] = \
+            substitution_matrix[row_count][0:row_count + 1] = \
                 map(float, row.split())
-            row_count = row_count+1
+            row_count = row_count + 1
             # Read 19 lines of substitution matrix
             if row_count == 19:
                 break
@@ -77,13 +77,28 @@ def load_equilibrium_freq(filename):
                              "numbers for equilibrium frequencies.")
         substitution_matrix[19][0:20] = frequencies[0:20]
     # return substitution_matrix
-    return {aa: freq for aa, freq in
-            zip(
-              ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", "M",
-               "F", "P", "S", "T", "W", "Y", "V"],
-              substitution_matrix[19]
-            )
-            }
+    return {aa: freq for aa,
+            freq in zip(["A",
+                         "R",
+                         "N",
+                         "D",
+                         "C",
+                         "Q",
+                         "E",
+                         "G",
+                         "H",
+                         "I",
+                         "L",
+                         "K",
+                         "M",
+                         "F",
+                         "P",
+                         "S",
+                         "T",
+                         "W",
+                         "Y",
+                         "V"],
+                        substitution_matrix[19])}
 
 
 def meanSimilarity(repeat, measureOfSimilarity,
@@ -110,8 +125,8 @@ def meanSimilarity(repeat, measureOfSimilarity,
             return measureOfSimilarity(column.replace("-", ""))
 
         return sum(map(
-                lambda column: measureOfSimilarity(column.replace("-", "")),
-                repeat.msaTD)) / repeat.lD  # python 2: integer division
+            lambda column: measureOfSimilarity(column.replace("-", "")),
+            repeat.msaTD)) / repeat.lD  # python 2: integer division
 
 
 def entropy(column):
@@ -134,8 +149,8 @@ def entropy(column):
         float: The entropy of ``column``.
     """
 
-    estimatedP = [(column.count(a)/float(len(column))) for a in set(column)]
-    return sum([-p*np.log2(p) for p in estimatedP if p > 0])
+    estimatedP = [(column.count(a) / float(len(column))) for a in set(column)]
+    return sum([-p * np.log2(p) for p in estimatedP if p > 0])
 
 
 def parsimony(column):
@@ -164,7 +179,7 @@ def parsimony(column):
     if len(column) > 1:
         # Here, 0 means no changes and 1 only changes # python 2: integer
         # division
-        return (len(set(column))-1)/(len(column)-1)
+        return (len(set(column)) - 1) / (len(column) - 1)
     else:
         logging.warning("Repeats with n = 1 are not repeats")
         # raise AssertionError("Repeats with n = 1 are not repeats")
@@ -190,7 +205,8 @@ def pSim(column):
         float: The pSim score of ``column``.
     """
 
-    return collections.Counter(column).most_common(1)[0][1]/float(len(column))
+    return collections.Counter(column).most_common(
+        1)[0][1] / float(len(column))
 
 
 """ 2. MAXIMUM LIKELIHOOD CALCULATIONS """
@@ -200,7 +216,6 @@ def optimisation(function, args,
                  start_min=config['optimisation'].as_float('start_min'),
                  start_max=config['optimisation'].as_float('start_max'),
                  nIteration=config['optimisation'].as_int('nIteration')):
-
     """Binary one-dimensional optimisation of ``function``.
 
     Perform a binary one dimensional optimisation of parameter ``t`` on
@@ -231,7 +246,7 @@ def optimisation(function, args,
       ..  todo:: Generalise hard-coded optimisation parameter boundaries.
     """
 
-    t = [[start_min], [(start_min+start_max)/2], [start_max]]
+    t = [[start_min], [(start_min + start_max) / 2], [start_max]]
     stepsize = 2
     for iT in t:
         iT.append(function(iT[0], *args))
@@ -256,7 +271,7 @@ def optimisation(function, args,
                 regionBounded = True
         if regionBounded:
             # calc halfPoints
-            halfPoints = [[(t[0][0] + t[1][0])/2], [(t[1][0] + t[2][0])/2]]
+            halfPoints = [[(t[0][0] + t[1][0]) / 2], [(t[1][0] + t[2][0]) / 2]]
             for iT in halfPoints:
                 iT.append(function(iT[0], *args))
             # First halfPoint is best - shift it to be the next midPoint
@@ -286,14 +301,14 @@ def loadModel(evolution_model='lg'):
     alphabet = {b: a for a, b in enumerate(aa)}
     length = len(aa)
     eqFreq = np.array(eqFreq)
-    eqFreq = eqFreq/sum(eqFreq)
+    eqFreq = eqFreq / sum(eqFreq)
     S = np.array(subsMatrix)
     PI = np.diag(eqFreq)
     Q = np.dot(S, PI)
     for i in range(length):
-        Q[i, i] = - sum(Q[i][:i]) - sum(Q[i][i+1:])
+        Q[i, i] = - sum(Q[i][:i]) - sum(Q[i][i + 1:])
     diagonal = [Q[i, i] for i in range(length)]
-    Q *= - sum((i*j for i, j in zip(diagonal, eqFreq)))
+    Q *= - sum((i * j for i, j in zip(diagonal, eqFreq)))
     return (Q, eqFreq, alphabet)
 
 
@@ -301,10 +316,10 @@ def TN93(alpha_1=config['TN93']['alpha_1'], alpha_2=config['TN93']['alpha_2'],
          beta=config['TN93']['beta']):
     '''TN93'''
     # 4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93
-    Q = [[-(alpha_1 + 2*beta), alpha_1, beta, beta],
-         [alpha_1, -(alpha_1 + 2*beta), beta, beta],
-         [beta, beta, -(alpha_2 + 2*beta), alpha_2],
-         [beta, beta, alpha_2, -(alpha_2 + 2*beta)]]
+    Q = [[-(alpha_1 + 2 * beta), alpha_1, beta, beta],
+         [alpha_1, -(alpha_1 + 2 * beta), beta, beta],
+         [beta, beta, -(alpha_2 + 2 * beta), alpha_2],
+         [beta, beta, alpha_2, -(alpha_2 + 2 * beta)]]
 
     return(['T', 'C', 'A', 'G'], [0.25, 0.25, 0.25, 0.25], Q)
 
@@ -323,22 +338,21 @@ def LG():
             0.022951, 0.042302, 0.04404, 0.061197, 0.053287, 0.012066,
             0.034155, 0.069147],
            [[-16.060388, 0.425093, 0.276818, 0.395144, 2.489084, 0.969894,
-            1.038545, 2.06604, 0.358858, 0.14983, 0.395337, 0.536518,
-            1.124035, 0.253701, 1.177651, 4.727182, 2.139501, 0.180717,
-            0.218959, 2.54787], [0.425093, -21.193959, 0.751878, 0.123954,
-            0.534551, 2.807908, 0.36397, 0.390192, 2.426601, 0.126991,
-            0.301848, 6.326067, 0.484133, 0.052722, 0.332533, 0.858151,
-            0.578987, 0.593607, 0.31444, 0.170887], [0.276818, 0.751878,
-            -17.692284, 5.076149, 0.528768, 1.695752, 0.541712, 1.437645,
-            4.509238, 0.191503, 0.068427, 2.145078, 0.371004, 0.089525,
-            0.161787, 4.008358, 2.000679, 0.045376, 0.612025, 0.083688],
+             1.038545, 2.06604, 0.358858, 0.14983, 0.395337, 0.536518,
+             1.124035, 0.253701, 1.177651, 4.727182, 2.139501, 0.180717,
+             0.218959, 2.54787], [0.425093, -21.193959, 0.751878, 0.123954,
+                                  0.534551, 2.807908, 0.36397, 0.390192, 2.426601, 0.126991,
+                                  0.301848, 6.326067, 0.484133, 0.052722, 0.332533, 0.858151,
+                                  0.578987, 0.593607, 0.31444, 0.170887], [0.276818, 0.751878,
+                                                                           -17.692284, 5.076149, 0.528768, 1.695752, 0.541712, 1.437645,
+                                                                           4.509238, 0.191503, 0.068427, 2.145078, 0.371004, 0.089525,
+                                                                           0.161787, 4.008358, 2.000679, 0.045376, 0.612025, 0.083688],
             [0.395144, 0.123954, 5.076149, -24.184967999999994, 0.062556,
-             0.523386, 5.24387, 0.844926, 0.927114, 0.01069, 0.015076, 0.282959, 0.025548, 0.017416, 0.394456, 1.240275, 0.42586, 0.02989, 0.135107, 0.037967], [2.489084, 0.534551, 0.528768, 0.062556, -13.058626, 0.084808, 0.003499, 0.569265, 0.640543, 0.320627, 0.594007, 0.013266, 0.89368, 1.105251, 0.075382, 2.784478, 1.14348, 0.670128, 1.165532, 1.959291], [0.969894, 2.807908, 1.695752, 0.523386, 0.084808, -18.724285999999996, 4.128591, 0.267959, 4.813505, 0.072854, 0.582457, 3.234294, 1.672569, 0.035855, 0.624294, 1.223828, 1.080136, 0.236199, 0.257336, 0.210332], [1.038545, 0.36397, 0.541712, 5.24387, 0.003499, 4.128591, -23.8339, 0.348847, 0.423881, 0.044265, 0.069673, 1.807177, 0.173735, 0.018811, 0.419409, 0.611973, 0.604545, 0.077852, 0.120037, 0.245034], [2.06604, 0.390192, 1.437645, 0.844926, 0.569265, 0.267959, 0.348847, -16.613733, 0.311484, 0.008705, 0.044261, 0.296636, 0.139538, 0.089586, 0.196961, 1.73999, 0.129836, 0.268491, 0.054679, 0.076701], [0.358858, 2.426601, 4.509238, 0.927114, 0.640543, 4.813505, 0.423881, 0.311484, -6.179003, 0.108882, 0.366317, 0.697264, 0.442472, 0.682139, 0.508851, 0.990012, 0.584262, 0.597054, 5.306834, 0.119013], [0.14983, 0.126991, 0.191503, 0.01069, 0.320627, 0.072854, 0.044265, 0.008705, 0.108882, -22.217359, 4.145067, 0.159069, 4.273607, 1.112727, 0.078281, 0.064105, 1.033739, 0.11166, 0.232523, 10.649107], [0.395337, 0.301848, 0.068427, 0.015076, 0.594007, 0.582457, 0.069673, 0.044261, 0.366317, 4.145067, -31.146227, 0.1375, 6.312358, 2.592692, 0.24906, 0.182287, 0.302936, 0.619632, 0.299648, 1.702745], [0.536518, 6.326067, 2.145078, 0.282959, 0.013266, 3.234294, 1.807177, 0.296636, 0.697264, 0.159069, 0.1375, -19.90551, 0.656604, 0.023918, 0.390322, 0.748683, 1.136863, 0.049906, 0.131932, 0.185202], [1.124035, 0.484133, 0.371004, 0.025548, 0.89368, 1.672569, 0.173735, 0.139538, 0.442472, 4.273607, 6.312358, 0.656604, -24.724051, 1.798853, 0.099849, 0.34696, 2.020366, 0.696175, 0.481306, 1.898718], [0.253701, 0.052722, 0.089525, 0.017416, 1.105251, 0.035855, 0.018811, 0.089586, 0.682139, 1.112727, 2.592692, 0.023918, 1.798853, -23.599417, 0.094464, 0.361819, 0.165001, 2.457121, 7.803902, 0.654683], [1.177651, 0.332533, 0.161787, 0.394456, 0.075382, 0.624294, 0.419409, 0.196961, 0.508851, 0.078281, 0.24906, 0.390322, 0.099849, 0.094464, -16.74927, 1.338132, 0.571468, 0.095131, 0.089613, 0.296501], [4.727182, 0.858151, 4.008358, 1.240275, 2.784478, 1.223828, 0.611973, 1.73999, 0.990012, 0.064105, 0.182287, 0.748683, 0.34696, 0.361819, 1.338132, -12.953694999999998, 6.472279, 0.248862, 0.400547, 0.098369], [2.139501, 0.578987, 2.000679, 0.42586, 1.14348, 1.080136, 0.604545, 0.129836, 0.584262, 1.033739, 0.302936, 1.136863, 2.020366, 0.165001, 0.571468, 6.472279, -20.294897, 0.140825, 0.245841, 2.188158], [0.180717, 0.593607, 0.045376, 0.02989, 0.670128, 0.236199, 0.077852, 0.268491, 0.597054, 0.11166, 0.619632, 0.049906, 0.696175, 2.457121, 0.095131, 0.248862, 0.140825, -19.666723, 3.151815, 0.18951], [0.218959, 0.31444, 0.612025, 0.135107, 1.165532, 0.257336, 0.120037, 0.054679, 5.306834, 0.232523, 0.299648, 0.131932, 0.481306, 7.803902, 0.089613, 0.400547, 0.245841, 3.151815, -20.084989000000004, 0.249313], [2.54787, 0.170887, 0.083688, 0.037967, 1.959291, 0.210332, 0.245034, 0.076701, 0.119013, 10.649107, 1.702745, 0.185202, 1.898718, 0.654683, 0.296501, 0.098369, 2.188158, 0.18951, 0.249313, -18.608258]]\
+             0.523386, 5.24387, 0.844926, 0.927114, 0.01069, 0.015076, 0.282959, 0.025548, 0.017416, 0.394456, 1.240275, 0.42586, 0.02989, 0.135107, 0.037967], [2.489084, 0.534551, 0.528768, 0.062556, -13.058626, 0.084808, 0.003499, 0.569265, 0.640543, 0.320627, 0.594007, 0.013266, 0.89368, 1.105251, 0.075382, 2.784478, 1.14348, 0.670128, 1.165532, 1.959291], [0.969894, 2.807908, 1.695752, 0.523386, 0.084808, -18.724285999999996, 4.128591, 0.267959, 4.813505, 0.072854, 0.582457, 3.234294, 1.672569, 0.035855, 0.624294, 1.223828, 1.080136, 0.236199, 0.257336, 0.210332], [1.038545, 0.36397, 0.541712, 5.24387, 0.003499, 4.128591, -23.8339, 0.348847, 0.423881, 0.044265, 0.069673, 1.807177, 0.173735, 0.018811, 0.419409, 0.611973, 0.604545, 0.077852, 0.120037, 0.245034], [2.06604, 0.390192, 1.437645, 0.844926, 0.569265, 0.267959, 0.348847, -16.613733, 0.311484, 0.008705, 0.044261, 0.296636, 0.139538, 0.089586, 0.196961, 1.73999, 0.129836, 0.268491, 0.054679, 0.076701], [0.358858, 2.426601, 4.509238, 0.927114, 0.640543, 4.813505, 0.423881, 0.311484, -6.179003, 0.108882, 0.366317, 0.697264, 0.442472, 0.682139, 0.508851, 0.990012, 0.584262, 0.597054, 5.306834, 0.119013], [0.14983, 0.126991, 0.191503, 0.01069, 0.320627, 0.072854, 0.044265, 0.008705, 0.108882, -22.217359, 4.145067, 0.159069, 4.273607, 1.112727, 0.078281, 0.064105, 1.033739, 0.11166, 0.232523, 10.649107], [0.395337, 0.301848, 0.068427, 0.015076, 0.594007, 0.582457, 0.069673, 0.044261, 0.366317, 4.145067, -31.146227, 0.1375, 6.312358, 2.592692, 0.24906, 0.182287, 0.302936, 0.619632, 0.299648, 1.702745], [0.536518, 6.326067, 2.145078, 0.282959, 0.013266, 3.234294, 1.807177, 0.296636, 0.697264, 0.159069, 0.1375, -19.90551, 0.656604, 0.023918, 0.390322, 0.748683, 1.136863, 0.049906, 0.131932, 0.185202], [1.124035, 0.484133, 0.371004, 0.025548, 0.89368, 1.672569, 0.173735, 0.139538, 0.442472, 4.273607, 6.312358, 0.656604, -24.724051, 1.798853, 0.099849, 0.34696, 2.020366, 0.696175, 0.481306, 1.898718], [0.253701, 0.052722, 0.089525, 0.017416, 1.105251, 0.035855, 0.018811, 0.089586, 0.682139, 1.112727, 2.592692, 0.023918, 1.798853, -23.599417, 0.094464, 0.361819, 0.165001, 2.457121, 7.803902, 0.654683], [1.177651, 0.332533, 0.161787, 0.394456, 0.075382, 0.624294, 0.419409, 0.196961, 0.508851, 0.078281, 0.24906, 0.390322, 0.099849, 0.094464, -16.74927, 1.338132, 0.571468, 0.095131, 0.089613, 0.296501], [4.727182, 0.858151, 4.008358, 1.240275, 2.784478, 1.223828, 0.611973, 1.73999, 0.990012, 0.064105, 0.182287, 0.748683, 0.34696, 0.361819, 1.338132, -12.953694999999998, 6.472279, 0.248862, 0.400547, 0.098369], [2.139501, 0.578987, 2.000679, 0.42586, 1.14348, 1.080136, 0.604545, 0.129836, 0.584262, 1.033739, 0.302936, 1.136863, 2.020366, 0.165001, 0.571468, 6.472279, -20.294897, 0.140825, 0.245841, 2.188158], [0.180717, 0.593607, 0.045376, 0.02989, 0.670128, 0.236199, 0.077852, 0.268491, 0.597054, 0.11166, 0.619632, 0.049906, 0.696175, 2.457121, 0.095131, 0.248862, 0.140825, -19.666723, 3.151815, 0.18951], [0.218959, 0.31444, 0.612025, 0.135107, 1.165532, 0.257336, 0.120037, 0.054679, 5.306834, 0.232523, 0.299648, 0.131932, 0.481306, 7.803902, 0.089613, 0.400547, 0.245841, 3.151815, -20.084989000000004, 0.249313], [2.54787, 0.170887, 0.083688, 0.037967, 1.959291, 0.210332, 0.245034, 0.076701, 0.119013, 10.649107, 1.702745, 0.185202, 1.898718, 0.654683, 0.296501, 0.098369, 2.188158, 0.18951, 0.249313, -18.608258]]
            )
 
 
 def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
-
     """ Calculate the likelihood of a repeat assuming a star tree and a
         sequence model defined by ``Q``, ``t``, ``eqFreq`` and ``alphabet``.
 
@@ -354,7 +368,7 @@ def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
 
     """
 
-    P = scipy.linalg.expm(Q*t)
+    P = scipy.linalg.expm(Q * t)
 
     # msaTDN is a list of tandem_repeat.n numpy arrays.
     # Each numpy array represents the elements of the alphabet. The entries are
@@ -368,22 +382,24 @@ def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
             my_diag = {i: 0 for i in range(len(alphabet.keys()))}
             for iN in column:
                 my_diag[alphabet[iN]] = my_diag[alphabet[iN]] + 1
-            tandem_repeat.msaTDN.append(np.array([j for j in my_diag.values()]))
+            tandem_repeat.msaTDN.append(
+                np.array([j for j in my_diag.values()]))
 
     # First sum: Over all sites
     # Second sum: Over all possible ancestral characters
     # Third product: Over all repeat units
     likelihood = sum(np.log(np.sum(iJ * np.product(np.power(P[i], column))
-                     for i, iJ in enumerate(eqFreq)))
+                                   for i, iJ in enumerate(eqFreq)))
                      for column in tandem_repeat.msaTDN)
     return likelihood
 
 
-def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat,
-                                             indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
-                                             gaps=config['indel']['gaps'],
-                                             indelZipf=config['indel'].as_float('zipf')):
-
+def loglikelihood_gaps_starphylogeny_zipfian(
+        t,
+        tandem_repeat,
+        indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
+        gaps=config['indel']['gaps'],
+        indelZipf=config['indel'].as_float('zipf')):
     """ Calculate the log-likelihood of the gap structure in a
         ``tandem repeat`` assuming a star tree.
 
@@ -425,10 +441,12 @@ def loglikelihood_gaps_starphylogeny_zipfian(t, tandem_repeat,
     # taken place. Do the same for deletions.
     # Here, we use the Poisson model
     probability_gap_per_site = t * indelRatePerSite / 2
-    l_insertions = \
-        scipy.stats.distributions.binom.pmf(len(insertions),
-                                            tandem_repeat.lD * tandem_repeat.n + 1,
-                                            probability_gap_per_site)
+    l_insertions = scipy.stats.distributions.binom.pmf(
+        len(insertions),
+        tandem_repeat.lD *
+        tandem_repeat.n +
+        1,
+        probability_gap_per_site)
     l_deletions = \
         scipy.stats.distributions.binom.pmf(len(deletions),
                                             tandem_repeat.lD * tandem_repeat.n,
@@ -443,11 +461,12 @@ def loglikelihood_substitutions_gaps(t, substitution_args, gap_args):
         loglikelihood_gaps_starphylogeny_zipfian(t, *gap_args)
 
 
-def loglikelihood_starTopology_local(tandem_repeat,
-                                     evolution_model=config['evolutionary_model'],
-                                     gaps=config['indel']['gaps'],
-                                     indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
-                                     parameters=False):
+def loglikelihood_starTopology_local(
+        tandem_repeat,
+        evolution_model=config['evolutionary_model'],
+        gaps=config['indel']['gaps'],
+        indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
+        parameters=False):
 
     if tandem_repeat.lD == 0:
         return 100, -100
@@ -478,13 +497,18 @@ def loglikelihood_random(repeat,
         if parameters:
             equilibrium_freq = parameters
         else:
-            aaRatefilename = join(DATA_DIR, "substitution_rate_matrices", evolution_model + ".dat")  # load equilibrium frequencies
+            aaRatefilename = join(
+                DATA_DIR,
+                "substitution_rate_matrices",
+                evolution_model +
+                ".dat")  # load equilibrium frequencies
             equilibrium_freq = load_equilibrium_freq(aaRatefilename)
 
         loglikelihoodRandom = 0.
         for aa, freq in equilibrium_freq.items():
             # np.log uses the natural logarithm.
-            loglikelihoodRandom += repeat.textD_standard_aa.count(aa) * np.log(float(freq))
+            loglikelihoodRandom += repeat.textD_standard_aa.count(
+                aa) * np.log(float(freq))
     elif repeat.sequence_type == 'DNA':
         # CHECK THIS!
         # At the moment, we assume equal frequencies for each nucleotide -
@@ -509,18 +533,23 @@ def phyloStarTopology_local(tandem_repeat, evolution_model=False, gaps=False,
                                          gaps=gaps,
                                          indelRatePerSite=indelRatePerSite,
                                          parameters=parameters)
-    logLH0 = loglikelihood_random(repeat=tandem_repeat, evolution_model=evolution_model)
+    logLH0 = loglikelihood_random(
+        repeat=tandem_repeat,
+        evolution_model=evolution_model)
 
-    return divergence, 2*(logLH1-logLH0)
+    return divergence, 2 * (logLH1 - logLH0)
 
 
 """ TANDEM REPEAT SCORE CALIBRATION """
 
 
-def calc_score(repeats, result_path, result_filename,
-               scoreslist=config['score_calibration'].as_list('scoreslist'),
-               save_calibration=config['score_calibration'].as_bool('save_calibration'),
-               precision=config['score_calibration'].as_int('precision')):
+def calc_score(
+        repeats,
+        result_path,
+        result_filename,
+        scoreslist=config['score_calibration'].as_list('scoreslist'),
+        save_calibration=config['score_calibration'].as_bool('save_calibration'),
+        precision=config['score_calibration'].as_int('precision')):
 
     sequence_type = repeats[0].sequence_type
     if repeats[0].sequence_type == 'AA':
@@ -531,32 +560,86 @@ def calc_score(repeats, result_path, result_filename,
     parameters = [Q, eqFreq, alphabet]
 
     if sequence_type == 'AA':
-        aaRatefilename = join(DATA_DIR, "substitution_rate_matrices",
-                              evolution_model + ".dat")  # load equilibrium frequencies
+        aaRatefilename = join(
+            DATA_DIR,
+            "substitution_rate_matrices",
+            evolution_model +
+            ".dat")  # load equilibrium frequencies
         equilibrium_freq = load_equilibrium_freq(aaRatefilename)
     else:
         equilibrium_freq = {i: 0.25 for i in ['A', 'C', 'G', 'T']}
 
-    random = [loglikelihood_random(repeat=iRepeat, evolution_model=evolution_model, parameters=equilibrium_freq) for iRepeat in repeats]
+    random = [
+        loglikelihood_random(
+            repeat=iRepeat,
+            evolution_model=evolution_model,
+            parameters=equilibrium_freq) for iRepeat in repeats]
     for iScore in scoreslist:
         if iScore == 'phylo':
-            testStatistic = [loglikelihood_starTopology_local(iRepeat, gaps=False, parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2*(iT-iR) if iT != -1 else -1000 for iT, iR in zip(testStatistic, random)]
+            testStatistic = [
+                loglikelihood_starTopology_local(
+                    iRepeat,
+                    gaps=False,
+                    parameters=parameters)[1] for iRepeat in repeats]
+            testStatistic = [2 *
+                             (iT -
+                              iR) if iT != -
+                             1 else -
+                             1000 for iT, iR in zip(testStatistic, random)]
         elif iScore == 'phylo_gap01':
-            testStatistic = [loglikelihood_starTopology_local(iRepeat, gaps=True, indelRatePerSite=0.01, parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2*(iT-iR) if iT != -1 else -1000 for iT, iR in zip(testStatistic, random)]
+            testStatistic = [
+                loglikelihood_starTopology_local(
+                    iRepeat,
+                    gaps=True,
+                    indelRatePerSite=0.01,
+                    parameters=parameters)[1] for iRepeat in repeats]
+            testStatistic = [2 *
+                             (iT -
+                              iR) if iT != -
+                             1 else -
+                             1000 for iT, iR in zip(testStatistic, random)]
         elif iScore == 'phylo_gap001':
-            testStatistic = [loglikelihood_starTopology_local(iRepeat, gaps=True, indelRatePerSite=0.001, parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2*(iT-iR) if iT != -1 else -1000 for iT, iR in zip(testStatistic, random)]
+            testStatistic = [
+                loglikelihood_starTopology_local(
+                    iRepeat,
+                    gaps=True,
+                    indelRatePerSite=0.001,
+                    parameters=parameters)[1] for iRepeat in repeats]
+            testStatistic = [2 *
+                             (iT -
+                              iR) if iT != -
+                             1 else -
+                             1000 for iT, iR in zip(testStatistic, random)]
         elif iScore == 'phylo_paml':
-            testStatistic = [loglikelihood_starTopology_paml(iRepeat) for iRepeat in repeats]
-            testStatistic = [2*(iT-iR) if iT != -1 else -1000 for iT, iR in zip(testStatistic, random)]
+            testStatistic = [
+                loglikelihood_starTopology_paml(iRepeat) for iRepeat in repeats]
+            testStatistic = [2 *
+                             (iT -
+                              iR) if iT != -
+                             1 else -
+                             1000 for iT, iR in zip(testStatistic, random)]
         elif iScore == 'parsimony':
-            testStatistic = [np.round_(meanSimilarity(iRepeat, parsimony), decimals=precision) if iRepeat.lD != 0 else -1 for iRepeat in repeats]
+            testStatistic = [
+                np.round_(
+                    meanSimilarity(
+                        iRepeat,
+                        parsimony),
+                    decimals=precision) if iRepeat.lD != 0 else -
+                1 for iRepeat in repeats]
         elif iScore == 'pSim':
-            testStatistic = [np.round_(meanSimilarity(iRepeat, pSim), decimals=precision) if iRepeat.lD != 0 else -1 for iRepeat in repeats]
+            testStatistic = [
+                np.round_(
+                    meanSimilarity(
+                        iRepeat,
+                        pSim),
+                    decimals=precision) if iRepeat.lD != 0 else -
+                1 for iRepeat in repeats]
         elif iScore == 'entropy':
-            testStatistic = [meanSimilarity(iRepeat, entropy) if iRepeat.lD != 0 else -1 for iRepeat in repeats]
+            testStatistic = [
+                meanSimilarity(
+                    iRepeat,
+                    entropy) if iRepeat.lD != 0 else -
+                1 for iRepeat in repeats]
 
         if save_calibration:
             filename = os.path.join(result_path, iScore, result_filename)
@@ -570,11 +653,14 @@ def calc_score(repeats, result_path, result_filename,
                 iR.dScore[iScore] = iT
 
 
-def calibrate_score(repeats, resultFilePath,
-                    scoreslist=config['score_calibration'].as_list('scoreslist')):
+def calibrate_score(
+        repeats,
+        resultFilePath,
+        scoreslist=config['score_calibration'].as_list('scoreslist')):
 
     for iScore in scoreslist:
-        testStatistic = np.sort([iRepeat.dScore[iScore] for iRepeat in repeats])
+        testStatistic = np.sort([iRepeat.dScore[iScore]
+                                 for iRepeat in repeats])
         np.savez(os.path.join('_'.join([resultFilePath, iScore])),
                  testStatistic)
 
@@ -586,8 +672,10 @@ def save_distribution(values, items, resultFilePath, fileName, inverse):
         val = np.array([i[iC] for i in values])
         result_val, inv_ndx = np.unique(val, return_inverse=True)
         result_p = np.bincount(inv_ndx)
-        result_p = result_p/float(sum(result_p))
-        if inverse and items[iC] in ['phylo', 'pSim']:  # Are high values the best?
+        result_p = result_p / float(sum(result_p))
+        if inverse and items[iC] in [
+                'phylo',
+                'pSim']:  # Are high values the best?
             result_p = result_p[::-1]
             result_val = result_val[::-1]
         result_p = result_p.cumsum()
@@ -597,11 +685,19 @@ def save_distribution(values, items, resultFilePath, fileName, inverse):
                  cdf=result_p, value=result_val)
 
 
-def calculatePDFScores(repeats, resultFilePath, fileName,
-                       scoreslist=config['score_calibration'].as_list('scoreslist')):
-
+def calculatePDFScores(
+        repeats,
+        resultFilePath,
+        fileName,
+        scoreslist=config['score_calibration'].as_list('scoreslist')):
     """ CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES """
 
     # Can you generalise the next command for arbitrary classifiers?
-    scores = [[repeat.score(scoreslist[0]), repeat.score(scoreslist[1])] for repeat in repeats]
-    save_distribution(values=scores, items=scoreslist, resultFilePath=resultFilePath, fileName=fileName, inverse=True)
+    scores = [
+        [repeat.score(scoreslist[0]), repeat.score(scoreslist[1])] for repeat in repeats]
+    save_distribution(
+        values=scores,
+        items=scoreslist,
+        resultFilePath=resultFilePath,
+        fileName=fileName,
+        inverse=True)
