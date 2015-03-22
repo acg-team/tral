@@ -58,8 +58,8 @@ def path():
     return os.path.join(os.path.abspath('.'), 'test')
 
 @pytest.mark.slow
-def test_MBE_2014_pipeline():
-    # The Schaper et al. (MBE, 2014) pipeline is tested on a single sequence.
+def test_MBE_2014_workflow():
+    # The Schaper et al. (MBE, 2014) workflow is tested on a single sequence.
 
     test_lSeq = sequence.Sequence.create(os.path.join(path(), TEST_FAA_FILE_MBE_2014), format = 'fasta')
     test_seq = test_lSeq[0]
@@ -120,23 +120,3 @@ def test_MBE_2014_pipeline():
     # Write result set of Pfam TRs
     #test_entire_set.write(format = "xml,json,csv,...")
 
-
-@notfixed
-def test_pipeline():
-
-    test_lSeq = sequence.Sequence.read(os.path.join(path(), TEST_FAA_FILE))
-
-    for i,iSeq in enumerate(test_lSeq[:2]):
-        test_repeat_denovo = iSeq.detect(denovo = True, **TEST_DENOVO_PARAMETERS)
-        test_repeat_denovo_filtered = test_repeat_denovo.filter("pValue", TEST_SCORE, 0.05)
-        test_repeat_denovo_hmm = [hmm.HMM.create(repeat = iTR) for iTR in test_repeat_denovo_filtered.repeats]
-        test_repeat_denovo_remastered = iSeq.detect(lHMM = test_repeat_denovo_hmm)
-        if i == 0:
-            assert TEST_RESULT_SEQ1[0] == len(test_repeat_denovo.repeats)
-            for k,l in zip(TEST_RESULT_SEQ1[1], test_repeat_denovo.repeats):
-                assert k == l.msa
-            assert TEST_RESULT_SEQ1[2] == len(test_repeat_denovo_filtered.repeats)
-            for k,l in zip(TEST_RESULT_SEQ1[3], test_repeat_denovo_remastered.repeats):
-                assert k == l.msa
-            # CURRENTLY, ONLY THE FIRST SEQ IS TESTED.
-            break
