@@ -72,28 +72,28 @@ class Repeat_list:
         else:
             raise Exception('format is unknown.')
 
-    def write(self, format, file=None, str=None, *args):
+    def write(self, output_format, file=None, str=None, *args):
         """ Serialize and write ``Repeat_list`` instances.
 
-        Serialize ``Repeat_list`` instance using the stated ``format``.
+        Serialize ``Repeat_list`` instance using the stated ``output_format``.
         If a ``file`` is specified, save the String. If ``str`` is specified, give back
         the String (not possible for pickles).
 
         Args:
-            format (str):  The input format: Either "pickle" or "tsv"
+            output_format (str):  The output format: Either "pickle" or "tsv"
             file (str): Path to output file
 
-        .. todo:: Write checks for ``format`` and ``file``.
+        .. todo:: Write checks for ``output_format`` and ``file``.
         """
 
-        if format == 'pickle':
+        if output_format == 'pickle':
             with open(file, 'wb') as fh:
                 pickle.dump(self, fh)
             file = False
-        elif format == 'tsv':
+        elif output_format == 'tsv':
             output = repeat_list_io.serialize_repeat_list_tsv(self)
         else:
-            raise Exception('format is unknown.')
+            raise Exception('output_format is unknown: {}'.format(output_format))
 
         if file:
             with open(file, 'w') as fh:
