@@ -70,7 +70,7 @@ class Repeat_list:
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
         else:
-            raise Exception('input_format is unknown: {}.'format(input_format))
+            raise Exception('input_format is unknown: {}.'.format(input_format))
 
     def write(self, output_format, file=None, str=None, *args):
         """ Serialize and write ``Repeat_list`` instances.
