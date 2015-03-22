@@ -5,7 +5,9 @@ from tral.paths import *
 pDefaults = config_file("config.ini")
 pSpec = config_file("spec.ini")
 
+
 class Singleton:
+
     """
     A non-thread-safe helper class to ease implementing singletons.
     This should be used as a decorator -- not a metaclass -- to the
@@ -47,8 +49,12 @@ class Singleton:
     def __instancecheck__(self, inst):
         return isinstance(inst, self._decorated)
 
+
 @Singleton
 class Configuration:
-    def __init__(self):
-        self.config = configobj.ConfigObj(pDefaults, configspec = pSpec, stringify=True)
 
+    def __init__(self):
+        self.config = configobj.ConfigObj(
+            pDefaults,
+            configspec=pSpec,
+            stringify=True)
