@@ -13,7 +13,7 @@ TEST_BEGIN_LIST = [6,10,10,10]
 TEST_SEQUENCE = "MAAAAKAAAAAAL"
 
 # The resulting string should contain the following data, however perhaps in a different order:
-TEST_TSV = "msa_original\tbegin\tn_effective\tlD\tsequence_length\tpvalue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
+TEST_TSV = "msa_original\tbegin\tn_effective\tl_effective\tsequence_length\tpvalue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
 
 
 @pytest.fixture

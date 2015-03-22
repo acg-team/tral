@@ -114,15 +114,15 @@ class HMM:
 
         # Warning! The following line is only appropriate, if there are only
         # "letters", "COMPO", and the match state keys in <hmmer_probabilities>
-        lD = len(hmmer_probabilities.keys()) - 2
+        l_effective = len(hmmer_probabilities.keys()) - 2
         # Assume: sequence_type = 'AA'
         Q, null_model_emission_p, alphabet = loadModel('lg')
 
         # Initialise all HMM states to default value
-        repeat_states, insert_states = self.initialise_HMM_structure(lD)
+        repeat_states, insert_states = self.initialise_HMM_structure(l_effective)
 
         # Store indel probabilities
-        self.set_indel_probabilities(prior_indel_insertion, lD, default=True)
+        self.set_indel_probabilities(prior_indel_insertion, l_effective, default=True)
 
         # Store null model insertion probabilities for terminal and insertion
         # states
@@ -172,10 +172,10 @@ class HMM:
 
         # This will fail at current, as the divergence attribute is a dict.
         if prior_divergence is None:
-            divergence = divergence_from_FP_simulations(tandem_repeat.lD)
+            divergence = divergence_from_FP_simulations(tandem_repeat.l_effective)
         elif prior_divergence['type'] == 'alpha':
             divergence = divergence_from_FP_simulations(
-                tandem_repeat.lD,
+                tandem_repeat.l_effective,
                 alpha=prior_divergence['value'])
             # print(divergence)
             # print(prior_divergence['value'])
@@ -192,10 +192,10 @@ class HMM:
 
         sequence_type = tandem_repeat.sequence_type
         msaTD = tandem_repeat.msaTD
-        lD = tandem_repeat.lD
+        l_effective = tandem_repeat.l_effective
         n = tandem_repeat.n  # Test: Do you really need this variable?
 
-        repeat_states, insert_states = self.initialise_HMM_structure(lD)
+        repeat_states, insert_states = self.initialise_HMM_structure(l_effective)
 
         # Transitions incorporating deletion or insertion states
 
@@ -206,12 +206,12 @@ class HMM:
 
         # # Apply the modulus in order to determine the true index of any state,
         # as you might have crossed the current tandem repeat unit's border:
-        # index(i,lD) = i%lD
+        # index(i,l_effective) = i%l_effective
 
         insertion_lengths, deletion_lengths = tandem_repeat.gap_structure_HMM()
         self.set_indel_probabilities(
             prior_indel_insertion,
-            lD,
+            l_effective,
             n=n,
             default=False,
             insertion_lengths=insertion_lengths,
@@ -244,7 +244,7 @@ class HMM:
             match_state_emission_p=likelihood_offspring,
             repeat_states=repeat_states)
 
-    def initialise_HMM_structure(self, lD):
+    def initialise_HMM_structure(self, l_effective):
         '''
         Initialise all states
         Set transition probabilities to None/0
@@ -252,8 +252,8 @@ class HMM:
         '''
 
         # Build a HMM from these likelihoods.
-        repeat_states = ["M{0}".format(str(i)) for i in range(lD)]
-        insert_states = ["I{0}".format(str(i)) for i in range(lD)]
+        repeat_states = ["M{0}".format(str(i)) for i in range(l_effective)]
+        insert_states = ["I{0}".format(str(i)) for i in range(l_effective)]
         self.states = ["N"] + repeat_states + insert_states + ["C"]
         logger.debug("HMM states: {0}".format(self.states))
 
@@ -272,19 +272,19 @@ class HMM:
         # - Transitions from "M_k" to "M_k+1" (for k<n) and "M_k" to "M_0" (for k==n)
         # - Transitions from "N" to "N"
         # - Transitions from "C" to "C"
-        for i in range(lD):
-            self.p_t["N"]["M{0}".format(index(i, lD))] = 0
-            self.p_t["M{0}".format(index(i, lD))]["C"] = 0
+        for i in range(l_effective):
+            self.p_t["N"]["M{0}".format(index(i, l_effective))] = 0
+            self.p_t["M{0}".format(index(i, l_effective))]["C"] = 0
             self.p_t[
                 "M{0}".format(
                     index(
                         i,
-                        lD))][
+                        l_effective))][
                 "M{0}".format(
                     index(
                         i +
                         1,
-                        lD))] = 0
+                        l_effective))] = 0
         self.p_t["N"]["N"] = 0
         self.p_t["C"]["C"] = 0
 
@@ -327,7 +327,7 @@ class HMM:
     def set_indel_probabilities(
             self,
             prior_indel_insertion,
-            lD,
+            l_effective,
             n=2,
             default=True,
             insertion_lengths=None,
@@ -344,7 +344,7 @@ class HMM:
                 prior=prior_indel_insertion)
             p_deletion_lengths = calculate_log10_probability_indel_lengths(
                 [],
-                lD -
+                l_effective -
                 1,
                 type='zipf')
             p_insertion_continued, p_insertion_stopped = calculate_log10_probability_indel_lengths(
@@ -352,7 +352,7 @@ class HMM:
 
         # First, calculate the transition probability of all states that only
         # depends on the gap structure of one site:
-        for i in range(lD):
+        for i in range(l_effective):
 
             if not default:
                 p_deletion_formation = calculate_log10_indel_probability(
@@ -361,7 +361,7 @@ class HMM:
                     len(insertion_lengths[i]), n, prior=prior_indel_insertion)
                 p_deletion_lengths = calculate_log10_probability_indel_lengths(
                     deletion_lengths[i],
-                    lD -
+                    l_effective -
                     1,
                     type='zipf')
                 p_insertion_continued, p_insertion_stopped = calculate_log10_probability_indel_lengths(
@@ -371,105 +371,105 @@ class HMM:
             # is less likely than staying in "N". Thus, these probabilities are left at zero.
             #self.p_t["N"]["I{0}".format(str(i))] = p_insertion
 
-            # Mi-1 -> Mi+lD (deletion(lD))
+            # Mi-1 -> Mi+l_effective (deletion(l_effective))
             for iC, p_deletion_length in enumerate(p_deletion_lengths):
                 self.p_t[
                     "M{0}".format(
                         index(
                             i - 1,
-                            lD))][
+                            l_effective))][
                     "M{0}".format(
                         index(
                             i + iC + 1,
-                            lD))] = p_deletion_formation + p_deletion_length
-                # Ii -> Mi + lD (insertionL) + deletion(lD)
+                            l_effective))] = p_deletion_formation + p_deletion_length
+                # Ii -> Mi + l_effective (insertionL) + deletion(l_effective)
                 self.p_t[
                     "I{0}".format(
                         index(
                             i,
-                            lD))][
+                            l_effective))][
                     "M{0}".format(
                         index(
                             i + iC + 1,
-                            lD))] = p_insertion_stopped + p_deletion_formation + p_deletion_length
+                            l_effective))] = p_insertion_stopped + p_deletion_formation + p_deletion_length
 
             # Mi-1 -> Ii (insertion)
             self.p_t[
                 "M{0}".format(
                     index(
                         i - 1,
-                        lD))][
+                        l_effective))][
                 "I{0}".format(
                     index(
                         i,
-                        lD))] = p_insertion_formation
+                        l_effective))] = p_insertion_formation
 
             # Ii -> Ii (1-insertionL)
             self.p_t[
                 "I{0}".format(
                     index(
                         i,
-                        lD))][
+                        l_effective))][
                 "I{0}".format(
                     index(
                         i,
-                        lD))] = p_insertion_continued
+                        l_effective))] = p_insertion_continued
 
             # Ii -> Mi (insertionL)
             self.p_t[
                 "I{0}".format(
                     index(
                         i,
-                        lD))][
+                        l_effective))][
                 "M{0}".format(
                     index(
                         i,
-                        lD))] = p_insertion_stopped
+                        l_effective))] = p_insertion_stopped
 
         # Second, calculate the transition probability of all states that depends on the gap structure of several sites.
         # These calcs use the information already gathered in self.p_t.
         # These are deletions, that are directly followed by insertions
         # (Case 1: deletion from match state. Case 2: deletion from insertion state.)
-        for i in range(lD):
-            for iC in range(1, lD):
+        for i in range(l_effective):
+            for iC in range(1, l_effective):
                 # Mi -> Ii+iC (deletion(iC-1) + insertion(i+iC))
                 self.p_t[
                     "M{0}".format(
                         index(
                             i,
-                            lD))][
+                            l_effective))][
                     "I{0}".format(
                         index(
                             i + iC,
-                            lD))] = self.p_t[
+                            l_effective))] = self.p_t[
                     "M{0}".format(
                         index(
                             i,
-                            lD))][
+                            l_effective))][
                     "M{0}".format(
                         index(
                             i + iC,
-                            lD))] + self.p_t[
+                            l_effective))] + self.p_t[
                     "M{0}".format(
                         index(
                             i + iC - 1,
-                            lD))][
+                            l_effective))][
                     "I{0}".format(
                         index(
                             i + iC,
-                            lD))]
+                            l_effective))]
 
-                # Ii -> Ii+lD insertion_stop(i) + deletion(i;lD) +
-                # insertion_formation(i+lD+1)
+                # Ii -> Ii+l_effective insertion_stop(i) + deletion(i;l_effective) +
+                # insertion_formation(i+l_effective+1)
                 self.p_t["I{0}".format(index(i,
-                                             lD))]["I{0}".format(index(i + iC,
-                                                                       lD))] = self.p_t["I{0}".format(index(i,
-                                                                                                            lD))]["M{0}".format(index(i,
-                                                                                                                                      lD))] + self.p_t["M{0}".format(index(i - 1,
-                                                                                                                                                                           lD))]["M{0}".format(index(i + iC,
-                                                                                                                                                                                                     lD))] + self.p_t["M{0}".format(index(i + iC - 1,
-                                                                                                                                                                                                                                          lD))]["I{0}".format(index(i + iC,
-                                                                                                                                                                                                                                                                    lD))]
+                                             l_effective))]["I{0}".format(index(i + iC,
+                                                                       l_effective))] = self.p_t["I{0}".format(index(i,
+                                                                                                            l_effective))]["M{0}".format(index(i,
+                                                                                                                                      l_effective))] + self.p_t["M{0}".format(index(i - 1,
+                                                                                                                                                                           l_effective))]["M{0}".format(index(i + iC,
+                                                                                                                                                                                                     l_effective))] + self.p_t["M{0}".format(index(i + iC - 1,
+                                                                                                                                                                                                                                          l_effective))]["I{0}".format(index(i + iC,
+                                                                                                                                                                                                                                                                    l_effective))]
 
         logger.debug("Transition probabilities: {0}".format(self.p_t))
 
@@ -485,7 +485,7 @@ class TR:
         self.msaTD = ["AAA", "CCC", "GTG"]
         self.sequence_type = 'DNA'
         self.n = 3
-        self.lD = 3
+        self.l_effective = 3
 
 ################################### MAP parameter estimation 3############
 
@@ -614,7 +614,7 @@ def calculate_log10_offspring_likelihood(tandem_repeat, divergence=None):
 
     sequence_type = tandem_repeat.sequence_type
     msaTD = tandem_repeat.msaTD
-    lD = tandem_repeat.lD
+    l_effective = tandem_repeat.l_effective
     n = tandem_repeat.n
 
     # Calculate posterior probabilities of ancestral states from the TR
@@ -726,7 +726,7 @@ def calculate_log10_probability_indel_lengths(
     indels lengths are distributed following a (1-alpha)*(alpha^(l-1)) distribution.
     [Is this model already used? Probably yes. How can i cite it?]
 
-    A good choice for <indel_length_max> when building HMMs for tandem repeats is <lD-1>, as a deletion, that
+    A good choice for <indel_length_max> when building HMMs for tandem repeats is <l_effective-1>, as a deletion, that
     includes a complete repeat unit, will not be visible in the tandem repeat unit alignment, and could therefore
     be ignored.
 

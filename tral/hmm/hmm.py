@@ -78,7 +78,7 @@ class HMM:
         states (list of str): The names of all states that the HMM contains. E.g. ["N", "M1", "I1", "M2", "I2", "C"]
         insertion_states (list of str): The names of all insertion states that the HMM contains. E.g. ["I1", "I2"]
         match_states (list of str): The names of all match states that the HMM contains. E.g. ["M1", "M2"]
-        lD (int): The number of states in the HMM. E.g. lD = 4
+        l_effective (int): The number of states in the HMM. E.g. l_effective = 4
         alphabet (list of str): The letters that the HMM states can emit. E.g. all amino acids in the LG matrix. ["A", "C", ...]
         p_t (dict of dict of float): A dictionary {state0: {state1: transition probability, ...}, ...} between all `states` as log10.
         p_0 (dict of dict of float): A dictionary of the null probabilities to be in any of the `states`: {`states[0]`: 0.1, `states[1]`: 0.2, ...}
@@ -96,7 +96,7 @@ class HMM:
                            for i in tmp])
             hmm = "cpHMM ID:          {}\ncpHMM length: {}\n".format(
                 self.id,
-                self.lD)
+                self.l_effective)
             hmm += "Most likely motif:      {}".format(tmp)
         except:
             hmm = "<HMM instance>"
@@ -125,12 +125,12 @@ class HMM:
         self.id = hmmer_probabilities['id']
         self.alphabet = self.hmmer['letters']
 
-        self.lD = max([int(key) for key in hmmer_probabilities.keys()
+        self.l_effective = max([int(key) for key in hmmer_probabilities.keys()
                        if key.isdigit()])
 
         # Initialise all HMM states to default value (e.g. transition to or
         # from terminal state all have the same cost 0).
-        self.initialise_HMM_structure(self.lD)
+        self.initialise_HMM_structure(self.l_effective)
 
         dTranslate_States = {
             i: i[
@@ -165,7 +165,7 @@ class HMM:
             iTransition_Probabilities = self.hmmer[
                 dTranslate_States[iState]]['transition']
             # Completing the circle of the HMM.
-            if i == self.lD - 1:
+            if i == self.l_effective - 1:
                 iTransition_Probabilities = self.set_circle_transition_probability_hmmer3(
                     iTransition_Probabilities,
                     dTranslate_States[iState])
@@ -181,7 +181,7 @@ class HMM:
 
         # Translate deletion states into direct transitions from match to match
         # states.
-        if self.lD > 1:
+        if self.l_effective > 1:
             p_t_d = {}
             for i, iMatch_state in enumerate(self.match_states):
                 p_t_d[iMatch_state] = self.get_direct_transition_probabilities_for_deletions(
@@ -370,23 +370,23 @@ class HMM:
         self.p_e['M1'] = {"A": 0.9, "C": 0.025, "G": 0.025, "T": 0.025}
         self.p_e['M2'] = {"A": 0.025, "C": 0.9, "G": 0.025, "T": 0.025}
 
-    def initialise_HMM_structure(self, lD):
-        """ Initialise the HMM with all states and standard values for transition and
-            emission probabilities.
+    def initialise_HMM_structure(self, l_effective):
+        """ Initialise the HMM with all states and standard values for
+            transition and emission probabilities.
 
         Initialise all states
         Set transition probabilities to None/0
         Set initial probability for all states equal.
 
         Args:
-          lD (int): The number of match states in the HMM.
+          l_effective (int): The number of match states in the HMM.
 
         """
 
         # Build a HMM from these likelihoods.
-        self.match_states = ["M{0}".format(str(i + 1)) for i in range(lD)]
-        self.insertion_states = ["I{0}".format(str(i + 1)) for i in range(lD)]
-        self.deletion_states = ["D{0}".format(str(i + 1)) for i in range(lD)]
+        self.match_states = ["M{0}".format(str(i + 1)) for i in range(l_effective)]
+        self.insertion_states = ["I{0}".format(str(i + 1)) for i in range(l_effective)]
+        self.deletion_states = ["D{0}".format(str(i + 1)) for i in range(l_effective)]
         self.terminal_states = ["N", "C"]
         self.states = [self.terminal_states[0]] + self.match_states + \
             self.insertion_states + self.deletion_states + [self.terminal_states[1]]
@@ -407,12 +407,12 @@ class HMM:
         # - Transitions from "M_k" to "M_k+1" (for k`n) and "M_k" to "M_0" (for k==n)
         # - Transitions from "N" to "N"
         # - Transitions from "C" to "C"
-        for i in range(lD):
-            self.p_t["N"]["M{0}".format(i % lD + 1)] = 0
-            self.p_t["M{0}".format(i % lD + 1)]["C"] = 0
+        for i in range(l_effective):
+            self.p_t["N"]["M{0}".format(i % l_effective + 1)] = 0
+            self.p_t["M{0}".format(i % l_effective + 1)]["C"] = 0
             self.p_t["M{0}".format(i %
-                                   lD + 1)]["M{0}".format((i + 1) %
-                                                          lD + 1)] = 0
+                                   l_effective + 1)]["M{0}".format((i + 1) %
+                                                          l_effective + 1)] = 0
         self.p_t["N"]["N"] = 0
         self.p_t["C"]["C"] = 0
 
@@ -463,7 +463,7 @@ class HMM:
 
         Input: -ln(p) Output: Also -ln(p')
 
-        When the HMM only has a single match state, i.e. lD == 1, the final match state
+        When the HMM only has a single match state, i.e. l_effective == 1, the final match state
         equals the only match state, and no transition probabilities can be calculated
         via averaging over all other states. Therefore, the its transition probabilities
         remain unchanged.
@@ -477,7 +477,7 @@ class HMM:
 
         """
 
-        if self.lD == 1:
+        if self.l_effective == 1:
             return lTransition_Probabilities
 
         # In self.hmmer, besides the probabilities for states 1, 2, 3, ... data for
@@ -549,7 +549,7 @@ class HMM:
 
         # Match state state_index -> Match state state_index + 1
         iM = self.match_states[state_index]
-        iM_1 = self.match_states[(state_index + 1) % self.lD]
+        iM_1 = self.match_states[(state_index + 1) % self.l_effective]
         self.p_t[iM][iM_1] = lTransition_Probabilities[0]
 
         # Match state state_index -> Insertion state state_index
@@ -557,7 +557,7 @@ class HMM:
             self.insertion_states[state_index]] = lTransition_Probabilities[1]
 
         # Match state state_index -> Deletion state state_index + 1
-        iD_1 = self.deletion_states[(state_index + 1) % self.lD]
+        iD_1 = self.deletion_states[(state_index + 1) % self.l_effective]
         self.p_t[iM][iD_1] = lTransition_Probabilities[2]
 
         # Insertion state state_index ->  Match state state_index + 1
@@ -604,11 +604,11 @@ class HMM:
         p_Deletion_State = self.p_t[state][
             self.deletion_states[
                 (state_index + 1) %
-                self.lD]]
-        for iState_index in range(1, self.lD):
-            iDeleted_state_index = (state_index + iState_index) % self.lD
+                self.l_effective]]
+        for iState_index in range(1, self.l_effective):
+            iDeleted_state_index = (state_index + iState_index) % self.l_effective
             iDeleted_state = self.deletion_states[iDeleted_state_index]
-            iGoal_state_index = (state_index + iState_index + 1) % self.lD
+            iGoal_state_index = (state_index + iState_index + 1) % self.l_effective
             iGoal_state = self.match_states[iGoal_state_index]
             transition[iGoal_state] = p_Deletion_State + \
                 self.p_t[iDeleted_state][iGoal_state]

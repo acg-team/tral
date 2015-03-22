@@ -133,7 +133,7 @@ class Sequence:
                 unaligned_msa = hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units(
                     self.seq,
                     most_likely_path,
-                    iHMM.lD)
+                    iHMM.l_effective)
                 if len(unaligned_msa) > 1:
                     # Align the msa
                     aligned_msa = repeat_align.realign_repeat(unaligned_msa)
@@ -176,7 +176,7 @@ class Sequence:
 
                     # Consider only tandem repeats that have a repeat unit
                     # predicted to be at least one character long.
-                    if iTR.lD > 0:
+                    if iTR.l_effective > 0:
 
                         # Save l, n, MSA, TRD, scores, sequence_type, position
                         # in sequence of given type

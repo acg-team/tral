@@ -46,13 +46,13 @@ def sample_MBE_2014_pipeline():
         os.path.join(
             path(),
             TEST_FAA_FILE_MBE_2014),
-        file_format="fasta")
+        input_format="fasta")
     test_seq = test_lSeq[0]
 
     # Information on sequence domains (here: Pfam) in this sequence are added.
     test_pfam_hmm = [
         hmm.HMM.create(
-            file_format="hmmer",
+            input_format="hmmer",
             file=os.path.join(
                 path(),
                 i)) for i in TEST_HMM_FILES_MBE_2014]

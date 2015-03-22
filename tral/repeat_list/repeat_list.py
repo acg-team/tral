@@ -405,7 +405,7 @@ def common_ancestry(repeat1, repeat2):
                     for iPRest in range(iP + 1, len(p)):
                         if p[iPRest] in original[i][j + 1:]:
                             #coverage = repeat1.repeat_region_length/repeat2.repeat_region_length
-                            #greediness = repeat1.lD/repeat2.lD
+                            #greediness = repeat1.l_effective/repeat2.l_effective
                             return True
     except:
         logging.warning(

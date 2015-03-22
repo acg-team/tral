@@ -40,18 +40,18 @@ def viterbi(hmm, emission):
     """
 
     if len(emission) / \
-            hmm.lD < float(config['filter']['basic']['dict']['n_effective']['threshold']):
+            hmm.l_effective < float(config['filter']['basic']['dict']['n_effective']['threshold']):
         logging.info(
             "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min n_effective ({}).".format(
-                hmm.lD,
+                hmm.l_effective,
                 len(emission),
                 config['filter']['basic']['dict']['n_effective']))
         return None
-    if hmm.lD > float(config['hmm']['lDMax']):
+    if hmm.l_effective > float(config['hmm']['l_effective_max']):
         logging.info(
-            "Skip the HMM as it is too long ({}) according to the filter criterion max hmm.lD ({}).".format(
-                hmm.lD,
-                config['hmm']['lDMax']))
+            "Skip the HMM as it is too long ({}) according to the filter criterion max hmm.l_effective ({}).".format(
+                hmm.l_effective,
+                config['hmm']['l_effective_max']))
         return None
 
     states = hmm.states
@@ -231,7 +231,7 @@ def distance_index(i, j, length):
 def hmm_path_to_maximal_complete_tandem_repeat_units(
         lSequence,
         lPath,
-        lD,
+        l_effective,
         alpha=None):
     """ Convert several viterbi paths of a hmm on several sequences into the corresponding hmm units.
 
@@ -246,7 +246,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
     Args:
         lSequence (list of str): A list of sequences.
         lPath (list of list of str): A list of Viterbi paths
-        lD (int): length of the HMM used to create the Viterbi paths.
+        l_effective (int): length of the HMM used to create the Viterbi paths.
         alpha (Float): alpha element [0,1].
 
     Returns:
@@ -278,7 +278,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
 
         for iP in path[::-1]:
             if iP.startswith("M"):
-                lTerminal_Indices.append((int(iP[1:])) % lD + 1)
+                lTerminal_Indices.append((int(iP[1:])) % l_effective + 1)
                 break
 
     # Find the max distance between two indices
@@ -292,7 +292,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
     else:
         distances = [i - j for j,
                      i in zip(lUsed_indices[:-1],
-                              lUsed_indices[1:])] + [lD - lUsed_indices[-1] + lUsed_indices[0]]
+                              lUsed_indices[1:])] + [l_effective - lUsed_indices[-1] + lUsed_indices[0]]
         max_distance_index, max_distance = max(
             enumerate(distances), key=operator.itemgetter(1))
 
@@ -319,7 +319,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
                 continue
             elif iP == 'C':
                 break
-            match_state_index = (int(iP[1:]) + (lD - start_index)) % lD + 1
+            match_state_index = (int(iP[1:]) + (l_effective - start_index)) % l_effective + 1
             if match_state_index >= current_index:
                 # We are staying within the same repeat unit.
                 msa_unit += iS
@@ -332,9 +332,9 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
         msa.append(msa_unit)
 
         try:
-            if (len(msa[-1]) < alpha * lD):
+            if (len(msa[-1]) < alpha * l_effective):
                 msa = msa[:-1]
-            if (len(msa[0]) < alpha * lD):
+            if (len(msa[0]) < alpha * l_effective):
                 msa = msa[1:]
             lMSA.append(msa)
         except:
@@ -343,8 +343,8 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
     return lMSA
 
 
-def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
-    """ Convert a viterbi <path> of a hmm of length <lD> on <sequence> into the corresponding tandem repeat
+def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
+    """ Convert a viterbi <path> of a hmm of length <l_effective> on <sequence> into the corresponding tandem repeat
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
     Ignore the alignment information in the Viterbi path. For example, all emissions
@@ -357,7 +357,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     Args:
         sequence (str): A sequence as a string.
         lPath (list of list of str): A list of Viterbi paths
-        lD (int): length of the HMM used to create the Viterbi paths.
+        l_effective (int): length of the HMM used to create the Viterbi paths.
 
     Returns:
         A multiple sequence alignment (MSA) created from the most likely path
@@ -381,14 +381,14 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
                     begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
-    index_shift = ["Empty"] + [(i + lD + 1 - shift) % lD for i in range(lD)]
+    index_shift = ["Empty"] + [(i + l_effective + 1 - shift) % l_effective for i in range(l_effective)]
     logging.debug("The tandem repeat is shifted by: {0}".format(str(shift)))
 
     repeat_msa = []
     repeat_unit = mapping[0][1]
     last_used_index = 0
 
-    if lD == 1:
+    if l_effective == 1:
         for iM, iS in mapping[1:]:
             if iM[0] == "I":
                 repeat_unit += iS
@@ -411,9 +411,9 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, lD):
     return repeat_msa
 
 
-def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
+def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effective,
                                             translate=False):
-    """Convert a viterbi path in an hmm of length ``lD`` on the sequence into a
+    """Convert a viterbi path in an hmm of length ``l_effective`` on the sequence into a
     corresponding tandem repeat.
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
@@ -430,7 +430,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
     Args:
         sequence (str): A sequence as a string.
         most_likely_path (list of str): a Viterbi path.
-        lD (int): length of the HMM used to create the Viterbi paths.
+        l_effective (int): length of the HMM used to create the Viterbi paths.
         translate (bool): This function assumes that HMM states are enumerated
             starting on 0.
             If the HMM states are enumerated starting on 1, set this flag for
@@ -473,7 +473,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
                     begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
-    index_shift = [(i + lD - shift) % lD for i in range(lD)]
+    index_shift = [(i + l_effective - shift) % l_effective for i in range(l_effective)]
     logging.debug("The tandem repeat is shifted by: {0}".format(str(shift)))
 
     insertions = []
@@ -515,15 +515,15 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
 
         # Save match state and deletion information
         if iM[0] == "M":
-            n_deletions = distance_index(last_used_index, iM[1], lD) - 1
+            n_deletions = distance_index(last_used_index, iM[1], l_effective) - 1
             repeat_text += "-" * n_deletions + iS
             last_used_index = iM[1]
 
         else:
             insertions[-1][index_shift[iM[1]]] += iS
 
-    msa = [repeat_text[i:i + lD] for i in range(0, len(repeat_text), lD)]
-    msa[-1] += "-" * (lD - len(msa[-1]))
+    msa = [repeat_text[i:i + l_effective] for i in range(0, len(repeat_text), l_effective)]
+    msa[-1] += "-" * (l_effective - len(msa[-1]))
     msaT = ["".join(c) for c in zip(*msa)]
     n = len(msa)
     logging.debug("This tandem repeat has {0} repeat units.".format(str(n)))
@@ -533,14 +533,14 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, lD,
 
     msaTemp = []
     # For each site ...
-    for i in range(lD):
+    for i in range(l_effective):
         msaTemp.extend(msaT[i:i + 1])
         # ... for each tandem repeat unit, check whether there are insertions.
         for j, row in enumerate(insertions):
             # Backtranslate the index used in insertions (shift by one to the
             # right (increase))
-            if (i + 1) % lD in row:
-                for iS in row[(i + 1) % lD]:
+            if (i + 1) % l_effective in row:
+                for iS in row[(i + 1) % l_effective]:
                     msaTemp.append("-" * j + iS + "-" * (n - j - 1))
     msa = ["".join(c) for c in zip(*msaTemp)]
 

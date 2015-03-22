@@ -30,9 +30,8 @@ def serialize_repeat_list_tsv(tandem_repeats, config=config, *args):
         * begin: position of the tandem repeats within the sequence,
         * pvalue: statistical significance of the tandem repeats
         * divergence: divergence of the tandem repeat units
-        * lD: length of the tandem repeat units
+        * l_effective: length of the tandem repeat units
         * n_effective: number of tandem repeat units
-
 
     Attributes:
         tandem_repeats (repeat_list): A ``Repeat_list`` instance.

@@ -149,7 +149,7 @@ def run_hmms_on_test_set(tests, divergence, parameter_ID):
             my_tandem_repeat = viterbi.hmm_path_to_tandem_repeat(
                 my_sequence.sequence,
                 most_likely_path=my_most_likely_path,
-                lD=tandem_repeat.lD)
+                l_effective=tandem_repeat.l_effective)
 
             iT[parameter_ID]['tandem_repeats'].append(my_tandem_repeat)
 
