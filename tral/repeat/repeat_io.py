@@ -16,7 +16,7 @@ from tral.paths import *
 log = logging.getLogger(__name__)
 
 
-###################### SAVE REPEAT #############################################
+###################### SAVE REPEAT #######################################
 
 def save_repeat_fasta(tandem_repeats, file):
     ''' save multiple <tandem_repeats> in Fasta format in specified <file>
@@ -33,10 +33,11 @@ def save_repeat_fasta(tandem_repeats, file):
             GH--
     '''
 
-    with open(file, 'w', newline = '\n') as f:
-        for identifier,msa in tandem_repeats.items():
+    with open(file, 'w', newline='\n') as f:
+        for identifier, msa in tandem_repeats.items():
             f.write(">{0}\n".format(identifier))
-            f.write("\n".join(msa)+"\n\n")
+            f.write("\n".join(msa) + "\n\n")
+
 
 def save_repeat_stockholm(tandem_repeat, file):
     ''' save <tandem_repeat> in STOCKHOLM format in specified <file>
@@ -59,9 +60,9 @@ def save_repeat_stockholm(tandem_repeat, file):
 
     '''
 
-    with open(file, 'w', newline = '\n') as f:
+    with open(file, 'w', newline='\n') as f:
         f.write("# STOCKHOLM 1.0\n")
-        for i,iMSA in enumerate(tandem_repeat):
+        for i, iMSA in enumerate(tandem_repeat):
             f.write("{} {}\n".format(str(i), iMSA))
         f.write("//")
 
@@ -96,20 +97,18 @@ def save_repeat_treks(tandem_repeats, file):
             UIR
     '''
 
-    with open(file, 'w', newline = '\n') as f:
+    with open(file, 'w', newline='\n') as f:
 
-        for identifier,info in tandem_repeats.items():
+        for identifier, info in tandem_repeats.items():
             f.write(">{0}\n".format(identifier))
             f.write("Length: from {0} to\n".format(str(info[1])))
-            f.write("\n".join(info[0])+"\n" + "*"*22 + "\n\n")
+            f.write("\n".join(info[0]) + "\n" + "*" * 22 + "\n\n")
 
 
+############################## READ REPEAT SEQUENCE ######################
 
-############################## READ REPEAT SEQUENCE ######################################
 
-
-def read_repeats(seq_filename, sequence_type = 'AA'):
-
+def read_repeats(seq_filename, sequence_type='AA'):
     """ Read repeat from file in fasta format.
 
     Read repeat from file in fasta format.
@@ -140,7 +139,7 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
                 match = pat_start.match(line)
                 if match:
                     logging.debug(" * (1->2) Found start")
-                    logging.debug("Start: %s",  match.group(1))
+                    logging.debug("Start: %s", match.group(1))
                     name = match.group(1)
                     repeats[name] = []
                     state = 2
@@ -149,7 +148,7 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
                 match = pat_repeat_unit.match(line)
                 if match:
                     logging.debug(" * (2->2) Found Repeat unit")
-                    logging.debug("Repeat Unit: %s",  match.group(1))
+                    logging.debug("Repeat Unit: %s", match.group(1))
                     repeat_unit = match.group(1)
                     repeats[name].append(repeat_unit.replace(".", "-").upper())
                 else:
@@ -157,13 +156,25 @@ def read_repeats(seq_filename, sequence_type = 'AA'):
                     state = 1
 
     for iName, iR in repeats.items():
-        repeats[iName] = repeat_info.Repeat(begin=0, msa = iR , sequence_type = sequence_type)
+        repeats[iName] = repeat_info.Repeat(
+            begin=0,
+            msa=iR,
+            sequence_type=sequence_type)
     return repeats
 
 
-################################### SIMULATE SEQUENCE ####################################
+################################### SIMULATE SEQUENCE ####################
 
-def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutationRate = 50, tree = 'star', indelRatePerSite = False, return_type = 'repeat'):
+def evolved_tandem_repeats(
+        l,
+        n,
+        n_samples,
+        sequence_type,
+        jobID='jobID',
+        mutationRate=50,
+        tree='star',
+        indelRatePerSite=False,
+        return_type='repeat'):
     """ Evolve sequence with ALF.
 
     Evolve sequence with ALF:
@@ -188,7 +199,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
         Return type depends on ``return_type``: ``Repeat`` or ``Bio.Seq.Seq`` instance.
     """
 
-    runfile_template = os.path.join(DATAROOT, "ALF",  "template.drw")
+    runfile_template = os.path.join(DATAROOT, "ALF", "template.drw")
     alf_exec = os.path.join(EXECROOT, "alfsim")
     # create temporary directory
     working_dir = tempfile.mkdtemp()
@@ -204,69 +215,97 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
 
     with open(os.path.join(working_dir, runfilename), "a") as runfile:
         if indelRatePerSite:
-            runfile.write("aaGainRate := "+str(indelRatePerSite/mutationRate)+";\n") ## insertion rate per site and PAM. E.g. for PAM=40 expect aaGainRate*40 insertions per site.
-            runfile.write("aaLossRate := "+str(indelRatePerSite/mutationRate)+";\n")
+            # insertion rate per site and PAM. E.g. for PAM=40 expect
+            # aaGainRate*40 insertions per site.
+            runfile.write(
+                "aaGainRate := " + str(indelRatePerSite / mutationRate) + ";\n")
+            runfile.write(
+                "aaLossRate := " + str(indelRatePerSite / mutationRate) + ";\n")
             runfile.write("maxIndelLength := 50;\n")
             runfile.write("indelModel := 'ZIPF';\n")
             runfile.write("Z_c := 1.821;\n")
             runfile.write("DawgPlacement := true;\n")
-        runfile.write("uuid := '"+jobID+"';\n")
-        runfile.write("mname := '"+jobID+"';\n")
-        runfile.write("protStart := "+str(n_samples)+";\n")
-        runfile.write("NSpecies := "+str(n)+";\n")
-        runfile.write("minGeneLength := "+str(l)+";\n")
-        runfile.write("mutRate := "+str(mutationRate)+";\n")
-        runfile.write("wdir := '"+working_dir+"';\n")
+        runfile.write("uuid := '" + jobID + "';\n")
+        runfile.write("mname := '" + jobID + "';\n")
+        runfile.write("protStart := " + str(n_samples) + ";\n")
+        runfile.write("NSpecies := " + str(n) + ";\n")
+        runfile.write("minGeneLength := " + str(l) + ";\n")
+        runfile.write("mutRate := " + str(mutationRate) + ";\n")
+        runfile.write("wdir := '" + working_dir + "';\n")
 
         tree_length = n * mutationRate
         # parameters concerning the species tree
         if tree == 'star':
-            runfile.write("treeType := 'Custom':\n") # BDTree, ToLSample, Custom
-            runfile.write("tree := MakeStarTree(BirthDeathTree(0.1,0.1,"+str(n)+",10),mutRate):\n")
-            runfile.write("treeLength:= %d ;\n"%tree_length)
+            # BDTree, ToLSample, Custom
+            runfile.write("treeType := 'Custom':\n")
+            runfile.write(
+                "tree := MakeStarTree(BirthDeathTree(0.1,0.1," + str(n) + ",10),mutRate):\n")
+            runfile.write("treeLength:= %d ;\n" % tree_length)
         else:
-            runfile.write("treeType := 'BDTree':\n") # BDTree, ToLSample, Custom
-            runfile.write("birthRate := 0.01:\n") # From the last discussion with Daniel, only the ration of birth to death rate matters, if we scale tree to match pam distance
+            # BDTree, ToLSample, Custom
+            runfile.write("treeType := 'BDTree':\n")
+            # From the last discussion with Daniel, only the ration of birth to
+            # death rate matters, if we scale tree to match pam distance
+            runfile.write("birthRate := 0.01:\n")
             runfile.write("deathRate := 0.01:\n")
-            runfile.write("ultrametric := false:\n") # for BDTree: should resulting tree be ultrametric, e.g. all leaves have same distance to origin?
-            runfile.write("treeLength:= %d ;\n"%tree_length)
-            ## DANIEL: Is a tree := missing?
+            # for BDTree: should resulting tree be ultrametric, e.g. all leaves
+            # have same distance to origin?
+            runfile.write("ultrametric := false:\n")
+            runfile.write("treeLength:= %d ;\n" % tree_length)
+            # DANIEL: Is a tree := missing?
         if tree not in {'star', 'birthdeath'}:
-            log.warning("evolvedTR: tree input %s not known, assuming birthdeath tree", tree)
+            log.warning(
+                "evolvedTR: tree input %s not known, assuming birthdeath tree",
+                tree)
 
         # parameters concerning the substitution models
         if sequence_type == 'AA':
-            runfile.write("substModels := [SubstitutionModel('CustomP', ['" + os.path.join(DATAROOT, 'ALF','lg.dat') + "'])];\n")
-            ## CHECK! DOES
+            runfile.write(
+                "substModels := [SubstitutionModel('CustomP', ['" +
+                os.path.join(
+                    DATAROOT,
+                    'ALF',
+                    'lg.dat') +
+                "'])];\n")
+            # CHECK! DOES
             # substModels := [SubstitutionModel('LG')];
-            ## WORK?
+            # WORK?
         elif sequence_type == 'DNA':
-            runfile.write("substModels := [SubstitutionModel('TN93', [.3, .4, .7],[seq(0.25,4)], true)]:\n")
-            ## CHECK! DO THE EMPIRICAL PARAMETERS MAKE SENSE AT ALL?
-            ## compare to http://people.inf.ethz.ch/ddalquen/alf/ALF_manual.pdf
-        else: ## CODONS
+            runfile.write(
+                "substModels := [SubstitutionModel('TN93', [.3, .4, .7],[seq(0.25,4)], true)]:\n")
+            # CHECK! DO THE EMPIRICAL PARAMETERS MAKE SENSE AT ALL?
+            # compare to http://people.inf.ethz.ch/ddalquen/alf/ALF_manual.pdf
+        else:  # CODONS
             runfile.write("substModels := [SubstitutionModel('CPAM')];\n")
 
-    ## Determine ALF MSA output file path
+    # Determine ALF MSA output file path
     if sequence_type == 'AA':
         infilePath = os.path.join(working_dir, jobID, "MSA", "MSA_all_aa.phy")
     elif sequence_type == 'DNA':
         infilePath = os.path.join(working_dir, jobID, "MSA", "MSA_all_dna.phy")
-    else:  ## CODONS
-        infilePath = os.path.join(working_dir, jobID, "MSA", "MSA_all_codon.phy")
+    else:  # CODONS
+        infilePath = os.path.join(
+            working_dir,
+            jobID,
+            "MSA",
+            "MSA_all_codon.phy")
 
     for i in range(10):
         with open(os.path.join(working_dir, "out.txt"), "w") as outfile:
-            alf_process = subprocess.Popen([alf_exec, runfilename], cwd=working_dir, stdout=outfile, stderr=outfile, close_fds=True)
+            alf_process = subprocess.Popen([alf_exec,
+                                            runfilename],
+                                           cwd=working_dir,
+                                           stdout=outfile,
+                                           stderr=outfile,
+                                           close_fds=True)
             alf_process.wait()
         if os.path.isfile(infilePath):
             break
     else:
         log.error('ALFSIM was not able to produce simulated sequence.')
 
-    #shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
+    # shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
     #shutil.copytree(working_dir, '/cluster/home/infk/eschaper/spielwiese/')
-
 
     ''' Read in MSA data from ALF
         The following is a short parser for ALFsim output files
@@ -279,9 +318,8 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
 
     # Our possible parser states:
     #
-    ## state 1: Find beginning of MSA (Felsenstein)
-    ## state 2: Find all repeat units
-
+    # state 1: Find beginning of MSA (Felsenstein)
+    # state 2: Find all repeat units
 
     # protein ::=
     #    \d \d
@@ -293,7 +331,7 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
         for i, line in enumerate(infile):
             log.debug("Line %d: %s", i, line[0:-1])
 
-            if 1 == state: # Find first repeat unit & save begin
+            if 1 == state:  # Find first repeat unit & save begin
                 search = pattern_start.search(line)
                 if search:
                     log.debug(" *(1->2) Found MSA start")
@@ -308,26 +346,38 @@ def evolved_tandem_repeats(l,n,n_samples, sequence_type, jobID = 'jobID', mutati
                 else:
                     log.debug(" *(2->1) repeat region finished, yielding.")
                     state = 1
-                    ## YIELD IF WE HAVE FOUND AT LEAST TWO REPEAT UNITS:
+                    # YIELD IF WE HAVE FOUND AT LEAST TWO REPEAT UNITS:
                     if len(msa) > 1:
                         if return_type == 'repeat':
-                            yield repeat_info.Repeat(begin = 0, msa = msa, sequence_type = sequence_type)
+                            yield repeat_info.Repeat(begin=0, msa=msa, sequence_type=sequence_type)
                         elif return_type == 'list':
                             yield msa
                         else:
-                            ## CHECK!!!
-                            log.debug("YIELD: %s", "".join(msa).replace('-',''))
-                            yield Bio.Seq.Seq("".join(msa).replace('-',''), sequence_type)
+                            # CHECK!!!
+                            log.debug(
+                                "YIELD: %s",
+                                "".join(msa).replace(
+                                    '-',
+                                    ''))
+                            yield Bio.Seq.Seq("".join(msa).replace('-', ''), sequence_type)
 
     # delete temporary directory
     try:
         shutil.rmtree(working_dir)
-    except: # I guess the error type is known, and you could be more precise :)
+    # I guess the error type is known, and you could be more precise :)
+    except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
 
 
-def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equilibrium_frequencies = 'human', l = 0, n = 0, sequence_length = 0):
+def random_sequence(
+        n_samples,
+        sequence_type='AA',
+        return_type='repeat',
+        equilibrium_frequencies='human',
+        l=0,
+        n=0,
+        sequence_length=0):
     """ Simulate random sequence locally.
 
     Simulate random sequence locally.
@@ -346,44 +396,53 @@ def random_sequence(n_samples, sequence_type = 'AA', return_type = 'repeat', equ
     """
 
     if sequence_length == 0 and (l == 0 or n == 0):
-        log.error('The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
+        log.error(
+            'The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
     else:
         if sequence_length == 0:
-            sequence_length = l*n
+            sequence_length = l * n
 
         if equilibrium_frequencies == 'human':
-            file = os.path.join(DATAROOT,'Random',"_".join([sequence_type,equilibrium_frequencies,'3']) + '.txt')
+            file = os.path.join(DATAROOT, 'Random', "_".join(
+                [sequence_type, equilibrium_frequencies, '3']) + '.txt')
 
-        with open(file,'r') as f:
+        with open(file, 'r') as f:
             a = f.readline()[:-1]
         b = [i.split(' ') for i in a.split('  ')]
         count = 0
-        frequencies = {i[0]:int(i[1]) for i in b}
+        frequencies = {i[0]: int(i[1]) for i in b}
         alphabet = np.unique(i[0] for i in frequencies.keys())
 
         for iSample in range(n_samples):
-            seed_int = random.randint(1,sum(frequencies.values()))
-            for key,value in frequencies.items():
+            seed_int = random.randint(1, sum(frequencies.values()))
+            for key, value in frequencies.items():
                 seed_int -= value
                 if seed_int <= 0:
                     seed = key
                     break
 
             dimer = [''.join(i) for i in itertools.product(alphabet, repeat=2)]
-            third_letter_frequencies = {iD: {iA: frequencies[iD+iA] for iA in alphabet} for iD in dimer}
+            third_letter_frequencies = {
+                iD: {
+                    iA: frequencies[
+                        iD +
+                        iA] for iA in alphabet} for iD in dimer}
 
             sequence = seed
-            for i in range(sequence_length-3):
-                next_int = random.randint(1,sum(third_letter_frequencies[sequence[-2:]].values()))
-                for key,value in third_letter_frequencies[sequence[-2:]].items():
-                    next_int -=  value
+            for i in range(sequence_length - 3):
+                next_int = random.randint(
+                    1, sum(third_letter_frequencies[sequence[-2:]].values()))
+                for key, value in third_letter_frequencies[
+                        sequence[-2:]].items():
+                    next_int -= value
                     if next_int <= 0:
                         sequence += key
                         break
 
-            if return_type == 'repeat' and not l == 0 and not n == 0: # return Repeat instances
-                yield repeat_info.Repeat(begin = 0, msa = [sequence[i*l:(i+1)*l] for i in range(n)], sequence_type = sequence_type)
+            # return Repeat instances
+            if return_type == 'repeat' and not l == 0 and not n == 0:
+                yield repeat_info.Repeat(begin=0, msa=[sequence[i * l:(i + 1) * l] for i in range(n)], sequence_type=sequence_type)
             elif return_type == 'list':
                 yield sequence
-            else: # return seqIO instances
+            else:  # return seqIO instances
                 yield Bio.Seq.Seq(sequence, sequence_type)
