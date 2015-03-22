@@ -13,7 +13,7 @@ TEST_BEGIN_LIST = [6,10,10,10]
 TEST_SEQUENCE = "MAAAAKAAAAAAL"
 
 # The resulting string should contain the following data, however perhaps in a different order:
-TEST_TSV = "msa_original\tbegin\tnD\tlD\tsequence_length\tpValue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
+TEST_TSV = "msa_original\tbegin\tn_effective\tlD\tsequence_length\tpvalue\nAA,AA\t2\t2.0\t2\t4\tNone\nAAA,AAA\t7\t2.0\t3\t6\tNone"
 
 
 @pytest.fixture
@@ -101,9 +101,9 @@ def test_cluster():
 
 
 @pytest.mark.no_external_software_required
-def test_filter_pValue():
+def test_filter_pvalue():
 
-    #test_repeats = [repeat.Repeat(msa = i, scoreslist = ["phylo_gap01"], calc_score = True, calc_pValue = True) for i in TEST_REPEATS]
+    #test_repeats = [repeat.Repeat(msa = i, scoreslist = ["phylo_gap01"], calc_score = True, calc_pvalue = True) for i in TEST_REPEATS]
     test_repeats = [repeat.Repeat(msa = i) for i in TEST_REPEATS]
     for i,j in zip(test_repeats, TEST_SCORE_VALUE_LIST):
         i.dPValue = {}
@@ -111,7 +111,7 @@ def test_filter_pValue():
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
 
-    test_repeat_list_filtered = test_repeat_list.filter("pValue", TEST_SCORE, 0.1)
+    test_repeat_list_filtered = test_repeat_list.filter("pvalue", TEST_SCORE, 0.1)
     assert len(test_repeat_list_filtered.repeats) == 1
 
 
@@ -127,8 +127,8 @@ def test_filter_cluster_based():
 
 
     test_repeat_list = rl.Repeat_list(repeats = test_repeats)
-    test_repeat_list.filter("pValue", TEST_SCORE, 0.1)
-    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ("common_ancestry", None), [("pValue", TEST_SCORE), ("divergence", TEST_SCORE)])
+    test_repeat_list.filter("pvalue", TEST_SCORE, 0.1)
+    test_repeat_list_filtered = test_repeat_list.filter("none_overlapping", ("common_ancestry", None), [("pvalue", TEST_SCORE), ("divergence", TEST_SCORE)])
     assert len(test_repeat_list_filtered.repeats) == 3
     for i in test_repeats[:3]:
         assert i in test_repeat_list_filtered.repeats

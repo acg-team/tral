@@ -10,7 +10,7 @@ PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 # The default location of the local config files
 CONFIG_DIR = os.path.join(os.path.expanduser('~'), ".tral")
 
-# Where are the data-files, e.g. for pValue calculation stored?
+# Where are the data-files, e.g. for pvalue calculation stored?
 DATA_DIR = os.path.join(CONFIG_DIR, "data")
 
 

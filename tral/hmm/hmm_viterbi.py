@@ -40,12 +40,12 @@ def viterbi(hmm, emission):
     """
 
     if len(emission) / \
-            hmm.lD < float(config['filter']['basic']['dict']['nD']['threshold']):
+            hmm.lD < float(config['filter']['basic']['dict']['n_effective']['threshold']):
         logging.info(
-            "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min nD ({}).".format(
+            "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min n_effective ({}).".format(
                 hmm.lD,
                 len(emission),
-                config['filter']['basic']['dict']['nD']))
+                config['filter']['basic']['dict']['n_effective']))
         return None
     if hmm.lD > float(config['hmm']['lDMax']):
         logging.info(

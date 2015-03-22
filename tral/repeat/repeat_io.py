@@ -11,8 +11,6 @@ import tempfile
 import subprocess
 import numpy as np
 
-from tral.paths import *
-
 log = logging.getLogger(__name__)
 
 

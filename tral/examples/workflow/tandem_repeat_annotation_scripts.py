@@ -127,7 +127,7 @@ def workflow(
         denovo_repeat_list = iS.detect(
             denovo=True,
             repeat={
-                "calc_pValue": True})
+                "calc_pvalue": True})
         log.debug(denovo_repeat_list.repeats)
         for iTR in denovo_repeat_list.repeats:
             iTR.model = None
@@ -146,14 +146,14 @@ def workflow(
             for hmm_ID in lHMM:
                 if hmm_ID not in dHMM:
                     dHMM[hmm_ID] = hmm.HMM.create(
-                        format="pickle",
+                        file_format="pickle",
                         file=os.path.join(
                             hmm_dir,
                             hmm_ID +
                             ".pickle"))
 
             pfam_repeat_list = iS.detect(
-                [dHMM[hmm_ID] for hmm_ID in lHMM], repeat={"calc_pValue": True})
+                [dHMM[hmm_ID] for hmm_ID in lHMM], repeat={"calc_pvalue": True})
             for iTR, hmm_ID in zip(pfam_repeat_list.repeats, lHMM):
                 iTR.model = hmm_ID
                 iTR.TRD = "PFAM"
@@ -196,7 +196,7 @@ def workflow(
         criterion_filter_order = {
             "func_name": "none_overlapping", "overlap": (
                 "common_ancestry", None), "lCriterion": [
-                ("pValue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
+                ("pvalue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
         iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[
             DE_NOVO_TAG].filter(**criterion_filter_order)
 
@@ -207,7 +207,7 @@ def workflow(
             if not iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
                 continue
             # Create HMM from TR
-            denovo_hmm = hmm.HMM.create(format='repeat', repeat=iTR)
+            denovo_hmm = hmm.HMM.create(file_format='repeat', repeat=iTR)
             # Run HMM on sequence
             denovo_refined_rl = iS.detect(lHMM=[denovo_hmm])
             append_refined = False
@@ -260,10 +260,10 @@ def workflow(
                 "ID",
                 "MSA",
                 "begin",
-                "pValue",
+                "pvalue",
                 "lD",
                 "n",
-                "nD",
+                "n_effective",
                 "TRD",
                 "model"]
         fh_o.write("\t".join(header))
@@ -278,10 +278,10 @@ def workflow(
                                 " ".join(
                                     iTR.msa),
                                 iTR.begin,
-                                iTR.pValue("phylo_gap01"),
+                                iTR.pvalue("phylo_gap01"),
                                 iTR.lD,
                                 iTR.n,
-                                iTR.nD,
+                                iTR.n_effective,
                                 iTR.TRD,
                                 iTR.model]]
                     except:

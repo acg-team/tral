@@ -207,7 +207,7 @@ class HMM:
 
         del self.deletion_states
 
-    def create(format, file=None, repeat=None):
+    def create(input_format, file=None, repeat=None):
         """ Creates a HMM instance from 2 possible input formats.
 
         A `HMM` instance is created from one of the two possible inputs:
@@ -216,7 +216,8 @@ class HMM:
         * ``Repeat`` instance
 
         Args:
-            hmmer_file (str): Path to the file containing the HMM parameters
+            input_format (str): The file format of the input file
+            file (str): Path to the file containing the HMM parameters
                 encoded in the HMMER3 format.
             repeat (Repeat): A Repeat object with an MSA that can be
                 transformed into an HMM.
@@ -237,21 +238,21 @@ class HMM:
 
         """
 
-        if format == 'hmmer':
+        if input_format == 'hmmer':
             # Read only first element from HMMER3 file.
             if not os.path.exists(file):
                 raise Exception('HMMER3 file does not exist.')
             hmmer_probabilities = next(HMM.read(file))
-        elif format == 'pickle':
+        elif input_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
-        elif format == 'repeat':
+        elif input_format == 'repeat':
             if not isinstance(repeat, Repeat):
                 raise Exception('The repeat value is not a valid instance of '
                                 'the Repeat class.')
             hmmer_probabilities = HMM.create_from_repeat(repeat)
         else:
-            raise Exception("Neither of the required inputs provided!")
+            raise Exception("Unknown input format: {}.".format(input_format))
 
         log.debug(hmmer_probabilities)
         return HMM(hmmer_probabilities)
@@ -294,7 +295,7 @@ class HMM:
         stockholm_file = os.path.join(tmp_dir, tmp_id + ".sto")
 
         # O repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
-        tandem_repeat.write(file=stockholm_file, format="stockholm")
+        tandem_repeat.write(file=stockholm_file, file_format="stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
         p = subprocess.Popen([config["hmmbuild"], "--amino", tmp_id + ".hmm",

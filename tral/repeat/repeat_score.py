@@ -126,7 +126,7 @@ def meanSimilarity(repeat, measureOfSimilarity,
 
         return sum(map(
             lambda column: measureOfSimilarity(column.replace("-", "")),
-            repeat.msaTD)) / repeat.lD  # python 2: integer division
+            repeat.msaTD)) / repeat.l_effective  # python 2: integer division
 
 
 def entropy(column):
@@ -443,13 +443,13 @@ def loglikelihood_gaps_starphylogeny_zipfian(
     probability_gap_per_site = t * indelRatePerSite / 2
     l_insertions = scipy.stats.distributions.binom.pmf(
         len(insertions),
-        tandem_repeat.lD *
+        tandem_repeat.l_effective *
         tandem_repeat.n +
         1,
         probability_gap_per_site)
     l_deletions = \
         scipy.stats.distributions.binom.pmf(len(deletions),
-                                            tandem_repeat.lD * tandem_repeat.n,
+                                            tandem_repeat.l_effective * tandem_repeat.n,
                                             probability_gap_per_site)
 
     # Return the total likelihood of tandem_repeat's gap structure:
@@ -468,7 +468,7 @@ def loglikelihood_starTopology_local(
         indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
         parameters=False):
 
-    if tandem_repeat.lD == 0:
+    if tandem_repeat.l_effective == 0:
         return 100, -100
 
     if parameters:
@@ -624,7 +624,7 @@ def calc_score(
                     meanSimilarity(
                         iRepeat,
                         parsimony),
-                    decimals=precision) if iRepeat.lD != 0 else -
+                    decimals=precision) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
         elif iScore == 'pSim':
             testStatistic = [
@@ -632,13 +632,13 @@ def calc_score(
                     meanSimilarity(
                         iRepeat,
                         pSim),
-                    decimals=precision) if iRepeat.lD != 0 else -
+                    decimals=precision) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
         elif iScore == 'entropy':
             testStatistic = [
                 meanSimilarity(
                     iRepeat,
-                    entropy) if iRepeat.lD != 0 else -
+                    entropy) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
 
         if save_calibration:

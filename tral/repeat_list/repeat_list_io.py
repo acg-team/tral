@@ -28,15 +28,15 @@ def serialize_repeat_list_tsv(tandem_repeats, config=config, *args):
         This could be for example:
 
         * begin: position of the tandem repeats within the sequence,
-        * pValue: statistical significance of the tandem repeats
+        * pvalue: statistical significance of the tandem repeats
         * divergence: divergence of the tandem repeat units
         * lD: length of the tandem repeat units
-        * nD: number of tandem repeat units
+        * n_effective: number of tandem repeat units
 
 
     Attributes:
         tandem_repeats (repeat_list): A ``Repeat_list`` instance.
-        config (dict): A dictionary. E.g.: {"output_characteristics": ["nD", "pValue"], model = "phylo_gap01"}
+        config (dict): A dictionary. E.g.: {"output_characteristics": ["n_effective", "pvalue"], model = "phylo_gap01"}
         *args: Additional arguments
 
     Returns:
@@ -56,9 +56,9 @@ def serialize_repeat_list_tsv(tandem_repeats, config=config, *args):
                     d.append(iRepeat.divergence(model))
                 else:
                     d.append(None)
-            elif "pValue" == iCharacteristic:
+            elif "pvalue" == iCharacteristic:
                 if hasattr(iRepeat, "dPValue") and model in iRepeat.dPValue:
-                    d.append(iRepeat.pValue(model))
+                    d.append(iRepeat.pvalue(model))
                 else:
                     d.append(None)
             elif "score" == iCharacteristic:

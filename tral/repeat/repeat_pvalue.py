@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 from tral.paths import *
 
-path_score = join(DATA_DIR, 'pValue')
+path_score = join(DATA_DIR, 'pvalue')
 
 ########################## REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ####
 
@@ -33,9 +33,9 @@ def empiricalList(l, n, sequence_type='AA', score='phylo'):
 
         * ``lMax`` = 99
         * ``nMax`` = 49
-        * ``totalRepeatLengthMax`` = 1000
+        * ``total_repeat_length_max`` = 1000
 
-    For ``l`` <=  ``lMax`` and ``n`` <=  ``nMax`` and ``n*l`` <=  ``totalRepeatLengthMax``
+    For ``l`` <=  ``lMax`` and ``n`` <=  ``nMax`` and ``n*l`` <=  ``total_repeat_length_max``
     all values are available.
 
     For other values, we use the closest distribution, assuming that values change little
@@ -61,16 +61,16 @@ def empiricalList(l, n, sequence_type='AA', score='phylo'):
         lMax = 20
         nMax = 5
 
-    totalRepeatLengthMax = 1000
+    total_repeat_length_max = 1000
     l = min(l, lMax)
     n = min(n, nMax)
-    if l * n > totalRepeatLengthMax:
+    if l * n > total_repeat_length_max:
         logging.debug(
-            "l: %d and n: %d are bigger than the totalRepeatLengthMax: %d" %
-            (l, n, totalRepeatLengthMax))
+            "l: %d and n: %d are bigger than the total_repeat_length_max: %d" %
+            (l, n, total_repeat_length_max))
         # Dirty little hack: as we do not have data for this pair of l and n,
         # apply nearest data file.
-        while l * n > totalRepeatLengthMax:
+        while l * n > total_repeat_length_max:
             if l > n:
                 l -= 1
             else:
@@ -97,7 +97,7 @@ def empiricalList(l, n, sequence_type='AA', score='phylo'):
     return empiricalList
 
 
-def pValueFromEmpiricialList(myTR, score='phylo', myScore=None, empirical=[]):
+def pvalueFromEmpiricialList(myTR, score='phylo', myScore=None, empirical=[]):
     """Calculates the p-Value of a score for the given myTR.
 
 
@@ -111,14 +111,14 @@ def pValueFromEmpiricialList(myTR, score='phylo', myScore=None, empirical=[]):
         empirical: The null distribution of the score for repeats of the same type.
 
     Returns:
-        pValue: A float.
+        pvalue: A float.
 
     """
     if myScore is None:
         myScore = myTR.score(score)
 
     if len(empirical) == 0:
-        empirical = empiricalList(myTR.lD, myTR.n, myTR.sequence_type, score)
+        empirical = empiricalList(myTR.l_effective, myTR.n, myTR.sequence_type, score)
 
     # A smaller score is a better score for all scores in this list.
     if score in ['entropy']:
@@ -210,7 +210,7 @@ def calculate_repeat_structure(myTR):
 
 ############################ DERIVE p-Value distributions ################
 
-def calc_pValues(
+def calc_pvalues(
         repeats,
         resultFilePath,
         fileName,
@@ -237,28 +237,28 @@ def calc_pValues(
     # If the repeats are not gappy, than you can use always the same distribution of scores
     # on random data to calculate the p-Value. Otherwise, there might be deletion columns
     # and the distribution should be loaded each time
-    # 'pValueFromEmpiricialList' is called.
+    # 'pvalueFromEmpiricialList' is called.
     empirical_list = []
 
     for iScore in scoreslist:
         if 'parsimony' == iScore:
             testStatistic = [
-                pValuePars(iRepeat) if iRepeat.lD != 0 else 1 for iRepeat in repeats]
+                pvaluePars(iRepeat) if iRepeat.l_effective != 0 else 1 for iRepeat in repeats]
         elif 'pSim' == iScore:
             testStatistic = [
-                pValuePSim(iRepeat) if iRepeat.lD != 0 else 1 for iRepeat in repeats]
+                pvaluePSim(iRepeat) if iRepeat.l_effective != 0 else 1 for iRepeat in repeats]
         else:
             if not gappy_data:
                 empirical_list = empiricalList(
-                    repeats[0].lD,
+                    repeats[0].l_effective,
                     repeats[0].n,
                     repeats[0].sequence_type,
                     iScore)
             testStatistic = [
-                pValueFromEmpiricialList(
+                pvalueFromEmpiricialList(
                     iRepeat,
                     iScore,
-                    empirical=empirical_list) if iRepeat.lD != 0 else 1 for iRepeat in repeats]
+                    empirical=empirical_list) if iRepeat.l_effective != 0 else 1 for iRepeat in repeats]
         score_path = os.path.join(resultFilePath, iScore)
         if not os.path.isdir(score_path):
             os.makedirs(score_path)
@@ -367,7 +367,7 @@ def dAverageMultipleMaxMultinom(myTR, precision=10000.):
         return p[::-1], (val / (precision * sum(lRepeatStructure)))[::-1]
 
 
-def pValuePSim(myTR):
+def pvaluePSim(myTR):
     """ Calculate the p-Value of the pSim score for a Repeat.
 
     Retrieve the probability density function for repeats of the same type as ``myTR``.
@@ -480,7 +480,7 @@ def dAverageMultipleParsMultinom(myTR, precision=10000.):
         return p, val / (precision * sum(lRepeatStructure))
 
 
-def pValuePars(myTR):
+def pvaluePars(myTR):
     """ Calculate the p-Value of the parsimony score for a Repeat.
 
     Retrieve the probability density function for repeats of the same type as ``myTR``.

@@ -48,7 +48,7 @@ def test_initialise_sequence():
 
 @pytest.mark.no_external_software_required
 def test_detect_repeats_with_hmm():
-    test_hmm = HMM.create(format = 'hmmer', file = os.path.join(path(), TEST_FILE_WITH_ID))
+    test_hmm = HMM.create(input_format = 'hmmer', file = os.path.join(path(), TEST_FILE_WITH_ID))
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
 
@@ -57,7 +57,7 @@ def test_detect_repeats_with_hmm():
 def test_detect_repeats_with_repeat():
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.Repeat_list
@@ -65,7 +65,7 @@ def test_detect_repeats_with_repeat():
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_DOUBLE
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_SINGLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.Repeat_list
     assert len(test_optimized_repeat.repeats) == 1
@@ -76,14 +76,14 @@ def test_detect_repeats_with_repeat():
 def test_too_big_hmms():
 
     test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_LONG)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE_A)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.Repeat_list
     assert len(test_optimized_repeat.repeats) == 0
 
     test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_SUPER_LONG)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE_SUPER_LONG_A)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.Repeat_list
@@ -113,7 +113,7 @@ def test_sequence_pickle():
     assert test_seq.seq == test_seq_new.seq
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_optimized_repeat = test_seq.detect([test_hmm])
     test_seq.set_repeat_list(test_optimized_repeat, TEST_SEQUENCE_TAG)
 

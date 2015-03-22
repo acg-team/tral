@@ -46,13 +46,13 @@ def sample_MBE_2014_pipeline():
         os.path.join(
             path(),
             TEST_FAA_FILE_MBE_2014),
-        format="fasta")
+        file_format="fasta")
     test_seq = test_lSeq[0]
 
     # Information on sequence domains (here: Pfam) in this sequence are added.
     test_pfam_hmm = [
         hmm.HMM.create(
-            format="hmmer",
+            file_format="hmmer",
             file=os.path.join(
                 path(),
                 i)) for i in TEST_HMM_FILES_MBE_2014]
@@ -62,8 +62,8 @@ def sample_MBE_2014_pipeline():
     test_pfam_list = test_seq.detect(lHMM=test_pfam_hmm)
     assert len(test_pfam_list.repeats) == 2
 
-    # Pfam TRs with nD < 3.5 are discarded.
-    test_pfam_list = test_pfam_list.filter("attribute", "nD", "min", 3.5)
+    # Pfam TRs with n_effective < 3.5 are discarded.
+    test_pfam_list = test_pfam_list.filter("attribute", "n_effective", "min", 3.5)
     assert len(test_pfam_list.repeats) == 2
 
     # de novo detection methods (Trust, T-reks, Xstream, HHrepID) are used to search the
@@ -74,11 +74,11 @@ def sample_MBE_2014_pipeline():
     # differ between runs...
     assert len(test_denovo_list.repeats) == 10
 
-    # De novo TRs with dTR_units (divergence) > 0.8; nD < 2.5; l < 10 or
-    # pValue "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions" > 0.01
+    # De novo TRs with dTR_units (divergence) > 0.8; n_effective < 2.5; l < 10 or
+    # pvalue "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions" > 0.01
     # are discarded.
     test_denovo_list = test_denovo_list.filter(
-        "pValue",
+        "pvalue",
         TEST_SCORE_MBE_2014,
         0.01)
     assert len(test_denovo_list.repeats) == 10
@@ -87,7 +87,7 @@ def sample_MBE_2014_pipeline():
         TEST_SCORE_MBE_2014,
         0.8)
     assert len(test_denovo_list.repeats) == 10
-    test_denovo_list = test_denovo_list.filter("attribute", "nD", "min", 2.5)
+    test_denovo_list = test_denovo_list.filter("attribute", "n_effective", "min", 2.5)
     assert len(test_denovo_list.repeats) == 5
     test_denovo_list = test_denovo_list.filter("attribute", "l", "min", 10)
     assert len(test_denovo_list.repeats) == 2
@@ -99,17 +99,17 @@ def sample_MBE_2014_pipeline():
     test_denovo_list_remastered = test_seq.detect(lHMM=test_denovo_hmm)
     assert len(test_denovo_list_remastered.repeats) == 2
 
-    # pValue "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions" > 0.1
+    # pvalue "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions" > 0.1
     # are discarded.
     test_denovo_list_remastered = test_denovo_list_remastered.filter(
-        "pValue",
+        "pvalue",
         TEST_SCORE_MBE_2014,
         0.1)
 
-    # De novo TRs were filtered (nD < 3.5 are discarded.)
+    # De novo TRs were filtered (n_effective < 3.5 are discarded.)
     test_denovo_list_remastered = test_denovo_list_remastered.filter(
         "attribute",
-        "nD",
+        "n_effective",
         "min",
         3.5)
     assert len(test_denovo_list_remastered.repeats) == 2
@@ -125,7 +125,7 @@ def sample_MBE_2014_pipeline():
     # lowest p-Value and lowest divergence were retained.
     test_denovo_list_remastered = test_denovo_list_remastered.filter(
         "none_overlapping", ["common_ancestry"], {
-            "pValue": TEST_SCORE_MBE_2014, "divergence": TEST_SCORE_MBE_2014})
+            "pvalue": TEST_SCORE_MBE_2014, "divergence": TEST_SCORE_MBE_2014})
     assert len(test_denovo_list_remastered.repeats) == 1
 
     # Merge remaining set of de novo and Pfam TRs.

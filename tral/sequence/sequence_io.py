@@ -4,7 +4,6 @@
     :synopsis: Input/output for sequences
 
     .. moduleauthor:: Elke Schaper <elke.schaper@sib-sib.ch>
-
 """
 
 from Bio import SeqIO
@@ -26,7 +25,6 @@ def read_fasta(file, indices=None):
         start ([int, int]): Index of the first returned sequence, and the first
                             not returned sequence.
 
-    .. todo:: Write checks for ``format`` and ``file``.
     """
 
     # Making a list out if the generator object might be overhead for huge

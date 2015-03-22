@@ -11,7 +11,7 @@ TEST_MSA_K = ['KCC', 'KKK']
 TEST_SCORE = "phylo_gap01"
 
 # defaultdict(<class 'int'>, {'pSim': 0.66666666669999997, 'parsimony': 0.66666666669999997, 'entropy': 0.66666666666666663, 'phylo': 0.11368675605567802})
-# pValue 'phylo': 0.3821
+# pvalue 'phylo': 0.3821
 
 notfixed = pytest.mark.notfixed
 
@@ -39,10 +39,10 @@ def test_repeat_ambiguous():
 
     assert myTR_O.score(TEST_SCORE) == myTR_K.score(TEST_SCORE)
     assert myTR_O.divergence(TEST_SCORE) == myTR_K.divergence(TEST_SCORE)
-    assert myTR_O.pValue(TEST_SCORE) == myTR_K.pValue(TEST_SCORE)
+    assert myTR_O.pvalue(TEST_SCORE) == myTR_K.pvalue(TEST_SCORE)
 
     assert myTR_O.divergence(TEST_SCORE) == 2.095947265625
-    assert myTR_K.pValue(TEST_SCORE) == 0.3507
+    assert myTR_K.pvalue(TEST_SCORE) == 0.3507
 
 
 @pytest.mark.no_external_software_required

@@ -51,7 +51,7 @@ class Sequence:
         self.dAnnotations = {}
         self.dRepeat_list = {}
 
-    def create(file, file_format):
+    def create(file, input_format):
         """ Create sequence(s) from file.
 
         Create sequence(s) from file.
@@ -63,15 +63,15 @@ class Sequence:
         .. todo:: Write checks for ``format`` and ``file``.
         """
 
-        if file_format == 'fasta':
+        if input_format == 'fasta':
             lSeq = sequence_io.read_fasta(file)
             return [Sequence(iSeq, iID) for iSeq, iID in lSeq]
-        if file_format == 'pickle':
+        if input_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
         else:
-            raise Exception("Output format {} is not implemented for"
-                            "sequence.write()".format(file_format))
+            raise Exception("Input format {} is not implemented for"
+                            "sequence.create()".format(input_format))
 
     def write(self, file, file_format):
         """ Write sequence to file.

@@ -11,20 +11,16 @@ from collections import defaultdict
 from copy import deepcopy
 import logging
 import numpy as np
-import os
-from os.path import join
 import pickle
 import re
 
 from tral.repeat import repeat_score, repeat_pvalue, repeat_io
-from tral.paths import *
 from tral import configuration
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["repeat"]
+CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG = CONFIG_GENERAL["repeat"]
 
 ''' Repeat class '''
 
@@ -60,15 +56,17 @@ class Repeat:
             ["KKKK", "LLLL", "MM-M"].
         sequence_type (str): "AA" or "DNA"
         n (int): The number of repeat units in the original msa. E.g. 4.
-        l (int): The length of the repeat units in the original msa. E.g. 3.
-        nD (int): The number of repeat units in the original msa not counting
-                  insertion columns (i.e. columns with more gaps than chars).
-        lD (float): The number of chars in the MSA without insertion columns
-                    divided by nD.
+        l_msa (int): The length of the repeat units in the original msa.
+                     E.g. 3.
+        l_effective (int): The number of columns in the original msa not
+                           counting insertion columns (i.e. columns with more
+                           gaps than chars).
+        n_effective (float): The number of chars in the MSA without insertion
+                             columns divided by n_effective.
         text (str): The repeat region of the tandem repeats (e.g. all chars in
                     the MSA without gaps concatenated.)
-        nGap (int): The number of gaps in ``msa``
-        sequence_length (int): The lengths of *text*
+        n_gaps (int): The number of gaps in ``msa``
+        repeat_region_length (int): The lengths of *text*
     """
 
     def __str__(self):
@@ -78,26 +76,26 @@ class Repeat:
         first_line = ">"
         if hasattr(self, 'begin'):
             first_line += " begin:{0}".format(self.begin)
-        if hasattr(self, 'lD'):
-            first_line += " lD:{0}".format(self.lD)
+        if hasattr(self, 'l_effective'):
+            first_line += " l_effective:{0}".format(self.l_effective)
         if hasattr(self, 'n'):
             first_line += " n:{0}".format(self.n)
-        if hasattr(self, 'dPValue') and len(self.dPValue) >= 1:
-            if config['scoreslist'][-1] in self.dPValue:
-                pValue = self.dPValue[config['scoreslist'][-1]]
-                type = config['scoreslist'][-1]
+        if hasattr(self, 'd_pvalue') and len(self.d_pvalue) >= 1:
+            if CONFIG['scoreslist'][-1] in self.d_pvalue:
+                pvalue = self.d_pvalue[CONFIG['scoreslist'][-1]]
+                model = CONFIG['scoreslist'][-1]
             else:
-                type, pValue = next(iter(self.dPValue.items()))
+                model, pvalue = next(iter(self.d_pvalue.items()))
             try:
-                divergence = self.dDivergence[type]
+                divergence = self.d_divergence[model]
             except:
                 divergence = None
-            first_line += (" pValue:{0} divergence:{1}",
-                           "type:{2}".format(pValue, divergence, type))
+            first_line += (" pvalue:{0} divergence:{1}",
+                           "type:{2}".format(pvalue, divergence, model))
 
         return first_line + "\n" + "\n".join(self.msa)
 
-    def create(file, format):
+    def create(file, file_format):
         """ Read tandem repeat from file.
 
         Read tandem repeat from file (currently, only pickle is supported)
@@ -110,68 +108,68 @@ class Repeat:
 
         """
 
-        if format == 'pickle':
+        if file_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
         else:
-            raise Exception('format is unknown.')
+            raise Exception('file_format is unknown: {}.'.format(file_format))
 
-    def write(self, file, format, *args):
+    def write(self, file, file_format):
         """ Write tandem repeat to file.
 
         Write tandem repeat to file using one of three formats.
 
         Args:
             file (str): Path to input file
-            format (str):  Either "fasta", "pickle" or "stockholm"
+            file_format (str):  Either "fasta", "pickle" or "stockholm"
 
         .. todo:: Write checks for ``format`` and ``file``.
 
         """
 
-        if format == 'fasta':
+        if file_format == 'fasta':
             repeat_io.save_repeat_fasta(self.msa, file)
-        elif format == 'pickle':
+        elif file_format == 'pickle':
             with open(file, 'wb') as fh:
                 pickle.dump(self, fh)
-        elif format == 'stockholm':
+        elif file_format == 'stockholm':
             repeat_io.save_repeat_stockholm(self.msa, file)
         else:
-            raise Exception('format is unknown.')
+            raise Exception('file_format is unknown: {}.'.format(file_format))
 
     def score(self, score_type):
-        if not hasattr(self, 'dScore') or score_type not in self.dScore:
+        if not hasattr(self, 'd_score') or score_type not in self.d_score:
             self.calculate_scores(scoreslist=[score_type])
-        if score_type in self.dScore:
-            return self.dScore[score_type]
+        if score_type in self.d_score:
+            return self.d_score[score_type]
 
-    def pValue(self, score_type):
-        if not hasattr(self, 'dPValue') or score_type not in self.dPValue:
-            self.calculate_pValues(scoreslist=[score_type])
-        if score_type in self.dPValue:
-            return self.dPValue[score_type]
+    def pvalue(self, score_type):
+        if not hasattr(self, 'd_pvalue') or score_type not in self.d_pvalue:
+            self.calculate_pvalues(scoreslist=[score_type])
+        if score_type in self.d_pvalue:
+            return self.d_pvalue[score_type]
 
     def divergence(self, score_type):
         if not hasattr(
                 self,
-                'dDivergence') or score_type not in self.dDivergence:
+                'd_divergence') or score_type not in self.d_divergence:
             self.calculate_scores(scoreslist=[score_type])
-        if score_type in self.dDivergence:
-            return self.dDivergence[score_type]
+        if score_type in self.d_divergence:
+            return self.d_divergence[score_type]
 
     def __init__(self, msa, begin=None,
-                 sequence_type=config_general["sequence_type"],
-                 scoreslist=config['scoreslist'],
-                 calc_score=config.as_bool('calc_score'),
-                 calc_pValue=config.as_bool('calc_pValue')):
+                 sequence_type=CONFIG_GENERAL["sequence_type"],
+                 scoreslist=CONFIG['scoreslist'],
+                 calc_score=CONFIG.as_bool('calc_score'),
+                 calc_pvalue=CONFIG.as_bool('calc_pvalue')):
         """
-        .. todo:: if calc_score == False and calc_pValue == True, there is an
-            error. However, calc_pValue == True should automatically require
+        .. todo:: if calc_score == False and calc_pvalue == True, there is an
+            error. However, calc_pvalue == True should automatically require
             the score to be calculated.
 
         """
 
-        log.debug(msa)
+        LOG.debug(msa)
 
         # The index of begin start out on Zero.
         if begin is not None:
@@ -188,15 +186,14 @@ class Repeat:
         self.sequence_type = sequence_type
 
         self.n = len(self.msa)
-        self.l = max(map(len, self.msa))
+        self.l_msa = max(map(len, self.msa))
 
         # Assure every line is equally long
-        for i, rep in enumerate(self.msa):
-            self.msa[i] += "-" * (self.l - len(msa[i]))
-        logging.debug(
-            "Constructing repeat from MSA:\n%s" %
-            "\n".join(
-                self.msa))
+        for i, iMSA in enumerate(self.msa):
+            self.msa[i] += "-" * (self.l_msa - len(iMSA))
+        LOG.debug(
+            "Constructing repeat from MSA:\n%s",
+            "\n".join(self.msa))
 
         # Transpose MSA
         self.msaT = ["".join(c) for c in zip(*self.msa)]
@@ -204,36 +201,36 @@ class Repeat:
         # Get text for MSA.
         self.text = " ".join(self.msa)
 
-        self.nGap = self.text.count("-")
-        self.sequence_length = len(
-            self.text) - self.nGap - self.text.count(" ")
+        self.n_gaps = self.text.count("-")
+        self.repeat_region_length = len(
+            self.text) - self.n_gaps - self.text.count(" ")
 
-        self.deleteInsertionColumns()
-        if self.lD != 0:
-            self.gapStructure()
+        self.delete_insertion_columns()
+        if self.l_effective != 0:
+            self.gap_structure()
 
             if calc_score:
                 self.calculate_scores(scoreslist=scoreslist)
 
-            if calc_pValue:
-                self.calculate_pValues(scoreslist=scoreslist)
+            if calc_pvalue:
+                self.calculate_pvalues(scoreslist=scoreslist)
 
-    def calc_nD(self):
-        """ Calculate the effective number of repeat units nD
+    def calc_n_effective(self):
+        """ Calculate the effective number of repeat units n_effective
 
         Calculate the number of letters in in all non-insertion columns,
-        divided by lD
+        divided by <l_effective>
 
         Args:
             self (Repeat instance)
 
         """
 
-        if self.lD != 0:
-            self.nD = (
-                len("".join(self.msaD)) - self.textD.count('-')) / self.lD
+        if self.l_effective != 0:
+            self.n_effective = (
+                len("".join(self.msaD)) - self.textD_standard_aa.count('-')) / self.l_effective
         else:
-            self.nD = 0
+            self.n_effective = 0
 
     def calc_index_msa(self):
         ''' formerly named: set_begin'''
@@ -244,7 +241,7 @@ class Repeat:
         # python 2: range returns list by default
         index = list(
             range(
-                self.begin + self.sequence_length - 1, self.begin - 1, -1))
+                self.begin + self.repeat_region_length - 1, self.begin - 1, -1))
         # Replace every letter with the index in the protein sequence
         msaI = [[j if j == '-' else index.pop() for j in i]
                 for i in self.msa]  # the 'I' stands for index
@@ -252,7 +249,7 @@ class Repeat:
         self.msaIT = [[i for i in c if i != '-'] for c in zip(*msaI)]
         self.msaIT = [i for i in self.msaIT if len(i) > 0]
 
-    def calculate_scores(self, scoreslist=config['scoreslist']):
+    def calculate_scores(self, scoreslist=CONFIG['scoreslist']):
         """ Calculate scores on a Repeat instance.
 
         Calculate scores on a Repeat instance for all scores in `scoreslist`.
@@ -265,11 +262,11 @@ class Repeat:
              ["phylo_gap01"]) that are calculated on the Repeat instance `self`
         """
 
-        if not hasattr(self, 'dScore'):
-            self.dScore = defaultdict(float)
+        if not hasattr(self, 'd_score'):
+            self.d_score = defaultdict(float)
 
-        if not hasattr(self, 'dDivergence'):
-            self.dDivergence = defaultdict(float)
+        if not hasattr(self, 'd_divergence'):
+            self.d_divergence = defaultdict(float)
 
         worst_score = {
             'entropy': 1,
@@ -279,65 +276,65 @@ class Repeat:
             'phylo_gap01': 0,
             'phylo_gap001': 0}
 
-        if self.lD == 0:  # Enter worst score
-            self.dScore = {
+        if self.l_effective == 0:  # Enter worst score
+            self.d_score = {
                 iScore: worst_score[iScore] for iScore in scoreslist}
         # Enter None, as a score cannot be calculated if there is just one
         # repeat unit.
         elif self.n < 2:
-            self.dScore = {iScore: None for iScore in scoreslist}
+            self.d_score = {iScore: None for iScore in scoreslist}
         else:   # Calculate score
             if 'entropy' in scoreslist:
-                self.dScore['entropy'] = \
+                self.d_score['entropy'] = \
                     repeat_score.meanSimilarity(self, repeat_score.entropy)
             if 'parsimony' in scoreslist:
-                self.dScore['parsimony'] = np.round_(
+                self.d_score['parsimony'] = np.round(
                     repeat_score.meanSimilarity(
                         self,
                         repeat_score.parsimony),
-                    decimals=config.as_int('precision'))
+                    decimals=CONFIG.as_int('precision'))
             if 'pSim' in scoreslist:
-                self.dScore['pSim'] = np.round_(
+                self.d_score['pSim'] = np.round(
                     repeat_score.meanSimilarity(
                         self,
                         repeat_score.pSim),
-                    decimals=config.as_int('precision'))
+                    decimals=CONFIG.as_int('precision'))
             if 'phylo' in scoreslist:
-                self.dDivergence['phylo'], self.dScore['phylo'] = \
+                self.d_divergence['phylo'], self.d_score['phylo'] = \
                     repeat_score.phyloStarTopology_local(self)
             if 'phylo_gap01' in scoreslist:
-                self.dDivergence['phylo_gap01'], self.dScore['phylo_gap01'] = \
+                self.d_divergence['phylo_gap01'], self.d_score['phylo_gap01'] = \
                     repeat_score.phyloStarTopology_local(self,
                                                          gaps='row_wise',
                                                          indelRatePerSite=0.01)
             if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
-                self.dDivergence['phylo_gap01_ignore_trailing_gaps'], \
-                    self.dScore['phylo_gap01_ignore_trailing_gaps'] = \
+                self.d_divergence['phylo_gap01_ignore_trailing_gaps'], \
+                    self.d_score['phylo_gap01_ignore_trailing_gaps'] = \
                     repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indelRatePerSite=0.01)
             if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
-                self.dDivergence['phylo_gap01_ignore_coherent_deletions'], self.dScore[
+                self.d_divergence['phylo_gap01_ignore_coherent_deletions'], self.d_score[
                     'phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indelRatePerSite=0.01)
             if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.dDivergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], \
-                    self.dScore['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = \
+                self.d_divergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], \
+                    self.d_score['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = \
                     repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite=0.01)
             if 'phylo_gap001' in scoreslist:
-                self.dDivergence['phylo_gap001'], self.dScore['phylo_gap001'] = repeat_score.phyloStarTopology_local(
+                self.d_divergence['phylo_gap001'], self.d_score['phylo_gap001'] = repeat_score.phyloStarTopology_local(
                     self, gaps='row_wise', indelRatePerSite=0.001)
             if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
-                self.dDivergence['phylo_gap001_ignore_trailing_gaps'], self.dScore[
+                self.d_divergence['phylo_gap001_ignore_trailing_gaps'], self.d_score[
                     'phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indelRatePerSite=0.001)
             if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
-                self.dDivergence['phylo_gap001_ignore_coherent_deletions'], self.dScore[
+                self.d_divergence['phylo_gap001_ignore_coherent_deletions'], self.d_score[
                     'phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indelRatePerSite=0.001)
             if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.dDivergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.dScore[
+                self.d_divergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.d_score[
                     'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite=0.001)
 
-    def calculate_pValues(self, scoreslist=config['scoreslist']):
-        """ Calculate pValues on a Repeat instance.
+    def calculate_pvalues(self, scoreslist=CONFIG['scoreslist']):
+        """ Calculate pvalues on a Repeat instance.
 
-        Calculate pValues on a Repeat instance for all scores in `scoreslist`.
+        Calculate pvalues on a Repeat instance for all scores in `scoreslist`.
 
         Args:
             self (Repeat): An instance of the repeat class.
@@ -348,68 +345,68 @@ class Repeat:
             Repeat instance `self`
         """
 
-        if not hasattr(self, 'dPValue'):
-            self.dPValue = defaultdict(int)
+        if not hasattr(self, 'd_pvalue'):
+            self.d_pvalue = defaultdict(int)
 
-        if self.lD == 0:  # Enter worst p-value
-            self.dPValue = {iScore: 1.0 for iScore in scoreslist}
-        # Enter None, as a pValue cannot be calculated if there is just one
+        if self.l_effective == 0:  # Enter worst p-value
+            self.d_pvalue = {iScore: 1.0 for iScore in scoreslist}
+        # Enter None, as a pvalue cannot be calculated if there is just one
         # repeat unit.
         elif self.n < 2:
-            self.dPValue = {iScore: None for iScore in scoreslist}
+            self.d_pvalue = {iScore: None for iScore in scoreslist}
         else:   # Calculate score
             if 'entropy' in scoreslist:
-                self.dPValue['entropy'] = \
-                    repeat_pvalue.pValueFromEmpiricialList(self, 'entropy')
+                self.d_pvalue['entropy'] = \
+                    repeat_pvalue.pvalueFromEmpiricialList(self, 'entropy')
             if 'parsimony' in scoreslist:
-                self.dPValue['parsimony'] = repeat_pvalue.pValuePars(self)
+                self.d_pvalue['parsimony'] = repeat_pvalue.pvaluePars(self)
             if 'pSim' in scoreslist:
-                self.dPValue['pSim'] = repeat_pvalue.pValuePSim(self)
+                self.d_pvalue['pSim'] = repeat_pvalue.pvaluePSim(self)
             if 'phylo' in scoreslist:
-                self.dPValue['phylo'] = \
-                    repeat_pvalue.pValueFromEmpiricialList(self, 'phylo')
+                self.d_pvalue['phylo'] = \
+                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo')
             if 'phylo_gap' in scoreslist:
-                self.dPValue['phylo_gap'] = \
-                    repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap')
+                self.d_pvalue['phylo_gap'] = \
+                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo_gap')
             if 'phylo_gap01' in scoreslist:
-                self.dPValue['phylo_gap01'] = \
-                    repeat_pvalue.pValueFromEmpiricialList(self, 'phylo_gap01')
+                self.d_pvalue['phylo_gap01'] = \
+                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo_gap01')
             if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
-                self.dPValue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_trailing_gaps'))
             if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
-                self.dPValue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_coherent_deletions'))
             if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.dPValue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'))
             if 'phylo_gap001' in scoreslist:
-                self.dPValue['phylo_gap001'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap001')
             if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
-                self.dPValue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_trailing_gaps'))
             if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
-                self.dPValue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_coherent_deletions'))
             if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.dPValue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pValueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'))
 
-    def deleteInsertionColumns(self):
+    def delete_insertion_columns(self):
         """ Create the tandem repeat attributes `msa`, `masT`, `l` and `n`
             without insertion columns.
 
@@ -418,7 +415,6 @@ class Repeat:
         These columns are removed from both `msa` to create `msaD` and `msaT`
         to create `msaTD`.
 
-        todo:: Check: is `totD` needed anywhere else? Is `textD` needed?
         """
 
         # We define insertion columns as columns where there are more or equal gaps
@@ -436,17 +432,18 @@ class Repeat:
 
         self.msaD = ["".join(c) for c in zip(*self.msaTD)]
 
-        self.lD = len(self.msaTD)
-        self.textD = " ".join(self.msaD)
-        self.textD_standard_aa = standardize(self.textD)
-        self.totD = len(self.textD) - self.textD.count('-') - self.n + 1
-        if self.lD != 0:
-            self.nD = (
-                len("".join(self.msaD)) - self.textD.count('-')) / self.lD
+        self.l_effective = len(self.msaTD)
+        textD = " ".join(self.msaD)
+        self.textD_standard_aa = standardize(textD)
+        # totD is used in repeat_score
+        self.totD = len(textD) - textD.count('-') - self.n + 1
+        if self.l_effective != 0:
+            self.n_effective = (
+                len("".join(self.msaD)) - textD.count('-')) / self.l_effective
         else:
-            self.nD = 0
+            self.n_effective = 0
 
-    def gapStructure(self):
+    def gap_structure(self):
         ''' Calculate the number and length of insertions and deletions for
             this tandem repeat.'''
 
@@ -479,12 +476,12 @@ class Repeat:
         insertions = insertions[int(len(insertions) / 2):-1] if len(
             insertions) % 2 == 1 else insertions[int(len(insertions) / 2):]
         self.insertions = [len(i) for i in insertions]
-        if self.lD == 0:
-            self.insertions = [self.l]
+        if self.l_effective == 0:
+            self.insertions = [self.l_msa]
 
         # 2. Detect deletions
         # CHECK this lines. you used msaTD before, but swapped to msaD
-        deletions = [(m.start() % self.l, len(m.group()))
+        deletions = [(m.start() % self.l_msa, len(m.group()))
                      for m in re.finditer(re.compile("-+"), "".join(self.msaD))]
         self.deletions['row_wise'] = [i[1] for i in deletions]
         self.gaps['row_wise'] = self.insertions + self.deletions['row_wise']
@@ -513,7 +510,7 @@ class Repeat:
         # msaTD = ["".join(c) for c in zip(*msaD)]
         deletions = [
             (m.start() %
-             self.l, len(
+             self.l_msa, len(
                 m.group())) for m in re.finditer(
                 re.compile("-+"), "".join(msaD))]
         self.deletions['ignore_trailing_gaps'] = [i[1] for i in deletions]
@@ -554,7 +551,7 @@ class Repeat:
         # Which insertions are neighboring == form a block, and on which index
         # with reference to self.msaTD do they start?
         insertion_blocks = {}
-        nInsertion_columns = 0
+        n_insertion_columns = 0
         while insertions:
             current = insertions.pop(0)
             insertion_blocks[current] = {'indices_self.msaT': [current]}
@@ -563,8 +560,8 @@ class Repeat:
                 insertion_blocks[current][
                     'indices_self.msaT'].append(insertions.pop(0))
             insertion_blocks[current]['index_self.msaTD'] = insertion_blocks[
-                current]['indices_self.msaT'][0] - nInsertion_columns
-            nInsertion_columns += len(
+                current]['indices_self.msaT'][0] - n_insertion_columns
+            n_insertion_columns += len(
                 insertion_blocks[current]['indices_self.msaT'])
 
         # If an insertions ranges over the repeat unit border, take the
@@ -590,7 +587,7 @@ class Repeat:
         # and of what length.
         l = len(self.msaT)
         insertion_lengths = {}
-        for iL in range(self.lD):
+        for iL in range(self.l_effective):
             insertion_lengths[iL] = []
             if iL in insertion_blocks:
                 begin = insertion_blocks[iL][0]
@@ -623,7 +620,7 @@ class Repeat:
                     insertion_lengths[iL].extend(
                         [len(iI) for iI in re.findall('\w+', insertion)])
 
-        logging.debug(
+        LOG.debug(
             "The insertion_lengths of the current TR are: {0}".format(insertion_lengths))
 
         # Deletions are much easier to handle than insertions, as they are already in the right coordinate system (self.msaTD)
@@ -634,9 +631,9 @@ class Repeat:
         deletion_lengths = {
             iL: [
                 iD[1] for iD in deletions_all if iD[0] %
-                self.lD == iL] for iL in range(
-                self.lD)}
-        logging.debug(
+                self.l_effective == iL] for iL in range(
+                self.l_effective)}
+        LOG.debug(
             "The deletion_lengths of the current TR are: {0}".format(deletion_lengths))
 
         return insertion_lengths, deletion_lengths
@@ -649,7 +646,7 @@ class Repeat:
             self.begin -
             1:self.begin -
             1 +
-            self.sequence_length]
+            self.repeat_region_length]
 
         count = 0
         self.msa_original = []
@@ -663,12 +660,12 @@ class Repeat:
                     count += 1
             self.msa_original.append(unit_original)
 
-""" Standardize MSA """
+# Standardize MSA #############################################################
 
 
 def standardize(blob):
 
-    for original, replacement in config_general[
+    for original, replacement in CONFIG_GENERAL[
             'dAmbiguous_amino_acid'].items():
         blob = blob.replace(original, replacement[0])
     return blob
@@ -679,19 +676,30 @@ def get_repeat_sequence(msa):
     return "".join([i.replace("_", "").replace("-", "") for i in msa])
 
 
-""" Localize repeat """
+# Localize repeat #############################################################
 
 
 def calculate_position_in_alignment(begin, length, alignment):
-    ''' calculate the index of the begin and the end of a TR within an alignment
+    """ Calculate the index of the begin and the end of a TR within an alignment
         returns
-     '''
+
+        Calculate the index of the begin and the end of a TR within an alignment
+        returns
+
+    Args:
+        begin (int): (needs explaining)
+        length (int): (needs explaining)
+        alignment (?): (needs explaining)
+
+    Returns:
+        Dict
+    """
 
     # a alignment.seq (hopefully!) is a string of letters, with many gaps "-",
     # as it this particular case is an alignment sequence.
     seq_indexed = [i for i, j in enumerate(str(alignment)) if j != '-']
-    log.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
-    log.debug("alignment: {0}".format(str(alignment)))
+    LOG.debug("begin: {0}; length: {1}".format(str(begin), str(length)))
+    LOG.debug("alignment: {0}".format(str(alignment)))
     return {
         'begin': seq_indexed[
             begin -

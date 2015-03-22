@@ -47,11 +47,11 @@ def test_create_HMM_from_Repeat():
 def test_hmm_pickle():
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(format = 'repeat', repeat = test_repeat)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
 
     test_pickle = os.path.join(path(), "test.pickle")
     test_hmm.write(test_pickle, 'pickle')
-    test_hmm_new = HMM.create(format = 'pickle', file = test_pickle)
+    test_hmm_new = HMM.create(input_format = 'pickle', file = test_pickle)
 
     assert test_hmm.hmmer == test_hmm_new.hmmer
     assert test_hmm.alphabet == test_hmm_new.alphabet

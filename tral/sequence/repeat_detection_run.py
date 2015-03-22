@@ -23,7 +23,6 @@ from collections import OrderedDict
 
 from tral import configuration
 from tral.sequence import repeat_detection_io
-from tral.paths import *
 
 log = logging.getLogger(__name__)
 
@@ -909,7 +908,7 @@ def split_sequence(seq_records, working_dir):
 
     for i, seq in enumerate(seq_records):
         filename = "sequence_{0:03}.faa".format(i + 1)
-        seq.write(file=os.path.join(working_dir, filename), format="fasta")
+        seq.write(file=os.path.join(working_dir, filename), file_format="fasta")
         outfiles.append((i, filename))
 
     return outfiles

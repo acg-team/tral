@@ -171,15 +171,15 @@ class Repeat_list:
 # Filter methods (func) are all defined in the same way: They return a subset of self.repeats, also as a list.
 #   Return is a (list of `Repeat`).
 
-def pValue(rl, score, threshold):
+def pvalue(rl, score, threshold):
     """ Returns all repeats in ``rl`` with a p-Value below a certain threshold.
 
     Returns all repeats in ``rl`` with a p-Value below a certain threshold.
 
     Args:
         rl (Repeat_list): An instance of the Repeat_list class.
-        score (str): The type of score defines the pValue that is used for filtering
-        threshold (float): All repeats with a pValue of type `score` above this threshold
+        score (str): The type of score defines the pvalue that is used for filtering
+        threshold (float): All repeats with a pvalue of type `score` above this threshold
             are filtered out.
 
     """
@@ -188,7 +188,7 @@ def pValue(rl, score, threshold):
 
     res = []
     for iRepeat in rl.repeats:
-        if iRepeat.pValue(score) <= threshold:
+        if iRepeat.pvalue(score) <= threshold:
             res.append(iRepeat)
     return(res)
 
@@ -302,10 +302,10 @@ def none_overlapping(rl, overlap, lCriterion):
                 res.append(iRepeat[0])
                 break
 
-            if criterion_type == 'pValue':
-                min_value = min(i.pValue(criterion_value) for i in iRepeat)
+            if criterion_type == 'pvalue':
+                min_value = min(i.pvalue(criterion_value) for i in iRepeat)
                 iRepeat = [
-                    i for i in iRepeat if i.pValue(criterion_value) == min_value]
+                    i for i in iRepeat if i.pvalue(criterion_value) == min_value]
 
             elif criterion_type == 'divergence':
                 min_value = min(i.divergence(criterion_value) for i in iRepeat)
@@ -356,9 +356,9 @@ def shared_char(repeat1, repeat2):
     """
 
     if (repeat1.begin +
-        repeat1.sequence_length -
+        repeat1.repeat_region_length -
         1 < repeat2.begin) or (repeat2.begin +
-                               repeat2.sequence_length -
+                               repeat2.repeat_region_length -
                                1 < repeat1.begin):
         return False
     else:
@@ -404,7 +404,7 @@ def common_ancestry(repeat1, repeat2):
                 else:
                     for iPRest in range(iP + 1, len(p)):
                         if p[iPRest] in original[i][j + 1:]:
-                            #coverage = repeat1.sequence_length/repeat2.sequence_length
+                            #coverage = repeat1.repeat_region_length/repeat2.repeat_region_length
                             #greediness = repeat1.lD/repeat2.lD
                             return True
     except:
