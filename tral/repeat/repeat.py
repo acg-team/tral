@@ -677,7 +677,7 @@ class Repeat:
 def standardize(blob):
 
     for original, replacement in CONFIG_GENERAL[
-            'dAmbiguous_amino_acid'].items():
+            'ambiguous_amino_acid'].items():
         blob = blob.replace(original, replacement[0])
     return blob
 

@@ -39,9 +39,9 @@ class Sequence:
             raise Exception('The seq value is not a String')
         self.seq = seq.upper()
         for i in self.seq:
-            if i not in CONFIG['lAll_amino_acid']:
-                raise Exception("{} is not in CONFIG['lAll_amino_acid']: {}"
-                                .format(i, CONFIG['lAll_amino_acid']))
+            if i not in CONFIG['all_amino_acids']:
+                raise Exception("{} is not in CONFIG['all_amino_acids']: {}"
+                                .format(i, CONFIG['all_amino_acids']))
 
         self.seq_standard_aa = repeat.standardize(self.seq)
 
