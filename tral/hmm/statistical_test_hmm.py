@@ -9,14 +9,8 @@ logger.setLevel(logging.WARNING)
 # logging.basicConfig(level=logging.WARNING)
 
 
-def create_test_set(n=3,
-                    l=[3,
-                       15,
-                       30],
-                    divergence=[0],
-                    iterations=10,
-                    flank_length_multiplier=5,
-                    sequence_type='AA'):
+def create_test_set(n=3, l=[3, 15, 30], divergence=[0], iterations=10,
+                    flank_length_multiplier=5, sequence_type='AA'):
     ''' Create a test set for HMMs consisting of
     <iterations> pairs of evolved homologous tandem repeats of repeat unit length <l> and number of repeat units <n>
     and both-sided random flanks of length <flank_length_multiplier>*<l>.'''
@@ -28,8 +22,7 @@ def create_test_set(n=3,
               'divergence': iD,
               'seed': {},
               'detectable': {}} for iL,
-             iD in itertools.product(l,
-                                     divergence)]
+             iD in itertools.product(l, divergence)]
 
     for iT in tests:
 
@@ -48,8 +41,7 @@ def create_test_set(n=3,
             while len(tandem_repeats) < iT['n_samples']:
                 new_repeats = list(
                     repeat_io.random_sequence(
-                        n_samples=iT['n_samples'] -
-                        len(tandem_repeats),
+                        n_samples=iT['n_samples'] - len(tandem_repeats),
                         sequence_length=iT['l'],
                         return_type='list'))
                 tandem_repeats.extend(
@@ -57,14 +49,11 @@ def create_test_set(n=3,
 
         # Split into seed and detectable tandem repeats
         iT['seed']['tandem_repeats'] = [
-            repeat_info.Repeat(
-                begin=0,
-                msa=iMSA[
-                    :iT['n']]) for iMSA in tandem_repeats]
+            repeat.Repeat(
+                begin=0, msa=iMSA[:iT['n']]) for iMSA in tandem_repeats]
         iT['detectable']['tandem_repeats'] = [
-            repeat_info.Repeat(
-                begin=0, msa=iMSA[
-                    iT['n']:]) for iMSA in tandem_repeats]
+            repeat.Repeat(
+                begin=0, msa=iMSA[iT['n']:]) for iMSA in tandem_repeats]
 
         # Create Random Flanks
         random_flanks = []
