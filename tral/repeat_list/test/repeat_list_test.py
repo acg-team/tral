@@ -58,7 +58,7 @@ def test_serialize_repeat_list_tsv():
         test_seq.repeat_in_sequence(i)
     test_repeat_list = rl.RepeatList(repeats = test_repeats)
 
-    tsv = test_repeat_list.write("tsv", str = True)
+    tsv = test_repeat_list.write("tsv", return_string = True)
 
     assert type(tsv) == str
 

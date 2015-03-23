@@ -2,11 +2,9 @@
 # (C) 2014 Julia Pecerska
 
 """
-
     :synopsis: A cyclic hidden Markov model that describes sequence tandem repeats.
 
-    .. moduleauthor:: Elke Schaper <elke@inf.ethz.ch>
-
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb.sib.ch>
 """
 
 import datetime
@@ -24,7 +22,7 @@ from tral import configuration
 
 LOG = logging.getLogger(__name__)
 
-CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG_GENERAL = configuration.Configuration.instance().config
 CONFIG = CONFIG_GENERAL["hmm"]
 
 ################################### HMM class ############################

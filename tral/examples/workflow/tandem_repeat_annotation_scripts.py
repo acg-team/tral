@@ -162,9 +162,9 @@ def workflow(
 
         # 3. merge_and_basic_filter()
         all_repeat_list = denovo_repeat_list + pfam_repeat_list
-        iS.set_repeat_list(all_repeat_list, REPEAT_LIST_TAG)
-        iS.set_repeat_list(denovo_repeat_list, DE_NOVO_ALL_TAG)
-        iS.set_repeat_list(pfam_repeat_list, PFAM_ALL_TAG)
+        iS.set_repeatlist(all_repeat_list, REPEAT_LIST_TAG)
+        iS.set_repeatlist(denovo_repeat_list, DE_NOVO_ALL_TAG)
+        iS.set_repeatlist(pfam_repeat_list, PFAM_ALL_TAG)
 
         rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
         if iS.dRepeat_list[REPEAT_LIST_TAG]:
@@ -172,12 +172,12 @@ def workflow(
                 rl_tmp = rl_tmp.filter(**iB)
         else:
             rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
-        iS.set_repeat_list(rl_tmp, basic_filter_tag)
-        iS.set_repeat_list(
+        iS.set_repeatlist(rl_tmp, basic_filter_tag)
+        iS.set_repeatlist(
             rl_tmp.intersection(
                 iS.dRepeat_list[PFAM_ALL_TAG]),
             PFAM_TAG)
-        iS.set_repeat_list(
+        iS.set_repeatlist(
             rl_tmp.intersection(
                 iS.dRepeat_list[DE_NOVO_ALL_TAG]),
             DE_NOVO_TAG)
@@ -235,13 +235,13 @@ def workflow(
             else:
                 denovo_final.append(iTR)
 
-        iS.set_repeat_list(
+        iS.set_repeatlist(
             repeat_list.Repeat_list(denovo_refined),
             DE_NOVO_REFINED_TAG)
-        iS.set_repeat_list(
+        iS.set_repeatlist(
             repeat_list.Repeat_list(denovo_final),
             DE_NOVO_FINAL_TAG)
-        iS.set_repeat_list(
+        iS.set_repeatlist(
             iS.dRepeat_list[DE_NOVO_FINAL_TAG] +
             iS.dRepeat_list[PFAM_TAG],
             FINAL_TAG)

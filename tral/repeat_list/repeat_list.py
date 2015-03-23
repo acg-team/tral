@@ -1,7 +1,7 @@
 # (C) 2015 Elke Schaper
 
 """
-    :synopsis: The Repeat Class.
+    :synopsis: The RepeatList Class.
 
     .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
@@ -73,7 +73,7 @@ class RepeatList:
         else:
             raise Exception('input_format is unknown: {}.'.format(input_format))
 
-    def write(self, output_format, file=None, str=None, *args):
+    def write(self, output_format, file=None, return_string=None, *args):
         """ Serialize and write ``RepeatList`` instances.
 
         Serialize ``RepeatList`` instance using the stated ``output_format``.
@@ -99,7 +99,7 @@ class RepeatList:
         if file:
             with open(file, 'w') as fh:
                 fh.write(output)
-        if str:
+        if return_string:
             return output
 
     def filter(self, func_name, *args, **kwargs):
@@ -140,9 +140,6 @@ class RepeatList:
         if not hasattr(self, 'd_cluster'):
             self.d_cluster = {}
 
-        # Is the next line used here?
-
-        is_overlapping = getattr(sys.modules[__name__], overlap_type)
         l_cluster = []
 
         l_repeat_indices = list(range(len(self.repeats)))
@@ -415,10 +412,8 @@ def common_ancestry(repeat1, repeat2):
                             #greediness = repeat1.l_effective/repeat2.l_effective
                             return True
     except:
-        LOG.warning(
-            'error in shared_char with original %s and potential %s', str(
-                repeat1.msaIT), str(
-                repeat2.msaIT))
+        LOG.warning('error in shared_char with original %s and potential %s',
+                    str(repeat1.msaIT), str(repeat2.msaIT))
         LOG.warning('original:', str(repeat2.msa))
         LOG.warning('original:', str(repeat2.begin))
         LOG.warning('potential:', str(repeat1.msa))

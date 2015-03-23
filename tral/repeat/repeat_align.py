@@ -1,5 +1,11 @@
 # (C) 2015 Elke Schaper
 
+"""
+    :synopsis: Alignment of tandem repeat units.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
 import logging
 import os
 import subprocess
@@ -11,7 +17,7 @@ log = logging.getLogger(__name__)
 from tral.repeat import repeat
 from tral import configuration
 
-CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
 ''' Some functions might overlap with repeat.gene_tree.align.'''

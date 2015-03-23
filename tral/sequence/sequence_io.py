@@ -11,7 +11,7 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-'''  READ SEQUENCE '''
+#  ########## READ SEQUENCE ###################################################
 
 
 def read_fasta(file, indices=None):
@@ -40,7 +40,7 @@ def read_fasta(file, indices=None):
         yield str(seq_record.seq), seq_record.id
 
 
-#  WRITE SEQUENCE ##########################################################
+#   ########## WRITE SEQUENCE #################################################
 
 
 def write(sequence, sequence_file, sequence_id="sequence_id_not_defined"):

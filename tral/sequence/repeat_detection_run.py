@@ -5,7 +5,6 @@
     :synopsis: Execution of repeat detection algorithms
 
     .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
-
 """
 
 from collections import OrderedDict
@@ -25,7 +24,7 @@ from tral.sequence import repeat_detection_io
 
 LOG = logging.getLogger(__name__)
 
-CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_DETECTOR_PATH = CONFIG_GENERAL["sequence"]["repeat_detector_path"]
 
 

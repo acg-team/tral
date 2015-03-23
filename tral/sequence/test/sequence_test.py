@@ -115,7 +115,7 @@ def test_sequence_pickle():
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
     test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
     test_optimized_repeat = test_seq.detect([test_hmm])
-    test_seq.set_repeat_list(test_optimized_repeat, TEST_SEQUENCE_TAG)
+    test_seq.set_repeatlist(test_optimized_repeat, TEST_SEQUENCE_TAG)
 
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert list(test_seq.d_repeatlist.keys()) == [TEST_SEQUENCE_TAG]

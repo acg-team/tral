@@ -16,7 +16,7 @@ from tral.repeat_list import repeat_list
 from tral.hmm import hmm, hmm_viterbi
 from tral.sequence import repeat_detection_run, sequence_io
 
-CONFIG = configuration.Configuration.Instance().config
+CONFIG = configuration.Configuration.instance().config
 LOG = logging.getLogger(__name__)
 
 
@@ -64,8 +64,8 @@ class Sequence:
         """
 
         if input_format == 'fasta':
-            lSeq = sequence_io.read_fasta(file)
-            return [Sequence(iSeq, iID) for iSeq, iID in lSeq]
+            l_seq = sequence_io.read_fasta(file)
+            return [Sequence(iSeq, iID) for iSeq, iID in l_seq]
         if input_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
@@ -185,9 +185,8 @@ class Sequence:
                         # Sanity check repeat and set begin coordinate for
                         # all repeats
                         if not self.repeat_in_sequence(iTR):
-                            LOG.debug("The tandem repeat is not part of",
-                                          "the sequence. Detector: {}"
-                                          .format(iTR.TRD))
+                            LOG.debug("The tandem repeat is not part of" \
+                                      "the sequence. Detector: %s", iTR.TRD)
                             continue
 
                         repeats.append(iTR)
@@ -198,18 +197,18 @@ class Sequence:
             raise Exception("Either require denovo detection, or provide an",
                             "HMM")
 
-    def set_repeat_list(self, repeat_list, tag):
-        """ Add `repeat_list` as attribute to this `sequence` instance.
+    def set_repeatlist(self, repeatlist, tag):
+        """ Add `repeatlist` as attribute to this `sequence` instance.
 
-        Add `repeat_list` as attribute to this `sequence` instance. Access
-        `repeat_list` as self.d_repeatlist[tag]
+        Add `repeatlist` as attribute to this `sequence` instance. Access
+        `repeatlist` as self.d_repeatlist[tag]
 
         Args:
-            repeat_list (repeat_list): A repeat_list instance.
+            repeatlist (RepeatList): A repeat_list instance.
             tag (str): A identifier for the repeat_list
         """
 
-        self.d_repeatlist[tag] = repeat_list
+        self.d_repeatlist[tag] = repeatlist
 
     def annotate(self, data, tag):
 

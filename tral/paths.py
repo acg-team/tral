@@ -1,3 +1,11 @@
+# (C) 2014-2015 Elke Schaper
+
+"""
+    :synopsis: The system paths module.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
 import os
 
 # Where are the executables stored? E.g. the tandem repeat detection
@@ -15,6 +23,12 @@ DATA_DIR = os.path.join(CONFIG_DIR, "data")
 
 
 def config_file(name):
+
+    ''' Returns the complete path to the config file `name`.
+
+        Returns the complete path to the config file `name`. Searches first in
+        `CONFIGDIR`. Otherwise, returns the distribution config file.
+    '''
 
     if os.path.isfile(os.path.join(CONFIG_DIR, name)):
         return os.path.join(CONFIG_DIR, name)

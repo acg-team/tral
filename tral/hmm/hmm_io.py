@@ -1,5 +1,11 @@
 # (C) 2015 Elke Schaper
 
+"""
+    :synopsis: Input/output for hmms.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
 import logging
 import os
 import re
@@ -93,7 +99,7 @@ def read(hmm_filename, id=None):
     pat_emissions = re.compile(r"[\w\.]+")
     pat_insertions = re.compile(r"[\d\.]+")
     pat_transition = re.compile(r"[\d\.\*]+")
-    pat_end_HMM = re.compile(r"//")
+    pat_end = re.compile(r"//")
 
     size_alphabet = 20
 
@@ -182,7 +188,7 @@ def read(hmm_filename, id=None):
                     LOG.debug("Emission probabilities: %s", emissions)
                     hmm[current_hmm_state] = {'emissions': emissions}
                     state = 4
-                elif pat_end_HMM.match(line):
+                elif pat_end.match(line):
                     if id:
                         LOG.debug(" * (3->TERMINAL) HMM Found and compiled,"
                                   " return HMM.")
@@ -227,11 +233,12 @@ def read(hmm_filename, id=None):
 
 
 def split_HMMER3_file(hmm_filename, resultdir):
-    """ Split HMMER3 models from a single file ``hmm_filename`` into many files in
-     ``resultdir``.
+    """ Split HMMER3 models from a single file ``hmm_filename`` into many files
+     in ``resultdir``.
 
-    Helper function: split HMMER3 models from a single file ``hmm_filename`` into many
-    files in ``resultdir``. The models are named after the HMM accession.
+    Helper function: split HMMER3 models from a single file ``hmm_filename``
+    into many files in ``resultdir``. The models are named after the HMM
+    accession.
 
     Args:
       hmm_filename (str): Path to HMMER3 file.
@@ -274,9 +281,11 @@ def split_HMMER3_file(hmm_filename, resultdir):
 
 
 def read_HMMER_acc_lengths(hmm_filename):
-    """Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.
+    """Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of
+    each model.
 
-    Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of each model.
+    Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of
+    each model.
 
     Args:
       hmm_filename (str): Path to HMMER3 file.
@@ -292,7 +301,7 @@ def read_HMMER_acc_lengths(hmm_filename):
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_length = re.compile(r"LENG\s+([\w\.]+)")
     state = 0
-    d = {}
+    data = {}
 
     with open(hmm_filename, "rt") as infile:
 
@@ -307,16 +316,17 @@ def read_HMMER_acc_lengths(hmm_filename):
             elif 1 == state:
                 match = pat_length.match(line)
                 if match:
-                    d[acc] = int(match.group(1))
+                    data[acc] = int(match.group(1))
                     LOG.debug(" * (1->0) Found length")
                     state = 0
 
-    return d
+    return data
 
 # def write_HMMER(hmm, hmm_filename):
 #
 #     ''' Write <hmm> too <hmm_filename> in HMMER3 format.
-#        Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf // 8.File formats '''
+#        Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf
+#        // 8.File formats '''
 #
 #
 #

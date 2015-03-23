@@ -1,9 +1,18 @@
+# (C) 2014-2015 Elke Schaper
+
+"""
+    :synopsis: Configuration Singleton class, ensuring that the configuration
+        is created in exactly one instance, even though it is called from
+        multiple modules in arbitrary orders.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
 import configobj
-import os
 from tral.paths import config_file
 
-pDefaults = config_file("config.ini")
-pSpec = config_file("spec.ini")
+P_CONFIG = config_file("config.ini")
+P_SPEC = config_file("spec.ini")
 
 
 class Singleton:
@@ -30,7 +39,7 @@ class Singleton:
     def __init__(self, decorated):
         self._decorated = decorated
 
-    def Instance(self):
+    def instance(self):
         """
         Returns the singleton instance. Upon its first call, it creates a
         new instance of the decorated class and calls its `__init__` method.
@@ -52,9 +61,14 @@ class Singleton:
 
 @Singleton
 class Configuration:
+    """
+    A singleton configuration object containing a `ConfigObj` instance.
 
+    Attributes:
+        config (configobj.ConfigObj): The `ConfigObj` instance.
+    """
     def __init__(self):
         self.config = configobj.ConfigObj(
-            pDefaults,
-            configspec=pSpec,
+            P_CONFIG,
+            configspec=P_SPEC,
             stringify=True)

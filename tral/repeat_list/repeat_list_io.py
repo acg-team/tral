@@ -1,20 +1,18 @@
 # (C) 2015 Elke Schaper
 
-
 """
-    :synopsis: Input/output for the repeat_list class
+    :synopsis: Input/output for the RepeatList class
 
     .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
 
 import logging
-import os
 
 from tral import configuration
 
 LOG = logging.getLogger(__name__)
 
-CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG_GENERAL = configuration.Configuration.instance().config
 CONFIG = CONFIG_GENERAL["repeat_list"]
 
 
@@ -45,39 +43,39 @@ def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
     output_characteristics = config["output_characteristics"]
     model = config["model"]
 
-    data = ["\t".join(output_characteristics)]
-    for iRepeat in tandem_repeats.repeats:
-        d = []
+    data_all = ["\t".join(output_characteristics)]
+    for i_repeat in tandem_repeats.repeats:
+        data = []
         for i_characteristic in output_characteristics:
             if "divergence" == i_characteristic:
-                if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
-                    d.append(iRepeat.divergence(model))
+                if hasattr(i_repeat, "dScore") and model in i_repeat.dScore:
+                    data.append(i_repeat.divergence(model))
                 else:
-                    d.append(None)
+                    data.append(None)
             elif "pvalue" == i_characteristic:
-                if hasattr(iRepeat, "dPValue") and model in iRepeat.dPValue:
-                    d.append(iRepeat.pvalue(model))
+                if hasattr(i_repeat, "dPValue") and model in i_repeat.dPValue:
+                    data.append(i_repeat.pvalue(model))
                 else:
-                    d.append(None)
+                    data.append(None)
             elif "score" == i_characteristic:
-                if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
-                    d.append(iRepeat.score(model))
+                if hasattr(i_repeat, "dScore") and model in i_repeat.dScore:
+                    data.append(i_repeat.score(model))
                 else:
-                    d.append(None)
+                    data.append(None)
             elif "msa_original" == i_characteristic:
                 try:
-                    d.append(",".join(iRepeat.msa_original))
+                    data.append(",".join(i_repeat.msa_original))
                 except:
-                    raise Exception(
-                        "The attribute msa_original is not available for iRepeat.")
-            elif getattr(iRepeat, i_characteristic):
-                d.append(getattr(iRepeat, i_characteristic))
+                    raise Exception("The attribute msa_original is not",
+                                    "available for i_repeat.")
+            elif getattr(i_repeat, i_characteristic):
+                data.append(getattr(i_repeat, i_characteristic))
             else:
                 raise Exception(
                     "The attribute {} is not available for tandem_repeats".format(i_characteristic))
-        data.append("\t".join(str(i) for i in d))
+        data_all.append("\t".join(str(i) for i in data))
 
-    return "\n".join(data) + "\n"
+    return "\n".join(data_all) + "\n"
 
 
 def save_repeat_fasta(tandem_repeats, file):
@@ -96,7 +94,7 @@ def save_repeat_fasta(tandem_repeats, file):
             GH--
     '''
 
-    with open(file, 'w', newline='\n') as f:
+    with open(file, 'w', newline='\n') as fh:
         for identifier, msa in tandem_repeats.items():
-            f.write(">{0}\n".format(identifier))
-            f.write("\n".join(msa) + "\n\n")
+            fh.write(">{0}\n".format(identifier))
+            fh.write("\n".join(msa) + "\n\n")

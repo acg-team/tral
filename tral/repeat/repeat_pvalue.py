@@ -1,5 +1,12 @@
 # (C) 2015 Elke Schaper
 
+"""
+    :synopsis: The repeat pvalue module.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
+
 import os
 import bisect
 from os.path import join
@@ -9,10 +16,9 @@ import numpy as np
 import scipy as sp
 
 from tral.paths import DATA_DIR
+SCORE_DIR = join(DATA_DIR, 'pvalue')
 
 LOG = logging.getLogger(__name__)
-
-path_score = join(DATA_DIR, 'pvalue')
 
 # ######################### REPEAT SCORE P-VALUE CALCULATION FUNCTIONS ########
 # #################### phylo & entropy ########################################
@@ -73,19 +79,19 @@ def empirical_list(l, n, sequence_type='AA', score_type='phylo'):
             else:
                 n -= 1
 
-    file = join(path_score, sequence_type, score_type,
+    file = join(SCORE_DIR, sequence_type, score_type,
                 str(l) + '_' + str(n) + '.npz')
     if not os.path.isfile(file):
         raise ValueError("complete pdf file %s does not exist!" % file)
 
-    myEmpiricalList = np.load(file)
-    # It is absolutely necessary to close the numpy filehandle.
-    # Otherwise, you will have too many open operating system filehandles
+    empirical_list_all = np.load(file)
+    # It is necessary to close the numpy filehandle.
+    # Otherwise, there will be too many open operating system filehandles
     # if you run this function many times (more than ulimit -n allows, that is)
-    empirical_list = myEmpiricalList['arr_0']
-    myEmpiricalList.close()
+    empirical_list_part = empirical_list_all['arr_0']
+    empirical_list_all.close()
 
-    return empirical_list
+    return empirical_list_part
 
 
 def pvalue_from_empirical_list(tandemrepeat, score_type='phylo', score_value=None, empirical=[]):
@@ -112,7 +118,7 @@ def pvalue_from_empirical_list(tandemrepeat, score_type='phylo', score_value=Non
 
     if len(empirical) == 0:
         empirical = empirical_list(tandemrepeat.l_effective, tandemrepeat.n,
-                                  tandemrepeat.sequence_type, score_type)
+                                   tandemrepeat.sequence_type, score_type)
 
     # A smaller score is a better score for all scores in this list.
     if score_type in ['entropy']:
@@ -162,7 +168,7 @@ def column_pdf(n, score_type='psim', sequence_type='AA'):
 
     # Currently, the pdfs are only save up to n_max = 150
     n_max = 150
-    with open(join(path_score, sequence_type, score_type, str(min(n, n_max)) + '.txt'), 'r') as pdf_file:
+    with open(join(SCORE_DIR, sequence_type, score_type, str(min(n, n_max)) + '.txt'), 'r') as pdf_file:
         pdf = [i for i in csv.reader(pdf_file, dialect='excel-tab')]
         pdf = [np.double(i[0]) for i in pdf[1:]]
         return np.array(pdf)
@@ -205,7 +211,7 @@ def calculate_repeat_structure(tandemrepeat):
 # #################### DERIVE p-Value distributions ###########################
 
 def calc_pvalues(repeats, result_file_path, file_name,
-        scoretypes=['phylo', 'phylo_gap'], gappy_data=False):
+                 scoretypes=['phylo', 'phylo_gap'], gappy_data=False):
     """ Create and save a null distribution for ``repeats`` scores for p-Value calculation.
 
     You can use a different null distribution for each column of different length for both
@@ -226,7 +232,7 @@ def calc_pvalues(repeats, result_file_path, file_name,
     # on random data to calculate the p-Value. Otherwise, there might be deletion columns
     # and the distribution should be loaded each time
     # 'pvalue_from_empirical_list' is called.
-    empirical_list = []
+    empirical_list_local = []
 
     for i_score_type in scoretypes:
         if 'parsimony' == i_score_type:
@@ -237,16 +243,15 @@ def calc_pvalues(repeats, result_file_path, file_name,
                 pvalue_psim(i_repeat) if i_repeat.l_effective != 0 else 1 for i_repeat in repeats]
         else:
             if not gappy_data:
-                empirical_list = empirical_list(
+                empirical_list_local = empirical_list(
                     repeats[0].l_effective,
                     repeats[0].n,
                     repeats[0].sequence_type,
                     i_score_type)
-            test_statistic = [
-                pvalue_from_empirical_list(
-                    i_repeat,
-                    i_score_type,
-                    empirical=empirical_list) if i_repeat.l_effective != 0 else 1 for i_repeat in repeats]
+            test_statistic = \
+                [pvalue_from_empirical_list(i_repeat, i_score_type,
+                                            empirical=empirical_list_local) \
+                 if i_repeat.l_effective != 0 else 1 for i_repeat in repeats]
         score_path = os.path.join(result_file_path, i_score_type)
         if not os.path.isdir(score_path):
             os.makedirs(score_path)
@@ -257,7 +262,7 @@ def calc_pvalues(repeats, result_file_path, file_name,
 def d_average_multinom(l, n, sequence_type, score_type):
     """ Helper function for the analytic calculation of parsimony or pSim scores.
 
-    Called by ``dAverageMultipleMaxMultinom`` or ``d_average_multiple_pars_multinom``.
+    Called by ``d_average_multiple_max_multinom`` or ``d_average_multiple_pars_multinom``.
 
     Return the ``l``-times self-convoluted pdf of the score on random sequence_type data
     of length ``n``. The order of the pdf is kept from ``column_pdf()``.
@@ -294,7 +299,7 @@ def d_average_multinom(l, n, sequence_type, score_type):
 
 
 # python 2: precision must be float
-def dAverageMultipleMaxMultinom(tandemrepeat, precision=10000.):
+def d_average_multiple_max_multinom(tandemrepeat, precision=10000.):
     """ Calculate null distribution for e.g. the pSim score for repeats of type ``tandemrepeat``
         as a probability density function.
 
@@ -320,26 +325,19 @@ def dAverageMultipleMaxMultinom(tandemrepeat, precision=10000.):
 
     l_repeat_structure, n_repeat_structure = calculate_repeat_structure(tandemrepeat)
 
-    p = d_average_multinom(
-        l_repeat_structure[0], n_repeat_structure[0],
-        tandemrepeat.sequence_type, score='psim'
-    )
-    val = np.array(
-        (np.r_[l_repeat_structure[0]:(l_repeat_structure[0] * n_repeat_structure[0] + 1.)]
-         * (precision / n_repeat_structure[0])).round(),
-        dtype='uint32'
-    )
+    p = d_average_multinom(l_repeat_structure[0], n_repeat_structure[0],
+                           tandemrepeat.sequence_type, score_type='psim')
+    val = np.array((np.r_[l_repeat_structure[0]:(l_repeat_structure[0] * n_repeat_structure[0] + 1.)] * \
+          (precision / n_repeat_structure[0])).round(), dtype='uint32')
     if len(l_repeat_structure) == 1:
         # return best values first. for pSim, best = 1, worst = 0
         return p[::-1], val[::-1] / (precision * sum(l_repeat_structure))
     else:
         for i in range(1, len(l_repeat_structure)):
-            p = np.outer(p,
-                         d_average_multinom(
-                             l_repeat_structure[i], n_repeat_structure[i],
-                             tandemrepeat.sequence_type, score='psim')
-                         ).ravel()
-
+            p = np.outer(p, d_average_multinom(l_repeat_structure[i],
+                                               n_repeat_structure[i],
+                                               tandemrepeat.sequence_type,
+                                               score_type='psim')).ravel()
             val = (val[:, np.newaxis] +
                    np.array(
                 (np.r_[l_repeat_structure[i]:(l_repeat_structure[i] * n_repeat_structure[i] + 1.)]
@@ -376,20 +374,20 @@ def pvalue_psim(tandemrepeat):
 
     precision = 10000.
 
-    pdf = dAverageMultipleMaxMultinom(tandemrepeat, precision)
-    cumsumPDF = np.cumsum(pdf[0])
+    pdf = d_average_multiple_max_multinom(tandemrepeat, precision)
+    cumsum_pdf = np.cumsum(pdf[0])
 
     #index = np.where(tandemrepeat.score('pSim') == pdf[1])[0]
     index = np.where(np.abs(tandemrepeat.score('pSim') - pdf[1]) <= 1. / precision)[0]
     if len(index) == 1:  # standard case: score is included in pdf[0]
-        return(cumsumPDF[index[0]])
+        return(cumsum_pdf[index[0]])
 
     indices = np.where(tandemrepeat.score('pSim') > pdf[1])[0]
     if len(indices) >= 1:
         # if pars is not exactly included in list, give back mean of value above
         # and value below (should only occur due to numerical imprecision)
         a = min(indices)
-        return((cumsumPDF[a] + cumsumPDF[a - 1]) / 2)
+        return((cumsum_pdf[a] + cumsum_pdf[a - 1]) / 2)
     # This should only occur if score('pSim') is really bad or really good
     else:
         return 1
@@ -426,7 +424,7 @@ def d_average_multiple_pars_multinom(tandemrepeat, precision=10000.):
 
     p = d_average_multinom(
         l_repeat_structure[0], n_repeat_structure[0],
-        tandemrepeat.sequence_type, score='parsimony'
+        tandemrepeat.sequence_type, score_type='parsimony'
     )
     val = np.array(
         (np.r_[(l_repeat_structure[0] * (n_repeat_structure[0] - 1)):-1:-1.]
@@ -444,7 +442,7 @@ def d_average_multiple_pars_multinom(tandemrepeat, precision=10000.):
                              d_average_multinom(
                                  l_repeat_structure[i],
                                  n_repeat_structure[i],
-                                 tandemrepeat.sequence_type, score='parsimony')
+                                 tandemrepeat.sequence_type, score_type='parsimony')
                              ).ravel()
 
                 val = (val[:, np.newaxis] + np.array(
@@ -471,9 +469,9 @@ def d_average_multiple_pars_multinom(tandemrepeat, precision=10000.):
 def pvalue_pars(tandemrepeat):
     """ Calculate the p-Value of the parsimony score for a Repeat.
 
-    Retrieve the probability density function for repeats of the same type as ``tandemrepeat``.
-    Then, calculate the p-Value given this probability density function, and the
-    parsimony score of ``tandemrepeat``.
+    Retrieve the probability density function for repeats of the same type as
+    ``tandemrepeat``. Then, calculate the p-Value given this probability
+    density function, and the parsimony score of ``tandemrepeat``.
 
     Args:
         tandemrepeat (Repeat): A ``Repeat`` instance.
@@ -481,8 +479,8 @@ def pvalue_pars(tandemrepeat):
     Returns:
         p-Value (float)
 
-    .. todo:: Check the method's behaviour if ``tandemrepeat`` s parsimony score has not been
-        calculated before.
+    .. todo:: Check the method's behaviour if ``tandemrepeat`` s parsimony
+              score has not been calculated before.
     .. todo:: Check exception: if pdf == False: return 1.
     """
 
@@ -492,7 +490,7 @@ def pvalue_pars(tandemrepeat):
     # Check the following three lines:
     if not pdf:
         return 1
-    cumsumPDF = np.cumsum(pdf[0])
+    cumsum_pdf = np.cumsum(pdf[0])
 
     #index = np.where(pdf[1] == tandemrepeat.score('parsimony'))[0]
     index = np.where(
@@ -501,7 +499,7 @@ def pvalue_pars(tandemrepeat):
             pdf[1]) <= 1. /
         precision)[0]
     if len(index) == 1:  # standard case: score is included in pdf[0]
-        return(cumsumPDF[index[0]])
+        return cumsum_pdf[index[0]]
 
     indices = np.where(tandemrepeat.score('parsimony') < pdf[1])[0]
     if len(indices) >= 1:
@@ -509,7 +507,7 @@ def pvalue_pars(tandemrepeat):
         # above and value below (should only occur due to numerical
         # imprecision)
         a = min(indices)
-        return (cumsumPDF[a] + cumsumPDF[a - 1]) / 2
+        return (cumsum_pdf[a] + cumsum_pdf[a - 1]) / 2
     else:  # This should only occur if score('parsimony') is really bad
         return 1
 
