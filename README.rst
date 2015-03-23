@@ -18,13 +18,13 @@ IO <http://elkeschaper.github.io/tral/>`__.
 Version
 ~~~~~~~
 
-0.3.2
+0.3.3
 
 Installation
 ~~~~~~~~~~~~
 
 TRAL is available on `Pypi <https://pypi.python.org/pypi>`__ and can be
-installed with `pip <https://pip.pypa.io/en/latest/>`__ for Python>3.2:
+installed with `pip <https://pip.pypa.io/en/latest/>`__ for Python>=3.2:
 
 .. code:: sh
 
