@@ -21,7 +21,7 @@ from tral.hmm import hmm_io
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
-c = configuration.Configuration.Instance()
+c = configuration.Configuration.instance()
 config = c.config
 
 # Shift REPEAT_LIST_TAG to configuration file and rename?
@@ -68,7 +68,7 @@ def workflow(
         max_time), int(time_interval), int(next_time)
 
     try:
-        lSequence = Fasta(sequences_file)
+        l_sequence = Fasta(sequences_file)
     except:
         raise Exception(
             "Cannot load putative pickle file sequences_file: {}".format(sequences_file))
@@ -108,7 +108,7 @@ def workflow(
         dResults = {}
 
     dHMM = {}
-    for iS_pyfaidx in lSequence:
+    for iS_pyfaidx in l_sequence:
 
         # If sequence is already included in results: continue.
         if iS_pyfaidx.name in dResults:
@@ -166,45 +166,41 @@ def workflow(
         iS.set_repeatlist(denovo_repeat_list, DE_NOVO_ALL_TAG)
         iS.set_repeatlist(pfam_repeat_list, PFAM_ALL_TAG)
 
-        rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
-        if iS.dRepeat_list[REPEAT_LIST_TAG]:
+        rl_tmp = iS.get_repeatlist(REPEAT_LIST_TAG)
+        if iS.get_repeatlist(REPEAT_LIST_TAG):
             for iB in basic_filter.values():
                 rl_tmp = rl_tmp.filter(**iB)
         else:
-            rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
+            rl_tmp = iS.get_repeatlist(REPEAT_LIST_TAG)
         iS.set_repeatlist(rl_tmp, basic_filter_tag)
         iS.set_repeatlist(
             rl_tmp.intersection(
-                iS.dRepeat_list[PFAM_ALL_TAG]),
-            PFAM_TAG)
+                iS.get_repeatlist(PFAM_ALL_TAG)), PFAM_TAG)
         iS.set_repeatlist(
-            rl_tmp.intersection(
-                iS.dRepeat_list[DE_NOVO_ALL_TAG]),
-            DE_NOVO_TAG)
+            rl_tmp.intersection(iS.get_repeatlist(DE_NOVO_ALL_TAG)),DE_NOVO_TAG)
 
         # 4. calculate_overlap()
 
         # Perform common ancestry overlap filter and keep PFAMs
         criterion_pfam_fixed = {
             "func_name": "none_overlapping_fixed_repeats",
-            "rl_fixed": iS.dRepeat_list[PFAM_TAG],
+            "rl_fixed": iS.get_repeatlist(PFAM_TAG),
             "overlap_type": "common_ancestry"}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[
-            DE_NOVO_TAG].filter(**criterion_pfam_fixed)
+
+        iS.d_repeatlist[DE_NOVO_TAG] = iS.get_repeatlist(DE_NOVO_TAG).filter(**criterion_pfam_fixed)
 
         # Choose only the most convincing de novo TRs
         criterion_filter_order = {
             "func_name": "none_overlapping", "overlap": (
                 "common_ancestry", None), "lCriterion": [
                 ("pvalue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[
-            DE_NOVO_TAG].filter(**criterion_filter_order)
+        iS.d_repeatlist[DE_NOVO_TAG] = iS.dRepeat_list[DE_NOVO_TAG].filter(**criterion_filter_order)
 
         # 5. refine_denovo()
         denovo_final = []
-        denovo_refined = [None] * len(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats)
-        for i, iTR in enumerate(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats):
-            if not iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+        denovo_refined = [None] * len(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats)
+        for i, iTR in enumerate(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats):
+            if not iTR in iS.get_repeatlist(DE_NOVO_TAG).repeats:
                 continue
             # Create HMM from TR
             denovo_hmm = hmm.HMM.create(file_format='repeat', repeat=iTR)
@@ -242,8 +238,8 @@ def workflow(
             repeat_list.Repeat_list(denovo_final),
             DE_NOVO_FINAL_TAG)
         iS.set_repeatlist(
-            iS.dRepeat_list[DE_NOVO_FINAL_TAG] +
-            iS.dRepeat_list[PFAM_TAG],
+            iS.get_repeatlist(DE_NOVO_FINAL_TAG) +
+            iS.get_repeatlist(PFAM_TAG),
             FINAL_TAG)
 
         dResults[iS.id] = iS
