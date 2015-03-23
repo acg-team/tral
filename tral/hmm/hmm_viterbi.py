@@ -38,14 +38,13 @@ def viterbi(hmm, emission):
 
     if len(emission) / \
             hmm.l_effective < float(CONFIG['filter']['basic']['dict']['n_effective']['threshold']):
-        logging.info(
-            "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min n_effective ({}).".format(
-                hmm.l_effective,
-                len(emission),
-                CONFIG['filter']['basic']['dict']['n_effective']))
+        LOG.info("Skip the HMM as it is too long ({}) for this sequence ({}) " \
+                 "according to the filter criterion min n_effective ({})." \
+                 .format(hmm.l_effective, len(emission),
+                         CONFIG['filter']['basic']['dict']['n_effective']))
         return None
     if hmm.l_effective > float(CONFIG['hmm']['l_effective_max']):
-        logging.info(
+        LOG.info(
             "Skip the HMM as it is too long ({}) according to the filter criterion max hmm.l_effective ({}).".format(
                 hmm.l_effective,
                 CONFIG['hmm']['l_effective_max']))
@@ -477,12 +476,9 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
     for iM, iS in mapping[1:]:
 
         LOG.debug(
-            "Iteration iS: {0}, iM: {1}, last_used_index: {2}, max_used_index_M: {3}, max_used_index_I: {4}".format(
-                str(iS),
-                str(iM),
-                str(last_used_index),
-                str(max_used_index_M),
-                str(max_used_index_I)))
+            "Iteration iS: {0}, iM: {1}, last_used_index: {2}, " \
+            "max_used_index_M: {3}, max_used_index_I: {4}",
+             iS, iM, last_used_index, max_used_index_M, max_used_index_I)
 
         # If we have entered a new repeat unit, add a new element to <insertions>
         # (Including some index magic, e.g. the insertion state index is shifted by one (lowered))
@@ -517,10 +513,8 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
     msa[-1] += "-" * (l_effective - len(msa[-1]))
     msaT = ["".join(c) for c in zip(*msa)]
     n = len(msa)
-    LOG.debug("This tandem repeat has {0} repeat units.".format(str(n)))
-    LOG.debug(
-        "These insertions were detected: {0}.".format(
-            str(insertions)))
+    LOG.debug("This tandem repeat has %d repeat units.", n)
+    LOG.debug("These insertions were detected: %s.", str(insertions))
 
     msa_temp = []
     # For each site ...
