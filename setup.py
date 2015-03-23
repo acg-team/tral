@@ -25,7 +25,7 @@ try:
 except:
     HOME=os.path.expanduser('~')
 
-SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['create_and_annotate_sequence_pickles.py', 'create_hmm_pickles.py', 'detect_tandem_repeats_in_sequence.py', 'example_pipeline.py', 'split_sequence_file.py']]
+SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['example_workflow_MBE2014.py']]
 SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_repeat_annotation_scripts.py', 'tandem_repeat_annotation_workflow.py']]
 
 setup(
