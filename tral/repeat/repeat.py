@@ -90,8 +90,8 @@ class Repeat:
                 divergence = self.d_divergence[model]
             except:
                 divergence = None
-            first_line += (" pvalue:{0} divergence:{1}",
-                           "type:{2}".format(pvalue, divergence, model))
+            first_line += " pvalue:{0} divergence:{1}" \
+                          " type:{2}".format(pvalue, divergence, model)
 
         return first_line + "\n" + "\n".join(self.msa)
 
