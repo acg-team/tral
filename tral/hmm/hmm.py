@@ -23,7 +23,7 @@ from tral.repeat import repeat_io
 from tral.repeat.repeat import Repeat
 from tral import configuration
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 CONFIG_GENERAL = configuration.Configuration.Instance().config
 CONFIG = CONFIG_GENERAL["hmm"]
@@ -99,7 +99,7 @@ class HMM:
             hmm += "Most likely motif:      {}".format(tmp)
         except:
             hmm = "<HMM instance>"
-            log.warning("Could not create string of HMM instance.")
+            LOG.warning("Could not create string of HMM instance.")
 
         return hmm
 
@@ -168,15 +168,15 @@ class HMM:
                 iTransition_Probabilities = self.set_circle_transition_probability_hmmer3(
                     iTransition_Probabilities,
                     dTranslate_States[iState])
-            log.debug("iState: %s", iState)
-            log.debug(
+            LOG.debug("iState: %s", iState)
+            LOG.debug(
                 "set_circle_transition_probability_hmmer3: %s",
                 iTransition_Probabilities)
             self.set_transition_probability_hmmer3(
                 i,
                 iTransition_Probabilities)
 
-        log.debug("p_t before deletion: %s", self.p_t)
+        LOG.debug("p_t before deletion: %s", self.p_t)
 
         # Translate deletion states into direct transitions from match to match
         # states.
@@ -190,7 +190,7 @@ class HMM:
                 for iGoal_state, iP in p_t_d[iMatch_state].items():
                     self.p_t[iMatch_state][iGoal_state] = iP
 
-        log.debug("p_t after deletion: %s", self.p_t)
+        LOG.debug("p_t after deletion: %s", self.p_t)
 
         # As it is never likely to got from a terminal state to a deletion state or vice versa, this transition probabilities can be ignored.
         # Thus, you may advance and:
@@ -253,7 +253,7 @@ class HMM:
         else:
             raise Exception("Unknown input format: {}.".format(input_format))
 
-        log.debug(hmmer_probabilities)
+        LOG.debug(hmmer_probabilities)
         return HMM(hmmer_probabilities)
 
     def create_from_repeat(tandem_repeat, hmm_copy_path=None,
@@ -305,7 +305,7 @@ class HMM:
         hmm_file = os.path.join(tmp_dir, tmp_id + ".hmm")
         if hmm_copy_path:
             if not os.path.exists(hmm_copy_path):
-                log.critical('Specified path for the file copy does not '
+                LOG.critical('Specified path for the file copy does not '
                              'exist, not saving copy: %s.', hmm_copy_path)
             else:
                 if hmm_copy_id:
@@ -389,7 +389,7 @@ class HMM:
         self.terminal_states = ["N", "C"]
         self.states = [self.terminal_states[0]] + self.match_states + \
             self.insertion_states + self.deletion_states + [self.terminal_states[1]]
-        log.debug("HMM states: %s", self.states)
+        LOG.debug("HMM states: %s", self.states)
 
         # Initialisation
         # The transition probability is initially set to None for all states.
@@ -488,8 +488,8 @@ class HMM:
 
         # M->M, M->I, M->D: Use an average from all other transitions from
         # match states.
-        log.debug("self.hmmer.keys(): %s", self.hmmer.items())
-        log.debug("self.hmmer.items(): %s", self.hmmer.items())
+        LOG.debug("self.hmmer.keys(): %s", self.hmmer.items())
+        LOG.debug("self.hmmer.items(): %s", self.hmmer.items())
         mean_M_M = np.mean([np.exp(-iP["transition"][0])
                             for iState, iP in self.hmmer.items() if iState not in skip_states])
         mean_M_I = np.mean([np.exp(-iP["transition"][1])
