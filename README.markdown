@@ -1,4 +1,4 @@
-|PyPI|
+[<img src="https://img.shields.io/pypi/v/tral.svg?branch=master">](https://pypi.python.org/pypi/tral)
 
 # Tandem Repeat Annotation Library
 
@@ -34,6 +34,3 @@ GNU
 [Installation instructions]:http://elkeschaper.github.io/tral/install.html#install
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
-
-.. |PyPI| image:: https://img.shields.io/pypi/v/tral.svg?branch=master
-    :target: https://pypi.python.org/pypi/tral
