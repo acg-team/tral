@@ -528,7 +528,7 @@ class DetectorTREKS(TRDetector):
             super(DetectorTREKS, self).run_process(wd, *prog_args)
 
         if check_java_errors(stdoutfname, stderrfname,
-                             log=log, procname=DetectorTREKS.displayname):
+                             log=LOG, procname=DetectorTREKS.displayname):
             return []
 
         # Process output file, return results
@@ -702,7 +702,7 @@ class DetectorTrust(TRDetector):
             wd, *self.config.tokens(infile))
 
         if check_java_errors(stdoutfname, stderrfname,
-                             log=log, procname=DetectorTrust.displayname):
+                             log=LOG, procname=DetectorTrust.displayname):
             return []
 
         # shutil.copyfile(stdoutfname, YOUR FAVOURITE PATH)
