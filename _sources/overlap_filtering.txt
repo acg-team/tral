@@ -38,17 +38,17 @@ Tandem repeats can be clustered according to different types of overlap:
 
     overlap_type = "shared_char"
     for iSequence in lHIV_Sequence:
-        iSequence.dRepeat_list['denovo'].cluster(overlap_type)
+        iSequence.get_repeatlist("denovo").cluster(overlap_type)
 
 
 In the first sequences, no repeats share any chars, however in the second sequence, three tandem repeats
 overlap:
 ::
 
-    >>> print(lHIV_Sequence[0].dRepeat_list['denovo'].dCluster[overlap_type])
-    [{4}, {3}, {2}, {1}, {0}]
-    >>> print(lHIV_Sequence[1].dRepeat_list['denovo'].dCluster[overlap_type])
-    [{1, 5}, {0, 3, 4}, {2}]
+    >>> print(lHIV_Sequence[0].get_repeatlist("denovo").d_cluster[overlap_type])
+    [{5}, {4}, {3}, {2}, {1}, {0}]
+    >>> print(lHIV_Sequence[1].get_repeatlist("denovo").d_cluster[overlap_type])
+    [{4, 5}, {0, 2, 3}, {1}]
 
 
 Tandem repeats can also directly be filtered of overlapping tandem repeats. Here, we need
@@ -60,18 +60,18 @@ there still are draws, retain the tandem repeat of lowest divergence:
     overlap_type = "common_ancestry"
     score = "phylo_gap001"
     for iSequence in lHIV_Sequence:
-        repeat_list_filtered = iSequence.dRepeat_list['denovo'].filter("none_overlapping", (overlap_type, None), [("pvalue", score), ("divergence", score)])
-        iSequence.set_repeat_list(repeat_list_filtered, "denovo_non_overlapping")
+        repeat_list_filtered = iSequence.get_repeatlist("denovo").filter("none_overlapping", (overlap_type, None), [("pvalue", score), ("divergence", score)])
+        iSequence.set_repeatlist(repeat_list_filtered, "denovo_non_overlapping")
 
 
 The resulting *result_list* now only contains tandem repeats that do not overlap according
 the *common ancestry* overlap:
 ::
 
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    27
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_non_overlapping"].repeats])
-    22
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist("denovo").repeats])
+    28
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist("denovo_non_overlapping").repeats])
+    23
 
 
 

@@ -23,16 +23,16 @@ Read in your sequence profile model.
     from tral.hmm import hmm
     from tral.paths import PACKAGE_DIRECTORY
 
-    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"examples", "data","Kelch_1.hmm")
-    circular_profile_HMM_Kelch_1 = hmm.HMM.create(input_format = 'hmmer', file = fPfam_profile_hmm)
+    pfam_profile_HMM = os.path.join(PACKAGE_DIRECTORY,"examples", "data","Kelch_1.hmm")
+    circular_profile_HMM_Kelch_1 = hmm.HMM.create(input_format = 'hmmer', file = pfam_profile_HMM)
 
 
 See the basic characteristics of the circular profile HMM::
 
-    >>>print(circular_profile_HMM_Kelch_1)
-    cpHMM ID:          PF01344.20
+    >>> print(circular_profile_HMM_Kelch_1)
+    cpHMM ID: PF01344.20
     cpHMM length: 47
-    Most likely motif:      ARSSAGVVVLDGKIYVIGGRDGDGNALNSVERYDPVTNTWEKLPSMP
+    Most likely motif: ARSSAGVVVLDGKIYVIGGRDGDGNALNSVERYDPVTNTWEKLPSMP
 
 
 Read in your sequences.
@@ -91,4 +91,4 @@ Write a singe repeat_list to .pickle format::
 A repeat_list in pickle format can easily be read in again::
 
     from tral.repeat_list import repeat_list
-    tandem_repeats = repeat_list.Repeat_list.create(input_format = "pickle", file = path_to_output_pickle_file)
+    tandem_repeats = repeat_list.RepeatList.create(input_format = "pickle", file = path_to_output_pickle_file)

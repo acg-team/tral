@@ -44,15 +44,14 @@ p-Value with parameters defined in the :ref:`configuration file <configure>`:
 ::
 
     for iSequence in lHIV_Sequence:
-        if iSequence.dRepeat_list['denovo']:
-            for iTandemRepeat in iSequence.dRepeat_list['denovo'].repeats:
-                iTandemRepeat.calculate_pvalues()
+        for iTandemRepeat in iSequence.get_repeatlist('denovo').repeats:
+            iTandemRepeat.calculate_pvalues()
 
 For example, the following putative tandem repeat is found to be non-significant with the used model
 of tandem repeat evolution :ref:`(interpretation) <background>`:
 ::
 
-    >>> print(lHIV_Sequence[2].dRepeat_list['denovo'].repeats[0])
+    >>> print(lHIV_Sequence[2].get_repeatlist('denovo').repeats[0])
     > begin:94 l_effective:7 n:2 pvalue:1.0 divergence:1.656005859375 type:phylo_gap01
     EKGGLEGLIYSKKRQE
     ---ILDLWVY------
@@ -61,7 +60,7 @@ of tandem repeat evolution :ref:`(interpretation) <background>`:
 Whereas this putative tandem repeat is considered significant:
 ::
 
-    >>> print(lHIV_Sequence[4].dRepeat_list['denovo'].repeats[1])
+    >>> print(lHIV_Sequence[4].get_repeatlist('denovo').repeats[0])
     > begin:38 l_effective:2 n:6 pvalue:0.0 divergence:0.46649169922545164 type:phylo_gap01
     RRN
     RR-
@@ -75,9 +74,8 @@ Besides, parameters can also be directly supplied to *calculate_pvalues*:
 ::
 
     for iSequence in lHIV_Sequence:
-        if iSequence.dRepeat_list['denovo']:
-            for iTandemRepeat in iSequence.dRepeat_list['denovo'].repeats:
-                iTandemRepeat.calculate_pvalues(scoreslist=['phylo_gap001'])
+        for iTandemRepeat in iSequence.get_repeatlist('denovo').repeats:
+            iTandemRepeat.calculate_pvalues(scoreslist=['phylo_gap001'])
 
 
 
@@ -88,20 +86,20 @@ Filter tandem repeat below a significance threshold.
 ::
 
     for iSequence in lHIV_Sequence:
-        repeat_list = iSequence.dRepeat_list["denovo"]
+        repeat_list = iSequence.get_repeatlist('denovo')
         if repeat_list:
             repeat_list_filtered = repeat_list.filter(func_name = "pvalue", score = "phylo_gap01", threshold = 0.05)
-            iSequence.set_repeat_list(repeat_list_filtered, "denovo_filtered")
+            iSequence.set_repeatlist(repeat_list_filtered, "denovo_filtered")
 
 The resulting *result_list* now only contains tandem repeats with a p-Value below
 0.05, and is shorter than the original tandem repeat list:
 
 ::
 
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    27
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_filtered"].repeats])
-    19
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist('denovo').repeats])
+    28
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist('denovo_filtered').repeats])
+    20
 
 
 
