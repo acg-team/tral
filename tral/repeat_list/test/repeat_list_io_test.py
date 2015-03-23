@@ -23,7 +23,7 @@ def test_serialize_repeat_list_tsv():
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     for i in test_repeats:
         test_seq.repeat_in_sequence(i)
-    test_repeat_list = rl.Repeat_list(repeats = test_repeats)
+    test_repeat_list = rl.RepeatList(repeats = test_repeats)
 
     tsv = rl_io.serialize_repeat_list_tsv(test_repeat_list)
 

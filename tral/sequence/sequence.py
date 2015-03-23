@@ -48,8 +48,8 @@ class Sequence:
         if name:
             self.name = name
 
-        self.dAnnotations = {}
-        self.dRepeat_list = {}
+        self.d_annotations = {}
+        self.d_repeatlist = {}
 
     def create(file, input_format):
         """ Create sequence(s) from file.
@@ -111,7 +111,7 @@ class Sequence:
                 instantiation. E.g. ``repeat = {"calc_score": True}``
 
         Returns:
-            A ``Repeat_list`` instance
+            A ``RepeatList`` instance
         """
 
         if lHMM:
@@ -123,7 +123,7 @@ class Sequence:
                                     'value is not a valid instance of the HMM'
                                     'class.')
 
-            lRepeat = []
+            repeats = []
             for iHMM in lHMM:
                 # Detect TRs on self.seq with hmm using the Viterbi algorithm.
                 most_likely_path = iHMM.viterbi(self.seq)
@@ -140,16 +140,16 @@ class Sequence:
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         if 'repeat' in kwargs:
-                            lRepeat.append(repeat.Repeat(aligned_msa,
+                            repeats.append(repeat.Repeat(aligned_msa,
                                                          **kwargs['repeat']))
                         else:
-                            lRepeat.append(repeat.Repeat(aligned_msa))
+                            repeats.append(repeat.Repeat(aligned_msa))
 
             # Set begin coordinate for all repeats
-            for iRepeat in lRepeat:
-                self.repeat_in_sequence(iRepeat)
+            for i_repeat in repeats:
+                self.repeat_in_sequence(i_repeat)
 
-            return repeat_list.Repeat_list(lRepeat)
+            return repeat_list.RepeatList(repeats)
 
         elif lHMM == []:
             LOG.debug("lHMM == []")
@@ -157,16 +157,16 @@ class Sequence:
 
         elif denovo:
             if 'detection' in kwargs:
-                lPredicted_repeat = repeat_detection_run.run_TRD(
+                predicted_repeats = repeat_detection_run.run_detector(
                     [self],
                     **kwargs['detection'])[0]
             else:
-                lPredicted_repeat = repeat_detection_run.run_TRD([self])[0]
+                predicted_repeats = repeat_detection_run.run_detector([self])[0]
 
-            LOG.debug("lPredicted_repeat: {}".format(lPredicted_repeat))
-            lRepeat = []
+            LOG.debug("predicted_repeats: {}".format(predicted_repeats))
+            repeats = []
 
-            for jTRD, jlTR in lPredicted_repeat.items():
+            for jTRD, jlTR in predicted_repeats.items():
                 for iTR in jlTR:
                     if 'repeat' in kwargs:
                         iTR = repeat.Repeat(iTR.msa, begin=iTR.begin,
@@ -190,9 +190,9 @@ class Sequence:
                                           .format(iTR.TRD))
                             continue
 
-                        lRepeat.append(iTR)
+                        repeats.append(iTR)
 
-            return repeat_list.Repeat_list(lRepeat)
+            return repeat_list.RepeatList(repeats)
 
         else:
             raise Exception("Either require denovo detection, or provide an",
@@ -202,23 +202,23 @@ class Sequence:
         """ Add `repeat_list` as attribute to this `sequence` instance.
 
         Add `repeat_list` as attribute to this `sequence` instance. Access
-        `repeat_list` as self.dRepeat_list[tag]
+        `repeat_list` as self.d_repeatlist[tag]
 
         Args:
             repeat_list (repeat_list): A repeat_list instance.
             tag (str): A identifier for the repeat_list
         """
 
-        self.dRepeat_list[tag] = repeat_list
+        self.d_repeatlist[tag] = repeat_list
 
     def annotate(self, data, tag):
 
-        self.dAnnotations[tag] = data
+        self.d_annotations[tag] = data
 
     def get_annotation(self, tag):
 
-        if tag in self.dAnnotations:
-            return self.dAnnotations[tag]
+        if tag in self.d_annotations:
+            return self.d_annotations[tag]
         else:
             return []
 

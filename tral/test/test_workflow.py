@@ -45,7 +45,7 @@ TEST_SCORE_MBE_2014 = "phylo_gap01_ignore_trailing_gaps_and_coherent_deletions"
 
 TEST_FAA_FILE = "HIV-1_388796.faa"
 TEST_HMM_FILE = "zf-CCHC.hmm"
-TEST_DENOVO_PARAMETERS = {"detection": {"lFinders": ["XSTREAM", "T-REKS"]}}
+TEST_DENOVO_PARAMETERS = {"detection": {"detectors": ["XSTREAM", "T-REKS"]}}
 TEST_SCORE = "phylo_gap01"
 TEST_RESULT_SEQ1 = [3,
                     [["LFNSTKLE", "LFNSST-N"],

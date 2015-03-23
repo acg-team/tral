@@ -12,7 +12,7 @@ import os
 
 from tral import configuration
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 CONFIG_GENERAL = configuration.Configuration.Instance().config
 CONFIG = CONFIG_GENERAL["repeat_list"]
@@ -21,8 +21,8 @@ CONFIG = CONFIG_GENERAL["repeat_list"]
 def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
     ''' Serialize a ``repeat_list`` instance as tsv.
 
-        config defines which tandem repeat characteristics are added to the .tsv.
-        This could be for example:
+        config defines which tandem repeat characteristics are added to the
+        .tsv. This could be for example:
 
         * begin: position of the tandem repeats within the sequence,
         * pvalue: statistical significance of the tandem repeats
@@ -32,7 +32,9 @@ def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
 
     Attributes:
         tandem_repeats (repeat_list): A ``Repeat_list`` instance.
-        config (dict): A dictionary. E.g.: {"output_characteristics": ["n_effective", "pvalue"], model = "phylo_gap01"}
+        config (dict): A dictionary. E.g.:
+                        {"output_characteristics": ["n_effective", "pvalue"],
+                         model: "phylo_gap01"}
         *args: Additional arguments
 
     Returns:
@@ -46,33 +48,33 @@ def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
     data = ["\t".join(output_characteristics)]
     for iRepeat in tandem_repeats.repeats:
         d = []
-        for iCharacteristic in output_characteristics:
-            if "divergence" == iCharacteristic:
+        for i_characteristic in output_characteristics:
+            if "divergence" == i_characteristic:
                 if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
                     d.append(iRepeat.divergence(model))
                 else:
                     d.append(None)
-            elif "pvalue" == iCharacteristic:
+            elif "pvalue" == i_characteristic:
                 if hasattr(iRepeat, "dPValue") and model in iRepeat.dPValue:
                     d.append(iRepeat.pvalue(model))
                 else:
                     d.append(None)
-            elif "score" == iCharacteristic:
+            elif "score" == i_characteristic:
                 if hasattr(iRepeat, "dScore") and model in iRepeat.dScore:
                     d.append(iRepeat.score(model))
                 else:
                     d.append(None)
-            elif "msa_original" == iCharacteristic:
+            elif "msa_original" == i_characteristic:
                 try:
                     d.append(",".join(iRepeat.msa_original))
                 except:
                     raise Exception(
                         "The attribute msa_original is not available for iRepeat.")
-            elif getattr(iRepeat, iCharacteristic):
-                d.append(getattr(iRepeat, iCharacteristic))
+            elif getattr(iRepeat, i_characteristic):
+                d.append(getattr(iRepeat, i_characteristic))
             else:
                 raise Exception(
-                    "The attribute {} is not available for tandem_repeats".format(iCharacteristic))
+                    "The attribute {} is not available for tandem_repeats".format(i_characteristic))
         data.append("\t".join(str(i) for i in d))
 
     return "\n".join(data) + "\n"
@@ -81,11 +83,12 @@ def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
 def save_repeat_fasta(tandem_repeats, file):
     ''' save multiple <tandem_repeats> in Fasta format in specified <file>
 
-        At current, only one TR per sequence can be defined, as the identifiers in
-        the dict <tandem_repeats> must be unique.
+        At current, only one TR per sequence can be defined, as the identifiers
+        in the dict <tandem_repeats> must be unique.
 
         Attributes:
-            tandem_repeats: Dict of tandem repeats and identifiers. e.g. {'ENSP00012': msa1, 'ENSP00013': msa2}
+            tandem_repeats: Dict of tandem repeats and identifiers.
+            e.g. {'ENSP00012': msa1, 'ENSP00013': msa2}
 
             >ID
             GHKI

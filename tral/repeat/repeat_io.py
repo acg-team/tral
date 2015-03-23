@@ -13,7 +13,7 @@ import numpy as np
 
 from tral.paths import DATA_DIR, EXEC_DIR
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 ###################### SAVE REPEAT #######################################
@@ -134,12 +134,12 @@ def read_repeats(seq_filename, sequence_type='AA'):
     with open(seq_filename, "rt") as infile:
 
         for i, line in enumerate(infile):
-            logging.debug("Line {0}: {1}".format(i, line[0:-1]))
+            LOG.debug("Line {0}: {1}".format(i, line[0:-1]))
             if 1 == state:
                 match = pat_start.match(line)
                 if match:
-                    logging.debug(" * (1->2) Found start")
-                    logging.debug("Start: %s", match.group(1))
+                    LOG.debug(" * (1->2) Found start")
+                    LOG.debug("Start: %s", match.group(1))
                     name = match.group(1)
                     repeats[name] = []
                     state = 2
@@ -147,12 +147,12 @@ def read_repeats(seq_filename, sequence_type='AA'):
             elif 2 == state:
                 match = pat_repeat_unit.match(line)
                 if match:
-                    logging.debug(" * (2->2) Found Repeat unit")
-                    logging.debug("Repeat Unit: %s", match.group(1))
+                    LOG.debug(" * (2->2) Found Repeat unit")
+                    LOG.debug("Repeat Unit: %s", match.group(1))
                     repeat_unit = match.group(1)
                     repeats[name].append(repeat_unit.replace(".", "-").upper())
                 else:
-                    logging.debug(" * (2->1) Found NO further Repeat unit")
+                    LOG.debug(" * (2->1) Found NO further Repeat unit")
                     state = 1
 
     for iName, iR in repeats.items():
@@ -203,7 +203,7 @@ def evolved_tandem_repeats(
     alf_exec = os.path.join(EXEC_DIR, "alfsim")
     # create temporary directory
     working_dir = tempfile.mkdtemp()
-    log.debug("evolvedTR: Created tempfile: %s", working_dir)
+    LOG.debug("evolvedTR: Created tempfile: %s", working_dir)
 
     # create working dir
     if not os.path.isdir(working_dir):
@@ -254,7 +254,7 @@ def evolved_tandem_repeats(
             runfile.write("treeLength:= %d ;\n" % tree_length)
             # DANIEL: Is a tree := missing?
         if tree not in {'star', 'birthdeath'}:
-            log.warning(
+            LOG.warning(
                 "evolvedTR: tree input %s not known, assuming birthdeath tree",
                 tree)
 
@@ -302,7 +302,7 @@ def evolved_tandem_repeats(
         if os.path.isfile(infilePath):
             break
     else:
-        log.error('ALFSIM was not able to produce simulated sequence.')
+        LOG.error('ALFSIM was not able to produce simulated sequence.')
 
     # shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
     #shutil.copytree(working_dir, '/cluster/home/infk/eschaper/spielwiese/')
@@ -329,22 +329,22 @@ def evolved_tandem_repeats(
     state = 1
     with open(infilePath, "r") as infile:
         for i, line in enumerate(infile):
-            log.debug("Line %d: %s", i, line[0:-1])
+            LOG.debug("Line %d: %s", i, line[0:-1])
 
             if 1 == state:  # Find first repeat unit & save begin
                 search = pattern_start.search(line)
                 if search:
-                    log.debug(" *(1->2) Found MSA start")
+                    LOG.debug(" *(1->2) Found MSA start")
                     state = 2
                     msa = []
 
             elif 2 == state:  # Find all repeat units
                 search = pattern_seq.search(line)
                 if search:
-                    log.debug(" *(2->2) Found another repeat unit")
+                    LOG.debug(" *(2->2) Found another repeat unit")
                     msa.append(search.group(1))
                 else:
-                    log.debug(" *(2->1) repeat region finished, yielding.")
+                    LOG.debug(" *(2->1) repeat region finished, yielding.")
                     state = 1
                     # YIELD IF WE HAVE FOUND AT LEAST TWO REPEAT UNITS:
                     if len(msa) > 1:
@@ -354,7 +354,7 @@ def evolved_tandem_repeats(
                             yield msa
                         else:
                             # CHECK!!!
-                            log.debug(
+                            LOG.debug(
                                 "YIELD: %s",
                                 "".join(msa).replace(
                                     '-',
@@ -396,7 +396,7 @@ def random_sequence(
     """
 
     if sequence_length == 0 and (l == 0 or n == 0):
-        log.error(
+        LOG.error(
             'The specified sequence_length or the product of l and n was set to 0 for random_sequence simulation')
     else:
         if sequence_length == 0:

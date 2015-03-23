@@ -306,30 +306,30 @@ class Repeat:
                 self.d_divergence['phylo_gap01'], self.d_score['phylo_gap01'] = \
                     repeat_score.phyloStarTopology_local(self,
                                                          gaps='row_wise',
-                                                         indelRatePerSite=0.01)
+                                                         indel_rate_per_site=0.01)
             if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
                 self.d_divergence['phylo_gap01_ignore_trailing_gaps'], \
                     self.d_score['phylo_gap01_ignore_trailing_gaps'] = \
-                    repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indelRatePerSite=0.01)
+                    repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indel_rate_per_site=0.01)
             if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
                 self.d_divergence['phylo_gap01_ignore_coherent_deletions'], self.d_score[
-                    'phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indelRatePerSite=0.01)
+                    'phylo_gap01_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indel_rate_per_site=0.01)
             if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.d_divergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], \
                     self.d_score['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = \
-                    repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite=0.01)
+                    repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indel_rate_per_site=0.01)
             if 'phylo_gap001' in scoreslist:
                 self.d_divergence['phylo_gap001'], self.d_score['phylo_gap001'] = repeat_score.phyloStarTopology_local(
-                    self, gaps='row_wise', indelRatePerSite=0.001)
+                    self, gaps='row_wise', indel_rate_per_site=0.001)
             if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
                 self.d_divergence['phylo_gap001_ignore_trailing_gaps'], self.d_score[
-                    'phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indelRatePerSite=0.001)
+                    'phylo_gap001_ignore_trailing_gaps'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps', indel_rate_per_site=0.001)
             if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
                 self.d_divergence['phylo_gap001_ignore_coherent_deletions'], self.d_score[
-                    'phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indelRatePerSite=0.001)
+                    'phylo_gap001_ignore_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_coherent_deletions', indel_rate_per_site=0.001)
             if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.d_divergence['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'], self.d_score[
-                    'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indelRatePerSite=0.001)
+                    'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_score.phyloStarTopology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indel_rate_per_site=0.001)
 
     def calculate_pvalues(self, scoreslist=CONFIG['scoreslist']):
         """ Calculate pvalues on a Repeat instance.
@@ -357,51 +357,51 @@ class Repeat:
         else:   # Calculate score
             if 'entropy' in scoreslist:
                 self.d_pvalue['entropy'] = \
-                    repeat_pvalue.pvalueFromEmpiricialList(self, 'entropy')
+                    repeat_pvalue.pvalue_from_empirical_list(self, 'entropy')
             if 'parsimony' in scoreslist:
                 self.d_pvalue['parsimony'] = repeat_pvalue.pvaluePars(self)
             if 'pSim' in scoreslist:
                 self.d_pvalue['pSim'] = repeat_pvalue.pvaluePSim(self)
             if 'phylo' in scoreslist:
                 self.d_pvalue['phylo'] = \
-                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo')
+                    repeat_pvalue.pvalue_from_empirical_list(self, 'phylo')
             if 'phylo_gap' in scoreslist:
                 self.d_pvalue['phylo_gap'] = \
-                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo_gap')
+                    repeat_pvalue.pvalue_from_empirical_list(self, 'phylo_gap')
             if 'phylo_gap01' in scoreslist:
                 self.d_pvalue['phylo_gap01'] = \
-                    repeat_pvalue.pvalueFromEmpiricialList(self, 'phylo_gap01')
+                    repeat_pvalue.pvalue_from_empirical_list(self, 'phylo_gap01')
             if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
-                self.d_pvalue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_trailing_gaps'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_trailing_gaps'))
             if 'phylo_gap01_ignore_coherent_deletions' in scoreslist:
-                self.d_pvalue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_coherent_deletions'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_coherent_deletions'))
             if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.d_pvalue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap01',
                     self.score('phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'))
             if 'phylo_gap001' in scoreslist:
-                self.d_pvalue['phylo_gap001'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap001')
             if 'phylo_gap001_ignore_trailing_gaps' in scoreslist:
-                self.d_pvalue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_trailing_gaps'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_trailing_gaps'))
             if 'phylo_gap001_ignore_coherent_deletions' in scoreslist:
-                self.d_pvalue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_coherent_deletions'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_coherent_deletions'))
             if 'phylo_gap001_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
-                self.d_pvalue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalueFromEmpiricialList(
+                self.d_pvalue['phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'] = repeat_pvalue.pvalue_from_empirical_list(
                     self,
                     'phylo_gap001',
                     self.score('phylo_gap001_ignore_trailing_gaps_and_coherent_deletions'))

@@ -10,22 +10,23 @@ import logging
 import pickle
 import sys
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 from tral.repeat_list import repeat_list_io
 
 
-class Repeat_list:
+class RepeatList:
 
-    """ A `repeat_list` is a list of repeats that belong to the same sequence, or set of
-        sequences.
+    """ A `RepeatList` contains list of repeats that belong to the same
+    sequence, or set of sequences.
 
-    Repeat_list contains methods that act on several tandem repeats.
+    `RepeatList` contains methods that act on several tandem repeats.
     For example, methods to
 
     *   detect overlapping tandem repeats
     *   identify the tandem repeat with highest statistical significance
-    *   filter a set of tandem repeats according to different filtering procedures.
+    *   filter a set of tandem repeats according to different filtering
+        procedures.
 
 
     Attributes:
@@ -34,7 +35,7 @@ class Repeat_list:
 
     def __str__(self):
         """
-            Create string for Repeat_list instance.
+            Create string for RepeatList instance.
         """
         return str(self.repeats)
 
@@ -43,20 +44,20 @@ class Repeat_list:
 
     def __add__(self, rl):
         if rl:
-            return Repeat_list(self.repeats + rl.repeats)
+            return RepeatList(self.repeats + rl.repeats)
         else:
             return self
 
     def intersection(self, rl):
         if rl:
-            return Repeat_list([i for i in self.repeats if i in rl.repeats])
+            return RepeatList([i for i in self.repeats if i in rl.repeats])
         else:
             return self
 
     def create(file, input_format):
-        """ Read ``Repeat_list`` from file.
+        """ Read ``RepeatList`` from file.
 
-        Read ``Repeat_list`` from file (currently, only pickle is supported)
+        Read ``RepeatList`` from file (currently, only pickle is supported)
 
         Args:
             input_format (str):  Currently only "pickle"
@@ -73,9 +74,9 @@ class Repeat_list:
             raise Exception('input_format is unknown: {}.'.format(input_format))
 
     def write(self, output_format, file=None, str=None, *args):
-        """ Serialize and write ``Repeat_list`` instances.
+        """ Serialize and write ``RepeatList`` instances.
 
-        Serialize ``Repeat_list`` instance using the stated ``output_format``.
+        Serialize ``RepeatList`` instance using the stated ``output_format``.
         If a ``file`` is specified, save the String. If ``str`` is specified, give back
         the String (not possible for pickles).
 
@@ -115,7 +116,7 @@ class Repeat_list:
         # must be in dir(): ``funcname in dir`` == TRUE?
 
         func = getattr(sys.modules[__name__], func_name)
-        return Repeat_list(func(self, *args, **kwargs))
+        return RepeatList(func(self, *args, **kwargs))
 
     def cluster(self, overlap_type, *args):
         """ Cluster ``repeats`` according to ``overlap_type``.
@@ -136,40 +137,41 @@ class Repeat_list:
 
         """
 
-        if not hasattr(self, 'dCluster'):
-            self.dCluster = {}
+        if not hasattr(self, 'd_cluster'):
+            self.d_cluster = {}
 
         # Is the next line used here?
 
         is_overlapping = getattr(sys.modules[__name__], overlap_type)
-        lCluster = []
+        l_cluster = []
 
-        lRepeat_indices = list(range(len(self.repeats)))
-        while(lRepeat_indices):
-            iCluster = [lRepeat_indices.pop()]
-            lRepeat_in_cluster_check = iCluster[:]
+        l_repeat_indices = list(range(len(self.repeats)))
+        while l_repeat_indices:
+            i_cluster = [l_repeat_indices.pop()]
+            l_repeat_in_cluster_check = i_cluster[:]
 
-            while(lRepeat_in_cluster_check):
-                check = lRepeat_in_cluster_check.pop()
-                remaining_indices = lRepeat_indices[:]
+            while l_repeat_in_cluster_check:
+                check = l_repeat_in_cluster_check.pop()
+                remaining_indices = l_repeat_indices[:]
                 for i in remaining_indices:
                     if two_repeats_overlap(
                             overlap_type,
                             self.repeats[check],
                             self.repeats[i]):
-                        iCluster.append(i)
-                        lRepeat_in_cluster_check.append(i)
-                        lRepeat_indices.remove(i)
+                        i_cluster.append(i)
+                        l_repeat_in_cluster_check.append(i)
+                        l_repeat_indices.remove(i)
 
-            lCluster.append(iCluster)
+            l_cluster.append(i_cluster)
 
-        lCluster = [set(i) for i in lCluster]
-        self.dCluster[overlap_type] = lCluster
+        l_cluster = [set(i) for i in l_cluster]
+        self.d_cluster[overlap_type] = l_cluster
 
 
 # FILTERING
-# Filter methods (func) are all defined in the same way: They return a subset of self.repeats, also as a list.
-#   Return is a (list of `Repeat`).
+# Filter methods (func) are all defined in the same way: They return a subset
+# of self.repeats, also as a list.
+#  Return is a (list of `Repeat`).
 
 def pvalue(rl, score, threshold):
     """ Returns all repeats in ``rl`` with a p-Value below a certain threshold.
@@ -177,7 +179,7 @@ def pvalue(rl, score, threshold):
     Returns all repeats in ``rl`` with a p-Value below a certain threshold.
 
     Args:
-        rl (Repeat_list): An instance of the Repeat_list class.
+        rl (RepeatList): An instance of the RepeatList class.
         score (str): The type of score defines the pvalue that is used for filtering
         threshold (float): All repeats with a pvalue of type `score` above this threshold
             are filtered out.
@@ -187,148 +189,156 @@ def pvalue(rl, score, threshold):
     threshold = float(threshold)
 
     res = []
-    for iRepeat in rl.repeats:
-        if iRepeat.pvalue(score) <= threshold:
-            res.append(iRepeat)
-    return(res)
+    for i_repeat in rl.repeats:
+        if i_repeat.pvalue(score) <= threshold:
+            res.append(i_repeat)
+    return res
 
 
 def divergence(rl, score, threshold):
-    """ Returns all repeats in ``rl`` with a divergence below a certain threshold.
+    """ Returns all repeats in ``rl`` with a divergence below a certain
+        threshold.
 
     Returns all repeats in ``rl`` with a divergence below a certain threshold.
 
     Args:
-        rl (Repeat_list): An instance of the Repeat_list class.
-        score (str): The type of score defines the divergence that is used for filtering
-        threshold (float): All repeats with a divergence of type `score` above this threshold
-            are filtered out.
+        rl (RepeatList): An instance of the RepeatList class.
+        score (str): The type of score defines the divergence that is used for
+                    filtering
+        threshold (float): All repeats with a divergence of type `score` above
+                            this threshold are filtered out.
     """
 
     res = []
-    for iRepeat in rl.repeats:
-        if iRepeat.divergence(score) <= threshold:
-            res.append(iRepeat)
-    return(res)
+    for i_repeat in rl.repeats:
+        if i_repeat.divergence(score) <= threshold:
+            res.append(i_repeat)
+    return res
 
 
 def attribute(rl, attribute, type, threshold):
-    """ Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
+    """ Returns all repeats in ``rl`` with a attribute below (above) a certain
+        threshold.
 
-    Returns all repeats in ``rl`` with a attribute below (above) a certain threshold.
+    Returns all repeats in ``rl`` with a attribute below (above) a certain
+    threshold.
 
     Args:
-        rl (Repeat_list): An instance of the Repeat_list class.
+        rl (RepeatList): An instance of the RepeatList class.
         attribute (str): The attribute of the Repeat instance
         type (str): Either "min" or "max"
-        threshold (float): All repeats with an attribute value below (above) this threshold
-            are filtered out.
+        threshold (float): All repeats with an attribute value below (above)
+                          this threshold are filtered out.
     """
 
     threshold = float(threshold)
 
     res = []
-    for iRepeat in rl.repeats:
-        value = getattr(iRepeat, attribute)
+    for i_repeat in rl.repeats:
+        value = getattr(i_repeat, attribute)
         if type == "min":
             if value >= threshold:
-                res.append(iRepeat)
+                res.append(i_repeat)
         elif type == "max":
             if value <= threshold:
-                res.append(iRepeat)
+                res.append(i_repeat)
         else:
             raise Exception(
                 "type must either be 'min' or 'max'. Instead, it is {}.".format(type))
-    return(res)
+    return res
 
 
 def none_overlapping_fixed_repeats(rl, rl_fixed, overlap_type):
     """ Returns all repeats in ``rl`` none-overlapping with ``rl_fixed``.
 
-    Returns all repeats in ``rl`` none-overlapping with ``rl_fixed`` according to
-    ``overlap``.
+    Returns all repeats in ``rl`` none-overlapping with ``rl_fixed`` according
+    to ``overlap``.
 
     Args:
-        rl (Repeat_list): An instance of the Repeat_list class.
-        rl (rl_fixed): A second instance of the Repeat_list class.
-        overlap (list): First list element: Name (str) of an overlap method in repeat_list.
-        All remaining elements are additional arguments for this class.
+        rl (RepeatList): An instance of the RepeatList class.
+        rl (rl_fixed): A second instance of the RepeatList class.
+        overlap (list): First list element: Name (str) of an overlap method in
+                        repeat_list. All remaining elements are additional
+                        arguments for this class.
     """
 
     res = []
-    for iRepeat in rl.repeats:
+    for i_repeat in rl.repeats:
 
-        for iRepeat_fixed in rl_fixed.repeats:
+        for i_repeat_fixed in rl_fixed.repeats:
             if two_repeats_overlap(
                     overlap_type,
-                    repeat1=iRepeat,
-                    repeat2=iRepeat_fixed):
+                    repeat1=i_repeat,
+                    repeat2=i_repeat_fixed):
                 break
         else:
-            res.append(iRepeat)
+            res.append(i_repeat)
 
-    return(res)
+    return res
 
 
-def none_overlapping(rl, overlap, lCriterion):
+def none_overlapping(rl, overlap, l_criterion):
     """ Returns all none-overlapping repeats in ``rl``.
 
-    Returns all none-overlapping repeats in ``rl``. Repeats are clustered according to
-    ``overlap``. Of each cluster, only the best repeat is returned according to
-    ``dCriterion``.
+    Returns all none-overlapping repeats in ``rl``. Repeats are clustered
+    according to ``overlap``. Of each cluster, only the best repeat is returned
+    according to ``dCriterion``.
 
     Args:
-        rl (Repeat_list): An instance of the Repeat_list class.
-        overlap (tuple): First element: Name (str) of an overlap method in repeat_list. Second element: **kwargs
-        All remaining elements are additional arguments for this class.
-        lCriterion (list): list of (criterion (str), criterion arguments) tuples. Until
-        only one repeat is remainining in a cluster, the criteria are applied in order.
+        rl (RepeatList): An instance of the RepeatList class.
+        overlap (tuple): First element: Name (str) of an overlap method in
+            `repeat_list`. Second element: **kwargs. All remaining elements are
+            additional arguments for this class.
+        l_criterion (list): list of (criterion (str), criterion arguments)
+            tuples. Until only one repeat is remainining in a cluster, the
+            criteria are applied in order.
     """
 
     overlap_type = overlap[0]
     overlap_args = overlap[1]
 
-    if not (hasattr(rl, 'dCluster') and overlap_type in rl.dCluster):
+    if not (hasattr(rl, 'd_cluster') and overlap_type in rl.d_cluster):
         rl.cluster(overlap_type, overlap_args)
 
     res = []
-    for iCluster in rl.dCluster[overlap_type]:
+    for i_cluster in rl.d_cluster[overlap_type]:
 
-        iRepeat = [rl.repeats[i] for i in iCluster]
+        i_repeat = [rl.repeats[i] for i in i_cluster]
 
-        for iC in lCriterion:
+        for iC in l_criterion:
             criterion_type, criterion_value = iC
-            if len(iRepeat) == 1:
-                res.append(iRepeat[0])
+            if len(i_repeat) == 1:
+                res.append(i_repeat[0])
                 break
 
             if criterion_type == 'pvalue':
-                min_value = min(i.pvalue(criterion_value) for i in iRepeat)
-                iRepeat = [
-                    i for i in iRepeat if i.pvalue(criterion_value) == min_value]
+                min_value = min(i.pvalue(criterion_value) for i in i_repeat)
+                i_repeat = [
+                    i for i in i_repeat if i.pvalue(criterion_value) == min_value]
 
             elif criterion_type == 'divergence':
-                min_value = min(i.divergence(criterion_value) for i in iRepeat)
-                iRepeat = [
-                    i for i in iRepeat if i.divergence(criterion_value) == min_value]
+                min_value = min(i.divergence(criterion_value) for i in i_repeat)
+                i_repeat = [
+                    i for i in i_repeat if i.divergence(criterion_value) == min_value]
 
         else:
-            logging.debug(
+            LOG.debug(
                 "repeat_list.none_overlapping(): > 1 Repeats have the same values...")
-            res.append(iRepeat[0])
+            res.append(i_repeat[0])
 
-    return(res)
+    return res
 
 
 # OVERLAP DETECTION METHODS
 def two_repeats_overlap(overlap_type, repeat1, repeat2):
     """ Helper method to test the overlap of ``repeat1`` and ``repeat2``.
 
-    Helper method to test the overlap of ``repeat1`` and ``repeat2``. The overlap is
-    calculated by the local method ``overlap_type``.
+    Helper method to test the overlap of ``repeat1`` and ``repeat2``. The
+    overlap is calculated by the local method ``overlap_type``.
 
     Args:
-        overlap_type (str): The name of a local pairwise repeat overlapping method.
+        overlap_type (str): The name of a local pairwise repeat overlapping
+                            method.
         repeat1 (Repeat): An instance of the Repeat class
         repeat2 (Repeat): A second instance of the Repeat class
 
@@ -338,7 +348,7 @@ def two_repeats_overlap(overlap_type, repeat1, repeat2):
 
     is_overlapping = getattr(sys.modules[__name__], overlap_type)
     # Alternative implementation:
-    #is_overlapping = globals()[overlap_type]
+    # is_overlapping = globals()[overlap_type]
     return is_overlapping(repeat1, repeat2)
 
 
@@ -355,11 +365,8 @@ def shared_char(repeat1, repeat2):
         Bool: 1 if the repeats share >= 1 char, else 0.
     """
 
-    if (repeat1.begin +
-        repeat1.repeat_region_length -
-        1 < repeat2.begin) or (repeat2.begin +
-                               repeat2.repeat_region_length -
-                               1 < repeat1.begin):
+    if (repeat1.begin + repeat1.repeat_region_length - 1 < repeat2.begin) or \
+       (repeat2.begin + repeat2.repeat_region_length - 1 < repeat1.begin):
         return False
     else:
         return True
@@ -408,13 +415,13 @@ def common_ancestry(repeat1, repeat2):
                             #greediness = repeat1.l_effective/repeat2.l_effective
                             return True
     except:
-        logging.warning(
+        LOG.warning(
             'error in shared_char with original %s and potential %s', str(
                 repeat1.msaIT), str(
                 repeat2.msaIT))
-        logging.warning('original:', str(repeat2.msa))
-        logging.warning('original:', str(repeat2.begin))
-        logging.warning('potential:', str(repeat1.msa))
-        logging.warning('potential:', str(repeat1.begin))
+        LOG.warning('original:', str(repeat2.msa))
+        LOG.warning('original:', str(repeat2.begin))
+        LOG.warning('potential:', str(repeat1.msa))
+        LOG.warning('potential:', str(repeat1.begin))
         return False
     return False

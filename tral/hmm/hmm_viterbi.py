@@ -11,8 +11,7 @@ from tral.repeat import repeat
 
 log = logging.getLogger(__name__)
 
-c = configuration.Configuration.Instance()
-config = c.config
+CONFIG = configuration.Configuration.Instance().config
 
 
 def viterbi(hmm, emission):
@@ -39,18 +38,18 @@ def viterbi(hmm, emission):
     """
 
     if len(emission) / \
-            hmm.l_effective < float(config['filter']['basic']['dict']['n_effective']['threshold']):
+            hmm.l_effective < float(CONFIG['filter']['basic']['dict']['n_effective']['threshold']):
         logging.info(
             "Skip the HMM as it is too long ({}) for this sequence ({}) according to the filter criterion min n_effective ({}).".format(
                 hmm.l_effective,
                 len(emission),
-                config['filter']['basic']['dict']['n_effective']))
+                CONFIG['filter']['basic']['dict']['n_effective']))
         return None
-    if hmm.l_effective > float(config['hmm']['l_effective_max']):
+    if hmm.l_effective > float(CONFIG['hmm']['l_effective_max']):
         logging.info(
             "Skip the HMM as it is too long ({}) according to the filter criterion max hmm.l_effective ({}).".format(
                 hmm.l_effective,
-                config['hmm']['l_effective_max']))
+                CONFIG['hmm']['l_effective_max']))
         return None
 
     states = hmm.states
@@ -66,19 +65,19 @@ def viterbi(hmm, emission):
             value in transition.items()} for iS,
         transition in hmm.p_t.items()}
 
-    if any([(iS not in config['lAll_amino_acid']) for iS in emission]):
+    if any([(iS not in CONFIG['lAll_amino_acid']) for iS in emission]):
         raise Exception(
             "There is an unknown amino acid in:\n {}\n".format(emission))
 
     # In case there are ambiguous amino acids in the sequence, calculate the expected frequencies of the AAs that they could stand for
     # from the emission frequencies of the hmm in the neutral state "N".
     dAmbiguous_local = {}
-    for iA in config['dAmbiguous_amino_acid'].keys():
+    for iA in CONFIG['dAmbiguous_amino_acid'].keys():
         dAmbiguous_local[iA] = {}
         if iA in emission:
             total = np.log10(sum(
-                10 ** p_e['N'][iAmbiguous] for iAmbiguous in config['dAmbiguous_amino_acid'][iA]))
-            for iAmbiguous in config['dAmbiguous_amino_acid'][iA]:
+                10 ** p_e['N'][iAmbiguous] for iAmbiguous in CONFIG['dAmbiguous_amino_acid'][iA]))
+            for iAmbiguous in CONFIG['dAmbiguous_amino_acid'][iA]:
                 dAmbiguous_local[iA][iAmbiguous] = p_e['N'][iAmbiguous] - total
 
     logging.debug("p_0: {0}".format(p_0))

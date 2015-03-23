@@ -16,15 +16,14 @@ import scipy.linalg
 from tral import configuration
 from tral.paths import DATA_DIR
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["repeat_score"]
+CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG = CONFIG_GENERAL["repeat_score"]
 
-""" REPEAT SCORE CALCULATION FUNCTIONS """
+# ############# REPEAT SCORE CALCULATION FUNCTIONS ############################
 
-""" 1. SIMILARITY SCORES """
+# ############# 1. SIMILARITY SCORES ##########################################
 
 
 def load_equilibrium_freq(filename):
@@ -101,15 +100,15 @@ def load_equilibrium_freq(filename):
                         substitution_matrix[19])}
 
 
-def meanSimilarity(repeat, measureOfSimilarity,
-                   ignoreGaps=config['indel'].as_bool('ignore_gaps')):
+def mean_similarity(repeat, measure_of_similarity,
+                    ignore_gaps=CONFIG['indel'].as_bool('ignore_gaps')):
     """ Calculate the mean similarity of all columns in the multiple sequence
-        alignment in ``repeat`` according to a ``measureOfSimilarity``.
+        alignment in ``repeat`` according to a ``measure_of_similarity``.
 
     Args:
         repeat (Repeat): An instance of the Repeat class.
-        measureOfSimilarity (str): Either "entropy", "parsimony", or "pSim".
-        ignoreGaps (boolean): Are gaps, "-" treated as chars (False) or ignored
+        measure_of_similarity (str): Either "entropy", "parsimony", or "pSim".
+        ignore_gaps (boolean): Are gaps, "-" treated as chars (False) or ignored
                               (True).
 
     Returns:
@@ -118,14 +117,14 @@ def meanSimilarity(repeat, measureOfSimilarity,
     ..  todo:: Is ``rep_and_meas`` used at current.
     """
 
-    if not ignoreGaps:
-        return sum(map(measureOfSimilarity, repeat.msaTD)) / float(repeat.l)
+    if not ignore_gaps:
+        return sum(map(measure_of_similarity, repeat.msaTD)) / float(repeat.l)
     else:
         def rep_and_meas(column):
-            return measureOfSimilarity(column.replace("-", ""))
+            return measure_of_similarity(column.replace("-", ""))
 
         return sum(map(
-            lambda column: measureOfSimilarity(column.replace("-", "")),
+            lambda column: measure_of_similarity(column.replace("-", "")),
             repeat.msaTD)) / repeat.l_effective  # python 2: integer division
 
 
@@ -181,7 +180,7 @@ def parsimony(column):
         # division
         return (len(set(column)) - 1) / (len(column) - 1)
     else:
-        logging.warning("Repeats with n = 1 are not repeats")
+        LOG.warning("Repeats with n = 1 are not repeats")
         # raise AssertionError("Repeats with n = 1 are not repeats")
         return 1
 
@@ -213,9 +212,9 @@ def pSim(column):
 
 
 def optimisation(function, args,
-                 start_min=config['optimisation'].as_float('start_min'),
-                 start_max=config['optimisation'].as_float('start_max'),
-                 nIteration=config['optimisation'].as_int('nIteration')):
+                 start_min=CONFIG['optimisation'].as_float('start_min'),
+                 start_max=CONFIG['optimisation'].as_float('start_max'),
+                 nIteration=CONFIG['optimisation'].as_int('nIteration')):
     """Binary one-dimensional optimisation of ``function``.
 
     Perform a binary one dimensional optimisation of parameter ``t`` on
@@ -241,7 +240,7 @@ def optimisation(function, args,
         tuple (Maximum of function: float,
                Corresponding function parameter: float)
 
-      ..  todo:: Check why ``regionBounded`` is hardcoded at current.
+      ..  todo:: Check why ``region_bounded`` is hardcoded at current.
       ..  todo:: Check why ``stepsize`` is hardcoded at current.
       ..  todo:: Generalise hard-coded optimisation parameter boundaries.
     """
@@ -250,11 +249,11 @@ def optimisation(function, args,
     stepsize = 2
     for iT in t:
         iT.append(function(iT[0], *args))
-    regionBounded = False
+    region_bounded = False
     count = 0
     while count < nIteration:
         count += 1
-        if not regionBounded:
+        if not region_bounded:
             # First entry is best - shift trial out zone to left
             if t[0][1] > t[1][1]:
                 t[2] = t[1][:]
@@ -268,8 +267,8 @@ def optimisation(function, args,
                 t[2] = [min(100, t[2][0] + stepsize)]
                 t[2].append(function(t[2][0], *args))
             else:
-                regionBounded = True
-        if regionBounded:
+                region_bounded = True
+        if region_bounded:
             # calc halfPoints
             halfPoints = [[(t[0][0] + t[1][0]) / 2], [(t[1][0] + t[2][0]) / 2]]
             for iT in halfPoints:
@@ -293,27 +292,27 @@ def loadModel(evolution_model='lg'):
     # Prepare the model of repeat evolution
     if evolution_model == 'lg':
         # 1. Substitutions are modeled by the LG matrix
-        aa, eqFreq, subsMatrix = LG()
+        aa, eq_freq, subsMatrix = LG()
     else:
-        aa, eqFreq, subsMatrix = K80()
+        aa, eq_freq, subsMatrix = K80()
 
-    equilibrium_freq = {i: j for i, j in zip(aa, eqFreq)}
+    equilibrium_freq = {i: j for i, j in zip(aa, eq_freq)}
     alphabet = {b: a for a, b in enumerate(aa)}
     length = len(aa)
-    eqFreq = np.array(eqFreq)
-    eqFreq = eqFreq / sum(eqFreq)
+    eq_freq = np.array(eq_freq)
+    eq_freq = eq_freq / sum(eq_freq)
     S = np.array(subsMatrix)
-    PI = np.diag(eqFreq)
+    PI = np.diag(eq_freq)
     Q = np.dot(S, PI)
     for i in range(length):
         Q[i, i] = - sum(Q[i][:i]) - sum(Q[i][i + 1:])
     diagonal = [Q[i, i] for i in range(length)]
-    Q *= - sum((i * j for i, j in zip(diagonal, eqFreq)))
-    return (Q, eqFreq, alphabet)
+    Q *= - sum((i * j for i, j in zip(diagonal, eq_freq)))
+    return (Q, eq_freq, alphabet)
 
 
-def TN93(alpha_1=config['TN93']['alpha_1'], alpha_2=config['TN93']['alpha_2'],
-         beta=config['TN93']['beta']):
+def TN93(alpha_1=CONFIG['TN93']['alpha_1'], alpha_2=CONFIG['TN93']['alpha_2'],
+         beta=CONFIG['TN93']['beta']):
     '''TN93'''
     # 4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93
     Q = [[-(alpha_1 + 2 * beta), alpha_1, beta, beta],
@@ -321,12 +320,12 @@ def TN93(alpha_1=config['TN93']['alpha_1'], alpha_2=config['TN93']['alpha_2'],
          [beta, beta, -(alpha_2 + 2 * beta), alpha_2],
          [beta, beta, alpha_2, -(alpha_2 + 2 * beta)]]
 
-    return(['T', 'C', 'A', 'G'], [0.25, 0.25, 0.25, 0.25], Q)
+    return ['T', 'C', 'A', 'G'], [0.25, 0.25, 0.25, 0.25], Q
 
 
-def K80(kappa=config['K80']['kappa']):
+def K80(kappa=CONFIG['K80']['kappa']):
     ''' K80 '''
-    return(TN93(alpha_1=kappa, alpha_2=kappa, beta=1))
+    return TN93(alpha_1=kappa, alpha_2=kappa, beta=1)
 
 
 def LG():
@@ -352,14 +351,14 @@ def LG():
            )
 
 
-def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
+def loglikelihood_substitution(t, Q, eq_freq, alphabet, tandem_repeat):
     """ Calculate the likelihood of a repeat assuming a star tree and a
-        sequence model defined by ``Q``, ``t``, ``eqFreq`` and ``alphabet``.
+        sequence model defined by ``Q``, ``t``, ``eq_freq`` and ``alphabet``.
 
     Args:
         t (float): The divergence of the ``tandem_repeat`` units.
         Q (dict ?): A substitution matrix.
-        eqFreq (dict ?): Equilibrium frequencies of all chars.
+        eq_freq (dict ?): Equilibrium frequencies of all chars.
         alphabet (dict of str,?):  An alphabet from a substitution matrix.
         tandem_repeat (Repeat): An instance of the ``Repeat`` class.
 
@@ -389,7 +388,7 @@ def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
     # Second sum: Over all possible ancestral characters
     # Third product: Over all repeat units
     likelihood = sum(np.log(np.sum(iJ * np.product(np.power(P[i], column))
-                                   for i, iJ in enumerate(eqFreq)))
+                                   for i, iJ in enumerate(eq_freq)))
                      for column in tandem_repeat.msaTDN)
     return likelihood
 
@@ -397,27 +396,27 @@ def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
 def loglikelihood_gaps_starphylogeny_zipfian(
         t,
         tandem_repeat,
-        indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
-        gaps=config['indel']['gaps'],
-        indelZipf=config['indel'].as_float('zipf')):
+        indel_rate_per_site=CONFIG['indel'].as_float('indel_rate_per_site'),
+        gaps=CONFIG['indel']['gaps'],
+        indel_zipf=CONFIG['indel'].as_float('zipf')):
     """ Calculate the log-likelihood of the gap structure in a
         ``tandem repeat`` assuming a star tree.
 
     Calculate the log-likelihood of the gap structure in a ``tandem repeat``
     assuming a star tree (i.e. repeat unit correlations are not modeled). The
-    gap length model is a zipfian distribution with parameter ``indelZipf``.
+    gap length model is a zipfian distribution with parameter ``indel_zipf``.
     The gap generation model is a simple poisson model with rate parameter
-    ``indelRatePerSite``.
+    ``indel_rate_per_site``.
 
     Args:
         t (float): The divergence of the ``tandem_repeat`` units.
         tandem_repeat (Repeat): An instance of the ``Repeat`` class.
-        indelRatePerSite (float): The mutation rate of insertions an deletions,
+        indel_rate_per_site (float): The mutation rate of insertions an deletions,
         as opposed to ``t``.
         gaps (str): The mode of gap counting. Options are "row_wise",
         "ignore_coherent_deletions", "ignore_trailing_gaps" and
         "ignore_trailing_gaps_and_coherent_deletions".
-        indelZipf (float): The parameter of the Zipfian distribution.
+        indel_zipf (float): The parameter of the Zipfian distribution.
 
     Returns:
         float: The loglikelihood value for the gap structure of the tandem
@@ -432,15 +431,15 @@ def loglikelihood_gaps_starphylogeny_zipfian(
 
     # Calculate likelihood of the gap lengths (insertions and deletions combined)
     # Here, we use the Zipfian distributions
-    l_length = scipy.special.zeta(indelZipf, 1) ** - len(gaps)
+    l_length = scipy.special.zeta(indel_zipf, 1) ** - len(gaps)
     for gap in gaps:
-        l_length = l_length * (gap ** -indelZipf)
+        l_length = l_length * (gap ** -indel_zipf)
 
     # Calculate the likelihood for the ratio of columns were an insertion has
     # taken place, as opposed to the number of columns, where no insertion has
     # taken place. Do the same for deletions.
     # Here, we use the Poisson model
-    probability_gap_per_site = t * indelRatePerSite / 2
+    probability_gap_per_site = t * indel_rate_per_site / 2
     l_insertions = scipy.stats.distributions.binom.pmf(
         len(insertions),
         tandem_repeat.l_effective *
@@ -461,48 +460,48 @@ def loglikelihood_substitutions_gaps(t, substitution_args, gap_args):
         loglikelihood_gaps_starphylogeny_zipfian(t, *gap_args)
 
 
-def loglikelihood_starTopology_local(
+def loglikelihood_startopology_local(
         tandem_repeat,
-        evolution_model=config['evolutionary_model'],
-        gaps=config['indel']['gaps'],
-        indelRatePerSite=config['indel'].as_float('indelRatePerSite'),
+        evolution_model=CONFIG['evolutionary_model'],
+        gaps=CONFIG['indel']['gaps'],
+        indel_rate_per_site=CONFIG['indel'].as_float('indel_rate_per_site'),
         parameters=False):
 
     if tandem_repeat.l_effective == 0:
         return 100, -100
 
     if parameters:
-        Q, eqFreq, alphabet = parameters
+        Q, eq_freq, alphabet = parameters
     else:
-        Q, eqFreq, alphabet = loadModel(evolution_model)
+        Q, eq_freq, alphabet = loadModel(evolution_model)
 
     if gaps:
-        divergence, loglikelihoodDuplicationHistory = \
+        divergence, loglikelihood_duplication_history = \
             optimisation(function=loglikelihood_substitutions_gaps,
-                         args=[[Q, eqFreq, alphabet, tandem_repeat],
-                               [tandem_repeat, indelRatePerSite, gaps]])
+                         args=[[Q, eq_freq, alphabet, tandem_repeat],
+                               [tandem_repeat, indel_rate_per_site, gaps]])
     else:
-        divergence, loglikelihoodDuplicationHistory = \
+        divergence, loglikelihood_duplication_history = \
             optimisation(function=loglikelihood_substitution,
-                         args=[Q, eqFreq, alphabet, tandem_repeat])
+                         args=[Q, eq_freq, alphabet, tandem_repeat])
 
-    return divergence, loglikelihoodDuplicationHistory
+    return divergence, loglikelihood_duplication_history
 
 
 def loglikelihood_random(repeat,
-                         evolution_model=config['evolutionary_model'],
+                         evolution_model=CONFIG['evolutionary_model'],
                          parameters=False):
 
     if repeat.sequence_type == 'AA':
         if parameters:
             equilibrium_freq = parameters
         else:
-            aaRatefilename = join(
+            aarate_filename = join(
                 DATA_DIR,
                 "substitution_rate_matrices",
                 evolution_model +
                 ".dat")  # load equilibrium frequencies
-            equilibrium_freq = load_equilibrium_freq(aaRatefilename)
+            equilibrium_freq = load_equilibrium_freq(aarate_filename)
 
         loglikelihoodRandom = 0.
         for aa, freq in equilibrium_freq.items():
@@ -520,7 +519,7 @@ def loglikelihood_random(repeat,
 
 
 def phyloStarTopology_local(tandem_repeat, evolution_model=False, gaps=False,
-                            indelRatePerSite=0.001, parameters=False):
+                            indel_rate_per_site=0.001, parameters=False):
     if not evolution_model:
         if tandem_repeat.sequence_type == 'AA':
             evolution_model = 'lg'
@@ -528,10 +527,10 @@ def phyloStarTopology_local(tandem_repeat, evolution_model=False, gaps=False,
             evolution_model = 'k80'
 
     divergence, logLH1 = \
-        loglikelihood_starTopology_local(tandem_repeat=tandem_repeat,
+        loglikelihood_startopology_local(tandem_repeat=tandem_repeat,
                                          evolution_model=evolution_model,
                                          gaps=gaps,
-                                         indelRatePerSite=indelRatePerSite,
+                                         indel_rate_per_site=indel_rate_per_site,
                                          parameters=parameters)
     logLH0 = loglikelihood_random(
         repeat=tandem_repeat,
@@ -547,25 +546,25 @@ def calc_score(
         repeats,
         result_path,
         result_filename,
-        scoreslist=config['score_calibration'].as_list('scoreslist'),
-        save_calibration=config['score_calibration'].as_bool('save_calibration'),
-        precision=config['score_calibration'].as_int('precision')):
+        scoreslist=CONFIG['score_calibration'].as_list('scoreslist'),
+        save_calibration=CONFIG['score_calibration'].as_bool('save_calibration'),
+        precision=CONFIG['score_calibration'].as_int('precision')):
 
     sequence_type = repeats[0].sequence_type
     if repeats[0].sequence_type == 'AA':
         evolution_model = 'lg'
     else:
         evolution_model = 'k80'
-    Q, eqFreq, alphabet = loadModel(evolution_model=evolution_model)
-    parameters = [Q, eqFreq, alphabet]
+    Q, eq_freq, alphabet = loadModel(evolution_model=evolution_model)
+    parameters = [Q, eq_freq, alphabet]
 
     if sequence_type == 'AA':
-        aaRatefilename = join(
+        aarate_filename = join(
             DATA_DIR,
             "substitution_rate_matrices",
             evolution_model +
             ".dat")  # load equilibrium frequencies
-        equilibrium_freq = load_equilibrium_freq(aaRatefilename)
+        equilibrium_freq = load_equilibrium_freq(aarate_filename)
     else:
         equilibrium_freq = {i: 0.25 for i in ['A', 'C', 'G', 'T']}
 
@@ -576,67 +575,67 @@ def calc_score(
             parameters=equilibrium_freq) for iRepeat in repeats]
     for iScore in scoreslist:
         if iScore == 'phylo':
-            testStatistic = [
-                loglikelihood_starTopology_local(
+            test_statistic = [
+                loglikelihood_startopology_local(
                     iRepeat,
                     gaps=False,
                     parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2 *
+            test_statistic = [2 *
                              (iT -
                               iR) if iT != -
                              1 else -
-                             1000 for iT, iR in zip(testStatistic, random)]
+                             1000 for iT, iR in zip(test_statistic, random)]
         elif iScore == 'phylo_gap01':
-            testStatistic = [
-                loglikelihood_starTopology_local(
+            test_statistic = [
+                loglikelihood_startopology_local(
                     iRepeat,
                     gaps=True,
-                    indelRatePerSite=0.01,
+                    indel_rate_per_site=0.01,
                     parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2 *
+            test_statistic = [2 *
                              (iT -
                               iR) if iT != -
                              1 else -
-                             1000 for iT, iR in zip(testStatistic, random)]
+                             1000 for iT, iR in zip(test_statistic, random)]
         elif iScore == 'phylo_gap001':
-            testStatistic = [
-                loglikelihood_starTopology_local(
+            test_statistic = [
+                loglikelihood_startopology_local(
                     iRepeat,
                     gaps=True,
-                    indelRatePerSite=0.001,
+                    indel_rate_per_site=0.001,
                     parameters=parameters)[1] for iRepeat in repeats]
-            testStatistic = [2 *
+            test_statistic = [2 *
                              (iT -
                               iR) if iT != -
                              1 else -
-                             1000 for iT, iR in zip(testStatistic, random)]
+                             1000 for iT, iR in zip(test_statistic, random)]
         elif iScore == 'phylo_paml':
-            testStatistic = [
+            test_statistic = [
                 loglikelihood_starTopology_paml(iRepeat) for iRepeat in repeats]
-            testStatistic = [2 *
+            test_statistic = [2 *
                              (iT -
                               iR) if iT != -
                              1 else -
-                             1000 for iT, iR in zip(testStatistic, random)]
+                             1000 for iT, iR in zip(test_statistic, random)]
         elif iScore == 'parsimony':
-            testStatistic = [
+            test_statistic = [
                 np.round_(
-                    meanSimilarity(
+                    mean_similarity(
                         iRepeat,
                         parsimony),
                     decimals=precision) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
         elif iScore == 'pSim':
-            testStatistic = [
+            test_statistic = [
                 np.round_(
-                    meanSimilarity(
+                    mean_similarity(
                         iRepeat,
                         pSim),
                     decimals=precision) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
         elif iScore == 'entropy':
-            testStatistic = [
-                meanSimilarity(
+            test_statistic = [
+                mean_similarity(
                     iRepeat,
                     entropy) if iRepeat.l_effective != 0 else -
                 1 for iRepeat in repeats]
@@ -644,30 +643,30 @@ def calc_score(
         if save_calibration:
             filename = os.path.join(result_path, iScore, result_filename)
             print(filename)
-            np.savez(filename, np.sort(testStatistic))
+            np.savez(filename, np.sort(test_statistic))
         else:
             if not hasattr(repeats[0], 'score'):
                 for iR in repeats:
                     iR.score = {}
-            for iR, iT in zip(repeats, testStatistic):
+            for iR, iT in zip(repeats, test_statistic):
                 iR.dScore[iScore] = iT
 
 
 def calibrate_score(
         repeats,
-        resultFilePath,
-        scoreslist=config['score_calibration'].as_list('scoreslist')):
+        result_file_path,
+        scoreslist=CONFIG['score_calibration'].as_list('scoreslist')):
 
     for iScore in scoreslist:
-        testStatistic = np.sort([iRepeat.dScore[iScore]
+        test_statistic = np.sort([iRepeat.dScore[iScore]
                                  for iRepeat in repeats])
-        np.savez(os.path.join('_'.join([resultFilePath, iScore])),
-                 testStatistic)
+        np.savez(os.path.join('_'.join([result_file_path, iScore])),
+                 test_statistic)
 
 """  CALCULATE AND SAVE THE PDF OF SCORES (Potentially deprecated) """
 
 
-def save_distribution(values, items, resultFilePath, fileName, inverse):
+def save_distribution(values, items, result_file_path, fileName, inverse):
     for iC in range(len(items)):
         val = np.array([i[iC] for i in values])
         result_val, inv_ndx = np.unique(val, return_inverse=True)
@@ -679,17 +678,17 @@ def save_distribution(values, items, resultFilePath, fileName, inverse):
             result_p = result_p[::-1]
             result_val = result_val[::-1]
         result_p = result_p.cumsum()
-        if not os.path.isdir(os.path.join(resultFilePath, items[iC])):
-            os.makedirs(os.path.join(resultFilePath, items[iC]))
-        np.savez(os.path.join(resultFilePath, items[iC], fileName),
+        if not os.path.isdir(os.path.join(result_file_path, items[iC])):
+            os.makedirs(os.path.join(result_file_path, items[iC]))
+        np.savez(os.path.join(result_file_path, items[iC], fileName),
                  cdf=result_p, value=result_val)
 
 
 def calculatePDFScores(
         repeats,
-        resultFilePath,
+        result_file_path,
         fileName,
-        scoreslist=config['score_calibration'].as_list('scoreslist')):
+        scoreslist=CONFIG['score_calibration'].as_list('scoreslist')):
     """ CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES """
 
     # Can you generalise the next command for arbitrary classifiers?
@@ -698,6 +697,6 @@ def calculatePDFScores(
     save_distribution(
         values=scores,
         items=scoreslist,
-        resultFilePath=resultFilePath,
+        result_file_path=result_file_path,
         fileName=fileName,
         inverse=True)

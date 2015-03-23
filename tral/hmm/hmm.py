@@ -25,9 +25,8 @@ from tral import configuration
 
 log = logging.getLogger(__name__)
 
-c = configuration.Configuration.Instance()
-config_general = c.config
-config = config_general["hmm"]
+CONFIG_GENERAL = configuration.Configuration.Instance().config
+CONFIG = CONFIG_GENERAL["hmm"]
 
 ################################### HMM class ############################
 
@@ -298,7 +297,7 @@ class HMM:
         tandem_repeat.write(file=stockholm_file, file_format="stockholm")
 
         # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen([config["hmmbuild"], "--amino", tmp_id + ".hmm",
+        p = subprocess.Popen([CONFIG["hmmbuild"], "--amino", tmp_id + ".hmm",
                               tmp_id + ".sto"],
                              stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
         p.wait()

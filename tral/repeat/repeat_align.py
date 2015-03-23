@@ -11,10 +11,8 @@ log = logging.getLogger(__name__)
 from tral.repeat import repeat
 from tral import configuration
 
-c = configuration.Configuration.Instance()
-general_config = c.config
-repeat_config = general_config["repeat"]
-
+CONFIG_GENERAL = configuration.Configuration.Instance().config
+REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
@@ -36,7 +34,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         # See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.
         # The mafft result is in stdout. Check: Do you need to capture or
         # redirect the stderr?
-        p = subprocess.Popen([repeat_config['ginsi'],
+        p = subprocess.Popen([REPEAT_CONFIG['ginsi'],
                               "--anysymbol",
                               "--quiet",
                               msa_file],

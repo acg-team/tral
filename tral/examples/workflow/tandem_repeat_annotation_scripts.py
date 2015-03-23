@@ -103,7 +103,7 @@ def workflow(
         with open(result_file, 'rb') as fh:
             dResults = pickle.load(fh)
     except:
-        log.debug(
+        LOG.debug(
             "Could not load previous results file - perhaps non existant: {}".format(result_file))
         dResults = {}
 
@@ -122,13 +122,13 @@ def workflow(
 
         iS = sequence.Sequence(seq=str(iS_pyfaidx), id=iS_pyfaidx.name)
 
-        log.debug("Work on sequence {}".format(iS))
+        LOG.debug("Work on sequence {}".format(iS))
         # 1. annotate_de_novo()
         denovo_repeat_list = iS.detect(
             denovo=True,
             repeat={
                 "calc_pvalue": True})
-        log.debug(denovo_repeat_list.repeats)
+        LOG.debug(denovo_repeat_list.repeats)
         for iTR in denovo_repeat_list.repeats:
             iTR.model = None
 
@@ -136,11 +136,11 @@ def workflow(
         if iS.id in dHMM_annotation:
             lHMM = dHMM_annotation[iS.id]
             infoNRuns = len(lHMM)
-            log.debug(
+            LOG.debug(
                 "{} Viterbi runs need to be performed.".format(infoNRuns))
             lHMM = set(lHMM)
             infoNHMM = len(lHMM)
-            log.debug(
+            LOG.debug(
                 "These derive from {} independent HMMs.".format(infoNHMM))
             # Load all HMM pickles needed for the particular sequence.
             for hmm_ID in lHMM:
@@ -223,7 +223,7 @@ def workflow(
                         iTR,
                         iTR_refined):
                     rl_tmp = repeat_list.Repeat_list([iTR_refined])
-                    log.debug(iTR_refined.msa)
+                    LOG.debug(iTR_refined.msa)
                     for iB in basic_filter.values():
                         rl_tmp = rl_tmp.filter(**iB)
                     if rl_tmp.repeats:
