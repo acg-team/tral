@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Perform overlap filtering of redundant tandem repeat annotations. &mdash; TRAL 0.3.0 documentation</title>
+    <title>Perform overlap filtering of redundant tandem repeat annotations. &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -130,7 +130,7 @@ types of overlap, and filter them accordingly.</p>
 <span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
 
-<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
+<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
@@ -152,7 +152,7 @@ overlap:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dCluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
 <span class="go">[{4}, {3}, {2}, {1}, {0}]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dCluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
-<span class="go">[{1, 2, 4}, {3}, {0}]</span>
+<span class="go">[{1, 5}, {0, 3, 4}, {2}]</span>
 </pre></div>
 </div>
 <p>Tandem repeats can also directly be filtered of overlapping tandem repeats. Here, we need
@@ -162,16 +162,16 @@ there still are draws, retain the tandem repeat of lowest divergence:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s">&quot;common_ancestry&quot;</span>
 <span class="n">score</span> <span class="o">=</span> <span class="s">&quot;phylo_gap001&quot;</span>
 <span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
-    <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;none_overlapping&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span> <span class="p">[(</span><span class="s">&quot;pValue&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;divergence&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">)])</span>
+    <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;none_overlapping&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span> <span class="p">[(</span><span class="s">&quot;pvalue&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;divergence&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">)])</span>
     <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeat_list</span><span class="p">(</span><span class="n">repeat_list_filtered</span><span class="p">,</span> <span class="s">&quot;denovo_non_overlapping&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The resulting <em>result_list</em> now only contains tandem repeats that do not overlap according
 the <em>common ancestry</em> overlap:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">22</span>
+<span class="go">27</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo_non_overlapping&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">18</span>
+<span class="go">22</span>
 </pre></div>
 </div>
 </div>

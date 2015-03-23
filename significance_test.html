@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Perform statistical significance test of tandem repeats. &mdash; TRAL 0.3.0 documentation</title>
+    <title>Perform statistical significance test of tandem repeats. &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -132,14 +132,14 @@ detailed in a <a class="reference internal" href="contributors.html#publications
 <span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
 
-<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
+<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>There are nine proteins in the HIV proteome:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">)</span>
 <span class="go">9</span>
 </pre></div>
 </div>
@@ -151,20 +151,20 @@ p-Value with parameters defined in the <a class="reference internal" href="confi
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">iTandemRepeat</span> <span class="ow">in</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
-            <span class="n">iTandemRepeat</span><span class="o">.</span><span class="n">calculate_pValues</span><span class="p">()</span>
+            <span class="n">iTandemRepeat</span><span class="o">.</span><span class="n">calculate_pvalues</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>For example, the following putative tandem repeat is found to be non-significant with the used model
 of tandem repeat evolution <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="go">&gt;begin:94 lD:7 n:2 pValue:1.0 divergence:1.656005859375</span>
+<span class="go">&gt; begin:94 l_effective:7 n:2 pvalue:1.0 divergence:1.656005859375 type:phylo_gap01</span>
 <span class="go">EKGGLEGLIYSKKRQE</span>
 <span class="go">---ILDLWVY------</span>
 </pre></div>
 </div>
 <p>Whereas this putative tandem repeat is considered significant:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt;begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164</span>
+<span class="go">&gt; begin:38 l_effective:2 n:6 pvalue:0.0 divergence:0.46649169922545164 type:phylo_gap01</span>
 <span class="go">RRN</span>
 <span class="go">RR-</span>
 <span class="go">RRW</span>
@@ -173,11 +173,11 @@ of tandem repeat evolution <a class="reference internal" href="background.html#b
 <span class="go">RQI</span>
 </pre></div>
 </div>
-<p>Besides, parameters can also be directly supplied to <em>calculate_pValues</em>:</p>
+<p>Besides, parameters can also be directly supplied to <em>calculate_pvalues</em>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">iTandemRepeat</span> <span class="ow">in</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
-            <span class="n">iTandemRepeat</span><span class="o">.</span><span class="n">calculate_pValues</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;phylo_gap001&#39;</span><span class="p">])</span>
+            <span class="n">iTandemRepeat</span><span class="o">.</span><span class="n">calculate_pvalues</span><span class="p">(</span><span class="n">scoreslist</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;phylo_gap001&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -186,16 +186,16 @@ of tandem repeat evolution <a class="reference internal" href="background.html#b
 <div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
     <span class="n">repeat_list</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">repeat_list</span><span class="p">:</span>
-        <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func_name</span> <span class="o">=</span> <span class="s">&quot;pValue&quot;</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="s">&quot;phylo_gap01&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">func_name</span> <span class="o">=</span> <span class="s">&quot;pvalue&quot;</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="s">&quot;phylo_gap01&quot;</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span>
         <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeat_list</span><span class="p">(</span><span class="n">repeat_list_filtered</span><span class="p">,</span> <span class="s">&quot;denovo_filtered&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The resulting <em>result_list</em> now only contains tandem repeats with a p-Value below
 0.05, and is shorter than the original tandem repeat list:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">22</span>
+<span class="go">27</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&quot;denovo_filtered&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
-<span class="go">17</span>
+<span class="go">19</span>
 </pre></div>
 </div>
 </div>

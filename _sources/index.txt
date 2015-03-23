@@ -1,7 +1,4 @@
-.. tandemrepeats documentation master file, created by
-   sphinx-quickstart on Wed Nov 20 16:22:30 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. tral
 
 Tandem Repeat Annotation Library
 ================================

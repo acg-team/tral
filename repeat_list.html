@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Repeat_list code documentation &mdash; TRAL 0.3.0 documentation</title>
+    <title>Repeat_list code documentation &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -123,40 +123,39 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Repeat_list class</td>
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">The Repeat Class.</td>
 </tr>
 </tbody>
 </table>
 <dl class="class">
-<dt id="tral.repeat_list.repeat_list.Repeat_list">
-<em class="property">class </em><tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">Repeat_list</tt><big>(</big><em>repeats</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>A <cite>repeat_list</cite> is a list of repeats that belong to the same sequence, or set of</dt>
-<dd>sequences.</dd>
-</dl>
-<p>Repeat_list contains methods that act on several tandem repeats.
+<dt id="tral.repeat_list.repeat_list.RepeatList">
+<em class="property">class </em><tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">RepeatList</tt><big>(</big><em>repeats</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>RepeatList</cite> contains list of repeats that belong to the same
+sequence, or set of sequences.</p>
+<p><cite>RepeatList</cite> contains methods that act on several tandem repeats.
 For example, methods to</p>
 <ul class="simple">
 <li>detect overlapping tandem repeats</li>
 <li>identify the tandem repeat with highest statistical significance</li>
-<li>filter a set of tandem repeats according to different filtering procedures.</li>
+<li>filter a set of tandem repeats according to different filtering
+procedures.</li>
 </ul>
 <dl class="attribute">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.repeats">
-<tt class="descname">repeats</tt><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.repeats" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat_list.repeat_list.RepeatList.repeats">
+<tt class="descname">repeats</tt><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.repeats" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>list of Repeat</em></p>
 <p>The list of tandem repats.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.__str__">
-<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create string for Repeat_list instance.</p>
+<dt id="tral.repeat_list.repeat_list.RepeatList.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create string for RepeatList instance.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.cluster">
-<tt class="descname">cluster</tt><big>(</big><em>overlap_type</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.cluster" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat_list.repeat_list.RepeatList.cluster">
+<tt class="descname">cluster</tt><big>(</big><em>overlap_type</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster <tt class="docutils literal"><span class="pre">repeats</span></tt> according to <tt class="docutils literal"><span class="pre">overlap_type</span></tt>.</p>
 <p>Cluster <tt class="docutils literal"><span class="pre">repeats</span></tt> according to <tt class="docutils literal"><span class="pre">overlap_type</span></tt>. We assume that overlap of
 repeats is transitive: If A overlaps with B, and B overlaps with C, (A,B,C) form
@@ -178,16 +177,16 @@ according to &#8220;overlap_type1&#8221;, whereas no repeats cluster according t
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.create">
-<tt class="descname">create</tt><big>(</big><em>file</em>, <em>format</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read <tt class="docutils literal"><span class="pre">Repeat_list</span></tt> from file.</p>
-<p>Read <tt class="docutils literal"><span class="pre">Repeat_list</span></tt> from file (currently, only pickle is supported)</p>
+<dt id="tral.repeat_list.repeat_list.RepeatList.create">
+<tt class="descname">create</tt><big>(</big><em>file</em>, <em>input_format</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read <tt class="docutils literal"><span class="pre">RepeatList</span></tt> from file.</p>
+<p>Read <tt class="docutils literal"><span class="pre">RepeatList</span></tt> from file (currently, only pickle is supported)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>format</strong> (<em>str</em>) &#8211; Currently only &#8220;pickle&#8221;</li>
+<li><strong>input_format</strong> (<em>str</em>) &#8211; Currently only &#8220;pickle&#8221;</li>
 <li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
 </ul>
 </td>
@@ -196,13 +195,13 @@ according to &#8220;overlap_type1&#8221;, whereas no repeats cluster according t
 </table>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
-<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
+<p class="last">Write checks for <tt class="docutils literal"><span class="pre">input_format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.filter">
-<tt class="descname">filter</tt><big>(</big><em>func_name</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.filter" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat_list.repeat_list.RepeatList.filter">
+<tt class="descname">filter</tt><big>(</big><em>func_name</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter <tt class="docutils literal"><span class="pre">repeats</span></tt> according to <tt class="docutils literal"><span class="pre">func_name</span></tt>.</p>
 <p>Filter <tt class="docutils literal"><span class="pre">repeats</span></tt> according to <tt class="docutils literal"><span class="pre">func_name</span></tt></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -216,10 +215,10 @@ according to &#8220;overlap_type1&#8221;, whereas no repeats cluster according t
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.repeat_list.repeat_list.Repeat_list.write">
-<tt class="descname">write</tt><big>(</big><em>format</em>, <em>file=None</em>, <em>str=None</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#Repeat_list.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.Repeat_list.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Serialize and write <tt class="docutils literal"><span class="pre">Repeat_list</span></tt> instances.</p>
-<p>Serialize <tt class="docutils literal"><span class="pre">Repeat_list</span></tt> instance using the stated <tt class="docutils literal"><span class="pre">format</span></tt>.
+<dt id="tral.repeat_list.repeat_list.RepeatList.write">
+<tt class="descname">write</tt><big>(</big><em>output_format</em>, <em>file=None</em>, <em>str=None</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize and write <tt class="docutils literal"><span class="pre">RepeatList</span></tt> instances.</p>
+<p>Serialize <tt class="docutils literal"><span class="pre">RepeatList</span></tt> instance using the stated <tt class="docutils literal"><span class="pre">output_format</span></tt>.
 If a <tt class="docutils literal"><span class="pre">file</span></tt> is specified, save the String. If <tt class="docutils literal"><span class="pre">str</span></tt> is specified, give back
 the String (not possible for pickles).</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -227,7 +226,7 @@ the String (not possible for pickles).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>format</strong> (<em>str</em>) &#8211; The input format: Either &#8220;pickle&#8221; or &#8220;tsv&#8221;</li>
+<li><strong>output_format</strong> (<em>str</em>) &#8211; The output format: Either &#8220;pickle&#8221; or &#8220;tsv&#8221;</li>
 <li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
 </ul>
 </td>
@@ -236,7 +235,7 @@ the String (not possible for pickles).</p>
 </table>
 <div class="admonition-todo admonition" id="index-1">
 <p class="first admonition-title">Todo</p>
-<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
+<p class="last">Write checks for <tt class="docutils literal"><span class="pre">output_format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
 </dd></dl>
 
@@ -245,18 +244,22 @@ the String (not possible for pickles).</p>
 <dl class="function">
 <dt id="tral.repeat_list.repeat_list.attribute">
 <tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">attribute</tt><big>(</big><em>rl</em>, <em>attribute</em>, <em>type</em>, <em>threshold</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.attribute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a attribute below (above) a certain threshold.</p>
-<p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a attribute below (above) a certain threshold.</p>
+<dd><dl class="docutils">
+<dt>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a attribute below (above) a certain</dt>
+<dd>threshold.</dd>
+</dl>
+<p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a attribute below (above) a certain
+threshold.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>rl</strong> (<em>Repeat_list</em>) &#8211; An instance of the Repeat_list class.</li>
+<li><strong>rl</strong> (<em>RepeatList</em>) &#8211; An instance of the RepeatList class.</li>
 <li><strong>attribute</strong> (<em>str</em>) &#8211; The attribute of the Repeat instance</li>
 <li><strong>type</strong> (<em>str</em>) &#8211; Either &#8220;min&#8221; or &#8220;max&#8221;</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with an attribute value below (above) this threshold
-are filtered out.</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with an attribute value below (above)
+this threshold are filtered out.</li>
 </ul>
 </td>
 </tr>
@@ -293,17 +296,21 @@ nucleotides) with common ancestry; else 0.</p>
 <dl class="function">
 <dt id="tral.repeat_list.repeat_list.divergence">
 <tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">divergence</tt><big>(</big><em>rl</em>, <em>score</em>, <em>threshold</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#divergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.divergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a divergence below a certain threshold.</p>
+<dd><dl class="docutils">
+<dt>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a divergence below a certain</dt>
+<dd>threshold.</dd>
+</dl>
 <p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a divergence below a certain threshold.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>rl</strong> (<em>Repeat_list</em>) &#8211; An instance of the Repeat_list class.</li>
-<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the divergence that is used for filtering</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a divergence of type <cite>score</cite> above this threshold
-are filtered out.</li>
+<li><strong>rl</strong> (<em>RepeatList</em>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the divergence that is used for
+filtering</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a divergence of type <cite>score</cite> above
+this threshold are filtered out.</li>
 </ul>
 </td>
 </tr>
@@ -313,21 +320,23 @@ are filtered out.</li>
 
 <dl class="function">
 <dt id="tral.repeat_list.repeat_list.none_overlapping">
-<tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">none_overlapping</tt><big>(</big><em>rl</em>, <em>overlap</em>, <em>lCriterion</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#none_overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.none_overlapping" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">none_overlapping</tt><big>(</big><em>rl</em>, <em>overlap</em>, <em>l_criterion</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#none_overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.none_overlapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all none-overlapping repeats in <tt class="docutils literal"><span class="pre">rl</span></tt>.</p>
-<p>Returns all none-overlapping repeats in <tt class="docutils literal"><span class="pre">rl</span></tt>. Repeats are clustered according to
-<tt class="docutils literal"><span class="pre">overlap</span></tt>. Of each cluster, only the best repeat is returned according to
-<tt class="docutils literal"><span class="pre">dCriterion</span></tt>.</p>
+<p>Returns all none-overlapping repeats in <tt class="docutils literal"><span class="pre">rl</span></tt>. Repeats are clustered
+according to <tt class="docutils literal"><span class="pre">overlap</span></tt>. Of each cluster, only the best repeat is returned
+according to <tt class="docutils literal"><span class="pre">dCriterion</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>rl</strong> (<em>Repeat_list</em>) &#8211; An instance of the Repeat_list class.</li>
-<li><strong>overlap</strong> (<em>tuple</em>) &#8211; First element: Name (str) of an overlap method in repeat_list. Second element: <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs</li>
-<li><strong>remaining elements are additional arguments for this class.</strong> (<em>All</em>) &#8211; </li>
-<li><strong>lCriterion</strong> (<em>list</em>) &#8211; list of (criterion (str), criterion arguments) tuples. Until</li>
-<li><strong>one repeat is remainining in a cluster, the criteria are applied in order.</strong> (<em>only</em>) &#8211; </li>
+<li><strong>rl</strong> (<em>RepeatList</em>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>overlap</strong> (<em>tuple</em>) &#8211; First element: Name (str) of an overlap method in
+<cite>repeat_list</cite>. Second element: <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs. All remaining elements are
+additional arguments for this class.</li>
+<li><strong>l_criterion</strong> (<em>list</em>) &#8211; list of (criterion (str), criterion arguments)
+tuples. Until only one repeat is remainining in a cluster, the
+criteria are applied in order.</li>
 </ul>
 </td>
 </tr>
@@ -339,17 +348,18 @@ are filtered out.</li>
 <dt id="tral.repeat_list.repeat_list.none_overlapping_fixed_repeats">
 <tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">none_overlapping_fixed_repeats</tt><big>(</big><em>rl</em>, <em>rl_fixed</em>, <em>overlap_type</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#none_overlapping_fixed_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.none_overlapping_fixed_repeats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> none-overlapping with <tt class="docutils literal"><span class="pre">rl_fixed</span></tt>.</p>
-<p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> none-overlapping with <tt class="docutils literal"><span class="pre">rl_fixed</span></tt> according to
-<tt class="docutils literal"><span class="pre">overlap</span></tt>.</p>
+<p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> none-overlapping with <tt class="docutils literal"><span class="pre">rl_fixed</span></tt> according
+to <tt class="docutils literal"><span class="pre">overlap</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>rl</strong> (<em>rl_fixed</em>) &#8211; An instance of the Repeat_list class.</li>
-<li><strong>rl</strong> &#8211; A second instance of the Repeat_list class.</li>
-<li><strong>overlap</strong> (<em>list</em>) &#8211; First list element: Name (str) of an overlap method in repeat_list.</li>
-<li><strong>remaining elements are additional arguments for this class.</strong> (<em>All</em>) &#8211; </li>
+<li><strong>rl</strong> (<em>rl_fixed</em>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>rl</strong> &#8211; A second instance of the RepeatList class.</li>
+<li><strong>overlap</strong> (<em>list</em>) &#8211; First list element: Name (str) of an overlap method in
+repeat_list. All remaining elements are additional
+arguments for this class.</li>
 </ul>
 </td>
 </tr>
@@ -358,8 +368,8 @@ are filtered out.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="tral.repeat_list.repeat_list.pValue">
-<tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">pValue</tt><big>(</big><em>rl</em>, <em>score</em>, <em>threshold</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#pValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.pValue" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat_list.repeat_list.pvalue">
+<tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">pvalue</tt><big>(</big><em>rl</em>, <em>score</em>, <em>threshold</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#pvalue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.pvalue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a p-Value below a certain threshold.</p>
 <p>Returns all repeats in <tt class="docutils literal"><span class="pre">rl</span></tt> with a p-Value below a certain threshold.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -367,9 +377,9 @@ are filtered out.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>rl</strong> (<em>Repeat_list</em>) &#8211; An instance of the Repeat_list class.</li>
-<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the pValue that is used for filtering</li>
-<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a pValue of type <cite>score</cite> above this threshold
+<li><strong>rl</strong> (<em>RepeatList</em>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the pvalue that is used for filtering</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a pvalue of type <cite>score</cite> above this threshold
 are filtered out.</li>
 </ul>
 </td>
@@ -407,14 +417,15 @@ are filtered out.</li>
 <dt id="tral.repeat_list.repeat_list.two_repeats_overlap">
 <tt class="descclassname">tral.repeat_list.repeat_list.</tt><tt class="descname">two_repeats_overlap</tt><big>(</big><em>overlap_type</em>, <em>repeat1</em>, <em>repeat2</em><big>)</big><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#two_repeats_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.two_repeats_overlap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to test the overlap of <tt class="docutils literal"><span class="pre">repeat1</span></tt> and <tt class="docutils literal"><span class="pre">repeat2</span></tt>.</p>
-<p>Helper method to test the overlap of <tt class="docutils literal"><span class="pre">repeat1</span></tt> and <tt class="docutils literal"><span class="pre">repeat2</span></tt>. The overlap is
-calculated by the local method <tt class="docutils literal"><span class="pre">overlap_type</span></tt>.</p>
+<p>Helper method to test the overlap of <tt class="docutils literal"><span class="pre">repeat1</span></tt> and <tt class="docutils literal"><span class="pre">repeat2</span></tt>. The
+overlap is calculated by the local method <tt class="docutils literal"><span class="pre">overlap_type</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>overlap_type</strong> (<em>str</em>) &#8211; The name of a local pairwise repeat overlapping method.</li>
+<li><strong>overlap_type</strong> (<em>str</em>) &#8211; The name of a local pairwise repeat overlapping
+method.</li>
 <li><strong>repeat1</strong> (<em>Repeat</em>) &#8211; An instance of the Repeat class</li>
 <li><strong>repeat2</strong> (<em>Repeat</em>) &#8211; A second instance of the Repeat class</li>
 </ul>

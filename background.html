@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Background &mdash; TRAL 0.3.0 documentation</title>
+    <title>Background &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -82,7 +82,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Background</a><ul>
-<li><a class="reference internal" href="#printing-tandem-repeats">Printing tandem repeats</a></li>
 <li><a class="reference internal" href="#more-tandem-repeat-characteristics">More tandem repeat characteristics</a></li>
 <li><a class="reference internal" href="#writing-a-tandem-repeat-to-csv">Writing a tandem repeat to .csv</a></li>
 </ul>
@@ -117,12 +116,10 @@
             
   <div class="section" id="background">
 <span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="printing-tandem-repeats">
-<h2>Printing tandem repeats<a class="headerlink" href="#printing-tandem-repeats" title="Permalink to this headline">¶</a></h2>
 <p>When printing a tandem repeat, you will see a lot of information. Here is what it means.
-(You get this example from <em class="xref std std-ref">the significance test tutorials</em>)</p>
+(You get this example from <a class="reference internal" href="significance_test.html#significance-test"><em>the significance test tutorials</em></a>)</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt; begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164 type:phylo_gap01</span>
+<span class="go">&gt; begin:38 l_effective:2 n:6 pvalue:0.0 divergence:0.46649169922545164 type:phylo_gap01</span>
 <span class="go">RRN</span>
 <span class="go">RR-</span>
 <span class="go">RRW</span>
@@ -148,25 +145,24 @@ RQI
 <p>These are the other characteristics of the tandem repeat, that might be shown (if available):</p>
 <ul class="simple">
 <li><strong>begin</strong>: This is the index where the tandem repeat starts in the sequence</li>
-<li><strong>lD</strong>: This is the length of the consensus tandem repeat unit, not including insertions.</li>
+<li><strong>l_effective</strong>: This is the length of the consensus tandem repeat unit, not including insertions.</li>
 <li><strong>n</strong>: This is the number of tandem repeat units.</li>
-<li><strong>pValue</strong>: What is the probability that this repeat has occurred by random chance? (This value
-is a good estimate. So even if pValue=0.0, of course it is possible that the sequence shows similarity
+<li><strong>pvalue</strong>: What is the probability that this repeat has occurred by random chance? (This value
+is a good estimate. So even if pvalue=0.0, of course it is possible that the sequence shows similarity
 by random chance, and not because the repeat units have evolved by duplications.)</li>
 <li><strong>divergence</strong>: this is a model-based measure of the similarity of the repeat units.
 (mathematically, it is the maximum likelihood estimate of the branch length on the phylogeny
 connecting all tandem repeat units. In the above example, every site has mutated 0.47 times
 on average. A value of 0 would mean no mutations have occurred, and the sequence of the
 tandem repeat units is very conserved.)</li>
-<li><strong>type</strong>: Which model was used to calculate the pValue and the divergence?</li>
+<li><strong>type</strong>: Which model was used to calculate the pvalue and the divergence?</li>
 </ul>
-</div>
 <div class="section" id="more-tandem-repeat-characteristics">
 <h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this headline">¶</a></h2>
 <p>You have access to more tandem repeat characteristics. The dir() command will provide you
 with a list of all attributes and functions connected to the object:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">[&#39;TRD&#39;, &#39;__class__&#39;, &#39;__delattr__&#39;, &#39;__dict__&#39;, &#39;__dir__&#39;, &#39;__doc__&#39;, &#39;__eq__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__gt__&#39;, &#39;__hash__&#39;, &#39;__init__&#39;, &#39;__le__&#39;, &#39;__lt__&#39;, &#39;__module__&#39;, &#39;__ne__&#39;, &#39;__new__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;, &#39;__repr__&#39;, &#39;__setattr__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__subclasshook__&#39;, &#39;__weakref__&#39;, &#39;begin&#39;, &#39;calc_index_msa&#39;, &#39;calc_nD&#39;, &#39;calculate_pValues&#39;, &#39;calculate_scores&#39;, &#39;create&#39;, &#39;dDivergence&#39;, &#39;dPValue&#39;, &#39;dScore&#39;, &#39;deleteInsertionColumns&#39;, &#39;deletions&#39;, &#39;divergence&#39;, &#39;gapStructure&#39;, &#39;gap_structure_HMM&#39;, &#39;gaps&#39;, &#39;insertions&#39;, &#39;l&#39;, &#39;lD&#39;, &#39;msa&#39;, &#39;msaD&#39;, &#39;msaT&#39;, &#39;msaTD&#39;, &#39;msaTDN&#39;, &#39;msaTD_standard_aa&#39;, &#39;msa_original&#39;, &#39;msa_standard_aa&#39;, &#39;n&#39;, &#39;nD&#39;, &#39;nGap&#39;, &#39;pValue&#39;, &#39;save_original_msa&#39;, &#39;score&#39;, &#39;sequence_length&#39;, &#39;sequence_type&#39;, &#39;text&#39;, &#39;textD&#39;, &#39;textD_standard_aa&#39;, &#39;totD&#39;, &#39;write&#39;]</span>
+<span class="go">[&#39;TRD&#39;, &#39;__class__&#39;, &#39;__delattr__&#39;, &#39;__dict__&#39;, &#39;__dir__&#39;, &#39;__doc__&#39;, &#39;__eq__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__gt__&#39;, &#39;__hash__&#39;, &#39;__init__&#39;, &#39;__le__&#39;, &#39;__lt__&#39;, &#39;__module__&#39;, &#39;__ne__&#39;, &#39;__new__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;, &#39;__repr__&#39;, &#39;__setattr__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__subclasshook__&#39;, &#39;__weakref__&#39;, &#39;begin&#39;, &#39;calc_index_msa&#39;, &#39;calc_calc_n_effective&#39;, &#39;calculate_pvalues&#39;, &#39;calculate_scores&#39;, &#39;create&#39;, &#39;dDivergence&#39;, &#39;dPValue&#39;, &#39;dScore&#39;, &#39;deleteInsertionColumns&#39;, &#39;deletions&#39;, &#39;divergence&#39;, &#39;gapStructure&#39;, &#39;gap_structure_HMM&#39;, &#39;gaps&#39;, &#39;insertions&#39;, &#39;l&#39;, &#39;l_effective&#39;, &#39;msa&#39;, &#39;msaD&#39;, &#39;msaT&#39;, &#39;msaTD&#39;, &#39;msaTDN&#39;, &#39;msaTD_standard_aa&#39;, &#39;msa_original&#39;, &#39;msa_standard_aa&#39;, &#39;n&#39;, &#39;calc_n_effective&#39;, &#39;nGap&#39;, &#39;pvalue&#39;, &#39;save_original_msa&#39;, &#39;score&#39;, &#39;sequence_length&#39;, &#39;sequence_type&#39;, &#39;text&#39;, &#39;textD&#39;, &#39;textD_standard_aa&#39;, &#39;totD&#39;, &#39;write&#39;]</span>
 </pre></div>
 </div>
 <p>For a more explanation, check out the <a class="reference internal" href="code_docs.html#code-docs"><em>Class documentation</em></a>, or
@@ -175,16 +171,19 @@ with a list of all attributes and functions connected to the object:</p>
 <div class="section" id="writing-a-tandem-repeat-to-csv">
 <h2>Writing a tandem repeat to .csv<a class="headerlink" href="#writing-a-tandem-repeat-to-csv" title="Permalink to this headline">¶</a></h2>
 <p>When you write a tandem repeat to .csv with TRAL, the result may look as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre>msa_original        lD      pValue  nD      sequence_length begin
-GDII,GDIR   4       None    2.0     8       316
-FLG,FLG     3       None    2.0     6       507
-</pre></div>
-</div>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/docs/background.rst</tt>, line 70)</p>
+Literal block expected; none found.</div>
+<p>begin   msa_original    l_effective      n_effective      repeat_region_length divergence      pvalue
+316     GDII,GDIR       4       2.0     8       None    None
+507     FLG,FLG 3       2.0     6       None    None</p>
 <p>Additional to the tandem repeat characteristics explained above, here you can find:</p>
 <ul class="simple">
 <li><strong>msa_original</strong>: The tandem repeat unit alignment, with units separated by commata.</li>
-<li><strong>sequence_length</strong>: The number of characters covered by the tandem repeat region.</li>
+<li><strong>repeat_region_length</strong>: The number of characters covered by the tandem repeat region.</li>
 </ul>
+<p><em>None</em> values indicated that the required characteristics had not been calculated previously
+in the code.</p>
 </div>
 </div>
 

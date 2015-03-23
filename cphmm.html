@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Annotate tandem repeats from sequence domain models. &mdash; TRAL 0.3.0 documentation</title>
+    <title>Annotate tandem repeats from sequence domain models. &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -133,11 +133,15 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <span class="kn">from</span> <span class="nn">tral.hmm</span> <span class="kn">import</span> <span class="n">hmm</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
 
-<span class="n">fPfam_profile_hmm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;Kelch_1.hmm&quot;</span><span class="p">)</span>
-
-<span class="n">circular_profile_HMM_Kelch_1</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&#39;hmmer&#39;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">fPfam_profile_hmm</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">)</span>
+<span class="n">fPfam_profile_hmm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span><span class="s">&quot;Kelch_1.hmm&quot;</span><span class="p">)</span>
+<span class="n">circular_profile_HMM_Kelch_1</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">input_format</span> <span class="o">=</span> <span class="s">&#39;hmmer&#39;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">fPfam_profile_hmm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the basic characteristics of the circular profile HMM:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="go">&gt;&gt;&gt;print(circular_profile_HMM_Kelch_1)</span>
+<span class="go">cpHMM ID:          PF01344.20</span>
+<span class="go">cpHMM length: 47</span>
+<span class="go">Most likely motif:      ARSSAGVVVLDGKIYVIGGRDGDGNALNSVERYDPVTNTWEKLPSMP</span>
 </pre></div>
 </div>
 </div>
@@ -145,8 +149,8 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
 
-<span class="n">human_HCFC1_fasta</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;P51610.fasta&quot;</span><span class="p">)</span>
-<span class="n">human_HCFC1_sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">human_HCFC1_fasta</span><span class="p">,</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">human_HCFC1_fasta</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;P51610.fasta&quot;</span><span class="p">)</span>
+<span class="n">human_HCFC1_sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">human_HCFC1_fasta</span><span class="p">,</span> <span class="n">input_format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -157,11 +161,11 @@ is searched for tandem repeats using the circular profile HMM.</p>
 </div>
 <p>The result is a tandem repeat <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="go">&gt; begin:31 lD:49 n:5</span>
-<span class="go">R--------PRHGHRAVAIKELIVVFGGG---------------------------------------------------------------------NEGIVDELHVYNTATNQW---FIPAVRGDIP-</span>
-<span class="go">P--------GCAAYGFVCDGTRLLVFGGM-------------------------------------------------------------------VEYGKYSNDLYELQASRWEWKRLKAK--------</span>
-<span class="go">TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTW---NKPSLSGVAPL</span>
-<span class="go">---------PRSLHSATTIGNKMYVFGGW----------VPLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-</span>
+<span class="go">&gt; begin:31 l_effective:53 n:5</span>
+<span class="go">R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-</span>
+<span class="go">P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---</span>
+<span class="go">TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL</span>
+<span class="go">---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-</span>
 <span class="go">R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------</span>
 </pre></div>
 </div>
@@ -170,17 +174,23 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this headline">¶</a></h2>
 <p>Write a singe repeat_list to .tsv format:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">path_to_output_tsv_file</span> <span class="o">=</span> <span class="s">&quot;outputfile.tsv&quot;</span>  <span class="c"># Choose your path and filename</span>
-<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;tsv&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_format</span> <span class="o">=</span> <span class="s">&quot;tsv&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is how the output looks like <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ cat outputfile.tsv
+begin       msa_original    l_effective     n_effective     repeat_region_length    divergence      pvalue
+31  R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-,P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---,TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL,---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-,R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------  53      4.056603773584905       306     None    None
 </pre></div>
 </div>
 <p>Write a singe repeat_list to .pickle format:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">path_to_output_pickle_file</span> <span class="o">=</span> <span class="s">&quot;outputfile.pickle&quot;</span>  <span class="c"># Choose your path and filename</span>
-<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>A repeat_list in pickle format can easily be read in again:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tral.repeat_list</span> <span class="kn">import</span> <span class="n">repeat_list</span>
-<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">Repeat_list</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">Repeat_list</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">input_format</span> <span class="o">=</span> <span class="s">&quot;pickle&quot;</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

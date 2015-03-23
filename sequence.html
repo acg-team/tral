@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Sequence code documentation &mdash; TRAL 0.3.0 documentation</title>
+    <title>Sequence code documentation &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -131,7 +131,7 @@
 </table>
 <dl class="class">
 <dt id="tral.sequence.sequence.Sequence">
-<em class="property">class </em><tt class="descclassname">tral.sequence.sequence.</tt><tt class="descname">Sequence</tt><big>(</big><em>seq</em>, <em>id=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tral.sequence.sequence.</tt><tt class="descname">Sequence</tt><big>(</big><em>seq</em>, <em>name=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <tt class="docutils literal"><span class="pre">Sequence</span></tt> describes either a protein or a DNA sequence.</p>
 <p><tt class="docutils literal"><span class="pre">Sequence</span></tt> contains methods that act on single sequences, for example:</p>
 <ul class="simple">
@@ -153,7 +153,7 @@
 
 <dl class="method">
 <dt id="tral.sequence.sequence.Sequence.create">
-<tt class="descname">create</tt><big>(</big><em>file</em>, <em>format</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.create" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create</tt><big>(</big><em>file</em>, <em>input_format</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create sequence(s) from file.</p>
 <p>Create sequence(s) from file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -178,8 +178,8 @@
 <dt id="tral.sequence.sequence.Sequence.detect">
 <tt class="descname">detect</tt><big>(</big><em>lHMM=None</em>, <em>denovo=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Detects tandem repeats on <tt class="docutils literal"><span class="pre">self.seq</span></tt> from 2 possible sources.</p>
-<p>A list of <tt class="docutils literal"><span class="pre">Repeat</span></tt> instances is created for tandem repeat detections on the
-sequence from two possible sources:</p>
+<p>A list of <tt class="docutils literal"><span class="pre">Repeat</span></tt> instances is created for tandem repeat detections
+on the sequence from two possible sources:</p>
 <ul class="simple">
 <li>Sequence profile hidden Markov models <tt class="docutils literal"><span class="pre">HMM</span></tt></li>
 <li>de novo detection algorithms.</li>
@@ -191,12 +191,12 @@ sequence from two possible sources:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>hmm</strong> (<em>HMM</em>) &#8211; A list of <tt class="docutils literal"><span class="pre">HMM</span></tt> instances.</li>
 <li><strong>denovo</strong> (<em>bool</em>) &#8211; boolean</li>
-<li><strong>*kwargs</strong> &#8211; Parameters fed to denovo TR prediction and/or Repeat instantiation.
-E.g. <tt class="docutils literal"><span class="pre">repeat</span> <span class="pre">=</span> <span class="pre">{&quot;calc_score&quot;:</span> <span class="pre">True}</span></tt></li>
+<li><strong>*kwargs</strong> &#8211; Parameters fed to denovo TR prediction and/or Repeat
+instantiation. E.g. <tt class="docutils literal"><span class="pre">repeat</span> <span class="pre">=</span> <span class="pre">{&quot;calc_score&quot;:</span> <span class="pre">True}</span></tt></li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A <tt class="docutils literal"><span class="pre">Repeat_list</span></tt> instance</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A <tt class="docutils literal"><span class="pre">RepeatList</span></tt> instance</p>
 </td>
 </tr>
 </tbody>
@@ -205,13 +205,13 @@ E.g. <tt class="docutils literal"><span class="pre">repeat</span> <span class="p
 
 <dl class="method">
 <dt id="tral.sequence.sequence.Sequence.repeat_in_sequence">
-<tt class="descname">repeat_in_sequence</tt><big>(</big><em>myRepeat</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.repeat_in_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.repeat_in_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sanity check whether the <cite>repeat</cite> is part of this <cite>sequence</cite>. In case,
-calculate the position of the <cite>repeat</cite> within the <cite>sequence</cite>.</p>
+<tt class="descname">repeat_in_sequence</tt><big>(</big><em>my_repeat</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.repeat_in_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.repeat_in_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sanity check whether the <cite>repeat</cite> is part of this <cite>sequence</cite>. In
+case, calculate the position of the <cite>repeat</cite> within the <cite>sequence</cite>.</p>
 <p>If yes: Return True, set repeat.begin to corrected value if necessary.
 If no: Return False.
-Perform sanity check on sequences where all amino acids are or are converted to
-standard amino acids.</p>
+Perform sanity check on sequences where all amino acids are or are
+converted to standard amino acids.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -234,8 +234,8 @@ standard amino acids.</p>
 <dt id="tral.sequence.sequence.Sequence.set_repeat_list">
 <tt class="descname">set_repeat_list</tt><big>(</big><em>repeat_list</em>, <em>tag</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.set_repeat_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.set_repeat_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add <cite>repeat_list</cite> as attribute to this <cite>sequence</cite> instance.</p>
-<p>Add <cite>repeat_list</cite> as attribute to this <cite>sequence</cite> instance. Access <cite>repeat_list</cite>
-as self.dRepeat_list[tag]</p>
+<p>Add <cite>repeat_list</cite> as attribute to this <cite>sequence</cite> instance. Access
+<cite>repeat_list</cite> as self.d_repeatlist[tag]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -252,7 +252,7 @@ as self.dRepeat_list[tag]</p>
 
 <dl class="method">
 <dt id="tral.sequence.sequence.Sequence.write">
-<tt class="descname">write</tt><big>(</big><em>file</em>, <em>format</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.write" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write</tt><big>(</big><em>file</em>, <em>file_format</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write sequence to file.</p>
 <p>Write sequence to file using one of two formats.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -286,6 +286,12 @@ as self.dRepeat_list[tag]</p>
 </tr>
 </tbody>
 </table>
+<dl class="data">
+<dt id="tral.sequence.sequence_io.LOG">
+<tt class="descclassname">tral.sequence.sequence_io.</tt><tt class="descname">LOG</tt><em class="property"> = &lt;logging.Logger object at 0x1099dce80&gt;</em><a class="headerlink" href="#tral.sequence.sequence_io.LOG" title="Permalink to this definition">¶</a></dt>
+<dd><p>READ SEQUENCE</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="tral.sequence.sequence_io.read_fasta">
 <tt class="descclassname">tral.sequence.sequence_io.</tt><tt class="descname">read_fasta</tt><big>(</big><em>file</em>, <em>indices=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence_io.html#read_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence_io.read_fasta" title="Permalink to this definition">¶</a></dt>
@@ -298,22 +304,33 @@ At current, the Biopython SeqIO parser is used.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>file</strong> (<em>str</em>) &#8211; Path to input file</li>
-<li><strong>start</strong> (<em>[int, int]</em>) &#8211; Index of the first returned sequence, and the first not returned sequence.</li>
+<li><strong>start</strong> (<em>[int, int]</em>) &#8211; Index of the first returned sequence, and the first
+not returned sequence.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-3">
-<p class="first admonition-title">Todo</p>
-<p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
-</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="tral.sequence.sequence_io.write">
 <tt class="descclassname">tral.sequence.sequence_io.</tt><tt class="descname">write</tt><big>(</big><em>sequence</em>, <em>sequence_file</em>, <em>sequence_id='sequence_id_not_defined'</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence_io.html#write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence_io.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>save the sequence in fasta format in specified &lt;sequence_file&gt;</p>
+<dd><p>Write a sequence str to fasta format in specified &lt;sequence_file&gt;</p>
+<p>Write s sequence str to fasta format in specified &lt;sequence_file&gt;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sequence</strong> (<em>str</em>) &#8211; Sequence</li>
+<li><strong>sequence_file</strong> (<em>str</em>) &#8211; Path to the output file</li>
+<li><strong>sequence_id</strong> (<em>str</em>) &#8211; ID of the sequence in the output file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -381,7 +398,7 @@ yields one repeat per iteration.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-4">
+<div class="admonition-todo admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">Layout HHREPID output syntax.</p>
 </div>
@@ -404,7 +421,7 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-5">
+<div class="admonition-todo admonition" id="index-4">
 <p class="first admonition-title">Todo</p>
 <p class="last">Show PHOBOS output syntax.</p>
 </div>
@@ -436,7 +453,7 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Layout TRED output syntax.</p>
 </div>
@@ -459,7 +476,7 @@ created.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is the Args format mentioned correctly?</p>
 </div>
@@ -495,7 +512,7 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Layout T-REKS output syntax.</p>
 </div>
@@ -545,11 +562,11 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">Layout TRF output syntax.</p>
 </div>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Does not search for the sequence identifier at current!</p>
 </div>
@@ -597,7 +614,7 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Layout TRUST output syntax.</p>
 </div>
@@ -633,23 +650,48 @@ yields one repeat per iteration.</td>
 </tr>
 </tbody>
 </table>
+<dl class="class">
+<dt id="tral.sequence.repeat_detection_run.BinaryExecutable">
+<em class="property">class </em><tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">BinaryExecutable</tt><big>(</big><em>binary=None</em>, <em>name=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#BinaryExecutable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.BinaryExecutable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the executable, and combines executable with parameters.</p>
+<p>Contains the executable, and combines executable with parameters.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Attributes:</dt>
+<dd>binary(str): Path to binary</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_line">
+<tt class="descname">get_execute_line</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#BinaryExecutable.get_execute_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the command line to invoke the program with the arguments args</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_tokens">
+<tt class="descname">get_execute_tokens</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#BinaryExecutable.get_execute_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the tokens to invoke the program with the arguments args</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
-<dt id="tral.sequence.repeat_detection_run.Finders">
-<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">Finders</tt><big>(</big><em>lFinder=None</em>, <em>sequence_type=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#Finders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.Finders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define a global dictionary of all used finder functions.</p>
-<p>Define a global dictionary of all used finder functions.</p>
+<dt id="tral.sequence.repeat_detection_run.Detectors">
+<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">Detectors</tt><big>(</big><em>lDetector=None</em>, <em>sequence_type=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#Detectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.Detectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a global dictionary of all used detector functions.</p>
+<p>Define a global dictionary of all used detector functions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lFinder</strong> (<em>list of str</em>) &#8211; A list of repeat detection algorithm names.</li>
+<li><strong>lDetector</strong> (<em>list of str</em>) &#8211; A list of repeat detection algorithm names.</li>
 <li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt> &#8211;
-if at least one of the provided finders in <tt class="docutils literal"><span class="pre">lFinder</span></tt> does not exist.</p>
+if at least one of the provided detectors in <tt class="docutils literal"><span class="pre">lDetector</span></tt> does not exist.</p>
 </td>
 </tr>
 </tbody>
@@ -658,7 +700,7 @@ if at least one of the provided finders in <tt class="docutils literal"><span cl
 
 <dl class="function">
 <dt id="tral.sequence.repeat_detection_run.check_java_errors">
-<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">check_java_errors</tt><big>(</big><em>outfile</em>, <em>errfile</em>, <em>log=None</em>, <em>procname=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#check_java_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.check_java_errors" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">check_java_errors</tt><big>(</big><em>outfile</em>, <em>errfile</em>, <em>log=&lt;logging.Logger object at 0x109863978&gt;</em>, <em>procname=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#check_java_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.check_java_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check for java problems. Return True if there were problems, else False.</p>
 <p>Check for these java errors:</p>
 <blockquote>
@@ -683,15 +725,15 @@ messages will be issued.</li>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Complete docstring</p>
 </div>
 </dd></dl>
 
 <dl class="function">
-<dt id="tral.sequence.repeat_detection_run.run_TRD">
-<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">run_TRD</tt><big>(</big><em>seq_records</em>, <em>lFinders=None</em>, <em>sequence_type='AA'</em>, <em>default=True</em>, <em>local_working_dir=None</em>, <em>num_threads=1</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#run_TRD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.run_TRD" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.sequence.repeat_detection_run.run_detector">
+<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">run_detector</tt><big>(</big><em>seq_records</em>, <em>detectors=None</em>, <em>sequence_type='AA'</em>, <em>default=True</em>, <em>local_working_dir=None</em>, <em>num_threads=1</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#run_detector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.run_detector" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Run TRD on sequence_records and return the predicted repeats for each <tt class="docutils literal"><span class="pre">seq_records</span></tt></dt>
 <dd>and for each tandem repeat detector.</dd>
@@ -716,17 +758,17 @@ and for each tandem repeat detector. Example of return type:</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>seq_records</strong> (<em>list of Sequence</em>) &#8211; A list of Sequence instances</li>
-<li><strong>lFinders</strong> (<em>list of str</em>) &#8211; A list tandem repeat detector names</li>
+<li><strong>detectors</strong> (<em>list of str</em>) &#8211; A list tandem repeat detector names</li>
 <li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
 <li><strong>default</strong> (<em>bool</em>) &#8211; If True, default values for the detection algorithms are used.</li>
 <li><strong>local_working_dir</strong> (<em>str</em>) &#8211; Directory where data and results are stored. If provided,</li>
 <li><strong>files are not deleted/</strong> (<em>temporary</em>) &#8211; </li>
-<li><strong>num_threads</strong> (<em>int</em>) &#8211; Run <tt class="docutils literal"><span class="pre">num_threads</span></tt> finders on parallel threads.</li>
+<li><strong>num_threads</strong> (<em>int</em>) &#8211; Run <tt class="docutils literal"><span class="pre">num_threads</span></tt> detectors on parallel threads.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionary: A list with a dictionary for each record in seq_records. The
-dictionary contains a list of repeats for each finder that was used.</p>
+dictionary contains a list of repeats for each detector that was used.</p>
 </td>
 </tr>
 </tbody>

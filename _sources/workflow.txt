@@ -18,13 +18,13 @@ the path to the local copy included in TRAL with this Python code::
 
     import os
     from tral.paths import PACKAGE_DIRECTORY
-    print(os.path.join(PACKAGE_DIRECTORY, "examples", "workflow"))
+    print(PACKAGE_DIRECTORY)
 
-To follow this tutorial, set a shell variable $MYTRAL to the package variable PACKAGE_DIRECTORY. In bash and sh, this can be done with:
+To follow this tutorial, set a shell variable $MYTRAL to the package variable PACKAGE_DIRECTORY. In bash and sh, this can be done with::
 
     export MYTRAL=/path/to/your/package/directory
 
-For csh or tcsh, use:
+For csh or tcsh, use::
 
     setenv MYTRAL /path/to/your/package/directory
 
@@ -45,7 +45,7 @@ Now, let's move ahead to data acquisition:
 
 Prepare your data.
 ------------------
-To annotate sequences with tandem repeats, we already acquired the following data and stored it in $MYTRAL/examples/workflow :
+To annotate sequences with tandem repeats, we already acquired the following data and stored it in *$MYTRAL/examples/workflow* :
 
 Sequence data
 ^^^^^^^^^^^^^^^^
@@ -139,15 +139,22 @@ Now, we can move ahead to automated distributed annotation with GC3PIE.
 
 Install GC3PIE.
 ---------------
-[MISSING]
 
-Configure GC3Pie.
----------------------
-[MISSING]
+You can follow the official
+`GC3Pie installation instructions <http://gc3pie.readthedocs.org/en/latest/users/install.html>`_.
+Upon installation, GC3Pie needs to be `locally configured <http://gc3pie.readthedocs.org/en/latest/users/configuration.html>`_.
 
 
 Usage
 -----
+
+Adapt this command to run the tandem repeat annotation workflow (`more information <http://gc3pie.readthedocs.org/en/latest/users/gc3apps/intro.html>`_)::
+
+
+    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini
+
+
+Control the workflow with `GC3Utils <http://gc3pie.readthedocs.org/en/latest/users/gc3utils.html>`_.
 
 ::
 
@@ -158,4 +165,3 @@ Usage
     $ ...
 
 
-    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini

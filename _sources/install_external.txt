@@ -223,5 +223,5 @@ Not yet integrated software
 ---------------------------
 
 There is a large number of tandem repeat detection software for which TRAL does not provide
-parsers. However, theses parsers are easily manually added to :ref:`sequence.repeat_detection_io <sequence>`.
+parsers. However, theses parsers are easily manually added to :ref:`sequence.repeat_detection_io <code_docs>`.
 Please file an issue on the `tracker <https://github.com/elkeschaper/tandemrepeats/issues>`_.

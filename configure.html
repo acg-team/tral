@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; TRAL 0.3.0 documentation</title>
+    <title>Configuration &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -191,13 +191,13 @@ not in your system path, define the absolute path:</p>
     [[basic]]
         tag = basic_filter
         [[[dict]]]
-            [[[[pValue]]]]
-                func_name = pValue
+            [[[[pvalue]]]]
+                func_name = pvalue
                 score = phylo_gap01  # score
                 threshold = 0.1  # p-Value cut-off
-            [[[[nD]]]]
+            [[[[n_effective]]]]
                 func_name = attribute
-                attribute = nD  # attribute of tandem repeat, e.g. the repeat unit length lD
+                attribute = n_effective  # attribute of tandem repeat, e.g. the repeat unit length l_effective
                 type = min
                 threshold = 1.9  # p-Value cut-off
 </pre></div>
@@ -208,7 +208,7 @@ not in your system path, define the absolute path:</p>
 <div class="highlight-python"><div class="highlight"><pre>[repeat]
     scoreslist = phylo_gap01,  # score
     calc_score = False  # Is the score calculated?
-    calc_pValue = False # Is the pValue calculated?
+    calc_pvalue = False # Is the pvalue calculated?
     precision = 10
     GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
 </pre></div>
@@ -243,21 +243,17 @@ not in your system path, define the absolute path:</p>
 <div class="section" id="creation-of-new-repeat-list-instances">
 <h3>Creation of new Repeat list instances<a class="headerlink" href="#creation-of-new-repeat-list-instances" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre>[repeat_list]
-    msa_original = True  # Is msa_original calculated?
-    lD = True  # Is lD calculated?
-    nD = True  # Is nD calculated?
-    sequence_length = True  # Is the sequence_length calculated?
-    pValue = phylo_gap01
-    begin = True  # Is the position in sequence calculated?
+    output_characteristics = begin, msa_original, l_effective, n_effective, repeat_region_length, divergence, pvalue
+    model = phylo_gap01
 </pre></div>
 </div>
 </div>
 <div class="section" id="restrict-hmmer-model-size">
 <h3>Restrict Hmmer model size.<a class="headerlink" href="#restrict-hmmer-model-size" title="Permalink to this headline">¶</a></h3>
-<p>Set the maximum size of HMM for which the Viterbi algorithm is performed <em>lDMax</em> e.g.
+<p>Set the maximum size of HMM for which the Viterbi algorithm is performed <em>l_effective_max</em> e.g.
 to ensure viable run-times on your system:</p>
 <div class="highlight-python"><div class="highlight"><pre>[hmm]
-    lDMax = 50
+    l_effective_max = 50
 </pre></div>
 </div>
 </div>
@@ -276,12 +272,14 @@ defined as</p>
 <div class="section" id="p-value-distribution-files">
 <span id="pvaluefiles"></span><h2>p-Value distribution files<a class="headerlink" href="#p-value-distribution-files" title="Permalink to this headline">¶</a></h2>
 <p>In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded and placed in ~/.tral/data/pValue:</p>
+need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue:</p>
 <div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/data
 wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pValue.tar.gz
 tar -xvzf pValue.tar.gz
 </pre></div>
 </div>
+<p>Instead of downloading all p-Value distributions, it is possible to download only the
+<a class="reference external" href="ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/">distributions for particular models of sequence evolution</a>.</p>
 </div>
 </div>
 

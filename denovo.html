@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Run and parse de novo repeat detection software. &mdash; TRAL 0.3.0 documentation</title>
+    <title>Run and parse de novo repeat detection software. &mdash; TRAL 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.0 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -130,8 +130,8 @@ file and output the results.</p>
 <span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
 
-<span class="n">fHIV_proteome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="s">&quot;HIV-1_388796.faa&quot;</span><span class="p">)</span>
-<span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">fHIV_proteome</span><span class="p">,</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)</span>
+<span class="n">fHIV_proteome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;HIV-1_388796.faa&quot;</span><span class="p">)</span>
+<span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">file</span> <span class="o">=</span> <span class="n">fHIV_proteome</span><span class="p">,</span> <span class="n">input_format</span> <span class="o">=</span> <span class="s">&#39;fasta&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -145,7 +145,7 @@ different results.</p>
 </div>
 <p>As an example, the first detected putative tandem repeat looks as follows <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="go">&gt; begin:316 lD:4 n:2</span>
+<span class="go">&gt; begin:316 l_effective:4 n:2</span>
 <span class="go">GDII</span>
 <span class="go">GDIR</span>
 </pre></div>
@@ -164,14 +164,14 @@ absolute number of detections in the HIV proteome for a couple of algorithms:</p
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">TRD</span> <span class="o">==</span> <span class="s">&quot;T-REKS&quot;</span><span class="p">])</span>
 <span class="go">4</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">TRD</span> <span class="o">==</span> <span class="s">&quot;TRUST&quot;</span><span class="p">])</span>
-<span class="go">0</span>
+<span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">TRD</span> <span class="o">==</span> <span class="s">&quot;XSTREAM&quot;</span><span class="p">])</span>
 <span class="go">9</span>
 </pre></div>
 </div>
 <p>As an example, T-REKS detects the following repeat in the second HIV sequence <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">TRD</span> <span class="o">==</span> <span class="s">&quot;T-REKS&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="go">&gt; begin:449 lD:10 n:2</span>
+<span class="go">&gt; begin:449 l_effective:10 n:2</span>
 <span class="go">RPEPTAPP-ESL</span>
 <span class="go">RPEPTAPPPES-</span>
 </pre></div>
@@ -186,9 +186,9 @@ absolute number of detections in the HIV proteome for a couple of algorithms:</p
 </div>
 <p>The created .tsv looks as follows <a class="reference internal" href="background.html#background"><em>(interpretation)</em></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ cat outputfile.tsv
-msa_original        lD      pValue  nD      sequence_length begin
-GDII,GDIR   4       None    2.0     8       316
-FLG,FLG     3       None    2.0     6       507
+begin   msa_original    l_effective      nD      sequence_length divergence      pvalue
+316     GDII,GDIR       4       2.0     8       None    None
+507     FLG,FLG 3       2.0     6       None    None
 </pre></div>
 </div>
 <p>Write a singe repeat_list to .pickle format:</p>
