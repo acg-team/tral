@@ -1,4 +1,4 @@
-background.rst.. _configure:
+.. _configure:
 
 Configuration
 =============
@@ -77,13 +77,13 @@ Define the default filter behaviour.
         [[basic]]
             tag = basic_filter
             [[[dict]]]
-                [[[[pValue]]]]
-                    func_name = pValue
+                [[[[pvalue]]]]
+                    func_name = pvalue
                     score = phylo_gap01  # score
                     threshold = 0.1  # p-Value cut-off
-                [[[[nD]]]]
+                [[[[n_effective]]]]
                     func_name = attribute
-                    attribute = nD  # attribute of tandem repeat, e.g. the repeat unit length lD
+                    attribute = n_effective  # attribute of tandem repeat, e.g. the repeat unit length l_effective
                     type = min
                     threshold = 1.9  # p-Value cut-off
 
@@ -97,7 +97,7 @@ Creation of new Repeat instances
     [repeat]
         scoreslist = phylo_gap01,  # score
         calc_score = False  # Is the score calculated?
-        calc_pValue = False # Is the pValue calculated?
+        calc_pvalue = False # Is the pvalue calculated?
         precision = 10
         GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
 
@@ -136,22 +136,18 @@ Creation of new Repeat list instances
 ::
 
     [repeat_list]
-        msa_original = True  # Is msa_original calculated?
-        lD = True  # Is lD calculated?
-        nD = True  # Is nD calculated?
-        sequence_length = True  # Is the sequence_length calculated?
-        pValue = phylo_gap01
-        begin = True  # Is the position in sequence calculated?
+        output_characteristics = begin, msa_original, l_effective, n_effective, repeat_region_length, divergence, pvalue
+        model = phylo_gap01
 
 
 Restrict Hmmer model size.
 ****************************
 
-Set the maximum size of HMM for which the Viterbi algorithm is performed *lDMax* e.g.
+Set the maximum size of HMM for which the Viterbi algorithm is performed *l_effective_max* e.g.
 to ensure viable run-times on your system::
 
     [hmm]
-        lDMax = 50
+        l_effective_max = 50
 
 logging.ini - OPTIONAL
 -----------------------
@@ -167,13 +163,13 @@ defined as
     logging.config.fileConfig("path/to/your/home/.tral/logging.ini")
 
 
-.. _pValuefiles:
+.. _pvaluefiles:
 
 p-Value distribution files
 --------------------------
 
 In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded (2.6Gb) and placed in ~/.tral/data/pValue:
+need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue:
 ::
 
     cd ~/.tral/data

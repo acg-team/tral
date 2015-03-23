@@ -1,4 +1,3 @@
-
 .. _significance_test:
 
 Perform statistical significance test of tandem repeats.
@@ -11,7 +10,7 @@ detailed in a :ref:`NAR publication (2012) <publications>`.
 Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the sequence data needed for this tutorial.
-- :ref:`Download p-Value distribution files <pValuefiles>`.
+- :ref:`Download p-Value distribution files <pvaluefiles>`.
 
 
 
@@ -33,7 +32,7 @@ Read in tandem repeat annotations.
 
 There are nine proteins in the HIV proteome::
 
-    >>> print(lHIV_Sequence)
+    >>> len(lHIV_Sequence)
     9
 
 
@@ -45,16 +44,15 @@ p-Value with parameters defined in the :ref:`configuration file <configure>`:
 ::
 
     for iSequence in lHIV_Sequence:
-        if iSequence.dRepeat_list['denovo']:
-            for iTandemRepeat in iSequence.dRepeat_list['denovo'].repeats:
-                iTandemRepeat.calculate_pValues()
+        for iTandemRepeat in iSequence.get_repeatlist('denovo').repeats:
+            iTandemRepeat.calculate_pvalues()
 
 For example, the following putative tandem repeat is found to be non-significant with the used model
 of tandem repeat evolution :ref:`(interpretation) <background>`:
 ::
 
-    >>> print(lHIV_Sequence[2].dRepeat_list['denovo'].repeats[0])
-    >begin:94 lD:7 n:2 pValue:1.0 divergence:1.656005859375
+    >>> print(lHIV_Sequence[2].get_repeatlist('denovo').repeats[0])
+    > begin:94 l_effective:7 n:2 pvalue:1.0 divergence:1.656005859375 type:phylo_gap01
     EKGGLEGLIYSKKRQE
     ---ILDLWVY------
 
@@ -62,8 +60,8 @@ of tandem repeat evolution :ref:`(interpretation) <background>`:
 Whereas this putative tandem repeat is considered significant:
 ::
 
-    >>> print(lHIV_Sequence[4].dRepeat_list['denovo'].repeats[1])
-    >begin:38 lD:2 n:6 pValue:0.0 divergence:0.46649169922545164
+    >>> print(lHIV_Sequence[4].get_repeatlist('denovo').repeats[0])
+    > begin:38 l_effective:2 n:6 pvalue:0.0 divergence:0.46649169922545164 type:phylo_gap01
     RRN
     RR-
     RRW
@@ -72,13 +70,12 @@ Whereas this putative tandem repeat is considered significant:
     RQI
 
 
-Besides, parameters can also be directly supplied to *calculate_pValues*:
+Besides, parameters can also be directly supplied to *calculate_pvalues*:
 ::
 
     for iSequence in lHIV_Sequence:
-        if iSequence.dRepeat_list['denovo']:
-            for iTandemRepeat in iSequence.dRepeat_list['denovo'].repeats:
-                iTandemRepeat.calculate_pValues(scoreslist=['phylo_gap001'])
+        for iTandemRepeat in iSequence.get_repeatlist('denovo').repeats:
+            iTandemRepeat.calculate_pvalues(scoreslist=['phylo_gap001'])
 
 
 
@@ -89,20 +86,20 @@ Filter tandem repeat below a significance threshold.
 ::
 
     for iSequence in lHIV_Sequence:
-        repeat_list = iSequence.dRepeat_list["denovo"]
+        repeat_list = iSequence.get_repeatlist('denovo')
         if repeat_list:
-            repeat_list_filtered = repeat_list.filter(func_name = "pValue", score = "phylo_gap01", threshold = 0.05)
-            iSequence.set_repeat_list(repeat_list_filtered, "denovo_filtered")
+            repeat_list_filtered = repeat_list.filter(func_name = "pvalue", score = "phylo_gap01", threshold = 0.05)
+            iSequence.set_repeatlist(repeat_list_filtered, "denovo_filtered")
 
 The resulting *result_list* now only contains tandem repeats with a p-Value below
 0.05, and is shorter than the original tandem repeat list:
 
 ::
 
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo"].repeats])
-    22
-    >>> len([iR for iS in lHIV_Sequence for iR in iS.dRepeat_list["denovo_filtered"].repeats])
-    17
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist('denovo').repeats])
+    28
+    >>> len([iR for iS in lHIV_Sequence for iR in iS.get_repeatlist('denovo_filtered').repeats])
+    20
 
 
 

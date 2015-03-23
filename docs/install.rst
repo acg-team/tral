@@ -1,4 +1,4 @@
-configure.rst.. _install:
+.. _install:
 
 Installation
 ============
