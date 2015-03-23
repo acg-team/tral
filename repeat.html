@@ -130,12 +130,6 @@
 </tr>
 </tbody>
 </table>
-<dl class="data">
-<dt id="tral.repeat.repeat.CONFIG">
-<tt class="descclassname">tral.repeat.repeat.</tt><tt class="descname">CONFIG</tt><em class="property"> = {'scoreslist': ['phylo_gap01'], 'calc_score': 'False', 'calc_pvalue': 'False', 'precision': '10', 'ginsi': 'ginsi'}</em><a class="headerlink" href="#tral.repeat.repeat.CONFIG" title="Permalink to this definition">¶</a></dt>
-<dd><p>Repeat class</p>
-</dd></dl>
-
 <dl class="class">
 <dt id="tral.repeat.repeat.Repeat">
 <em class="property">class </em><tt class="descclassname">tral.repeat.repeat.</tt><tt class="descname">Repeat</tt><big>(</big><em>msa, begin=None, sequence_type='AA', scoreslist=['phylo_gap01'], calc_score=False, calc_pvalue=False</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat.html#Repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat.Repeat" title="Permalink to this definition">¶</a></dt>
@@ -314,7 +308,7 @@ Repeat instance <cite>self</cite></dd>
 
 <dl class="method">
 <dt id="tral.repeat.repeat.Repeat.create">
-<tt class="descname">create</tt><big>(</big><em>file</em>, <em>file_format</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat.html#Repeat.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat.Repeat.create" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create</tt><big>(</big><em>file</em>, <em>input_format</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat.html#Repeat.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat.Repeat.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read tandem repeat from file.</p>
 <p>Read tandem repeat from file (currently, only pickle is supported)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -332,6 +326,14 @@ Repeat instance <cite>self</cite></dd>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
+</div>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write tests.</p>
+</div>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Can repeat_io.read_fasta be replaced by e.g. BioPython seqIO?</p>
 </div>
 </dd></dl>
 
@@ -410,7 +412,7 @@ obsolete when the original MSA is saved from the beginning.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-1">
+<div class="admonition-todo admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">Write checks for <tt class="docutils literal"><span class="pre">format</span></tt> and <tt class="docutils literal"><span class="pre">file</span></tt>.</p>
 </div>
@@ -466,7 +468,7 @@ returns</p>
 
 <dl class="data">
 <dt id="tral.repeat.repeat_exon.logger">
-<tt class="descclassname">tral.repeat.repeat_exon.</tt><tt class="descname">logger</tt><em class="property"> = &lt;logging.Logger object at 0x10b829d30&gt;</em><a class="headerlink" href="#tral.repeat.repeat_exon.logger" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.repeat.repeat_exon.</tt><tt class="descname">logger</tt><em class="property"> = &lt;logging.Logger object at 0x109451c88&gt;</em><a class="headerlink" href="#tral.repeat.repeat_exon.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Functions to check whether the exon structure and the repeat unit structure are correlated.</p>
 </dd></dl>
 
@@ -480,11 +482,19 @@ returns</p>
 </div>
 <div class="section" id="module-tral.repeat.repeat_io">
 <span id="repeat-io"></span><h2>repeat_io<a class="headerlink" href="#module-tral.repeat.repeat_io" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Input/output for tandem repeats.</td>
+</tr>
+</tbody>
+</table>
 <dl class="function">
 <dt id="tral.repeat.repeat_io.evolved_tandem_repeats">
-<tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">evolved_tandem_repeats</tt><big>(</big><em>l</em>, <em>n</em>, <em>n_samples</em>, <em>sequence_type</em>, <em>jobID='jobID'</em>, <em>mutationRate=50</em>, <em>tree='star'</em>, <em>indelRatePerSite=False</em>, <em>return_type='repeat'</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#evolved_tandem_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.evolved_tandem_repeats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evolve sequence with ALF.</p>
-<p>Evolve sequence with ALF:
+<tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">evolved_tandem_repeats</tt><big>(</big><em>l</em>, <em>n</em>, <em>n_samples</em>, <em>sequence_type</em>, <em>job_id='job_id'</em>, <em>mutation_rate=50</em>, <em>tree='star'</em>, <em>indel_rate_per_site=False</em>, <em>return_type='repeat'</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#evolved_tandem_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.evolved_tandem_repeats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate evolved sequences with ALF.</p>
+<p>Simulate evolved sequences with ALF:
 Dalquen, D. A., Anisimova, M., Gonnet, G. H. &amp; Dessimoz, C.
 ALF&#8211;a simulation framework for genome evolution. Molecular Biology and Evolution 29,
 1115–1123 (2012).</p>
@@ -497,10 +507,10 @@ ALF&#8211;a simulation framework for genome evolution. Molecular Biology and Evo
 <li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units in the tandem repeat</li>
 <li><strong>n_samples</strong> (<em>int</em>) &#8211; The number of samples</li>
 <li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
-<li><strong>jobID</strong> (<em>str</em>) &#8211; A tag for files produces with ALF, and result files.</li>
-<li><strong>mutationRate</strong> (<em>float</em>) &#8211; The mutation rate.</li>
+<li><strong>job_id</strong> (<em>str</em>) &#8211; A tag for files produces with ALF, and result files.</li>
+<li><strong>mutation_rate</strong> (<em>float</em>) &#8211; The mutation rate.</li>
 <li><strong>tree</strong> (<em>str</em>) &#8211; The type of tree, e.g. &#8220;star&#8221; or &#8220;birthdeath&#8221;</li>
-<li><strong>indelRatePerSite</strong> (<em>int or False</em>) &#8211; The indel rate per site.</li>
+<li><strong>indel_rate_per_site</strong> (<em>int or False</em>) &#8211; The indel rate per site.</li>
 <li><strong>return_type</strong> (<em>str</em>) &#8211; Either &#8220;repeat&#8221; or &#8220;list&#8221;</li>
 <li><strong>sequence_length</strong> (<em>int</em>) &#8211; The total length of the simulated sequence</li>
 </ul>
@@ -541,8 +551,8 @@ ALF&#8211;a simulation framework for genome evolution. Molecular Biology and Evo
 </dd></dl>
 
 <dl class="function">
-<dt id="tral.repeat.repeat_io.read_repeats">
-<tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">read_repeats</tt><big>(</big><em>seq_filename</em>, <em>sequence_type='AA'</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#read_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.read_repeats" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat.repeat_io.read_fasta">
+<tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">read_fasta</tt><big>(</big><em>seq_filename</em>, <em>sequence_type='AA'</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#read_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.read_fasta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read repeat from file in fasta format.</p>
 <p>Read repeat from file in fasta format.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -566,8 +576,8 @@ ALF&#8211;a simulation framework for genome evolution. Molecular Biology and Evo
 <dt id="tral.repeat.repeat_io.save_repeat_fasta">
 <tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">save_repeat_fasta</tt><big>(</big><em>tandem_repeats</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#save_repeat_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.save_repeat_fasta" title="Permalink to this definition">¶</a></dt>
 <dd><p>save multiple &lt;tandem_repeats&gt; in Fasta format in specified &lt;file&gt;</p>
-<p>At current, only one TR per sequence can be defined, as the identifiers in
-the dict &lt;tandem_repeats&gt; must be unique.</p>
+<p>At current, only one TR per sequence can be defined, as the identifiers
+in the dict &lt;tandem_repeats&gt; must be unique.</p>
 <dl class="docutils">
 <dt>Parameters: Dict of tandem repeats and identifiers.</dt>
 <dd><p class="first">e.g. {&#8216;ENSP00012&#8217;: msa1, &#8216;ENSP00013&#8217;: msa2}</p>
@@ -586,7 +596,8 @@ GH&#8211;</p>
 <dl class="docutils">
 <dt>Parameters: Tandem repeat MSA.</dt>
 <dd><p class="first">e.g. [&#8220;ACDEF-&#8221;, &#8220;ACCDEF&#8221;]</p>
-<p>More information in <a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>
+<p>More information in
+<a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>
 STOCKHOLM Format Example:</p>
 <p># STOCKHOLM 1.0
 seq1 ACDEF...GHIKL
@@ -603,13 +614,13 @@ seq3 MNPQT...
 <dl class="function">
 <dt id="tral.repeat.repeat_io.save_repeat_treks">
 <tt class="descclassname">tral.repeat.repeat_io.</tt><tt class="descname">save_repeat_treks</tt><big>(</big><em>tandem_repeats</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_io.html#save_repeat_treks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_io.save_repeat_treks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save multiple &lt;tandem_repeats&gt; in T-REKS format in specified &lt;file&gt;</p>
-<p>At current, only one TR per sequence can be defined, as the identifiers in
-the dict &lt;tandem_repeats&gt; must be unique.</p>
+<dd><p>Save multiple <cite>tandem_repeats</cite> in T-REKS format in specified <cite>file</cite></p>
+<p>At current, only one TR per sequence can be defined, as the identifiers
+in the dict &lt;tandem_repeats&gt; must be unique.</p>
 <dl class="docutils">
 <dt>Parameters: Dict of tandem repeats and identifiers.</dt>
 <dd><p class="first">e.g. {&#8216;ENSP00012&#8217;: [msa1, begin1], &#8216;ENSP00013&#8217;: [msa2, begin2]}</p>
-<p>T-REKS Format Example:</p>
+<p>T-REKS format example:</p>
 <p>&gt;a
 Length: 3 residues - nb: 3  from  1 to 10 - Psim:0.8076923076923077 region Length:42
 GHKI
@@ -632,6 +643,14 @@ UIR</p>
 </div>
 <div class="section" id="module-tral.repeat.repeat_pvalue">
 <span id="repeat-pvalue"></span><h2>repeat_pvalue<a class="headerlink" href="#module-tral.repeat.repeat_pvalue" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">The repeat pvalue module.</td>
+</tr>
+</tbody>
+</table>
 <dl class="function">
 <dt id="tral.repeat.repeat_pvalue.calc_pvalues">
 <tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">calc_pvalues</tt><big>(</big><em>repeats, result_file_path, file_name, scoretypes=['phylo', 'phylo_gap'], gappy_data=False</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#calc_pvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.calc_pvalues" title="Permalink to this definition">¶</a></dt>
@@ -683,7 +702,7 @@ n_repeat_structure (int)</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-2">
+<div class="admonition-todo admonition" id="index-4">
 <p class="first admonition-title">Todo</p>
 <p class="last">Include exact definition of returned values.</p>
 </div>
@@ -728,19 +747,58 @@ a given <tt class="docutils literal"><span class="pre">n</span></tt> the closest
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-3">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check return type.</p>
 </div>
-<div class="admonition-todo admonition" id="index-4">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check how this method concurs with the <tt class="docutils literal"><span class="pre">empirical_list</span></tt> method.</p>
 </div>
 </dd></dl>
 
 <dl class="function">
-<dt id="tral.repeat.repeat_pvalue.dAverageMultipleMaxMultinom">
-<tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">dAverageMultipleMaxMultinom</tt><big>(</big><em>tandemrepeat</em>, <em>precision=10000.0</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#dAverageMultipleMaxMultinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.dAverageMultipleMaxMultinom" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat.repeat_pvalue.d_average_multinom">
+<tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">d_average_multinom</tt><big>(</big><em>l</em>, <em>n</em>, <em>sequence_type</em>, <em>score_type</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#d_average_multinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.d_average_multinom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for the analytic calculation of parsimony or pSim scores.</p>
+<p>Called by <tt class="docutils literal"><span class="pre">d_average_multiple_max_multinom</span></tt> or <tt class="docutils literal"><span class="pre">d_average_multiple_pars_multinom</span></tt>.</p>
+<p>Return the <tt class="docutils literal"><span class="pre">l</span></tt>-times self-convoluted pdf of the score on random sequence_type data
+of length <tt class="docutils literal"><span class="pre">n</span></tt>. The order of the pdf is kept from <tt class="docutils literal"><span class="pre">column_pdf()</span></tt>.</p>
+<p>For details see:</p>
+<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
+&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
+Nucleic Acids Research (2012).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit.</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
+<li><strong>score_type</strong> &#8211; The model of repeat evolution used. Either &#8216;psim&#8217; or &#8216;parsimony&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(description missing)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">if precision higher than max(uint32) use uint64 instead.
+CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
+</div>
+<div class="admonition-todo admonition" id="index-7">
+<p class="first admonition-title">Todo</p>
+<p class="last">Describe return value.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat.repeat_pvalue.d_average_multiple_max_multinom">
+<tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">d_average_multiple_max_multinom</tt><big>(</big><em>tandemrepeat</em>, <em>precision=10000.0</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#d_average_multiple_max_multinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.d_average_multiple_max_multinom" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Calculate null distribution for e.g. the pSim score for repeats of type <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt></dt>
 <dd>as a probability density function.</dd>
@@ -775,45 +833,6 @@ unnamed (list of float): scores corresponding to the probabilities in <tt class=
 <p class="first admonition-title">Warning</p>
 <p class="last">if precision higher than max(uint32) use uint64 instead.
 CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
-</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="tral.repeat.repeat_pvalue.d_average_multinom">
-<tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">d_average_multinom</tt><big>(</big><em>l</em>, <em>n</em>, <em>sequence_type</em>, <em>score_type</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#d_average_multinom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.d_average_multinom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper function for the analytic calculation of parsimony or pSim scores.</p>
-<p>Called by <tt class="docutils literal"><span class="pre">dAverageMultipleMaxMultinom</span></tt> or <tt class="docutils literal"><span class="pre">d_average_multiple_pars_multinom</span></tt>.</p>
-<p>Return the <tt class="docutils literal"><span class="pre">l</span></tt>-times self-convoluted pdf of the score on random sequence_type data
-of length <tt class="docutils literal"><span class="pre">n</span></tt>. The order of the pdf is kept from <tt class="docutils literal"><span class="pre">column_pdf()</span></tt>.</p>
-<p>For details see:</p>
-<p>Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?
-&#8211;Statistical validation of tandem repeat prediction in genomic sequences.
-Nucleic Acids Research (2012).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>l</strong> (<em>int</em>) &#8211; The length of the repeat unit.</li>
-<li><strong>n</strong> (<em>int</em>) &#8211; The number of repeat units.</li>
-<li><strong>sequence_type</strong> (<em>str</em>) &#8211; The type of the sequence: either &#8220;AA&#8221; or &#8220;DNA&#8221;.</li>
-<li><strong>score_type</strong> &#8211; The model of repeat evolution used. Either &#8216;psim&#8217; or &#8216;parsimony&#8217;.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(description missing)</p>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">if precision higher than max(uint32) use uint64 instead.
-CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
-</div>
-<div class="admonition-todo admonition" id="index-5">
-<p class="first admonition-title">Todo</p>
-<p class="last">Describe return value.</p>
 </div>
 </dd></dl>
 
@@ -895,11 +914,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define &#8220;phylo&#8221; model.</p>
 </div>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Perhaps add distributions beyond l_max, n_max.</p>
 </div>
@@ -924,11 +943,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define <tt class="docutils literal"><span class="pre">mu</span></tt> more precisely.</p>
 </div>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is this function called from anywhere? In case, consider refactoring.</p>
 </div>
@@ -968,9 +987,9 @@ type.</li>
 <dt id="tral.repeat.repeat_pvalue.pvalue_pars">
 <tt class="descclassname">tral.repeat.repeat_pvalue.</tt><tt class="descname">pvalue_pars</tt><big>(</big><em>tandemrepeat</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_pvalue.html#pvalue_pars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_pvalue.pvalue_pars" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the p-Value of the parsimony score for a Repeat.</p>
-<p>Retrieve the probability density function for repeats of the same type as <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt>.
-Then, calculate the p-Value given this probability density function, and the
-parsimony score of <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt>.</p>
+<p>Retrieve the probability density function for repeats of the same type as
+<tt class="docutils literal"><span class="pre">tandemrepeat</span></tt>. Then, calculate the p-Value given this probability
+density function, and the parsimony score of <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -981,12 +1000,12 @@ parsimony score of <tt class="docutils literal"><span class="pre">tandemrepeat</
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-12">
 <p class="first admonition-title">Todo</p>
-<p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt> s parsimony score has not been
-calculated before.</p>
+<p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt> s parsimony
+score has not been calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-13">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
@@ -1009,16 +1028,16 @@ pSim score of <tt class="docutils literal"><span class="pre">tandemrepeat</span>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-14">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <tt class="docutils literal"><span class="pre">tandemrepeat</span></tt> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-13">
+<div class="admonition-todo admonition" id="index-15">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
-<div class="admonition-todo admonition" id="index-14">
+<div class="admonition-todo admonition" id="index-16">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe <tt class="docutils literal"><span class="pre">precision</span></tt>.</p>
 </div>
@@ -1027,6 +1046,14 @@ calculated before.</p>
 </div>
 <div class="section" id="module-tral.repeat.repeat_score">
 <span id="repeat-score"></span><h2>repeat_score<a class="headerlink" href="#module-tral.repeat.repeat_score" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">The repeat score module.</td>
+</tr>
+</tbody>
+</table>
 <dl class="function">
 <dt id="tral.repeat.repeat_score.K80">
 <tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">K80</tt><big>(</big><em>kappa='2.59'</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#K80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.K80" title="Permalink to this definition">¶</a></dt>
@@ -1043,8 +1070,8 @@ calculated before.</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="tral.repeat.repeat_score.calculatePDFScores">
-<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">calculatePDFScores</tt><big>(</big><em>repeats, result_file_path, fileName, scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#calculatePDFScores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.calculatePDFScores" title="Permalink to this definition">¶</a></dt>
+<dt id="tral.repeat.repeat_score.calculate_pdf_scores">
+<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">calculate_pdf_scores</tt><big>(</big><em>repeats, result_file_path, file_name, scoreslist=['phylo_gap01']</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#calculate_pdf_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.calculate_pdf_scores" title="Permalink to this definition">¶</a></dt>
 <dd><p>CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES</p>
 </dd></dl>
 
@@ -1075,7 +1102,7 @@ str or int.</td>
 
 <dl class="function">
 <dt id="tral.repeat.repeat_score.load_equilibrium_freq">
-<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">load_equilibrium_freq</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#load_equilibrium_freq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.load_equilibrium_freq" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">load_equilibrium_freq</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#load_equilibrium_freq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.load_equilibrium_freq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load equilibrium frequencies from a substitution matrix file.</p>
 <p>Load equilibrium frequencies from a substitution matrix file. Note that
 with minor changes, the whole amino acid substitution matrix could be
@@ -1084,7 +1111,7 @@ returned.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; Path to substitution matrix file, E.g. LG.dat.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> (<em>str</em>) &#8211; Path to substitution matrix file, E.g. LG.dat.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(Dict of str, float): Dictionary of one letter amino acid codes and
 float value</td>
@@ -1112,8 +1139,8 @@ The gap generation model is a simple poisson model with rate parameter
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>t</strong> (<em>float</em>) &#8211; The divergence of the <tt class="docutils literal"><span class="pre">tandem_repeat</span></tt> units.</li>
 <li><strong>tandem_repeat</strong> (<em>Repeat</em>) &#8211; An instance of the <tt class="docutils literal"><span class="pre">Repeat</span></tt> class.</li>
-<li><strong>indel_rate_per_site</strong> (<em>float</em>) &#8211; The mutation rate of insertions an deletions,</li>
-<li><strong>opposed to t.</strong> (<em>as</em>) &#8211; </li>
+<li><strong>indel_rate_per_site</strong> (<em>float</em>) &#8211; The mutation rate of insertions and
+deletions, as opposed to <tt class="docutils literal"><span class="pre">t</span></tt>.</li>
 <li><strong>gaps</strong> (<em>str</em>) &#8211; The mode of gap counting. Options are &#8220;row_wise&#8221;,</li>
 <li><strong>&#8220;ignore_trailing_gaps&#8221; and</strong> (<em>&#8220;ignore_coherent_deletions&#8221;,</em>) &#8211; </li>
 <li><strong>&#8220;ignore_trailing_gaps_and_coherent_deletions&#8221;.</strong> &#8211; </li>
@@ -1130,7 +1157,7 @@ repeat.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-15">
+<div class="admonition-todo admonition" id="index-17">
 <p class="first admonition-title">Todo</p>
 <p class="last">USE LOG EARLIER, NOT JUST IN RETURN STATEMENT</p>
 </div>
@@ -1193,19 +1220,15 @@ repeat.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-16">
-<p class="first admonition-title">Todo</p>
-<p class="last">Is <tt class="docutils literal"><span class="pre">rep_and_meas</span></tt> used at current.</p>
-</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="tral.repeat.repeat_score.optimisation">
-<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">optimisation</tt><big>(</big><em>function</em>, <em>args</em>, <em>start_min=0.5</em>, <em>start_max=1.5</em>, <em>nIteration=14</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#optimisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.optimisation" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.repeat.repeat_score.</tt><tt class="descname">optimisation</tt><big>(</big><em>function</em>, <em>args</em>, <em>start_min=0.5</em>, <em>start_max=1.5</em>, <em>n_iteration=14</em><big>)</big><a class="reference internal" href="_modules/tral/repeat/repeat_score.html#optimisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_score.optimisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary one-dimensional optimisation of <tt class="docutils literal"><span class="pre">function</span></tt>.</p>
 <p>Perform a binary one dimensional optimisation of parameter <tt class="docutils literal"><span class="pre">t</span></tt> on
 <tt class="docutils literal"><span class="pre">function</span></tt> with the additional list of arguments/parameters <tt class="docutils literal"><span class="pre">args</span></tt>.
-Start on a given range of start, and iterate <tt class="docutils literal"><span class="pre">nIteration</span></tt> times. Return
+Start on a given range of start, and iterate <tt class="docutils literal"><span class="pre">n_iteration</span></tt> times. Return
 the maximum of the function, together with the maximum parameter <tt class="docutils literal"><span class="pre">t</span></tt> as a
 tuple.</p>
 <p>In addition to <tt class="docutils literal"><span class="pre">start_min</span></tt> and <tt class="docutils literal"><span class="pre">start_max</span></tt>, additional hard boundaries
@@ -1226,7 +1249,7 @@ on the optimisation parameter <tt class="docutils literal"><span class="pre">t</
 <dt>Kwargs:</dt>
 <dd><p class="first">start_min (float): Minimum value of function parameter <tt class="docutils literal"><span class="pre">t</span></tt>.
 start_max (float): Maximum value of function parameter <tt class="docutils literal"><span class="pre">t</span></tt>.
-nIteration (int): Number of iterations until optimisation results are</p>
+n_iteration (int): Number of iterations until optimisation results are</p>
 <div class="system-message">
 <p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/repeat/repeat_score.py:docstring of tral.repeat.repeat_score.optimisation</tt>, line 22)</p>
 Unexpected indentation.</div>
@@ -1242,15 +1265,15 @@ Unexpected indentation.</div>
 <dt>tuple (Maximum of function: float,</dt>
 <dd>Corresponding function parameter: float)</dd>
 </dl>
-<span class="target" id="index-17"></span><div class="admonition-todo admonition">
+<span class="target" id="index-18"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <tt class="docutils literal"><span class="pre">region_bounded</span></tt> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-18"></span><div class="admonition-todo admonition">
+<span class="target" id="index-19"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <tt class="docutils literal"><span class="pre">stepsize</span></tt> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-19"></span><div class="admonition-todo admonition">
+<span class="target" id="index-20"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Generalise hard-coded optimisation parameter boundaries.</p>
 </div>
@@ -1313,7 +1336,7 @@ Nucleic Acids Research (2012).</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-20">
+<div class="admonition-todo admonition" id="index-21">
 <p class="first admonition-title">Todo</p>
 <p class="last">At which step shall we assert that the length of <tt class="docutils literal"><span class="pre">column</span></tt> &gt; 1?</p>
 </div>

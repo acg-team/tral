@@ -231,17 +231,17 @@ converted to standard amino acids.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="tral.sequence.sequence.Sequence.set_repeat_list">
-<tt class="descname">set_repeat_list</tt><big>(</big><em>repeat_list</em>, <em>tag</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.set_repeat_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.set_repeat_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add <cite>repeat_list</cite> as attribute to this <cite>sequence</cite> instance.</p>
-<p>Add <cite>repeat_list</cite> as attribute to this <cite>sequence</cite> instance. Access
-<cite>repeat_list</cite> as self.d_repeatlist[tag]</p>
+<dt id="tral.sequence.sequence.Sequence.set_repeatlist">
+<tt class="descname">set_repeatlist</tt><big>(</big><em>repeatlist</em>, <em>tag</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.set_repeatlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.set_repeatlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add <cite>repeatlist</cite> as attribute to this <cite>sequence</cite> instance.</p>
+<p>Add <cite>repeatlist</cite> as attribute to this <cite>sequence</cite> instance. Access
+<cite>repeatlist</cite> as self.d_repeatlist[tag]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>repeat_list</strong> (<em>repeat_list</em>) &#8211; A repeat_list instance.</li>
+<li><strong>repeatlist</strong> (<em>RepeatList</em>) &#8211; A repeat_list instance.</li>
 <li><strong>tag</strong> (<em>str</em>) &#8211; A identifier for the repeat_list</li>
 </ul>
 </td>
@@ -286,12 +286,6 @@ converted to standard amino acids.</p>
 </tr>
 </tbody>
 </table>
-<dl class="data">
-<dt id="tral.sequence.sequence_io.LOG">
-<tt class="descclassname">tral.sequence.sequence_io.</tt><tt class="descname">LOG</tt><em class="property"> = &lt;logging.Logger object at 0x1099dce80&gt;</em><a class="headerlink" href="#tral.sequence.sequence_io.LOG" title="Permalink to this definition">¶</a></dt>
-<dd><p>READ SEQUENCE</p>
-</dd></dl>
-
 <dl class="function">
 <dt id="tral.sequence.sequence_io.read_fasta">
 <tt class="descclassname">tral.sequence.sequence_io.</tt><tt class="descname">read_fasta</tt><big>(</big><em>file</em>, <em>indices=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/sequence_io.html#read_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence_io.read_fasta" title="Permalink to this definition">¶</a></dt>
@@ -340,7 +334,7 @@ not returned sequence.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Input/output for repeat detection algorithms</td>
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Parsing repeat detection algorithm output</td>
 </tr>
 </tbody>
 </table>
@@ -700,7 +694,7 @@ if at least one of the provided detectors in <tt class="docutils literal"><span 
 
 <dl class="function">
 <dt id="tral.sequence.repeat_detection_run.check_java_errors">
-<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">check_java_errors</tt><big>(</big><em>outfile</em>, <em>errfile</em>, <em>log=&lt;logging.Logger object at 0x109863978&gt;</em>, <em>procname=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#check_java_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.check_java_errors" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tral.sequence.repeat_detection_run.</tt><tt class="descname">check_java_errors</tt><big>(</big><em>outfile</em>, <em>errfile</em>, <em>log=&lt;logging.Logger object at 0x109eaccf8&gt;</em>, <em>procname=None</em><big>)</big><a class="reference internal" href="_modules/tral/sequence/repeat_detection_run.html#check_java_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.repeat_detection_run.check_java_errors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check for java problems. Return True if there were problems, else False.</p>
 <p>Check for these java errors:</p>
 <blockquote>
