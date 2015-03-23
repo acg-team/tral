@@ -1,3 +1,5 @@
+[<img src="https://img.shields.io/pypi/v/tral.svg?branch=master">](https://pypi.python.org/pypi/tral)
+
 # Tandem Repeat Annotation Library
 
 TRAL is a highly modularized, flexible sequence tandem repeats annotation Python2/3 library.
@@ -10,7 +12,7 @@ TRAL is a highly modularized, flexible sequence tandem repeats annotation Python
 The source code is [documented on GitHub IO].
 
 ### Version
-0.3.2
+0.3.3
 
 
 ### Installation

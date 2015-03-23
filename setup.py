@@ -25,12 +25,12 @@ try:
 except:
     HOME=os.path.expanduser('~')
 
-SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['create_and_annotate_sequence_pickles.py', 'create_hmm_pickles.py', 'detect_tandem_repeats_in_sequence.py', 'example_pipeline.py', 'split_sequence_file.py']]
+SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['example_workflow_MBE2014.py']]
 SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_repeat_annotation_scripts.py', 'tandem_repeat_annotation_workflow.py']]
 
 setup(
     name='tral',
-    version='0.3.2',
+    version='0.3.3',
     author='Elke Schaper',
     author_email='elke.schaper@isb-sib.ch',
     packages=['tral', 'tral.test', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],

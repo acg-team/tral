@@ -6,7 +6,6 @@ from tral.hmm.hmm_viterbi import *
 from tral.repeat import repeat
 from tral.repeat import repeat_align
 
-
 notfixed = pytest.mark.notfixed
 
 @pytest.mark.no_external_software_required
@@ -21,7 +20,7 @@ def test_hmm_path_to_non_aligned_tandem_repeat_units():
             "Long": ["GYRADKLADKLADKL", ["N","N","N","M1","M2","M3","M4","M1","M2","M3","M4","M1","M2","M3","M4"], 4, ["ADKL","ADKL","ADKL"]],
             }
     for test, p in TEST.items():
-        test_repeat_msa = hmm_path_to_non_aligned_tandem_repeat_units(sequence = p[0], path = p[1], lD = p[2])
+        test_repeat_msa = hmm_path_to_non_aligned_tandem_repeat_units(sequence = p[0], path = p[1], l_effective = p[2])
         assert test_repeat_msa == p[3]
 
 
@@ -35,7 +34,7 @@ def test_viterbi():
 
     for test, p in TEST.items():
         test_repeat = repeat.Repeat(msa = p[0])
-        test_hmm = HMM.create(format = "repeat", repeat = test_repeat)
+        test_hmm = HMM.create(input_format = "repeat", repeat = test_repeat)
 
         for iHMM in [test_hmm]:
             # Detect TRs on self.seq with hmm using the Viterbi algorithm.
@@ -43,7 +42,7 @@ def test_viterbi():
             assert type(most_likely_path) == list
             assert most_likely_path == p[2]
 
-            unaligned_msa = hmm_path_to_non_aligned_tandem_repeat_units(p[1], most_likely_path, iHMM.lD)
+            unaligned_msa = hmm_path_to_non_aligned_tandem_repeat_units(p[1], most_likely_path, iHMM.l_effective)
             assert unaligned_msa == p[3]
 
             aligned_msa = repeat_align.realign_repeat(unaligned_msa)
@@ -58,7 +57,7 @@ def test_conversion_multiple():
         However, no positive set is defined right now.
     """
     assert 0, "Test not fixed"
-    lD = 3
+    l_effective = 3
     lPaths = [['N','N','N', 'M0','M1','M2','M0','I1','M1','M2','M0','M1','M2','N','N','N'],
             ['N','N','N','M1','M2','M0','M1','M2','M0','M1','M2', 'M0', 'N','N','N'],
             ['N','N','N','M2','M0','M1','M2','M0','M1','M2','M0','M1', 'N','N','N']]

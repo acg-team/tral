@@ -23,12 +23,16 @@ Read in your sequence profile model.
     from tral.hmm import hmm
     from tral.paths import PACKAGE_DIRECTORY
 
-    fPfam_profile_hmm = os.path.join(PACKAGE_DIRECTORY,"examples", "data","Kelch_1.hmm")
+    pfam_profile_HMM = os.path.join(PACKAGE_DIRECTORY,"examples", "data","Kelch_1.hmm")
+    circular_profile_HMM_Kelch_1 = hmm.HMM.create(input_format = 'hmmer', file = pfam_profile_HMM)
 
-    circular_profile_HMM_Kelch_1 = hmm.HMM.create(format = 'hmmer', file = fPfam_profile_hmm)
 
-    print(circular_profile_HMM_Kelch_1)
+See the basic characteristics of the circular profile HMM::
 
+    >>> print(circular_profile_HMM_Kelch_1)
+    cpHMM ID: PF01344.20
+    cpHMM length: 47
+    Most likely motif: ARSSAGVVVLDGKIYVIGGRDGDGNALNSVERYDPVTNTWEKLPSMP
 
 
 Read in your sequences.
@@ -39,7 +43,7 @@ Read in your sequences.
     from tral.sequence import sequence
 
     human_HCFC1_fasta = os.path.join(PACKAGE_DIRECTORY,"examples", "data", "P51610.fasta")
-    human_HCFC1_sequence = sequence.Sequence.create(file = human_HCFC1_fasta, format = 'fasta')[0]
+    human_HCFC1_sequence = sequence.Sequence.create(file = human_HCFC1_fasta, input_format = 'fasta')[0]
 
 
 
@@ -55,13 +59,12 @@ Annotate tandem repeats with the circular profile HMM.
 The result is a tandem repeat :ref:`(interpretation) <background>`::
 
     >>> print(tandem_repeats.repeats[0])
-    > begin:31 lD:49 n:5
-    R--------PRHGHRAVAIKELIVVFGGG---------------------------------------------------------------------NEGIVDELHVYNTATNQW---FIPAVRGDIP-
-    P--------GCAAYGFVCDGTRLLVFGGM-------------------------------------------------------------------VEYGKYSNDLYELQASRWEWKRLKAK--------
-    TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTW---NKPSLSGVAPL
-    ---------PRSLHSATTIGNKMYVFGGW----------VPLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-
+    > begin:31 l_effective:53 n:5
+    R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-
+    P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---
+    TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL
+    ---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-
     R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------
-
 
 Output the detected tandem repeats.
 -----------------------------------
@@ -69,16 +72,23 @@ Output the detected tandem repeats.
 Write a singe repeat_list to .tsv format::
 
     path_to_output_tsv_file = "outputfile.tsv"  # Choose your path and filename
-    tandem_repeats.write(format = "tsv", file = path_to_output_tsv_file)
+    tandem_repeats.write(output_format = "tsv", file = path_to_output_tsv_file)
+
+
+This is how the output looks like :ref:`(interpretation) <background>`::
+
+    $ cat outputfile.tsv
+    begin	msa_original	l_effective	n_effective	repeat_region_length	divergence	pvalue
+    31	R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-,P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---,TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL,---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-,R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------	53	4.056603773584905	306	None	None
 
 
 Write a singe repeat_list to .pickle format::
 
     path_to_output_pickle_file = "outputfile.pickle"  # Choose your path and filename
-    tandem_repeats.write(format = "pickle", file = path_to_output_pickle_file)
+    tandem_repeats.write(output_format = "pickle", file = path_to_output_pickle_file)
 
 
 A repeat_list in pickle format can easily be read in again::
 
     from tral.repeat_list import repeat_list
-    tandem_repeats = repeat_list.Repeat_list.create(format = "pickle", file = path_to_output_pickle_file)
+    tandem_repeats = repeat_list.RepeatList.create(input_format = "pickle", file = path_to_output_pickle_file)

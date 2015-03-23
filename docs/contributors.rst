@@ -26,6 +26,8 @@ Journal publications
 --------------------
 E Schaper, [...], M Anisimova. TRAL - Tandem Repeat Annotation Library,(2015, *unsubmitted*)
 
+M Anisimova, J Pecerska, E Schaper (2015). `Statistical approaches to detecting and analyzing tandem repeats in genomic sequences <http://journal.frontiersin.org/article/10.3389/fbioe.2015.00031/full>`_. *Frontiers in Bioengineering and Biotechnology*. DOI: 10.3389/fbioe.2015.00031
+
 E Schaper & M Anisimova (2014). `The evolution and function of protein tandem repeats in plants <http://onlinelibrary.wiley.com/doi/10.1111/nph.13184/full>`_. *New Phytologist*. DOI: 10.1111/nph.13184
 
 E Schaper, O Gascuel & M Anisimova (2014). `Deep conservation of human protein tandem repeats within the eukaryotes <http://onlinelibrary.wiley.com/doi/10.1111/nph.13184/full>`_. *MBE*. DOI: 10.1093/molbev/msu062

@@ -1,10 +1,10 @@
-configure.rst.. _install:
+.. _install:
 
 Installation
 ============
 
-Try:
-::
+
+With pip (or pip3) configured for Python3, try::
 
     $ pip install tral
 

@@ -1,22 +1,29 @@
 # (C) 2015 Elke Schaper
 
-import logging, os, subprocess, tempfile
+"""
+    :synopsis: Alignment of tandem repeat units.
+
+    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+"""
+
+import logging
+import os
+import subprocess
+import tempfile
 from Bio import AlignIO
 
 log = logging.getLogger(__name__)
 
 from tral.repeat import repeat
-from tral.paths import *
 from tral import configuration
 
-c = configuration.Configuration.Instance()
-general_config = c.config
-repeat_config = general_config["repeat"]
-
+CONFIG_GENERAL = configuration.Configuration.instance().config
+REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
-def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None):
+
+def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
 
     # Create temporary working directory
     working_dir = tempfile.mkdtemp()
@@ -25,14 +32,19 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
     # Save my_TR to temp directory:
     msa_file = os.path.join(working_dir, 'msa_temp.faa')
     with open(msa_file, 'w') as msa_filehandle:
-        for i,iMSA in enumerate(my_msa):
+        for i, iMSA in enumerate(my_msa):
             msa_filehandle.write('> {0}\n{1}\n'.format(i, iMSA))
 
     if aligner == 'mafft':
         # Run Mafft
         # See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.
-        # The mafft result is in stdout. Check: Do you need to capture or redirect the stderr?
-        p = subprocess.Popen([repeat_config['ginsi'], "--anysymbol", "--quiet", msa_file], stdout=subprocess.PIPE)
+        # The mafft result is in stdout. Check: Do you need to capture or
+        # redirect the stderr?
+        p = subprocess.Popen([REPEAT_CONFIG['ginsi'],
+                              "--anysymbol",
+                              "--quiet",
+                              msa_file],
+                             stdout=subprocess.PIPE)
         mafft_output = [line.decode('utf8').rstrip() for line in p.stdout]
         msa = []
         for iLine in mafft_output:
@@ -46,12 +58,12 @@ def realign_repeat(my_msa, aligner = 'mafft', sequence_type = 'AA', begin = None
         try:
             return msa
         except:
-            error_note = ("Mafft could not successfully run the realignment for: "
-            "\n".join(my_msa)
-            )
+            error_note = (
+                "Mafft could not successfully run the realignment for: "
+                "\n".join(my_msa))
             logging.error(error_note)
             return None
 
     else:
-        raise ValueError('Currently, the aligner {} is not implemented.'.format(aligner))
-
+        raise ValueError(
+            'Currently, the aligner {} is not implemented.'.format(aligner))
