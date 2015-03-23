@@ -109,10 +109,10 @@ class HMM:
             tmp = [self.p_e[i] for i in self.match_states]
             tmp = "".join([max(i.keys(), key=(lambda key: i[key]))
                            for i in tmp])
-            hmm = "cpHMM ID:          {}\ncpHMM length: {}\n".format(
+            hmm = "cpHMM ID: {}\ncpHMM length: {}\n".format(
                 self.id,
                 self.l_effective)
-            hmm += "Most likely motif:      {}".format(tmp)
+            hmm += "Most likely motif: {}".format(tmp)
         except:
             hmm = "<HMM instance>"
             LOG.warning("Could not create string of HMM instance.")
