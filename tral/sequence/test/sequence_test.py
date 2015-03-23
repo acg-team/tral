@@ -122,6 +122,9 @@ def test_sequence_pickle():
     assert type(test_seq.d_repeatlist[TEST_SEQUENCE_TAG]) == repeat_list.RepeatList
     assert test_seq.d_repeatlist[TEST_SEQUENCE_TAG].repeats
 
+    test_retrieved_repeatlist = test_seq.get_repeatlist(TEST_SEQUENCE_TAG)
+    assert test_retrieved_repeatlist == test_optimized_repeat
+
     test_seq.write(test_pickle, 'pickle')
     test_seq_new = sequence.Sequence.create(test_pickle, 'pickle')
 

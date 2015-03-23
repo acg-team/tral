@@ -197,6 +197,25 @@ class Sequence:
             raise Exception("Either require denovo detection, or provide an",
                             "HMM")
 
+    def get_repeatlist(self, tag):
+        """ Retrieve `repeatlist` from this `sequence` instance.
+
+        Retrieve `repeatlist` from this `sequence` instance. Access
+        `repeatlist` as self.d_repeatlist[tag]
+
+        Args:
+            tag (str): A identifier for the repeat_list
+
+        Returns:
+            RepeatList: A repeat_list instance.
+        """
+
+        try:
+            return self.d_repeatlist[tag]
+        except ValueError:
+            logging.error("RepeatList %s not in Sequence", tag)
+
+
     def set_repeatlist(self, repeatlist, tag):
         """ Add `repeatlist` as attribute to this `sequence` instance.
 
