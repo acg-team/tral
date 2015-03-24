@@ -19,10 +19,9 @@ from tral.hmm import hmm
 from tral.hmm import hmm_io
 
 logging.config.fileConfig(config_file("logging.ini"))
-log = logging.getLogger('root')
+LOG = logging.getLogger('root')
 
-c = configuration.Configuration.Instance()
-config = c.config
+CONFIG = configuration.Configuration.instance().config
 
 # Shift REPEAT_LIST_TAG to configuration file and rename?
 REPEAT_LIST_TAG = "all"
@@ -68,7 +67,7 @@ def workflow(
         max_time), int(time_interval), int(next_time)
 
     try:
-        lSequence = Fasta(sequences_file)
+        l_sequence = Fasta(sequences_file)
     except:
         raise Exception(
             "Cannot load putative pickle file sequences_file: {}".format(sequences_file))
@@ -87,8 +86,8 @@ def workflow(
         raise Exception(
             "Cannot load hmm_annotation_file: {}".format(hmm_annotation_file))
 
-    basic_filter = config['filter']['basic']['dict']
-    basic_filter_tag = config['filter']['basic']['tag']
+    basic_filter = CONFIG['filter']['basic']['dict']
+    basic_filter_tag = CONFIG['filter']['basic']['tag']
 
     # Load previous results
     try:
@@ -108,7 +107,7 @@ def workflow(
         dResults = {}
 
     dHMM = {}
-    for iS_pyfaidx in lSequence:
+    for iS_pyfaidx in l_sequence:
 
         # If sequence is already included in results: continue.
         if iS_pyfaidx.name in dResults:
@@ -120,7 +119,7 @@ def workflow(
                 pickle.dump(dResults, fh)
             next_time = next_time + time_interval
 
-        iS = sequence.Sequence(seq=str(iS_pyfaidx), id=iS_pyfaidx.name)
+        iS = sequence.Sequence(seq=str(iS_pyfaidx), name=iS_pyfaidx.name)
 
         LOG.debug("Work on sequence {}".format(iS))
         # 1. annotate_de_novo()
@@ -133,8 +132,8 @@ def workflow(
             iTR.model = None
 
         # 2. annotate_TRs_from_hmmer()
-        if iS.id in dHMM_annotation:
-            lHMM = dHMM_annotation[iS.id]
+        if iS.name in dHMM_annotation:
+            lHMM = dHMM_annotation[iS.name]
             infoNRuns = len(lHMM)
             LOG.debug(
                 "{} Viterbi runs need to be performed.".format(infoNRuns))
@@ -166,45 +165,41 @@ def workflow(
         iS.set_repeatlist(denovo_repeat_list, DE_NOVO_ALL_TAG)
         iS.set_repeatlist(pfam_repeat_list, PFAM_ALL_TAG)
 
-        rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
-        if iS.dRepeat_list[REPEAT_LIST_TAG]:
+        rl_tmp = iS.get_repeatlist(REPEAT_LIST_TAG)
+        if iS.get_repeatlist(REPEAT_LIST_TAG):
             for iB in basic_filter.values():
                 rl_tmp = rl_tmp.filter(**iB)
         else:
-            rl_tmp = iS.dRepeat_list[REPEAT_LIST_TAG]
+            rl_tmp = iS.get_repeatlist(REPEAT_LIST_TAG)
         iS.set_repeatlist(rl_tmp, basic_filter_tag)
         iS.set_repeatlist(
             rl_tmp.intersection(
-                iS.dRepeat_list[PFAM_ALL_TAG]),
-            PFAM_TAG)
+                iS.get_repeatlist(PFAM_ALL_TAG)), PFAM_TAG)
         iS.set_repeatlist(
-            rl_tmp.intersection(
-                iS.dRepeat_list[DE_NOVO_ALL_TAG]),
-            DE_NOVO_TAG)
+            rl_tmp.intersection(iS.get_repeatlist(DE_NOVO_ALL_TAG)),DE_NOVO_TAG)
 
         # 4. calculate_overlap()
 
         # Perform common ancestry overlap filter and keep PFAMs
         criterion_pfam_fixed = {
             "func_name": "none_overlapping_fixed_repeats",
-            "rl_fixed": iS.dRepeat_list[PFAM_TAG],
+            "rl_fixed": iS.get_repeatlist(PFAM_TAG),
             "overlap_type": "common_ancestry"}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[
-            DE_NOVO_TAG].filter(**criterion_pfam_fixed)
+
+        iS.d_repeatlist[DE_NOVO_TAG] = iS.get_repeatlist(DE_NOVO_TAG).filter(**criterion_pfam_fixed)
 
         # Choose only the most convincing de novo TRs
         criterion_filter_order = {
             "func_name": "none_overlapping", "overlap": (
-                "common_ancestry", None), "lCriterion": [
+                "common_ancestry", None), "l_criterion": [
                 ("pvalue", "phylo_gap01"), ("divergence", "phylo_gap01")]}
-        iS.dRepeat_list[DE_NOVO_TAG] = iS.dRepeat_list[
-            DE_NOVO_TAG].filter(**criterion_filter_order)
+        iS.d_repeatlist[DE_NOVO_TAG] = iS.get_repeatlist(DE_NOVO_TAG).filter(**criterion_filter_order)
 
         # 5. refine_denovo()
         denovo_final = []
-        denovo_refined = [None] * len(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats)
-        for i, iTR in enumerate(iS.dRepeat_list[DE_NOVO_ALL_TAG].repeats):
-            if not iTR in iS.dRepeat_list[DE_NOVO_TAG].repeats:
+        denovo_refined = [None] * len(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats)
+        for i, iTR in enumerate(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats):
+            if not iTR in iS.get_repeatlist(DE_NOVO_TAG).repeats:
                 continue
             # Create HMM from TR
             denovo_hmm = hmm.HMM.create(file_format='repeat', repeat=iTR)
@@ -222,7 +217,7 @@ def workflow(
                         "shared_char",
                         iTR,
                         iTR_refined):
-                    rl_tmp = repeat_list.Repeat_list([iTR_refined])
+                    rl_tmp = repeat_list.RepeatList([iTR_refined])
                     LOG.debug(iTR_refined.msa)
                     for iB in basic_filter.values():
                         rl_tmp = rl_tmp.filter(**iB)
@@ -236,17 +231,17 @@ def workflow(
                 denovo_final.append(iTR)
 
         iS.set_repeatlist(
-            repeat_list.Repeat_list(denovo_refined),
+            repeat_list.RepeatList(denovo_refined),
             DE_NOVO_REFINED_TAG)
         iS.set_repeatlist(
-            repeat_list.Repeat_list(denovo_final),
+            repeat_list.RepeatList(denovo_final),
             DE_NOVO_FINAL_TAG)
         iS.set_repeatlist(
-            iS.dRepeat_list[DE_NOVO_FINAL_TAG] +
-            iS.dRepeat_list[PFAM_TAG],
+            iS.get_repeatlist(DE_NOVO_FINAL_TAG) +
+            iS.get_repeatlist(PFAM_TAG),
             FINAL_TAG)
 
-        dResults[iS.id] = iS
+        dResults[iS.name] = iS
 
     # 6.a Save results as pickle
     with open(result_file, 'wb') as fh:
@@ -269,12 +264,12 @@ def workflow(
         fh_o.write("\t".join(header))
 
         for iS in dResults.values():
-            for iTR in iS.dRepeat_list[FINAL_TAG].repeats:
+            for iTR in iS.get_repeatlist(FINAL_TAG).repeats:
                 if format == 'tsv':
                     try:
                         data = [
                             str(i) for i in [
-                                iS.id,
+                                iS.name,
                                 " ".join(
                                     iTR.msa),
                                 iTR.begin,
@@ -339,12 +334,12 @@ def main():
 
     # Update configuration
     if "sequence_type" in pars:
-        config["sequence_type"] = pars["sequence_type"]
+        CONFIG["sequence_type"] = pars["sequence_type"]
     if "detectors" in pars:
-        config["sequence"]["repeat_detection"][
-            config["sequence_type"]] = pars["detectors"]
+        CONFIG["sequence"]["repeat_detection"][
+            CONFIG["sequence_type"]] = pars["detectors"]
     if "significance_test" in pars:
-        config["repeat_score"]["score_calibration"] = pars["significance_test"]
+        CONFIG["repeat_score"]["score_calibration"] = pars["significance_test"]
 
     if pars["method"] == "file_preparation":
         file_preparation(

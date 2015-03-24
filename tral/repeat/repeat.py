@@ -117,7 +117,7 @@ class Repeat:
             return [Repeat(msa=i_msa, sequence_type=i_sequence_type) \
                     for i_msa, i_sequence_type in l_repeat]
         elif input_format == 'simulate':
-            l_repeat = repeat_io.random_sequence(return_type='repeat')
+            l_repeat = repeat_io.random_sequence(return_type='repeat', **kwargs)
             return [Repeat(msa=i_msa, sequence_type=i_sequence_type) \
                     for i_msa, i_sequence_type in l_repeat]
         else:

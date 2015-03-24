@@ -26,8 +26,6 @@ Read in tandem repeat annotations.
     with open(fRepeat_Pickle, 'rb') as fh:
         lHIV_Sequence = pickle.load(fh)
 
-    print(lHIV_Sequence)
-
 
 
 Filter overlapping tandem repeats.

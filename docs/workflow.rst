@@ -112,7 +112,7 @@ to Python pickle objects:
 ::
 
     mkdir $MYTRAL/hmm
-    python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/example/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/example/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/example/workflow/hmm
+    python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/examples/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/examples/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/examples/workflow/hmm
 
 
 On the small toy example, this file preparation step should run fast.
@@ -125,7 +125,7 @@ With the following command, annotation is performed on *uniprot_PRDM_1.fasta*:
 
 ::
 
-    python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/example/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/example/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/example/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/example/workflow/hmm
+    python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/examples/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/examples/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/examples/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/examples/workflow/hmm
 
 
 If this runs fine, you should see annotation results in:
@@ -151,7 +151,7 @@ Usage
 Adapt this command to run the tandem repeat annotation workflow (`more information <http://gc3pie.readthedocs.org/en/latest/users/gc3apps/intro.html>`_)::
 
 
-    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini
+    $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/examples/workflow/tandem_repeat_annotation_workflow.ini
 
 
 Control the workflow with `GC3Utils <http://gc3pie.readthedocs.org/en/latest/users/gc3utils.html>`_.

@@ -10,7 +10,7 @@ except ImportError:
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
-    with open(os.path.join(*paths), 'r') as f:
+    with open(os.path.join(*paths), "r") as f:
         return f.read()
 
 # Set the home variable with user argument:
@@ -21,32 +21,32 @@ try:
     del sys.argv[i+1]
     del sys.argv[i]
     if not os.path.exists(HOME):
-        raise ValueError('The argument supplied in --home is not a valid path: {}'.format(HOME))
+        raise ValueError("The argument supplied in --home is not a valid path: {}".format(HOME))
 except:
-    HOME=os.path.expanduser('~')
+    HOME=os.path.expanduser("~")
 
-SCRIPTS1 = [os.path.join('tral', 'examples', i) for i in ['example_workflow_MBE2014.py']]
-SCRIPTS2 = [os.path.join('tral', 'examples', 'workflow', i) for i in ['tandem_repeat_annotation_scripts.py', 'tandem_repeat_annotation_workflow.py']]
+SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
+SCRIPTS2 = [os.path.join("tral", "examples", "workflow", i) for i in ["tandem_repeat_annotation_scripts.py", "tandem_repeat_annotation_workflow.py"]]
 
 setup(
-    name='tral',
-    version='0.3.3',
-    author='Elke Schaper',
-    author_email='elke.schaper@isb-sib.ch',
-    packages=['tral', 'tral.test', 'tral.hmm', 'tral.hmm.test', 'tral.repeat', 'tral.repeat.test', 'tral.repeat_list', 'tral.repeat_list.test', 'tral.sequence', 'tral.sequence.test'],
-    #packages=find_packages(exclude=['tests*']),
+    name="tral",
+    version="0.3.4",
+    author="Elke Schaper",
+    author_email="elke.schaper@isb-sib.ch",
+    packages=["tral", "tral.test", "tral.hmm", "tral.hmm.test", "tral.repeat", "tral.repeat.test", "tral.repeat_list", "tral.repeat_list.test", "tral.sequence", "tral.sequence.test"],
+    #packages=find_packages(exclude=["tests*"]),
     scripts= SCRIPTS1 + SCRIPTS2,
-    url='http://pypi.python.org/pypi/tral/',
-    license='LICENSE.txt',
-    description='Detect and evaluate tandem repeats in genomic sequence data.',
-    long_description=read('README.rst'),
+    url="http://pypi.python.org/pypi/tral/",
+    license="LICENSE.txt",
+    description="Detect and evaluate tandem repeats in genomic sequence data.",
+    long_description=read("README.rst"),
     #include_package_data=True, # If you want files mentioned in MANIFEST.in also to be installed, i.e. copied to usr/local/bin
     classifiers = [
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        'Natural Language :: English',
+        "Natural Language :: English",
         "Topic :: Software Development",
         "Topic :: Scientific/Engineering",
         "Operating System :: OS Independent",
@@ -61,8 +61,16 @@ setup(
         "scipy >=0.12.0",
         #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
-    package_data={'tral': ['tral_configuration/*.ini', 'tral_configuration/data/hhrepid/*', 'tral_configuration/data/substitution_rate_matrices/*', 'examples/*.py', 'examples/data/*', "tral/examples/workflow/*.py","tral/examples/workflow/*.tsv","tral/examples/workflow/*.ini","tral/examples/workflow/*.hmm","tral/examples/workflow/*.fasta","tral/examples/workflow/split_sequence_data/*.fasta"]},
-    package_dir={'tral': 'tral'},
+    # package_data: None-module files, which should still be distributed are mentioned here:
+    package_data={"tral": ["tral_configuration/*.ini",
+                           "tral_configuration/data/hhrepid/*",
+                           "tral_configuration/data/substitution_rate_matrices/*",
+                           "examples/*.py", "examples/data/*",
+                           "examples/workflow/*.py", "examples/workflow/*.tsv",
+                           "examples/workflow/*.ini", "examples/workflow/*.hmm",
+                           "examples/workflow/*.fasta",
+                           "examples/workflow/split_sequence_data/*.fasta"]},
+    package_dir={"tral": "tral"},
 )
 
 

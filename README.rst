@@ -18,7 +18,7 @@ IO <http://elkeschaper.github.io/tral/>`__.
 Version
 ~~~~~~~
 
-0.3.3
+0.3.4
 
 Installation
 ~~~~~~~~~~~~
