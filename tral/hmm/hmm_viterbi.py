@@ -367,7 +367,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
     emissions labelled with M1 (match state 1) align according to the HMM.
     However, this method does not use this information. Therefore, for example
     the first characters in the repeat units do not necessarily align, and the
-     repeat units are not necessarily of same length.
+    repeat units are not necessarily of same length.
 
     Assume that all states are counted starting on 1.
 

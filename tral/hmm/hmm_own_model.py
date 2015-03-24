@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.ERROR)
 
 from tral.repeat import repeat
-from tral.repeat.repeat_score import loadModel
+from tral.repeat.repeat_score import load_model
 from tral.hmm import hmm_io
 
 ################################### HMM class ############################
@@ -116,7 +116,7 @@ class HMM:
         # "letters", "COMPO", and the match state keys in <hmmer_probabilities>
         l_effective = len(hmmer_probabilities.keys()) - 2
         # Assume: sequence_type = 'AA'
-        Q, null_model_emission_p, alphabet = loadModel('lg')
+        Q, null_model_emission_p, alphabet = load_model('lg')
 
         # Initialise all HMM states to default value
         repeat_states, insert_states = self.initialise_HMM_structure(l_effective)
@@ -219,9 +219,9 @@ class HMM:
 
         # Load model of sequence evolution parameters
         if sequence_type == 'AA':
-            Q, eqFreq, alphabet = loadModel('lg')
+            Q, eqFreq, alphabet = load_model('lg')
         else:
-            Q, eqFreq, alphabet = loadModel('tn93')
+            Q, eqFreq, alphabet = load_model('tn93')
 
         # Calculate ML-emission probabilities for all match states
         # YOU might want to transfer Q,eqFreq,alphabet to this function???
@@ -622,9 +622,9 @@ def calculate_log10_offspring_likelihood(tandem_repeat, divergence=None):
 
     # Load model of sequence evolution parameters
     if sequence_type == 'AA':
-        Q, eqFreq, alphabet = loadModel('lg')
+        Q, eqFreq, alphabet = load_model('lg')
     else:
-        Q, eqFreq, alphabet = loadModel('tn93')
+        Q, eqFreq, alphabet = load_model('tn93')
     P = scipy.linalg.expm(Q * divergence)
     alphabet_reverse = {i: j for j, i in alphabet.items()}
 
