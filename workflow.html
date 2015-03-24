@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Use GC3Pie to annotate your large sequence dataset. &mdash; TRAL 0.3.3 documentation</title>
+    <title>Use GC3Pie to annotate your large sequence dataset. &mdash; TRAL 0.3.4 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.3',
+        VERSION:     '0.3.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="TRAL 0.3.3 documentation" href="index.html" />
+    <link rel="top" title="TRAL 0.3.4 documentation" href="index.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -203,7 +203,7 @@ for .fasta file indexing.</p>
 <p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:</p>
 <div class="highlight-python"><div class="highlight"><pre>mkdir $MYTRAL/hmm
-python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/example/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/example/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/example/workflow/hmm
+python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/examples/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/examples/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/examples/workflow/hmm
 </pre></div>
 </div>
 <p>On the small toy example, this file preparation step should run fast.</p>
@@ -212,7 +212,7 @@ python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_ra
 <div class="section" id="perform-a-test-run">
 <h2>Perform a test run.<a class="headerlink" href="#perform-a-test-run" title="Permalink to this headline">¶</a></h2>
 <p>With the following command, annotation is performed on <em>uniprot_PRDM_1.fasta</em>:</p>
-<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/example/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/example/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/example/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/example/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/example/workflow/hmm
+<div class="highlight-python"><div class="highlight"><pre>python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/examples/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/examples/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/examples/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/examples/workflow/hmm
 </pre></div>
 </div>
 <p>If this runs fine, you should see annotation results in:</p>
@@ -230,7 +230,7 @@ Upon installation, GC3Pie needs to be <a class="reference external" href="http:/
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Adapt this command to run the tandem repeat annotation workflow (<a class="reference external" href="http://gc3pie.readthedocs.org/en/latest/users/gc3apps/intro.html">more information</a>):</p>
-<div class="highlight-python"><div class="highlight"><pre>$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf $MYTRAL/example/workflow/tandem_repeat_annotation_workflow.ini
+<div class="highlight-python"><div class="highlight"><pre>$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf $MYTRAL/examples/workflow/tandem_repeat_annotation_workflow.ini
 </pre></div>
 </div>
 <p>Control the workflow with <a class="reference external" href="http://gc3pie.readthedocs.org/en/latest/users/gc3utils.html">GC3Utils</a>.</p>
