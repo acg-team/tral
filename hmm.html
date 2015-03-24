@@ -84,7 +84,7 @@
 <li><a class="reference internal" href="#">HMM code documentation</a><ul>
 <li><a class="reference internal" href="#module-tral.hmm.hmm">hmm</a></li>
 <li><a class="reference internal" href="#module-tral.hmm.hmm_io">hmm_io</a></li>
-<li><a class="reference internal" href="#hmm-own-model">hmm_own_model</a></li>
+<li><a class="reference internal" href="#module-tral.hmm.hmm_own_model">hmm_own_model</a></li>
 <li><a class="reference internal" href="#module-tral.hmm.hmm_viterbi">hmm_viterbi</a></li>
 </ul>
 </li>
@@ -546,17 +546,12 @@ Therefore, the its transition probabilities remain unchanged.</p>
 <p>Set p_e of states to <cite>l_emission_probabilities</cite> for <cite>state</cite> given
 <cite>self.alphabet</cite>.
 In HMMER3 data, emission probabilities are -ln(p).</p>
-<dl class="docutils">
-<dt>It is e.g.::</dt>
-<dd><p class="first">self.alphabet =
-[&#8216;A&#8217;, &#8216;C&#8217;, &#8216;D&#8217;, &#8216;E&#8217;, &#8216;F&#8217;, &#8216;G&#8217;, &#8216;H&#8217;, &#8216;I&#8217;, &#8216;K&#8217;, &#8216;L&#8217;, &#8216;M&#8217;, &#8216;N&#8217;, &#8216;P&#8217;,</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/hmm/hmm.py:docstring of tral.hmm.hmm.HMM.set_emission_probability_hmmer3</tt>, line 11)</p>
-Unexpected indentation.</div>
-<blockquote class="last">
-<div>&#8216;Q&#8217;, &#8216;R&#8217;, &#8216;S&#8217;, &#8216;T&#8217;, &#8216;V&#8217;, &#8216;W&#8217;, &#8216;Y&#8217;]</div></blockquote>
-</dd>
-</dl>
+<p>It is e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre>self.alphabet =
+[&#39;A&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;, &#39;H&#39;, &#39;I&#39;, &#39;K&#39;, &#39;L&#39;, &#39;M&#39;, &#39;N&#39;, &#39;P&#39;, &#39;Q&#39;,
+ &#39;R&#39;, &#39;S&#39;, &#39;T&#39;, &#39;V&#39;, &#39;W&#39;, &#39;Y&#39;]
+</pre></div>
+</div>
 <p>Return log10(p), that is convert between the two. Conversion:
 p_Local = - p_HMM * log10(e)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -597,15 +592,10 @@ Conversion: p_Local = - p_HMM * log10(e)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>state_index</strong> (<em>int</em>) &#8211; E.g. 4</li>
-<li><strong>l_transition_probabilities</strong> (<em>list of float</em>) &#8211; <p>A list of transition
+<li><strong>l_transition_probabilities</strong> (<em>list of float</em>) &#8211; A list of transition
 probabilities as found in a single row for a certain state in
-HMMER3 files. E.g. [&#8216;0.00021&#8217;, &#8216;8.85487&#8217;, &#8216;9.57722&#8217;, &#8216;0.61958&#8217;,</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/hmm/hmm.py:docstring of tral.hmm.hmm.HMM.set_transition_probability_hmmer3</tt>, line 19)</p>
-Unexpected indentation.</div>
-<blockquote>
-<div>&#8216;0.77255&#8217;, &#8216;0.48576&#8217;, &#8216;0.95510&#8217;]</div></blockquote>
-</li>
+HMMER3 files. E.g. [&#8216;0.00021&#8217;, &#8216;8.85487&#8217;, &#8216;9.57722&#8217;, &#8216;0.61958&#8217;,
+&#8216;0.77255&#8217;, &#8216;0.48576&#8217;, &#8216;0.95510&#8217;]</li>
 </ul>
 </td>
 </tr>
@@ -645,18 +635,12 @@ Unexpected indentation.</div>
 In hmm file, emission probabilities are -ln(p).
 Return log10(p), i.d. convert between the two.
 Conversion: p_Local = - p_HMM * log10(e)</p>
-<dl class="docutils">
-<dt>Parameters (e.g.)::</dt>
-<dd><dl class="first docutils">
-<dt>letters = [&#8216;A&#8217;, &#8216;C&#8217;, &#8216;E&#8217;, &#8216;D&#8217;, &#8216;G&#8217;, &#8216;F&#8217;, &#8216;I&#8217;, &#8216;H&#8217;, &#8216;K&#8217;, &#8216;M&#8217;, &#8216;L&#8217;, &#8216;N&#8217;,</dt>
-<dd>&#8216;Q&#8217;, &#8216;P&#8217;, &#8216;S&#8217;, &#8216;R&#8217;, &#8216;T&#8217;, &#8216;W&#8217;, &#8216;V&#8217;, &#8216;Y&#8217;]</dd>
-</dl>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/hmm/hmm.py:docstring of tral.hmm.hmm.hmmer3_emission_probabilities</tt>, line 9)</p>
-Definition list ends without a blank line; unexpected unindent.</div>
-<p class="last">l_match = [&#8216;M&#8217;+str(i) for i in range(24)]</p>
-</dd>
-</dl>
+<p>Parameters (e.g.):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">letters</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;I&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="s">&#39;K&#39;</span><span class="p">,</span> <span class="s">&#39;M&#39;</span><span class="p">,</span> <span class="s">&#39;L&#39;</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">,</span>
+           <span class="s">&#39;Q&#39;</span><span class="p">,</span> <span class="s">&#39;P&#39;</span><span class="p">,</span> <span class="s">&#39;S&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">,</span> <span class="s">&#39;W&#39;</span><span class="p">,</span> <span class="s">&#39;V&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span><span class="p">]</span>
+<span class="n">l_match</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;M&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)]</span>
+</pre></div>
+</div>
 <p>Return format (pseudo code):
 [{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in l_match]</p>
 </dd></dl>
@@ -817,18 +801,171 @@ accession.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="hmm-own-model">
-<h2>hmm_own_model<a class="headerlink" href="#hmm-own-model" title="Permalink to this headline">¶</a></h2>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/docs/hmm.rst</tt>, line 18)</p>
-autodoc: failed to import module &#8216;tral.hmm.hmm_own_model&#8217;; the following exception was raised:
-Traceback (most recent call last):
-  File &#8220;/Users/elkeschaper/.virtualenvs/tral/lib/python3.4/site-packages/sphinx/ext/autodoc.py&#8221;, line 335, in import_object
-    __import__(self.modname)
-  File &#8220;/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/hmm/hmm_own_model.py&#8221;, line 16, in &lt;module&gt;
-    from tral.repeat.repeat_score import loadModel
-ImportError: cannot import name &#8216;loadModel&#8217;
-</div>
+<div class="section" id="module-tral.hmm.hmm_own_model">
+<span id="hmm-own-model"></span><h2>hmm_own_model<a class="headerlink" href="#module-tral.hmm.hmm_own_model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tral.hmm.hmm_own_model.HMM">
+<em class="property">class </em><tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">HMM</tt><big>(</big><em>tandem_repeat=None</em>, <em>prior_divergence=None</em>, <em>prior_indel_insertion=None</em>, <em>parameters=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cyclic HMM applicable to describe sequence Tandem Repeats</p>
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_TR">
+<tt class="descname">HMM_from_TR</tt><big>(</big><em>tandem_repeat</em>, <em>prior_divergence=None</em>, <em>prior_indel_insertion=None</em>, <em>emission_file=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_TR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_TR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a HMM from a TR &lt;tandem_repeat&gt;.
+Two step approach: First, calc the posterior of the ancestral sequence
+Then, calculate the likelihood of the homologous repeat unit sequence.</p>
+<p>Parameters:
+&lt;prior_divergence&gt; is {&#8216;type&#8217;: &#8216;alpha&#8217;/&#8217;fixed_value&#8217;, &#8216;value&#8217;: 4}
+&lt;prior_indel_insertion&gt; is {&#8216;mu&#8217;: 0.5, &#8216;sigma_squared&#8217;: 0.81}</p>
+<p>Store probabilities as log10arithms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_TR_One_step">
+<tt class="descname">HMM_from_TR_One_step</tt><big>(</big><em>tandem_repeat</em>, <em>t</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_TR_One_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_TR_One_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a HMM from a TR alignment given the ML divergence t.
+One step approach: Calc the posterior of the ancestral sequence and use it
+as the likelihood of the homologous repeat unit sequence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_file">
+<tt class="descname">HMM_from_file</tt><big>(</big><em>hmm_file</em>, <em>accession</em>, <em>prior_indel_insertion</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a HMM from hmm_file
+Store probabilities as log10arithms.</p>
+<p>Parameters:
+&lt;hmm_file&gt; = &#8216;path//to/file.hmm&#8217;
+&lt;accession&gt; = &#8216;PF00560&#8217;
+&lt;prior_indel_insertion&gt; = {&#8216;mu&#8217;: 0.5, &#8216;sigma_squared&#8217;: 0.81}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.initialise_HMM_structure">
+<tt class="descname">initialise_HMM_structure</tt><big>(</big><em>l_effective</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.initialise_HMM_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.initialise_HMM_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise all states
+Set transition probabilities to None/0
+Set initial probability for all states equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tral.hmm.hmm_own_model.TR">
+<em class="property">class </em><tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">TR</tt><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#TR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.TR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fake interim TR class</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">calculate_MAP_Indel_length_Zipfian_factor</tt><big>(</big><em>indel_lengths</em>, <em>prior=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_Indel_length_Zipfian_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the MAP Zipfian constant &lt;indel_zipf&gt; that determines the distribution of
+indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular
+column.
+The probability distribution of indel lengths is assumed to follow the Zipfian distribution
+(Compare Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution. Mol Biol Evol, 26, 1879–1888.
+In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
+<p>The MAP is calculated numerically, as there did not seem to be a nice analytical solution.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">calculate_MAP_Indel_length_exponential_factor</tt><big>(</big><em>indel_lengths</em>, <em>prior=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_Indel_length_exponential_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the MAP Exponential decay constant &lt;alpha&gt; that determines the distribution of
+indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular
+column.</p>
+<p>The MAP is calculated numerically, as no nice analytical solution has been found so far [power function of grade 3 needs to be solved:
+0 == prior[&#8216;sigma_squared&#8217;]*(sum(indel_lengths) - len(indel_lengths)) - alpha*(prior[&#8216;sigma_squared&#8217;]*sum(indel_lengths) + prior[&#8216;mu&#8217;]) + (alpha**2)*(1+prior[&#8216;mu&#8217;]) - alpha**3</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_indel_rate">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">calculate_MAP_indel_rate</tt><big>(</big><em>nIndels</em>, <em>n</em>, <em>prior=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_indel_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_indel_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the MAP indel_rate per repeat unit and site given
+- an assumed prior distribution of the indel rate described by the dict &lt;prior&gt;
+- the likelihood of the the observed number of indels &lt;nIndels&gt;.</p>
+<p>posterior ~ likelihood * prior
+Derive the posterior with respect to the indel_rate
+Set the result equal to 0
+Solve with respect to the MAP of the indel_rate.</p>
+<p>For nIndels in {0,1} it is possible to derive the MAP indel_rate analytically.
+For all other cases, the maximum of the posterior distribution needs to be found in good approximation algorithmically.</p>
+<p>ln(posterior) ~ ln(likelihood) + ln(prior)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_log10_indel_probability">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">calculate_log10_indel_probability</tt><big>(</big><em>nIndels</em>, <em>n</em>, <em>prior=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_log10_indel_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_log10_indel_probability" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the probabilty of an indel per site and per repeat unit
+from the MAP estimate of the indel rate, given
+- the &lt;divergence&gt; of the repeat units
+- a &lt;prior&gt; on the indel rates (normal distributed)
+- the number of indels &lt;nIndels&gt; in this column
+- the total length &lt;n&gt; of this column</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">calculate_log10_probability_indel_lengths</tt><big>(</big><em>indel_lengths</em>, <em>indel_length_max</em>, <em>type='zipf'</em>, <em>prior=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_log10_probability_indel_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the probability of indels of different length until a maximum length &lt;indel_length_max&gt;,
+assuming that either</p>
+<p>type == &#8216;zipf&#8217;
+indel lengths are distributed following a Zipfian distribution with parameter &lt;indel_zipf&gt;.
+(Compare Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution. Mol Biol Evol, 26, 1879–1888.
+In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
+<p>or
+type == &#8216;exponential&#8217;
+indels lengths are distributed following a (1-alpha)*(alpha^(l-1)) distribution.
+[Is this model already used? Probably yes. How can i cite it?]</p>
+<p>A good choice for &lt;indel_length_max&gt; when building HMMs for tandem repeats is &lt;l_effective-1&gt;, as a deletion, that
+includes a complete repeat unit, will not be visible in the tandem repeat unit alignment, and could therefore
+be ignored.</p>
+<p>Return the probabilities as a list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.derivative_log_posterior">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">derivative_log_posterior</tt><big>(</big><em>indel_rate</em>, <em>prior</em>, <em>n</em>, <em>nIndels</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#derivative_log_posterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.derivative_log_posterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>assuming that on each site on each repeat unit, an in/del event has occured, or not.
+Thus, the likelihood of a certain number of in/del events follows the binomial distribution.
+The prior is assumed to be a gaussian described by prior.</p>
+<p>Return the derivative with respect to &lt;indel_rate&gt; of the natural logarithm of the posterior
+probability of &lt;nIndels&gt;, calculated as the product of likelihood and prior. The
+normalisation factor is ignored for the moment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.divergence_from_FP_simulations">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">divergence_from_FP_simulations</tt><big>(</big><em>l</em>, <em>alpha=0.1</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#divergence_from_FP_simulations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.divergence_from_FP_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which HMM divergence sets the average FP-rate
+(i.e. the number of falsely positively assigend amino acid on either flanking side to a perfect TR)
+to in total alpha*l</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.hmmer3_emission_probabilities">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">hmmer3_emission_probabilities</tt><big>(</big><em>hmmer_probabilities</em>, <em>letters</em>, <em>lMatch</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#hmmer3_emission_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.hmmer3_emission_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emission probabilities from hmmer3 hmm file.
+In hmm file, emission probabilities are -ln(p).
+Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)</p>
+<p>Parameters (e.g.):
+letters = [&#8216;A&#8217;, &#8216;C&#8217;, &#8216;E&#8217;, &#8216;D&#8217;, &#8216;G&#8217;, &#8216;F&#8217;, &#8216;I&#8217;, &#8216;H&#8217;, &#8216;K&#8217;, &#8216;M&#8217;, &#8216;L&#8217;, &#8216;N&#8217;, &#8216;Q&#8217;, &#8216;P&#8217;, &#8216;S&#8217;, &#8216;R&#8217;, &#8216;T&#8217;, &#8216;W&#8217;, &#8216;V&#8217;, &#8216;Y&#8217;]
+lMatch = [&#8216;M&#8217;+str(i) for i in range(24)]</p>
+<p>Return format (pseudo code):
+[{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in lMatch]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.loglikelihood_substitution">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">loglikelihood_substitution</tt><big>(</big><em>t</em>, <em>Q</em>, <em>eqFreq</em>, <em>alphabet</em>, <em>tandem_repeat</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#loglikelihood_substitution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.loglikelihood_substitution" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the likelihood of a repeat assuming a star tree and a sequence model
+defined by Q, t, eqFreq and alphabet.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.test">
+<tt class="descclassname">tral.hmm.hmm_own_model.</tt><tt class="descname">test</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>To be implemented...</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-tral.hmm.hmm_viterbi">
 <span id="hmm-viterbi"></span><h2>hmm_viterbi<a class="headerlink" href="#module-tral.hmm.hmm_viterbi" title="Permalink to this headline">¶</a></h2>
@@ -996,12 +1133,8 @@ If alpha is not in [0,1].</p>
 Ignore the alignment information in the Viterbi path. For example, all
 emissions labelled with M1 (match state 1) align according to the HMM.
 However, this method does not use this information. Therefore, for example
-the first characters in the repeat units do not necessarily align, and the</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/tral/hmm/hmm_viterbi.py:docstring of tral.hmm.hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units</tt>, line 9)</p>
-Unexpected indentation.</div>
-<blockquote>
-<div>repeat units are not necessarily of same length.</div></blockquote>
+the first characters in the repeat units do not necessarily align, and the
+repeat units are not necessarily of same length.</p>
 <p>Assume that all states are counted starting on 1.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
