@@ -30,7 +30,7 @@ SCRIPTS2 = [os.path.join("tral", "examples", "workflow", i) for i in ["tandem_re
 
 setup(
     name="tral",
-    version="0.3.3",
+    version="0.3.4",
     author="Elke Schaper",
     author_email="elke.schaper@isb-sib.ch",
     packages=["tral", "tral.test", "tral.hmm", "tral.hmm.test", "tral.repeat", "tral.repeat.test", "tral.repeat_list", "tral.repeat_list.test", "tral.sequence", "tral.sequence.test"],
