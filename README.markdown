@@ -33,7 +33,7 @@ GPL
 
 ### Dependencies
 
-Some of TRAL's functions depend on external software ([Installation instrutions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
+Some of TRAL's functions depend on external software ([Installation instructions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
 
 
