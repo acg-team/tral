@@ -28,9 +28,17 @@ See also more extensive [Installation instructions].
 
 ### License
 
-GNU
+GPL
+
+
+### Dependencies
+
+Some of TRAL's functions depend on external software ([Installation instrutions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
+
+
 
 [documented on GitHub IO]:http://elkeschaper.github.io/tral/
 [Installation instructions]:http://elkeschaper.github.io/tral/install.html#install
+[Installation instructions for dependencies]:http://elkeschaper.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
