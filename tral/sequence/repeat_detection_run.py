@@ -858,20 +858,18 @@ def Detectors(lDetector=None, sequence_type=None):
         sequence_type = CONFIG_GENERAL["sequence_type"]
     if not lDetector:
         lDetector = CONFIG_GENERAL["sequence"]["repeat_detection"][sequence_type]
-    if not isinstance(lDetector, list):
-        raise TypeError(""" lDetector is not of type list. Please supply a list of TR detectors
-        (e.g. lDetector = ['HHrepID']). If you use TR detectors defined in config.ini, make
-        sure the TR detector name is followed by a comma. E.g.: HHrepID,""")
     else:
-        if any(
-            i not in list(
-                itertools.chain(
-                *
-                CONFIG_GENERAL["sequence"]["repeat_detection"].values())) for i in lDetector):
+        if isinstance(lDetector, str):
+            lDetector = [lDetector]
+        elif not isinstance(lDetector, list):
+            raise TypeError(""" lDetector is not of type list. Please supply a list of TR detectors
+            (e.g. lDetector = ['HHrepID']). If you use TR detectors defined in config.ini, make
+            sure the TR detector list (AA or DNA) is correctly defined.""")
+        if any(i not in FINDER_LIST.keys() for i in lDetector):
             raise Exception(
                 "Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})".format(
                     lDetector,
-                    FINDER_LIST))
+                    FINDER_LIST.keys()))
 
     DETECTORS = {FINDER_LIST[i].name: FINDER_LIST[i]() for i in lDetector}
 

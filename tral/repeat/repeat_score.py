@@ -232,8 +232,7 @@ def optimisation(function, args,
     Kwargs:
         start_min (float): Minimum value of function parameter ``t``.
         start_max (float): Maximum value of function parameter ``t``.
-        n_iteration (int): Number of iterations until optimisation results are
-                          returned.
+        n_iteration (int): Number of iterations until optimisation results are returned.
 
     Returns:
         tuple (Maximum of function: float,

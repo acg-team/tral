@@ -442,9 +442,10 @@ class HMM:
         In HMMER3 data, emission probabilities are -ln(p).
 
         It is e.g.::
+
             self.alphabet =
-            ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P',
-             'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+            ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q',
+             'R', 'S', 'T', 'V', 'W', 'Y']
 
         Return log10(p), that is convert between the two. Conversion:
         p_Local = - p_HMM * log10(e)
@@ -567,7 +568,7 @@ class HMM:
             l_transition_probabilities (list of float): A list of transition
                 probabilities as found in a single row for a certain state in
                 HMMER3 files. E.g. ['0.00021', '8.85487', '9.57722', '0.61958',
-                 '0.77255', '0.48576', '0.95510']
+                '0.77255', '0.48576', '0.95510']
         """
 
         l_transition_probabilities = [-(i) * np.log10(np.exp(1)) for i \
@@ -657,6 +658,7 @@ def hmmer3_emission_probabilities(hmmer_probabilities, letters, l_match):
     Conversion: p_Local = - p_HMM * log10(e)
 
     Parameters (e.g.)::
+
         letters = ['A', 'C', 'E', 'D', 'G', 'F', 'I', 'H', 'K', 'M', 'L', 'N',
                    'Q', 'P', 'S', 'R', 'T', 'W', 'V', 'Y']
         l_match = ['M'+str(i) for i in range(24)]
