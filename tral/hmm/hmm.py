@@ -312,8 +312,14 @@ class HMM:
         # O repeat_io.save_repeat_stockholm(tandem_repeat.msaD, stockholm_file)
         tandem_repeat.write(file=stockholm_file, file_format="stockholm")
 
+        # Define hmmbuild sequence type flag.
+        if tandem_repeat.sequence_type == "AA":
+            sequence_type_flag = "-amino"
+        else:
+            sequence_type_flag = "-nucleic"
+
         # Run HMMbuild to build a HMM model, and read model
-        p = subprocess.Popen([CONFIG["hmmbuild"], "--amino", tmp_id + ".hmm",
+        p = subprocess.Popen([CONFIG["hmmbuild"], sequence_type_flag, tmp_id + ".hmm",
                               tmp_id + ".sto"],
                              stdout=subprocess.PIPE, stderr=None, cwd=tmp_dir)
         p.wait()
