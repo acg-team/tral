@@ -170,13 +170,17 @@ class Repeat:
                  sequence_type=CONFIG_GENERAL["sequence_type"],
                  scoreslist=CONFIG['scoreslist'],
                  calc_score=CONFIG.as_bool('calc_score'),
-                 calc_pvalue=CONFIG.as_bool('calc_pvalue')):
+                 calc_pvalue=CONFIG.as_bool('calc_pvalue'),
+                 name = None):
         """
         .. todo:: if calc_score == False and calc_pvalue == True, there is an
             error. However, calc_pvalue == True should automatically require
             the score to be calculated.
 
         """
+
+        if name:
+            self.name = name
 
         LOG.debug(msa)
 
