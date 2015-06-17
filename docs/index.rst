@@ -7,8 +7,6 @@ TRAL makes annotation of tandem repeats in amino acid and nucleic data simple. T
 modules for detecting tandem repeats with both de novo software and sequence profile HMMs;
 statistical significance analysis of putative tandem repeats, and filtering of redundant predictions.
 
-A manuscript describing TRAL is soon to be submitted.
-
 
 Getting started
 ===============
@@ -40,7 +38,9 @@ Reference Guide
 How to cite us
 ===============
 
-*TRAL - Tandem Repeat Annotation Library (2015, unsubmitted).* - you can have a look at all :ref:`contributors and the background <contributors>` of this project.
+E Schaper, A Korsunsky, J Pecerska, A Messina, R Murri, H Stockinger, S Zoller, I Xenarios, and M Anisimova (2015). `TRAL: Tandem Repeat Annotation Library <http://bioinformatics.oxfordjournals.org/content/early/2015/05/17/bioinformatics.btv306.abstract>`_. *Bioinformatics*. DOI:  10.1093/bioinformatics/btv306
+
+More on :ref:`contributors and the background <contributors>` of this project.
 
 
 How to contribute
