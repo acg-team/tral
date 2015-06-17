@@ -44,6 +44,24 @@ def test_create_HMM_from_Repeat():
     assert test_hmm.p_0 == TEST_HMM_P0_SINGLE
 
 
+def test_create_HMM_from_DNA_Repeat():
+
+    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE, sequence_type="DNA")
+    #test_parameters = {"hmmbuild":{"hmm_copy_path":"/Users/elkeschaper/Downloads", "hmm_copy_id":"maulwurf"}}
+    #test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat, **test_parameters)
+    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+
+    assert set(test_hmm.hmmer['letters']) == set(["A","C","G","T"])
+    assert set(test_hmm.alphabet) == set(["A","C","G","T"])
+
+    assert test_hmm.l_effective == 2
+    assert set(test_hmm.states) == set(TEST_HMM_STATES_DOUBLE)
+    assert test_hmm.p_0 == TEST_HMM_P0_DOUBLE
+
+    for iState,ip_e in test_hmm.p_e.items():
+        assert set(list(ip_e.keys())) == set(["A","C","G","T"])
+    #assert test_hmm.p_t == TEST_HMM_P0_DOUBLE
+
 def test_hmm_pickle():
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)

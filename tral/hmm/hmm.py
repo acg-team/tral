@@ -127,7 +127,7 @@ class HMM:
     def viterbi(self, *args):
         return hmm_viterbi.viterbi(self, *args)
 
-    def __init__(self, hmmer_probabilities):
+    def __init__(self, hmmer_probabilities, sequence_type = "AA"):
         """ HMM class __init_ module.
 
         __init__ takes HMM parameters (including the alphabet, emission
@@ -140,6 +140,7 @@ class HMM:
         self.hmmer = hmmer_probabilities
         self.id = hmmer_probabilities['id']
         self.alphabet = self.hmmer['letters']
+        self.sequence_type = sequence_type
 
         self.l_effective = max([int(key) for key \
                                in hmmer_probabilities.keys() if key.isdigit()])
@@ -223,7 +224,7 @@ class HMM:
 
         del self.deletion_states
 
-    def create(input_format, file=None, repeat=None):
+    def create(input_format, file=None, repeat=None, **kwargs):
         """ Creates a HMM instance from 2 possible input formats.
 
         A `HMM` instance is created from one of the two possible inputs:
@@ -259,6 +260,7 @@ class HMM:
             if not os.path.exists(file):
                 raise Exception('HMMER3 file does not exist.')
             hmmer_probabilities = next(HMM.read(file))
+            sequence_type = "AA"
         elif input_format == 'pickle':
             with open(file, 'rb') as fh:
                 return pickle.load(fh)
@@ -266,12 +268,17 @@ class HMM:
             if not isinstance(repeat, Repeat):
                 raise Exception('The repeat value is not a valid instance of '
                                 'the Repeat class.')
-            hmmer_probabilities = HMM.create_from_repeat(repeat)
+            if 'hmmbuild' in kwargs:
+                hmmer_probabilities = HMM.create_from_repeat(repeat, **kwargs['hmmbuild'])
+            else:
+                hmmer_probabilities = HMM.create_from_repeat(repeat)
+            sequence_type = repeat.sequence_type
+
         else:
             raise Exception("Unknown input format: {}.".format(input_format))
 
         LOG.debug(hmmer_probabilities)
-        return HMM(hmmer_probabilities)
+        return HMM(hmmer_probabilities, sequence_type)
 
     def create_from_repeat(tandem_repeat, hmm_copy_path=None,
                            hmm_copy_id=None):
@@ -314,9 +321,11 @@ class HMM:
 
         # Define hmmbuild sequence type flag.
         if tandem_repeat.sequence_type == "AA":
-            sequence_type_flag = "-amino"
+            sequence_type_flag = "--amino"
+        elif tandem_repeat.sequence_type == "RNA":
+            sequence_type_flag = "--rna"
         else:
-            sequence_type_flag = "-nucleic"
+            sequence_type_flag = "--dna"
 
         # Run HMMbuild to build a HMM model, and read model
         p = subprocess.Popen([CONFIG["hmmbuild"], sequence_type_flag, tmp_id + ".hmm",
