@@ -131,7 +131,7 @@
 </table>
 <dl class="class">
 <dt id="tral.hmm.hmm.HMM">
-<em class="property">class </em><tt class="descclassname">tral.hmm.hmm.</tt><tt class="descname">HMM</tt><big>(</big><em>hmmer_probabilities</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tral.hmm.hmm.</tt><tt class="descname">HMM</tt><big>(</big><em>hmmer_probabilities</em>, <em>sequence_type='AA'</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sequence profile hidden Markov models (HMMs) are used to model genomic
 sequence containing a tandem repeat.</p>
 <div class="admonition note">
@@ -259,7 +259,7 @@ extracted from a Hmmer model.</p>
 
 <dl class="method">
 <dt id="tral.hmm.hmm.HMM.create">
-<tt class="descname">create</tt><big>(</big><em>input_format</em>, <em>file=None</em>, <em>repeat=None</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.create" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">create</tt><big>(</big><em>input_format</em>, <em>file=None</em>, <em>repeat=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a HMM instance from 2 possible input formats.</p>
 <p>A <cite>HMM</cite> instance is created from one of the two possible inputs:</p>
 <ul class="simple">

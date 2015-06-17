@@ -11,6 +11,7 @@ People
 ------
 
 - `Maria Anisimova <http://www.inf.ethz.ch/personal/anmaria/>`_
+- `Alexander Korsunsky <https://online.tugraz.at/tug_online/visitenkarte.show_vcard?pPersonenId=CB87061E95264479&pPersonenGruppe=3>`_
 - `Antonio Messina <http://www.gc3.uzh.ch/people/am/>`_
 - `Riccardo Murri <http://www.gc3.uzh.ch/people/rm/>`_
 - `Julia Pecerska <http://www.bsse.ethz.ch/department/people/detail-person.html?persid=192596>`_
@@ -24,7 +25,7 @@ People
 
 Journal publications
 --------------------
-E Schaper, [...], M Anisimova. TRAL - Tandem Repeat Annotation Library,(2015, *unsubmitted*)
+E Schaper, A Korsunsky, J Pecerska, A Messina, R Murri, H Stockinger, S Zoller, I Xenarios, and M Anisimova (2015). `TRAL: Tandem Repeat Annotation Library <http://bioinformatics.oxfordjournals.org/content/early/2015/05/17/bioinformatics.btv306.abstract>`_. *Bioinformatics*. DOI:  10.1093/bioinformatics/btv306
 
 M Anisimova, J Pecerska, E Schaper (2015). `Statistical approaches to detecting and analyzing tandem repeats in genomic sequences <http://journal.frontiersin.org/article/10.3389/fbioe.2015.00031/full>`_. *Frontiers in Bioengineering and Biotechnology*. DOI: 10.3389/fbioe.2015.00031
 
