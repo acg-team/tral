@@ -1,29 +1,28 @@
 import os
 import pytest
 
+import ete3
+
 from tral.repeat_unit_phylogeny import repeat_unit_phylogeny
 from tral.repeat_unit_phylogeny.repeat_unit_phylogeny import RepeatUnitPhylogeny
 from tral.repeat import repeat
 from tral.hmm import hmm, hmm_viterbi
 
-# In case all repeat units start from the same index
+# In case all repeat units start from the same index.
 TEST_REPEAT_MSA_ORTHOLOG1 = ["AA","AA"]
 TEST_REPEAT_MSA_ORTHOLOG2 = ["A","A","A"]
 TEST_REPEAT_MSA_ORTHOLOG3 = ["A","A","A"]
 
+# In case repeat units were detected with the Viterbi algorithm and do not
+# from the same index.
 TEST_REPEAT_MSA = ["AC","AC"]
 TEST_SEQUENCE1 = "GYEDEACACACLPRY"
 TEST_SEQUENCE2 = "DEDRATACACLGLG"
 TEST_SEQUENCE3 = "FYCACACACACACALGLGKRP"
 TEST_IDS = ["S1", "S2", "S3"]
 
-# In case repeat units were detected with the Viterbi algorithm and do not
-# from the same index
-TEST_SEQUENCES = ""
-TEST_VITERBI_PATHS1 =
-TEST_VITERBI_PATHS2 =
-TEST_VITERBI_PATHS3 =
 
+notfixed = pytest.mark.notfixed
 
 @pytest.fixture
 def path():
@@ -52,13 +51,14 @@ def test_create_RepeatUnitPhylogeny_from_double_Repeat():
     test_phylo = RepeatUnitPhylogeny.create(input_type = 'repeat', repeats = test_repeats)
     assert 1 == 1
 
+
 @notfixed
 def test_check_Repeat_characteristics():
 
-    assert 1 == 1
+    assert 1 == 2
 
 
-def pair_wise_phylogenies():
+def test_pair_wise_phylogenies():
 
     # Retrieve Viterbi paths
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA)
@@ -76,5 +76,8 @@ def pair_wise_phylogenies():
 
     test_d_phylo = repeat_unit_phylogeny.pairwise_optimal_repeat_unit_phylogenies(test_d_sequences, test_d_viterbi_paths, lD)
 
-    assert ('S2', 'S3') in test_d_phylo
-    assert isinstance(test_d_phylo[('S2', 'S3')].phylogeny, ete3.coretype.tree.TreeNode)
+    print(test_d_phylo)
+    assert (('S2', 'S3') in test_d_phylo or ('S3', 'S2') in test_d_phylo)
+    assert test_d_phylo[('S1', 'S3')] == None
+    assert isinstance(test_d_phylo[('S1', 'S2')], RepeatUnitPhylogeny)
+    assert isinstance(test_d_phylo[('S1', 'S2')].phylogeny, ete3.coretype.tree.TreeNode)
