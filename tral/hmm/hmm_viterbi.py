@@ -69,20 +69,20 @@ def viterbi(hmm, emission):
             value in transition.items()} for iS,
         transition in hmm.p_t.items()}
 
-    if any([(iS not in CONFIG['all_amino_acids']) for iS in emission]):
+    if any([(iS not in CONFIG[hmm.sequence_type]['all_chars']) for iS in emission]):
         raise Exception(
             "There is an unknown amino acid in:\n {}\n".format(emission))
 
-    # In case there are ambiguous amino acids in the sequence, calculate the
-    # expected frequencies of the AAs that they could stand for from the
-    # emission frequencies of the hmm in the neutral state "N".
+    # In case there are ambiguous characters in the sequence, calculate the
+    # expected frequencies of the char (AA or DNA) that they could stand for
+    # from the emission frequencies of the hmm in the neutral state "N".
     d_ambiguous_local = {}
-    for iA in CONFIG['ambiguous_amino_acid'].keys():
+    for iA in CONFIG[hmm.sequence_type]['ambiguous_chars'].keys():
         d_ambiguous_local[iA] = {}
         if iA in emission:
             total = np.log10(sum(10 ** p_e['N'][i_ambiguous] \
-                    for i_ambiguous in CONFIG['ambiguous_amino_acid'][iA]))
-            for i_ambiguous in CONFIG['ambiguous_amino_acid'][iA]:
+                    for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
+            for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]:
                 d_ambiguous_local[iA][i_ambiguous] = p_e['N'][i_ambiguous] - total
 
     LOG.debug("p_0: {0}".format(p_0))

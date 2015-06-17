@@ -190,9 +190,9 @@ class Repeat:
         self.msa = [repeat_unit.upper().replace("_", "-").replace("*", "-")
                     for repeat_unit in msa]
 
-        self.msa_standard_aa = [standardize(i) for i in self.msa]
-
         self.sequence_type = sequence_type
+
+        self.msa_standard_aa = [standardize(i, self.sequence_type) for i in self.msa]
 
         self.n = len(self.msa)
         self.l_msa = max(map(len, self.msa))
@@ -443,13 +443,13 @@ class Repeat:
         ])
         )
 
-        self.msaTD_standard_aa = [standardize(i) for i in self.msaTD]
+        self.msaTD_standard_aa = [standardize(i, self.sequence_type) for i in self.msaTD]
 
         self.msaD = ["".join(c) for c in zip(*self.msaTD)]
 
         self.l_effective = len(self.msaTD)
         textD = " ".join(self.msaD)
-        self.textD_standard_aa = standardize(textD)
+        self.textD_standard_aa = standardize(textD, self.sequence_type)
         # totD is used in repeat_score
         self.totD = len(textD) - textD.count('-') - self.n + 1
         if self.l_effective != 0:
@@ -674,10 +674,10 @@ class Repeat:
 # Standardize MSA #############################################################
 
 
-def standardize(blob):
+def standardize(blob, sequence_type):
 
-    for original, replacement in CONFIG_GENERAL[
-            'ambiguous_amino_acid'].items():
+    for original, replacement in CONFIG_GENERAL[sequence_type][
+            'ambiguous_chars'].items():
         blob = blob.replace(original, replacement[0])
     return blob
 

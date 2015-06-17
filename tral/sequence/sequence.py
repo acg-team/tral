@@ -33,17 +33,18 @@ class Sequence:
         seq_standard_aa (str): The sequence with standard amino acids only
     """
 
-    def __init__(self, seq, name=None):
+    def __init__(self, seq, name=None, sequence_type="AA"):
 
         if not isinstance(seq, str):
             raise Exception('The seq value is not a String')
         self.seq = seq.upper()
+        self.sequence_type = sequence_type
         for i in self.seq:
-            if i not in CONFIG['all_amino_acids']:
-                raise Exception("{} is not in CONFIG['all_amino_acids']: {}"
-                                .format(i, CONFIG['all_amino_acids']))
+            if i not in CONFIG[self.sequence_type]['all_chars']:
+                raise Exception("{} is not in CONFIG[{}]['all_chars']: {}"
+                                .format(i, self.sequence_type, CONFIG['all_chars']))
 
-        self.seq_standard_aa = repeat.standardize(self.seq)
+        self.seq_standard_aa = repeat.standardize(self.seq, self.sequence_type)
 
         if name:
             self.name = name
