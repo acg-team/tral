@@ -202,7 +202,7 @@ def workflow(
             if not iTR in iS.get_repeatlist(DE_NOVO_TAG).repeats:
                 continue
             # Create HMM from TR
-            denovo_hmm = hmm.HMM.create(file_format='repeat', repeat=iTR)
+            denovo_hmm = hmm.HMM.create(input_format='repeat', repeat=iTR)
             # Run HMM on sequence
             denovo_refined_rl = iS.detect(lHMM=[denovo_hmm])
             append_refined = False
