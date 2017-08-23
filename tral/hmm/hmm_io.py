@@ -1,18 +1,19 @@
 # (C) 2015 Elke Schaper
 
 """
-    :synopsis: Input/output for hmms.
+:synopsis: Input/output for hmms.
 
-    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+.. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
 
 import logging
 import os
 import re
+import math
 
 LOG = logging.getLogger(__name__)
 
-################################## READ HMMMER3  #########################
+# ################################ READ HMMMER3  #########################
 
 
 def read(hmm_filename, id=None):
@@ -54,8 +55,6 @@ def read(hmm_filename, id=None):
         of 0 probability is stored as ``*`` which in fact means -∞ (minus
         infinity).
 
-    .. todo:: What does this mean: "Store probabilities as log10arithms. [???]"
-
     Args:
         hmm_filename (str): Path to the file with model data in the HMMER3
             file format.
@@ -91,7 +90,6 @@ def read(hmm_filename, id=None):
             }
 
     """
-
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_HMM = re.compile(r"HMM")
@@ -233,8 +231,8 @@ def read(hmm_filename, id=None):
 
 
 def split_HMMER3_file(hmm_filename, resultdir):
-    """ Split HMMER3 models from a single file ``hmm_filename`` into many files
-     in ``resultdir``.
+    """Split HMMER3 models from a single file ``hmm_filename`` into many files
+    in ``resultdir``.
 
     Helper function: split HMMER3 models from a single file ``hmm_filename``
     into many files in ``resultdir``. The models are named after the HMM
@@ -245,12 +243,12 @@ def split_HMMER3_file(hmm_filename, resultdir):
       resultdir (str): Path to directory where result files are stored.
 
     """
-
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     tmp_file = os.path.join(resultdir, "tmp.hmm")
     state = 0
     fh = None
+    acc = None
 
     with open(hmm_filename, "rt") as infile:
 
@@ -297,7 +295,6 @@ def read_HMMER_acc_lengths(hmm_filename):
       ..  todo:: Decide whether this function is needed.
 
     """
-
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_length = re.compile(r"LENG\s+([\w\.]+)")
     state = 0
