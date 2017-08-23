@@ -406,7 +406,7 @@ def write_HMMER(hmm, hmm_file):
         out.write("ALPH  {}\n".format(alphabet))
         out.write("RF    no\n")
         out.write("CS    no\n")
-        out.write("MAP   no\n")
+        out.write("MAP   yes\n")
         # HMM header line
         out.write("HMM       ")
         out.write(" ".join([l.center(7) for l in hmm.alphabet]))
@@ -447,7 +447,7 @@ def write_HMMER(hmm, hmm_file):
         for i in range(1, hmm.l_effective + 1):
             out.write("  {:<7} ".format(i))
             out.write(" ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['emissions']]))
-            out.write(" - - -\n")
+            out.write(" {} - -\n".format(i))
             out.write(" " * 10)
             out.write(" ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['insertion_emissions']]))
             out.write("\n")
