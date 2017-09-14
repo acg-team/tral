@@ -28,9 +28,16 @@ except:
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
 SCRIPTS2 = [os.path.join("tral", "examples", "workflow", i) for i in ["tandem_repeat_annotation_scripts.py", "tandem_repeat_annotation_workflow.py"]]
 
+
+# Load the version number from tral/__init__.py
+__version__ = "Undefined"
+for line in open('tral/__init__.py'):
+    if (line.startswith('__version__')):
+        exec(line.strip())
+
 setup(
     name="tral",
-    version="0.3.5",
+    version=__version__,
     author="Elke Schaper",
     author_email="elke.schaper@isb-sib.ch",
     packages=["tral", "tral.test", "tral.hmm", "tral.hmm.test", "tral.repeat", "tral.repeat.test", "tral.repeat_list", "tral.repeat_list.test", "tral.sequence", "tral.sequence.test"],
