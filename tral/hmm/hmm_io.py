@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import math
+import tral
 
 LOG = logging.getLogger(__name__)
 
@@ -373,14 +374,15 @@ def write_HMMER(hmm, hmm_file):
             out = open(hmm_file, 'w')
 
         # Header section
-        out.write("HMMER3/b\n")
+        out.write("HMMER3/f [TRAL {}]\n".format(tral.__version__))
 
         if hmm.id:
-
             name = hmm.id
         elif type(hmm_file) == str:
             # use filename
             name = os.path.splitext(os.path.basename(hmm_file))[0]
+        elif hasattr(hmm_file, "name"):
+            name = os.path.splitext(os.path.basename(hmm_file.name))[0]
         else:
             # final fallback
             name = "TRAL"
@@ -404,9 +406,11 @@ def write_HMMER(hmm, hmm_file):
             alphabet = "custom"
 
         out.write("ALPH  {}\n".format(alphabet))
-        out.write("RF    no\n")
-        out.write("CS    no\n")
         out.write("MAP   yes\n")
+        out.write("CONS  no\n")
+        out.write("RF    no\n")
+        out.write("MM    no\n")
+        out.write("CS    no\n")
         # HMM header line
         out.write("HMM       ")
         out.write(" ".join([l.center(7) for l in hmm.alphabet]))
@@ -433,26 +437,26 @@ def write_HMMER(hmm, hmm_file):
                 return to_fixed_width(p, 7)
 
         out.write("  COMPO   ")
-        out.write(" ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['emissions']]))
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['emissions']]))
         out.write("\n")
         # BEGIN probabilities
         out.write(" " * 10)
-        out.write(" ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['insertion_emissions']]))
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['insertion_emissions']]))
         out.write("\n")
         out.write(" " * 10)
-        out.write(" ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['transition']]))
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['transition']]))
         out.write("\n")
 
         # Main states
         for i in range(1, hmm.l_effective + 1):
-            out.write("  {:<7} ".format(i))
-            out.write(" ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['emissions']]))
-            out.write(" {} - -\n".format(i))
+            out.write("{:>7}   ".format(i))
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['emissions']]))
+            out.write(" {map} {cons} {rf} {mm} {cs}\n".format(map=i, cons="-", rf="-", mm="-", cs="-"))
             out.write(" " * 10)
-            out.write(" ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['insertion_emissions']]))
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['insertion_emissions']]))
             out.write("\n")
             out.write(" " * 10)
-            out.write(" ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['transition']]))
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['transition']]))
             out.write("\n")
         out.write("//")
 
