@@ -1,9 +1,9 @@
 # (C) 2012-2015 Elke Schaper
 
 """
-    :synopsis: Viterbi algorithm for circular hidden Markov models.
+:synopsis: Viterbi algorithm for circular hidden Markov models.
 
-    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+.. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
 
 from collections import defaultdict
@@ -18,9 +18,10 @@ LOG = logging.getLogger(__name__)
 CONFIG = configuration.Configuration.instance().config
 
 
-def viterbi(hmm, emission):
-    """ Calculate the most probable sequence of states given a sequence of
-    emissions and a HMM using the Viterbi algorithm
+def viterbi_with_prob(hmm, emission):
+    """Calculate the most probable sequence of states given a sequence of
+    emissions and a HMM using the Viterbi algorithm, as well as the probability\
+    of that path
 
     Get local copies of all variables.
     All probabilities must be given as logarithms
@@ -33,28 +34,35 @@ def viterbi(hmm, emission):
         emission (sequence): An instance of the Sequence class.
 
     Returns:
-        The most likely sequence of hmm states to emit the sequence in the
-        form of a list of str.
+        Tuple (path, probability)
+        - The most likely sequence of hmm states to emit the sequence in the
+        form of a list of str, or None if it does not meet the configured thresholds
+        - The log10 probability of that path (-inf if path is None)
+
+    Configuration:
+        filter.basic.dict.n_effective.threshold: minimum (sequence length/hmm l_effective)
+        hmm.l_effective_max: Max HMM size
+        [AA|DNA].ambiguous_chars: Combine probabilities of ambiguous residues
 
     .. todo:: Adapt docstrings to refactored Viterbi -> Viterbi_path classes.
     .. todo:: Check: Do you need local copies of all variables?
     .. todo:: Do the functions related to viterbi need to be summarized (e.g.
               in one class?) How do they relate to the Sequence class, or the
               HMM class?
-    """
 
+    """
     if len(emission) / hmm.l_effective < \
-        float(CONFIG['filter']['basic']['dict']['n_effective']['threshold']):
-        LOG.info("Skip the HMM as it is too long ({}) for this sequence ({}) " \
-                 "according to the filter criterion min n_effective ({})." \
+            float(CONFIG['filter']['basic']['dict']['n_effective']['threshold']):
+        LOG.info("Skip the HMM as it is too long ({}) for this sequence ({}) "
+                 "according to the filter criterion min n_effective ({})."
                  .format(hmm.l_effective, len(emission),
                          CONFIG['filter']['basic']['dict']['n_effective']))
-        return None
+        return None, -np.inf
     if hmm.l_effective > float(CONFIG['hmm']['l_effective_max']):
-        LOG.info("Skip the HMM as it is too long (%d) according to the " \
+        LOG.info("Skip the HMM as it is too long (%d) according to the "
                  "filter criterion max hmm.l_effective (%d).", hmm.l_effective,
                  CONFIG['hmm']['l_effective_max'])
-        return None
+        return None, -np.inf
 
     states = hmm.states
     p_0 = {iS: value for iS, value in hmm.p_0.items()}
@@ -80,7 +88,7 @@ def viterbi(hmm, emission):
     for iA in CONFIG[hmm.sequence_type]['ambiguous_chars'].keys():
         d_ambiguous_local[iA] = {}
         if iA in emission:
-            total = np.log10(sum(10 ** p_e['N'][i_ambiguous] \
+            total = np.log10(sum(10 ** p_e['N'][i_ambiguous]
                     for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
             for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]:
                 d_ambiguous_local[iA][i_ambiguous] = p_e['N'][i_ambiguous] - total
@@ -188,7 +196,7 @@ def viterbi(hmm, emission):
         for iV in path.values():
             iV['path'] = iV['path_next'][:]
             iV['probability'] = iV['probability_next']
-        #LOG.debug("Path: {0}".format(path))
+        # LOG.debug("Path: {0}".format(path))
 
     # Which overall path is the most likely?
     path_summary = {iS: path[iS]['probability'] for iS in states}
@@ -198,12 +206,41 @@ def viterbi(hmm, emission):
     LOG.debug("The most likely path is %s. It has a score of %d.",
               str(most_likely_path), p_most_likely_path)
 
-    return most_likely_path
+    return most_likely_path, p_most_likely_path
+
+
+def viterbi(hmm, emission):
+    """Calculate the most probable sequence of states given a sequence of
+    emissions and a HMM using the Viterbi algorithm
+
+    Get local copies of all variables.
+    All probabilities must be given as logarithms
+    Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with
+    Lysine (K) [Reason: Seldom AAs that are not part of standard amino acid
+    substitution models.]
+
+    Args:
+        hmm (hmm): An instance of the HMM class.
+        emission (sequence): An instance of the Sequence class.
+
+    Returns:
+        The most likely sequence of hmm states to emit the sequence in the
+        form of a list of str, or None if it does not meet the configured thresholds
+
+    Configuration:
+        filter.basic.dict.n_effective.threshold: minimum (sequence length/hmm l_effective)
+        hmm.l_effective_max: Max HMM size
+        [AA|DNA].ambiguous_chars: Combine probabilities of ambiguous residues
+
+    """
+    path, prob = viterbi_with_prob(hmm, emission)
+    return path
 
 
 def probability_of_the_former_state(i_former, iS, iE, p_e, p_t, path):
-    ''' Calculate the probability of i_former, given iS and iE together with
-    the dicts of emission and transition probabilities.'''
+    """Calculate the probability of i_former, given iS and iE together with
+    the dicts of emission and transition probabilities.
+    """
     # Exclude paths with a zero probability (i.e. a log(probability) set to
     # None)
     if iS in p_t[i_former] and None is not p_t[i_former][iS] and iE in p_e[
@@ -214,7 +251,7 @@ def probability_of_the_former_state(i_former, iS, iE, p_e, p_t, path):
 
 
 def distance_index(i, j, length):
-    """ Helper function to calculate the distance between two indices in a
+    """Helper function to calculate the distance between two indices in a
     circular HMM.
 
     Helper function to calculate the distance between two indices in a
@@ -232,6 +269,7 @@ def distance_index(i, j, length):
 
     .. todo:: May be replaced by a simple mod, as distance_index is used only
         once in the code at current.
+
     """
     if j > i:
         return j - i
@@ -244,7 +282,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
         paths,
         l_effective,
         alpha=None):
-    """ Convert several viterbi paths of a hmm on several sequences into the
+    """Convert several viterbi paths of a hmm on several sequences into the
     corresponding hmm units.
 
     Be ungreedy: Start from the last index in the cluster of all start state
@@ -274,7 +312,6 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
     .. todo:: Check example for returns.
 
     """
-
     if not alpha:
         alpha = 0.6
 
@@ -304,7 +341,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
     elif len(l_used_indices) == 1:
         start_index = l_used_indices[0]
     else:
-        distances = [i - j for j, i in \
+        distances = [i - j for j, i in
                         zip(l_used_indices[:-1], l_used_indices[1:])] + \
                     [l_effective - l_used_indices[-1] + l_used_indices[0]]
         max_distance_index, max_distance = max(enumerate(distances),
@@ -359,8 +396,8 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
 
 
 def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
-    """ Convert a viterbi <path> of a hmm of length <l_effective> on <sequence>
-     into the corresponding tandem repeat
+    """Convert a viterbi <path> of a hmm of length <l_effective> on <sequence>
+    into the corresponding tandem repeat
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
     Ignore the alignment information in the Viterbi path. For example, all
@@ -383,7 +420,6 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
     .. todo:: Use sequence instance instead of string for input?
 
     """
-
     begin = path.count('N')
     # If no repeat was found, return None.
     if begin == len(sequence) or path.count('C') == len(sequence):
@@ -391,11 +427,11 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
 
     splitter = re.compile("(\w)(\d+)")
     mapping = [
-        ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS) \
+        ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)
         for iS, iP in zip(sequence[begin:], path[begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
-    index_shift = ["Empty"] + [(i + l_effective + 1 - shift) % \
+    index_shift = ["Empty"] + [(i + l_effective + 1 - shift) %
                               l_effective for i in range(l_effective)]
     LOG.debug("The tandem repeat is shifted by: %d", shift)
 
@@ -413,7 +449,6 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
 
     else:
         for iM, iS in mapping[1:]:
-            #print("{} {}".format(iM,iS))
             if index_shift[iM[1]] >= last_used_index:
                 repeat_unit += iS
             else:
@@ -466,8 +501,8 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
         Is it the index of the last flanking character, or the first repeat character?
     .. todo:: Can we update this function, e.g. to not assume that HMM states start on 0?
     .. todo:: Check the docstring, reformat returns.
-    """
 
+    """
     begin = most_likely_path.count('N')
     # If no repeat was found, return None.
     if begin == len(sequence) or most_likely_path.count('C') == len(sequence):
@@ -481,8 +516,8 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
     splitter = re.compile("(\w)(\d+)")
 
     mapping = [
-        ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS) \
-        for iS, iP in zip(sequence[begin:], most_likely_path[begin:]) \
+        ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)
+        for iS, iP in zip(sequence[begin:], most_likely_path[begin:])
         if iP != 'C']
 
     shift = mapping[0][0][1]
@@ -498,19 +533,19 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
 
     for iM, iS in mapping[1:]:
 
-        LOG.debug("Iteration iS: %d, iM: %d, last_used_index: %d, " \
+        LOG.debug("Iteration iS: %d, iM: %d, last_used_index: %d, "
                   "max_used_index_M: %d, max_used_index_I: %d",
                   iS, iM, last_used_index, max_used_index_M, max_used_index_I)
 
         # If we have entered a new repeat unit, add a new element to <insertions>
         # (Including some index magic, e.g. the insertion state index is shifted by one (lowered))
-        if iM[0] == "M" and (index_shift[iM[1]] <= max_used_index_M or \
+        if iM[0] == "M" and (index_shift[iM[1]] <= max_used_index_M or
                              index_shift[iM[1]] <= max_used_index_I):
             insertions.append(defaultdict(str))
             max_used_index_M = index_shift[iM[1]]
             max_used_index_I = index_shift[iM[1]] - 1
 
-        elif iM[0] == "I" and (index_shift[iM[1] - 1] < max_used_index_I or \
+        elif iM[0] == "I" and (index_shift[iM[1] - 1] < max_used_index_I or
                               index_shift[iM[1] - 1] < max_used_index_M):
             insertions.append(defaultdict(str))
             max_used_index_I = index_shift[iM[1] - 1]
