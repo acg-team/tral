@@ -8,6 +8,7 @@ import os
 import argparse
 import logging
 import gzip
+import itertools
 from tral.hmm import hmm, hmm_io, hmm_viterbi
 from tral.sequence import sequence
 from Bio import SeqIO
@@ -24,7 +25,7 @@ def opengzip(filename):
         return open(filename, 'rt')
 
 
-def tralsearch(hmmfile, databasefile, outfile):
+def tralsearch(hmmfile, databasefile, outfile, start=0, n=0):
     circular_profile = hmm.HMM.create(input_format='hmmer', file=hmmfile)
 
     with opengzip(databasefile) as database:
@@ -35,7 +36,7 @@ def tralsearch(hmmfile, databasefile, outfile):
             # logging.info("Loaded %d sequences", len(list(seqs)))
             seqs = SeqIO.parse(database, 'fasta')
 
-            for seq in seqs:
+            for seq in itertools.islice(seqs, start, start + n if n > 0 else None):
                 hmm_results, prob = hmm_viterbi.viterbi_with_prob(circular_profile, seq.seq)
 
                 results.write(seq.name)
@@ -54,8 +55,12 @@ if __name__ == "__main__":
     parser.add_argument("results", help="results file")
     parser.add_argument("-v", "--verbose", help="Long messages",
         dest="verbose", default=False, action="store_true")
+    parser.add_argument("-s", "--start", help="Index of database sequence to start with (default: 0)",
+                        type=int, default=0)
+    parser.add_argument("-n", "--dbsize", help="Number of database sequences to include (default: 0 to include all)",
+                        type=int, default=0)
     args = parser.parse_args()
 
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
-    tralsearch(args.hmm, args.database, args.results)
+    tralsearch(args.hmm, args.database, args.results, start=args.start, n=args.dbsize)
