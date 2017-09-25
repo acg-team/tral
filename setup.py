@@ -16,12 +16,12 @@ here = path.abspath(path.dirname(__file__))
 # Here we can't use import as that would
 # tell us the version of Biopython already installed (if any).
 __version__ = "Undefined"
-for line in open('armrp-pipeline/__init__.py'):
+for line in open('armrppipeline/__init__.py'):
     if (line.startswith('__version__')):
         exec(line.strip())
 
 setup(
-    name='armrp-pipeline',
+    name='armrppipeline',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -31,7 +31,7 @@ setup(
     description='Collection of scripts for analyzing Armadillo repeat proteins',
 
     # The project's main homepage.
-    url='https://github.com/acg-team/armrp-pipeline',
+    url='https://github.com/acg-team/armrppipeline',
 
     # Author details
     author='Spencer Bliven',

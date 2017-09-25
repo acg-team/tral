@@ -1,4 +1,4 @@
-# armrp-pipeline
+# ArmRP Pipeline
 Collection of scripts for analyzing Armadillo repeat proteins
 
 
