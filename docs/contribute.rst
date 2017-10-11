@@ -96,3 +96,31 @@ Install the package from pypitest as follows:
     pip install -i https://testpypi.python.org/pypi
 
 
+
+How to use Pypi
+---------------
+
+
+This documentation summarizes the steps to a new release of TRAL.
+
+Version number updates
+
+* README.markdown and README.rst
+* setup.py
+* docs/conf.py
+
+
+Try testpypi
+
+::
+    cd ~
+    swap .pypirc_testpypi .pypirc
+
+    cd [TRAL directory]
+    python setup.py sdist upload -r pypitest
+
+    cd ~
+    swap .pypirc_testpypi .pypirc
+
+    cd [Installation test directory]
+    pip install -i https://testpypi.python.org/pypi tral
