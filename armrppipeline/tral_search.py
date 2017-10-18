@@ -70,7 +70,7 @@ def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
                 results.write("\t")
                 results.write(str(odds))
                 results.write("\t")
-                results.write(" ".join(hmm_results))
+                results.write(" ".join(hmm_results) if hmm_results else "")
                 results.write("\n")
                 results.flush()
 
