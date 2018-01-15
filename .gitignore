@@ -54,3 +54,6 @@ docs/_build/
 
 # Other stuff
 .DS_Store
+
+# IDE
+.idea
