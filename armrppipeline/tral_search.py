@@ -51,6 +51,9 @@ def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
             # logging.info("Loaded %d sequences", len(list(seqs)))
             seqs = SeqIO.parse(database, 'fasta')
 
+            #header
+            results.write("ID\tProb\tLO\tStates\n")
+
             for record in itertools.islice(seqs, start, start + n if n > 0 else None):
 
                 seq = record.seq
@@ -59,9 +62,13 @@ def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
 
                 hmm_results, prob = hmm_viterbi.viterbi_with_prob(circular_profile, seq)
 
+                odds = hmm_viterbi.logodds(seq, prob, circular_profile.p_e['N'])
+
                 results.write(record.name)
                 results.write("\t")
                 results.write(str(prob))
+                results.write("\t")
+                results.write(str(odds))
                 results.write("\t")
                 results.write(" ".join(hmm_results))
                 results.write("\n")
