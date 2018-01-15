@@ -62,7 +62,7 @@ def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
 
                 hmm_results, prob = hmm_viterbi.viterbi_with_prob(circular_profile, seq)
 
-                odds = hmm_viterbi.logodds(seq, prob, circular_profile.p_e['N'])
+                odds = hmm_viterbi.logodds(circular_profile, seq, prob)
 
                 results.write(record.name)
                 results.write("\t")
