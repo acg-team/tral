@@ -77,7 +77,7 @@ def viterbi_with_prob(hmm, emission):
             value in transition.items()} for iS,
         transition in hmm.p_t.items()}
 
-    if any([(iS not in CONFIG[hmm.sequence_type]['all_chars']) for iS in emission]):
+    if any([(iE not in CONFIG[hmm.sequence_type]['all_chars']) for iE in emission]):
         raise Exception(
             "There is an unknown amino acid in:\n {}\n".format(emission))
 
@@ -207,6 +207,31 @@ def viterbi_with_prob(hmm, emission):
               str(most_likely_path), p_most_likely_path)
 
     return most_likely_path, p_most_likely_path
+
+
+def logodds(emission, logprob, background):
+    """Compute the log-odds score of the given emission
+
+    Log odds is defined as:
+
+        LO = log10 Pr[viterbi probability]/Pr[null]
+
+    where the null model is given by a constant background frequency f(x) for each amino acid:
+
+        Pr[null] = sum(f(x) for x in emission)
+
+    Args:
+        - emission (str): emitted residues
+        - logprob (float): log10 of the match probability, as returned by viterby_with_prob
+        - background (dict): dictionary mapping residues to their log10 background frequency. Typically hmm.p_e['N'] for
+          TRAL HMMs
+
+    Returns:
+        (float) LO
+
+    """
+    null = sum(background[x] for x in emission)
+    return logprob - null
 
 
 def viterbi(hmm, emission):
