@@ -84,7 +84,7 @@ def viterbi_with_prob(hmm, emission):
     # In case there are ambiguous characters in the sequence, calculate the
     # expected frequencies of the char (AA or DNA) that they could stand for
     # from the emission frequencies of the hmm in the neutral state "N".
-    d_ambiguous_local = {}
+    d_ambiguous_local = {}  # ambiguous char -> concrete char -> log10 prob
     for iA in CONFIG[hmm.sequence_type]['ambiguous_chars'].keys():
         d_ambiguous_local[iA] = {}
         if iA in emission:
@@ -209,7 +209,7 @@ def viterbi_with_prob(hmm, emission):
     return most_likely_path, p_most_likely_path
 
 
-def logodds(emission, logprob, background):
+def logodds(hmm, emission, logprob):
     """Compute the log-odds score of the given emission
 
     Log odds is defined as:
@@ -221,16 +221,39 @@ def logodds(emission, logprob, background):
         Pr[null] = sum(f(x) for x in emission)
 
     Args:
+        - hmm (HMM): hmm used to calculate logprob
         - emission (str): emitted residues
         - logprob (float): log10 of the match probability, as returned by viterby_with_prob
-        - background (dict): dictionary mapping residues to their log10 background frequency. Typically hmm.p_e['N'] for
-          TRAL HMMs
 
     Returns:
         (float) LO
 
     """
-    null = sum(background[x] for x in emission)
+    # background freq dist
+    background = dict(hmm.p_e['N'])
+
+    # total null probability
+    null = 0
+    for e in emission:
+        if e not in background:
+            # perhaps this residue is ambiguous
+            if e in CONFIG[hmm.sequence_type]['ambiguous_chars']:
+                # For ambiguous characters in the sequence, calculate the
+                # expected frequencies of the char (AA or DNA) that they could stand for
+                # from the emission frequencies of the hmm in the neutral state "N".
+                # e.g. Pr[B] = (Pr[D]^2 + Pr[N]^2)/(Pr[D] + Pr[N])
+
+                total = 0
+                squares = 0
+                for concrete in CONFIG[hmm.sequence_type]['ambiguous_chars'][e]:
+                    p = 10 ** background[concrete]
+                    total += p
+                    squares += p*p
+                background[e] = np.log10(squares) - np.log10(total)
+
+        # may throw KeyError if still unrecognized
+        null += background[e]
+
     return logprob - null
 
 
