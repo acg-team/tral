@@ -38,7 +38,7 @@ executable scripts) are detailed in :ref:`Installation of external software <ins
         [[repeat_detector_path]]
             PHOBOS = phobos
             HHrepID = hhrepid_64
-            HHrepID_dummyhmm = /path/to/home/.tral/data/dummyHMM.hmm
+            HHrepID_dummyhmm = /path/to/home/.tral/data/hhrepid/dummyHMM.hmm
             TRUST = TRUST
             TRUST_substitutionmatrix = /path/to/TRUST/Align/BLOSUM50  #Recommended: Use matrices packages shipped with TRUST
             XSTREAM = XSTREAM
