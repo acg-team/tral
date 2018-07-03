@@ -25,7 +25,7 @@ by default.
 
     [sequence]
         [[repeat_detection]]
-            AA = HHrepID,  # List of default de novo detectors on amino acid data that you wish to use.
+            AA = HHrepID, T-REKS, TRUST, XSTREAM  # List of default de novo detectors on amino acid data that you wish to use.
             DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
 
 

@@ -7,6 +7,7 @@ import logging
 import logging.config
 import os
 import pickle
+import shutil
 import sys
 
 from pyfaidx import Fasta
@@ -119,7 +120,7 @@ def workflow(
                 pickle.dump(dResults, fh)
             next_time = next_time + time_interval
 
-        iS = sequence.Sequence(seq=str(iS_pyfaidx), name=iS_pyfaidx.name)
+        iS = sequence.Sequence(seq=str(iS_pyfaidx), name=iS_pyfaidx.name.split("|")[1])
 
         LOG.debug("Work on sequence {}".format(iS))
         # 1. annotate_de_novo()
@@ -132,7 +133,7 @@ def workflow(
             iTR.model = None
 
         # 2. annotate_TRs_from_hmmer()
-        if iS.name in dHMM_annotation:
+        if iS.name in dHMM_annotation and len(dHMM_annotation[iS.name]) != 0:
             lHMM = dHMM_annotation[iS.name]
             infoNRuns = len(lHMM)
             LOG.debug(
@@ -145,7 +146,7 @@ def workflow(
             for hmm_ID in lHMM:
                 if hmm_ID not in dHMM:
                     dHMM[hmm_ID] = hmm.HMM.create(
-                        file_format="pickle",
+                        input_format="pickle",
                         file=os.path.join(
                             hmm_dir,
                             hmm_ID +
@@ -309,7 +310,7 @@ def create_hmm_files(hmm_file, output_file):
         iHMM.write(file, "pickle")
 
 
-def read_pfam_uniprot(annotation_data_file, output_file):
+def read_pfam_uniprot(annotation_data_file, output_file, csv_delimiter="\t", annotation_delimiter=";"):
     ''' annotation_file from:
         http://www.uniprot.org/uniprot/?query=database:(type:pfam%20AND%20*)&fil=&sort=score '''
 
@@ -317,15 +318,28 @@ def read_pfam_uniprot(annotation_data_file, output_file):
     if annotation_data_file:
         try:
             with open(annotation_data_file) as f:
-                reader = csv.reader(f, delimiter="\t")
+                reader = csv.reader(f, delimiter=csv_delimiter)
                 for row in reader:
-                    p[row[0]] = row[1][:-1].split(";")
+                    p[row[0]] = [i for i in row[1].split(annotation_delimiter) if i != ""]
         except:
             raise Exception("Cannot load sequence annotation file annotation_data_file: {}".format(
                 annotation_data_file))
 
     with open(output_file, 'wb') as fh:
         pickle.dump(p, fh)
+
+
+def concatenate_csv_files(directory, result_file, file_extension=".csv"):
+    files = [file for file in os.listdir(directory) if file.endswith(file_extension)]
+    shutil.copyfile(os.path.join(directory, files.pop()), result_file)
+    with open(result_file, "a") as fh:
+        for file in files:
+            fh.write("\n")
+            with open(os.path.join(directory, file), "r") as fh2:
+                fh2.readline()
+                for line in fh2.readlines():
+                    fh.write(line)
+
 
 
 def main():
