@@ -9,7 +9,7 @@ TRAL is a highly modularized, flexible sequence tandem repeats annotation Python
   - Refinement of tandem repeat annotations with circular profile hidden Markov models
   - User-defined output formats
 
-The source code is [documented on GitHub IO](https://acg-team.github.io/tral/).
+The source code is [documented on GitHub IO].
 
 ### Version
 0.3.5
@@ -23,7 +23,7 @@ TRAL is available on [Pypi] and can be installed with [pip] for Python>=3.2:
 $ pip install tral
 ```
 
-See also more extensive [Installation instructions](install.html#install).
+See also more extensive [Installation instructions].
 
 
 ### License
@@ -33,8 +33,10 @@ GPL
 
 ### Dependencies
 
-Some of TRAL's functions depend on external software ([Installation instructions for dependencies](install_external.html#install-external)). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
+Some of TRAL's functions depend on external software ([Installation instructions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
-
+[documented on GitHub IO]:https://acg-team.github.io/tral/
+[Installation instructions]:https://acg-team.github.io/tral/install.html#install
+[Installation instructions for dependencies]:https://acg-team.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
