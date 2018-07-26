@@ -180,13 +180,13 @@ def treks_get_repeats(infile):
     pat_repeat_end = re.compile(r"\*+")
 
     # pattern for repeat sequence
-    # FIXME stuff that occurs here is not just A-Z but a set of possible amino
+    # FIXME stuff that occurs here is not just A-Z but a set of possible amino
     # acid symbols
     pat_sequence = re.compile(r"([A-Z-]+)")
 
     # Our possible parser states:
     #
-    # 1: state between repeats
+    # 1: state between repeats
     #   entry: reset repeat
     #   expect repeat_header(goto 2) OR identifier(store identifier, goto 1)
     # 2: state for multiple sequence alignment line
@@ -381,9 +381,9 @@ def trust_get_repeats(infile):
 
     # Our possible parser states:
     #
-    # 0: initial state
+    # 0: initial state
     #   expect: identifier(store identifier, goto 1)
-    # 1: before the beginning of a repeat
+    # 1: before the beginning of a repeat
     #   expect: "REPEAT_TYPE"(goto 2) or "//"(goto 0)
     # 2: state after having found "REPEAT_TYPE"
     #   entry: reset state of return value (repeat)
@@ -868,7 +868,7 @@ def hhpredid_get_repeats(infile):
                         yield region
                         region = None
                     else:
-                        log.warning(
+                        LOG.warning(
                             "HHPREDID: Msa too short %s", str(
                                 region.msa))
 
@@ -877,7 +877,7 @@ def hhpredid_get_repeats(infile):
         if len(region.msa) >= 2:
             yield region
         else:
-            log.warning("HHPREDID: Msa too short %s", str(region.msa))
+            LOG.warning("HHPREDID: Msa too short %s", str(region.msa))
 
 ####################################### Phobos TRF  ######################
 
@@ -937,4 +937,4 @@ def phobos_get_repeats(infile):
                 if len(region.msa) >= 2:
                     yield region
                 else:
-                    log.warning("phobos: Msa too short %s", str(region.msa))
+                    LOG.warning("phobos: Msa too short %s", str(region.msa))
