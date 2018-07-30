@@ -298,7 +298,7 @@ class DetectorPhobos(TRDetector):
                 # <int> Display of TR. 0: asIs, 1: Alphabetical normal form, 2: Alphabetical normal form also considering the reverse complement. Default: 2
                 "--reportUnit": None,
                 "--NPerfectionMode": None,  # <int> Treatment of N.  0: asMismatch, 1: asNeutral, 2: asMatch. Default: 0.
-                "--printRepeatSeqMode": '3',  # <int> Show the repeat unit alignment
+                "--printRepeatSeqMode": '2',  # <int> Show the repeat unit alignment
                 "--outputFormat": None,  # <int> 0 : Use the Phobos output format. Default: 0
                 "--minPerfection": None,  # <float> Minimum perfection of a satellites. Default: 0.
                 "--maxPerfection": None,  # <float> Maximum perfection of a satellites. Default: 100.
