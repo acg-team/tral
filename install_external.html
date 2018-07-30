@@ -163,7 +163,10 @@ TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (mo
 <div class="section" id="hhrepid">
 <h3>HHrepID<a class="headerlink" href="#hhrepid" title="Permalink to this headline">¶</a></h3>
 <p>HHrepID is a profile self alignment <em>de novo</em> amino acid tandem repeat detection software
-<a class="reference external" href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002195">published e.g. in PLOS Computational Biology (2011)</a> (<a class="reference external" href="http://toolkit.tuebingen.mpg.de/hhrepid">Installation instructions</a>).
+<a class="reference external" href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002195">published e.g. in PLOS Computational Biology (2011)</a> <!-- LinaNaef 20180730
+Is currently only available as an online tool.
+(<a class="reference external" href="http://toolkit.tuebingen.mpg.de/hhrepid">Installation instructions</a>) -->
+    .
 TRAL searches for the executable binary <em>hhrepid64</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
@@ -220,7 +223,7 @@ TRAL searches for the executable <em>tred</em> in the system path by default (mo
 <div class="section" id="t-reks">
 <h3>T-REKS<a class="headerlink" href="#t-reks" title="Permalink to this headline">¶</a></h3>
 <p>T-REKS is a <em>k</em>-mer based <em>de novo</em> DNA/AA tandem repeat detection software
-<a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/25/20/2632.short">published in Bioinformatics (2009)</a> (<a class="reference external" href="http://bioinfo.montp.cnrs.fr/?r=t-reks">Installation instructions</a>).
+<a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/25/20/2632.short">published in Bioinformatics (2009)</a> (<a class="reference external" href="http://bioinfo.montp.cnrs.fr/index.php?route=tools&tool=3&lang=uk">Installation instructions</a>).
 Create an executable text file T-REKS with the following content:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh
 java -jar /my/path/to/T-Reks.jar &quot;$@&quot;
@@ -318,8 +321,8 @@ path:</p>
 <div class="section" id="not-yet-integrated-software">
 <h2>Not yet integrated software<a class="headerlink" href="#not-yet-integrated-software" title="Permalink to this headline">¶</a></h2>
 <p>There is a large number of tandem repeat detection software for which TRAL does not provide
-parsers. However, theses parsers are easily manually added to <a class="reference internal" href="code_docs.html#code-docs"><em>sequence.repeat_detection_io</em></a>.
-Please file an issue on the <a class="reference external" href="https://github.com/elkeschaper/tandemrepeats/issues">tracker</a>.</p>
+parsers. However, theses parsers are easily manually added to <a class="reference internal" href="sequence.html#module-tral.sequence.repeat_detection_io"><em>sequence.repeat_detection_io</em></a>.
+Please file an issue on the <a class="reference external" href="https://github.com/acg-team/tral/issues">tracker</a>.</p>
 </div>
 </div>
 

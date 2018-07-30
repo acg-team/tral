@@ -28,7 +28,7 @@ For csh or tcsh, use::
 
     setenv MYTRAL /path/to/your/package/directory
 
-.. _`toy workflow located in the TRAL source`: https://github.com/elkeschaper/tral/tree/develop/tral/examples/workflow
+.. _`toy workflow located in the TRAL source`: https://github.com/acg-team/tral/tree/develop/tral/examples/workflow
 
 
 
