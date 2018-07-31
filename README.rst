@@ -13,7 +13,7 @@ annotation Python2/3 library.
 -  User-defined output formats
 
 The source code is `documented on GitHub
-IO <http://elkeschaper.github.io/tral/>`__.
+IO <http://agc-team.github.io/tral/>`__.
 
 Version
 ~~~~~~~
@@ -31,7 +31,7 @@ installed with `pip <https://pip.pypa.io/en/latest/>`__ for Python>=3.2:
     $ pip install tral
 
 See also more extensive `Installation
-instructions <http://elkeschaper.github.io/tral/install.html#install>`__.
+instructions <http://agc-team.github.io/tral/install.html#install>`__.
 
 License
 ~~~~~~~
@@ -41,5 +41,5 @@ GPL
 Dependencies
 ~~~~~~~~~~~~
 
-Some of TRAL's functions depend on external software (`Installation instructions for dependencies <http://elkeschaper.github.io/tral/install_external.html#install-external>`__). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
+Some of TRAL's functions depend on external software (`Installation instructions for dependencies <http://agc-team.github.io/tral/install_external.html#install-external>`__). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
