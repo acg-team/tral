@@ -9,8 +9,7 @@
 # TODO-- install TRAL with pip
 # TODO-- describe how to use setupTRAL.sh and scripts for external software, and deleteTRAL.sh
 # TODO-- add installation path for external software and install external software within this folder
-# TODO-- ask user if he wants to delete the directory for ext software
-# TODO-- add PATH variable within the script activate TRAL (export TRAL)
+
 
 ######################
 ### Prepare Filesystem
@@ -19,8 +18,13 @@
 . configTRAL_path.cfg 
 
 # create needed directories to install tral
-mkdir -p $TRAL_PATH/{tral,tral_ext,tral_env,output}
-mkdir -p $TRAL_SOFTWARE # will be added temporarely to PATH with 
+mkdir -p $TRAL_PATH/{tral,tral_env,output}
+mkdir -p $TRAL_EXT_SOFTWARE # create directory for installation of external software
+
+# directories will be added temporarely to PATH 
+[[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
+
+
 
 
 ######################
@@ -36,7 +40,6 @@ while [ hash virtualenv 2>/dev/null ] ; do
                 echo -e "\nA problem occured while trying to install virtualenv."
                 exit 1 
                 }
-                break 
                 ;;
             [Nn]* ) 
                 echo -e "\nAbort."
@@ -58,7 +61,7 @@ pip install ipython
 ######################
 ### installing TRAL
 
-# TODO -- to use this script, the TRAL repository should already be downloaded
+# TODO -- to use this script, the TRAL repository should already be downloaded (?)
 
 if [[ $1 == "git" ]]; then
 

@@ -14,5 +14,5 @@ source $TRAL_PATH/tral_env/bin/activate
 # add directory with tral and with external software to path (beginning)
 
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && export PATH="$TRAL:$PATH"
-[[ ":$PATH:" != *"$TRAL_SOFTWARE:$PATH"* ]] && export PATH="$TRAL_SOFTWARE:$PATH"
-[[ ":$PATH:" != *"$TRAL_SOFTWARE/bin:$PATH"* ]] && export PATH="$TRAL_SOFTWARE/bin:$PATH"
+[[ ":$PATH:" != *"$TRAL_EXT_SOFTWARE:$PATH"* ]] && export PATH="$TRAL_EXT_SOFTWARE:$PATH"
+[[ ":$PATH:" != *"$TRAL_EXT_SOFTWARE/bin:$PATH"* ]] && export PATH="$TRAL_EXT_SOFTWARE/bin:$PATH"
