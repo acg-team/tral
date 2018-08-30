@@ -2,6 +2,8 @@
 
 # INSTALLING ALF #####
 
+# (!) this script will install ALF within the $TRAL_EXT_SOFTWARE directory
+
 ######################
 ### Housekeeping
 
@@ -18,14 +20,14 @@ LINK_ALF=http://abacus.gene.ucl.ac.uk/daniel/alf/ALF_standalone.tar.gz
 sudo wget $LINK_ALF -P $TRAL_EXT_SOFTWARE    # download
 sudo tar -xvzf $TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz -C $TRAL_EXT_SOFTWARE
 sudo rm -rf $TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz
-(cd $TRAL_EXT_SOFTWARE/ALF_standalone && sudo $TRAL_EXT_SOFTWARE/ALF_standalone/install.sh) # installation of ALF
+(cd $TRAL_EXT_SOFTWARE/ALF_standalone && sudo $TRAL_EXT_SOFTWARE/ALF_standalone/install.sh $TRAL_EXT_SOFTWARE) # installation of ALF
 
 
 ######################
 ### Uninstall ALF (default paths!)
 
-rm -rf /usr/local/bin/darwin*
-rm -rf /usr/local/bin/alfsim
-rm -rf /usr/local/share/alfdarwin
+# rm -rf /usr/local/bin/darwin*
+# rm -rf /usr/local/bin/alfsim
+# rm -rf /usr/local/share/alfdarwin
 
 

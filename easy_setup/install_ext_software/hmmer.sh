@@ -4,6 +4,8 @@
 # hmmer: Sequence profile model generation
 # http://hmmer.org/documentation.html
 
+# installing the newest version of hmmer with direct link
+
 
 ######################
 ### Housekeeping
@@ -12,26 +14,19 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 # other files are located one directory above
 . $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
 
-[[ ":$PATH:" != *"$TRAL_EXT_SOFTWARE:$PATH"* ]] && PATH="$TRAL_EXT_SOFTWARE:$PATH"
+
+######################
+### Installation HMMER
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install hmmer
+
+# to install  a specific version number
+# sudo apt install hmmer=<version_number> 
 
 
 ######################
-### Download and Installation hmmer
+### Uninstall HMMER
 
-# grab the latest Version of hmmer for linux-intel-x86_64 (from the old ones)
-latestVer=$(wget -qO- http://eddylab.org/software/hmmer3/CURRENT/ |
-            grep linux-intel-x86_64 | 
-            sed -n 's/.*href="\([^"]*\).*/\1/p')
-sudo wget http://eddylab.org/software/hmmer3/CURRENT/${latestVer} -P $TRAL_EXT_SOFTWARE
-sudo tar -xvzf $TRAL_EXT_SOFTWARE/${latestVer} -C $TRAL_EXT_SOFTWARE
-
-cd $TRAL_EXT_SOFTWARE/${latestVer%.tar.gz}
-sudo ./configure --prefix $TRAL_EXT_SOFTWARE
-sudo make
-sudo make check
-sudo make install
-cd ~
-
-sudo rm -rf $TRAL_EXT_SOFTWARE/${latestVer}
-
-
+# sudo apt-get remove hmmer

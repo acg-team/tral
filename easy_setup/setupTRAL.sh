@@ -1,14 +1,19 @@
 #!/bin/bash
 
+# here comes a nice description how to use setupTRAL.sh and other shell scripts in this directory
+
+# run this script as a superuser (depending on where TRAL and depencies should be installed)
+
 ######################
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
 # TODO-- how to use sudo within script (bash requires sudo)
 # TODO-- adapt the other setupfiles to the same changes!
-# TODO-- install TRAL with pip
+# TODO-- install TRAL with pip (tral should be installed anyway)
 # TODO-- describe how to use setupTRAL.sh and scripts for external software, and deleteTRAL.sh
 # TODO-- add installation path for external software and install external software within this folder
+# TODO-- create README for easy_setup (or include in main README of TRAL?)
 
 
 ######################
@@ -113,9 +118,9 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
     read -p "Would you like to do this? yes(y) or no (n):" yn
     case $yn in
         [Yy]* )
-            sudo wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue.tar.gz -P $TRAL_CONF/data
-            sudo tar -xzf $TRAL_CONF/data/pvalue.tar.gz -C $TRAL_CONF/data
-            sudo rm -rf $TRAL_CONF/data/pvalue.tar.gz
+            wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue.tar.gz -P $TRAL_CONF/data
+            tar -xzf $TRAL_CONF/data/pvalue.tar.gz -C $TRAL_CONF/data
+            rm -rf $TRAL_CONF/data/pvalue.tar.gz
             ;;
         [Nn]* ) 
             echo -e "\nYou can download this files later from ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper"
