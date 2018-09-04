@@ -22,17 +22,17 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 ### Download and Installation hmmer
 
 # grab the latest Version of hmmer for linux-intel-x86_64 (from the old ones)
-sudo wget http://eddylab.org/software/hmmer/hmmer.tar.gz -P $TRAL_EXT_SOFTWARE 
-sudo tar -xvzf $TRAL_EXT_SOFTWARE/hmmer.tar.gz -C $TRAL_EXT_SOFTWARE
+wget http://eddylab.org/software/hmmer/hmmer.tar.gz -P $TRAL_EXT_SOFTWARE 
+tar -xvzf $TRAL_EXT_SOFTWARE/hmmer.tar.gz -C $TRAL_EXT_SOFTWARE
 latestVersion=$(tar tfz $TRAL_EXT_SOFTWARE/hmmer.tar.gz --exclude '*/*') # get name of version
 cd $TRAL_EXT_SOFTWARE/$latestVersion
 
-sudo ./configure --prefix $TRAL_EXT_SOFTWARE    # with this version, HMMER will be installed within the $TRAL_EXT_SOFTWARE directory
-sudo make
-sudo make check
-sudo make install
+./configure --prefix $TRAL_EXT_SOFTWARE    # with this version, HMMER will be installed within the $TRAL_EXT_SOFTWARE directory
+make
+make check
+make install
 cd ~
-sudo rm -rf $TRAL_EXT_SOFTWARE/hmmer.tar.gz
+rm -rf $TRAL_EXT_SOFTWARE/hmmer.tar.gz
 
 
 

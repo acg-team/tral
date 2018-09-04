@@ -8,7 +8,7 @@
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
-# TODO-- how to use sudo within script (bash requires sudo)
+# TODO-- how to use within script (bash requires sudo)
 # TODO-- adapt the other setupfiles to the same changes!
 # TODO-- install TRAL with pip (tral should be installed anyway)
 # TODO-- describe how to use setupTRAL.sh and scripts for external software, and deleteTRAL.sh
@@ -30,18 +30,16 @@ mkdir -p $TRAL_EXT_SOFTWARE # create directory for installation of external soft
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
 
 
-
-
 ######################
 ### install virtualenv and activate
 
 # check if virtualenv is installed
 while [ hash virtualenv 2>/dev/null ] ; do
-    echo "Installing virtualenv required by: sudo apt-get install virtualenv."
+    echo "Installing virtualenv required by: apt-get install virtualenv."
     read -p "Do you wish to install this program? yes(y) or no (n):" yn
         case $yn in
             [Yy]* )
-                sudo apt-get install virtualenv || { 
+                apt-get install virtualenv || { 
                 echo -e "\nA problem occured while trying to install virtualenv."
                 exit 1 
                 }
@@ -53,11 +51,11 @@ while [ hash virtualenv 2>/dev/null ] ; do
         esac
 done
 
-# create virtual environment called "tral_env" with python3.5
-virtualenv $TRAL_ENV -p python3.5
+# create virtual environment called "python3_5" with python3.5
+virtualenv $TRAL_ENV/python3_5 -p python3.5
 
 # activate the virtual environment
-source $TRAL_ENV/bin/activate
+. $TRAL_ENV/python3_5/bin/activate
 
 ######################
 ### install ipython3 in virtualenv
@@ -70,45 +68,52 @@ pip install ipython
 
 if [[ $1 == "git" ]]; then
 
-        ######################
-        ### install tral with git and setup.py
-        
-        # check if git is installed
-        while [ hash git 2>/dev/null ] ; do
-            echo "Git is required to install TRAL."
-        done
-        
-        # installing with git
-        echo -e "\nPlease clone the TRAL repository from github into $TRAL_PATH.\n"
-        read -p "Do you want to clone the TRAL repository from github in the given directory? yes(y) or no (n):" yn
-        case $yn in
-            [Yy]* )
-                git clone https://github.com/acg-team/tral.git $TRAL
-                (cd $TRAL && python $TRAL/setup.py develop)                   ## TODO change from develop to install
-                ;;
-            [Nn]* ) 
-                echo -e "\nAbort."
-                exit 1
-                ;;
-        esac
+    ######################
+    ### install tral with git and setup.py
+    
+    # check if git is installed
+    while [ hash git 2>/dev/null ] ; do
+        echo "Git is required to install TRAL."
+    done
+    
+    # installing with git
+    echo -e "\nPlease clone the TRAL repository from github into $TRAL_PATH.\n"
+    read -p "Do you want to clone the TRAL repository from github in the given directory? yes(y) or no (n):" yn
+    case $yn in
+        [Yy]* )
+            git clone https://github.com/acg-team/tral.git $TRAL
+            (cd $TRAL && python $TRAL/setup.py develop)                   ## TODO change from develop to install
+            ;;
+        [Nn]* ) 
+            echo -e "\nAbort."
+            exit 1
+            ;;
+    esac
 
     
-# else
-#     #####################
-#     ## install tral with pip
-#     #####################
-#     $TRAL_PATH/bin/pip install tral
+elif [[ $1 == "pip" ]]; then
 
+    #####################
+    ## install tral with pip
+    #####################
 
-#         check if pip is installed
-#        while [ hash pip 2>/dev/null ] ; do
-#            echo "Pip is required to install TRAL "
-#        done
+    # -- TODO .tral will not automatically be added to $HOME
 
-#        sudo pip install tral || { echo -e "\nA problem occured while trying to install TRAL." ; exit 1 }
+    echo -e "start installation"
+    $TRAL_ENV/python3_5/bin/pip3 install --target=$TRAL_ENV/python3_5/bin/ tral && 
+
+    echo -e "\n---------------------------------"
+    echo -e "Installing TRAL with pip successful"
+    echo -e "-----------------------------------\n"
+
+else
+    echo -e "\nPlease give as argument if you want to install TRAL with git or with pip."
+    exit 1
 
 
 fi
+
+deactivate
 
 ######################
 ### Download p-Value distribution files

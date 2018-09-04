@@ -22,13 +22,13 @@ latestVer=$(wget -qO- https://mafft.cbrc.jp/alignment/software/linux.html |
             egrep amd64.deb |                  # only grep deb version
             sed -n 's/.*href="\([^"]*\).*/\1/p')
 
-sudo wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
-sudo dpkg -i $TRAL_EXT_SOFTWARE/$latestVer
+wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
+dpkg -i $TRAL_EXT_SOFTWARE/$latestVer
 
 
 ######################
 ### Uninstall MAFFT (default paths!)
 # TODO -- check if this uninstalls also if package installed within the $TRAL_EXT_SOFTWARE
 
-# sudo dpkg --remove mafft
-# sudo rm -rf $TRAL_EXT_SOFTWARE/mafft*
+# dpkg --remove mafft
+# rm -rf $TRAL_EXT_SOFTWARE/mafft*

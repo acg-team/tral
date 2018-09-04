@@ -18,15 +18,15 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 ######################
 ### Installation HMMER
 
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt install hmmer
+apt-get update
+apt-get upgrade
+apt install hmmer
 
 # to install  a specific version number
-# sudo apt install hmmer=<version_number> 
+# apt install hmmer=<version_number> 
 
 
 ######################
 ### Uninstall HMMER
 
-# sudo apt-get remove hmmer
+# apt-get remove hmmer

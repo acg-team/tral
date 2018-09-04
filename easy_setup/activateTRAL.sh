@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # script to run whenever one want to start TRAL
-# run this script with ". ./activateTRAL.sh" or "source activateTRAL.sh"
-# to deactivate the virtual tral environment type "deactivate"
+# run this script with ". activateTRAL.sh" or "source activateTRAL.sh"
+# to deactivate the virtual tral environment type "deactivate" into the shell
 
 
 # provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg 
 
 # activate the virtual environment
-source $TRAL_PATH/tral_env/bin/activate 
+. $TRAL_ENV/python3_5/bin/activate
 
 # add directory with tral and with external software to path (beginning)
 

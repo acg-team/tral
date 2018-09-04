@@ -22,16 +22,16 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 latestVer=$(wget -qO- http://eddylab.org/software/hmmer3/CURRENT/ |
             grep linux-intel-x86_64 | 
             sed -n 's/.*href="\([^"]*\).*/\1/p')
-sudo wget http://eddylab.org/software/hmmer3/CURRENT/$latestVer -P $TRAL_EXT_SOFTWARE
-sudo tar -xvzf $TRAL_EXT_SOFTWARE/$latestVer -C $TRAL_EXT_SOFTWARE
+wget http://eddylab.org/software/hmmer3/CURRENT/$latestVer -P $TRAL_EXT_SOFTWARE
+tar -xvzf $TRAL_EXT_SOFTWARE/$latestVer -C $TRAL_EXT_SOFTWARE
 
 cd $TRAL_EXT_SOFTWARE/${latestVer%.tar.gz}  # go into unzipped directory
-sudo ./configure --prefix $TRAL_EXT_SOFTWARE
-sudo make
-sudo make check
-sudo make install
+./configure --prefix $TRAL_EXT_SOFTWARE
+make
+make check
+make install
 cd ~
 
-sudo rm -rf $TRAL_EXT_SOFTWARE/$latestVer
+rm -rf $TRAL_EXT_SOFTWARE/$latestVer
 
 
