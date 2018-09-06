@@ -4,7 +4,7 @@
 # hmmer: Sequence profile model generation
 # http://hmmer.org/documentation.html
 
-# installing the newest version of hmmer with direct link
+# installing the newest version of hmmer with a direct link
 
 
 ######################

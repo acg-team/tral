@@ -44,7 +44,7 @@ tred.py "$@"' > $TRAL_EXT_SOFTWARE/tred
 
 
 chmod +x $TRAL_EXT_SOFTWARE/tred
-cp -n $TRAL_EXT_SOFTWARE/tred /usr/local/bin # copy wrapper file to system path 
+cp $TRAL_EXT_SOFTWARE/tred /usr/local/bin # copy wrapper file to system path 
 deactivate
 cd $HOME
 

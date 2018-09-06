@@ -17,18 +17,21 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 ######################
 ### Download and Installion MAFFT
 
-# get newest version for linux system
 latestVer=$(wget -qO- https://mafft.cbrc.jp/alignment/software/linux.html |
-            egrep amd64.deb |                  # only grep deb version
-            sed -n 's/.*href="\([^"]*\).*/\1/p')
+    egrep amd64.deb |                  # only grep deb version
+    sed -n 's/.*href="\([^"]*\).*/\1/p')
 
-wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
-dpkg -i $TRAL_EXT_SOFTWARE/$latestVer
+dpkg -s mafft 2>/dev/null >/dev/null && echo "MAFFT is already installed " || # test if mafft already installed
+    {
+    # if not installed get newest version for linux system
+    wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
+    dpkg -i $latestVer
+    }
+
 
 
 ######################
 ### Uninstall MAFFT (default paths!)
-# TODO -- check if this uninstalls also if package installed within the $TRAL_EXT_SOFTWARE
 
 # dpkg --remove mafft
 # rm -rf $TRAL_EXT_SOFTWARE/mafft*

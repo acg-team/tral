@@ -1,18 +1,13 @@
 #!/bin/bash
 
 # here comes a nice description how to use setupTRAL.sh and other shell scripts in this directory
-
 # run this script as a superuser (depending on where TRAL and depencies should be installed)
 
 ######################
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
-# TODO-- how to use within script (bash requires sudo)
-# TODO-- adapt the other setupfiles to the same changes!
-# TODO-- install TRAL with pip (tral should be installed anyway)
 # TODO-- describe how to use setupTRAL.sh and scripts for external software, and deleteTRAL.sh
-# TODO-- add installation path for external software and install external software within this folder
 # TODO-- create README for easy_setup (or include in main README of TRAL?)
 
 
@@ -28,6 +23,11 @@ mkdir -p $TRAL_EXT_SOFTWARE # create directory for installation of external soft
 
 # directories will be added temporarely to PATH 
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
+
+if [[ ! "$1" =~ ^(git|pip)$ ]]; then
+    echo -e "\nPlease provide as argument how you want to install TRAL (\"git\" or \"pip\").\n"
+    exit 1
+fi
 
 
 ######################
@@ -115,6 +115,7 @@ fi
 
 deactivate
 
+
 ######################
 ### Download p-Value distribution files
 
@@ -128,11 +129,46 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
             rm -rf $TRAL_CONF/data/pvalue.tar.gz
             ;;
         [Nn]* ) 
-            echo -e "\nYou can download this files later from ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper"
+            echo -e "\nYou can download this files later from ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper.\n"
             ;;
     esac
 else
     echo -e "\nDirectory for p-Value distribution files already exists.\nWill not be updated."
 fi
+
+######################
+### Installing external software
+
+
+install_ext_software () {
+    for var in "$@"
+    do
+        read -p "Would you like to install $var? Type \"y\" if YES:" y
+        case $y in
+            [Yy]* )
+                . install_ext_software/$var.sh
+                ;;
+            * ) 
+                echo -e "\nYou can install it later with the script $var.sh.\n"
+                ;;
+        esac
+    done
+}
+
+read -p "Would you like any external software? yes(y) or no (n):" yn
+case $yn in
+    [Yy]* )
+        echo -e "\n"
+        install_ext_software alf hmmer mafft phobos tredparse treks trf trust      
+        ;;
+    [Nn]* ) 
+        echo -e "\nNo external software will be installed right now."
+        ;;
+esac
+
+
+
+
+
 
 

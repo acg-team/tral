@@ -27,6 +27,7 @@
 rm -rf /usr/local/bin/darwin*
 rm -rf /usr/local/bin/alfsim
 rm -rf /usr/local/share/alfdarwin
+rm -rf /usr/local/bin/alfdarwin*
 
 ### HMMER
 
@@ -50,7 +51,17 @@ rm /usr/local/bin/tred
 
 ### TREKS
 
+rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
+rm -rf $TRAL_EXT_SOFTWARE/TREKS
+rm -rf /usr/local/bin/TREKS
+
 ### TRF
 
+rm -rf $TRAL_EXT_SOFTWARE/trf409.linux64
+rm -rf /usr/local/bin/trf409.linux64
+
 ### TRUST
+
+rm -rf $TRAL_EXT_SOFTWARE/TRUST_Align
+rm -rf /usr/local/bin/TRUST
 
