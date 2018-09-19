@@ -26,7 +26,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 
 
 ######################
-### Download and Installion PHOBOS
+### Download and Installation PHOBOS
 
 if [ ! -f phobos_* ]; then # test if not already in directory
 

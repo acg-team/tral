@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # INSTALLING T-REKS #####
-# T-REKS: identification of Tandem REpeats in sequences with a K-meanS based algorithm. (https://www.ncbi.nlm.nih.gov/pubmed/19671691)
+# T-REKS: identification of Tandem Repeats in sequences with a K-meanS based algorithm. 
+# T-REKS is an algorithm for de novo detection and alignment of repeats in sequences based on K-means algorithm.
+# Minimal length of repeat arrays is 9 for true homorepeats and 14 for other repeats with potential biological meaning.
+# T-reks: identification of tandem repeats in sequences with a k-means based algorithm. Jorda J, Kajava AV(2009). Bioinformatics 25 (20), 2632-2638 (https://www.ncbi.nlm.nih.gov/pubmed/19671691)
 
 
 ######################

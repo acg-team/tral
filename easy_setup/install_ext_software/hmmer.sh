@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # INSTALLING HMMER #####
-# hmmer: Sequence profile model generation
-# http://hmmer.org/documentation.html
+# HMMER: Sequence profile model generation using profile hidden Markov models
 
-# installing the newest version of hmmer with a direct link
+# HMMER is used for searching sequence databases for sequence homologs, and for making sequence alignments.
+# It implements methods using probabilistic models called profile hidden Markov models (profile HMMs).
+
+# http://hmmer.org/documentation.html
+# HMMER and its documentation are freely distributed under the #3-Clause BSD open source license.
+# For a copy of the license, see opensource.org/licenses/BSD-3-Clause.
 
 
 ######################
@@ -17,6 +21,8 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 
 ######################
 ### Installation HMMER
+
+# installing the newest version of hmmer with a direct link
 
 apt-get update
 apt-get upgrade

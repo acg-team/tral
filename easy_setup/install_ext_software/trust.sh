@@ -2,14 +2,15 @@
 
 # INSTALLING TRUST #####
 # TRUST: Tracking repeats using significance and transitivity.
+# A method for ab-initio determination of internal repeats in proteins.
+# The high sensitivity and accuracy of the method is achieved by exploiting the concept of transitivity of alignments.
+# ISMB/ECCB 2004 conference (Glasgow, UK), appeared in Bioinformatics. 2004 Aug 4;20 Suppl 1:i311-i317. 
 # http://www.ibi.vu.nl/programs/trustwww/
-
-# TODO -- till now nl.vu.cs.align.SelfSimilarity cannot be opened like this within the wrapper file, should i change dots with slashs?
 
 
 ######################
 ### Housekeeping
-
+ja 
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
 # other files are located one directory above
 . $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
