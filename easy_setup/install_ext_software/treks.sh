@@ -39,7 +39,7 @@ else # Create an executable file for TREKS
 fi
 
 ######################
-### Uninstall T-REKS
+### Uninstallation of T-REKS
 
 # rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
 # rm -rf $TRAL_EXT_SOFTWARE/TREKS

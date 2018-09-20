@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# here comes a nice description how to use setupTRAL.sh and other shell scripts in this directory
-# run this script as a superuser (depending on where TRAL and depencies should be installed)
+# By execution of this script a little filesystem will be created within the INSTALLATION_PATH (default: /usr/local/bin).
+# If you wish to change this path, do this within configTRAL_path.cfg
+# TRAL will be installed within a virtual environment (virtenv).
+# Run this script as as superuser if your INSTALLATION_PATH only can be accessed by root.
+
 
 ######################
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
-
-# TODO-- describe how to use setupTRAL.sh and scripts for external software, and deleteTRAL.sh
-# TODO-- create README for easy_setup (or include in main README of TRAL?)
 
 
 ######################
@@ -31,7 +31,7 @@ fi
 
 
 ######################
-### install virtualenv and activate
+### Install virtualenv and activate
 
 # check if virtualenv is installed
 while [ hash virtualenv 2>/dev/null ] ; do
@@ -137,35 +137,14 @@ else
 fi
 
 ######################
-### Installing external software
+### Installation of external software for TRAL
 
 
-install_ext_software () {
-    for var in "$@"
-    do
-        read -p "Would you like to install $var? Type \"y\" if YES:" y
-        case $y in
-            [Yy]* )
-                . install_ext_software/$var.sh
-                ;;
-            * ) 
-                echo -e "\nYou can install it later with the script $var.sh.\n"
-                ;;
-        esac
-    done
-}
+. install_ext_software.sh # script to install external software within the same directory will be executed
 
-read -p "Would you like any external software? yes(y) or no (n):" yn
-case $yn in
-    [Yy]* )
-        echo -e "\n"
-        install_ext_software alf hmmer mafft phobos tredparse treks trf trust      
-        ;;
-    [Nn]* ) 
-        echo -e "\nNo external software will be installed right now."
-        ;;
-esac
-
+echo -e "\n---------------------------------"
+echo -e "Installation of TRAL is completed."
+echo -e "-----------------------------------\n"
 
 
 

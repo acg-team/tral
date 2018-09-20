@@ -37,7 +37,7 @@ If you haven't git installed, you may need to download the github repository man
 After setting up TRAL with setupTRAL.sh you can install external software. The script setupTRAL.sh automatically ask you if you want to install any of the recommended software.
 By pressing y/n you can decide wheter you want to install it now or later.
 
-If you decide to install the external software later, you can run a script for each external software individually. This scripts can be found within the directory setup_tral/install_ext_software.
+If you decide to install the external software later,you can install them later by executing the script install_ext_software. Otherwise, you can run an installation script for each external software individually which can be found within the directory setup_tral/install_ext_software.
 The software will be installed within the directory INSTALLATION_PATH/tral_external_software.
 Currently, installation scripts for the following external software are available:
 

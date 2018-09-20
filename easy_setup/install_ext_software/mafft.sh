@@ -34,14 +34,16 @@ latestVer=$(wget -qO- https://mafft.cbrc.jp/alignment/software/linux.html |
 dpkg -s mafft 2>/dev/null >/dev/null && echo "MAFFT is already installed " || # test if mafft already installed
     {
     # if not installed get newest version for linux system
-    wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
-    dpkg -i $latestVer
+    if [ ! -f $TRAL_EXT_SOFTWARE/$latestVer ]; then # test if latest version already downloaded
+        wget https://mafft.cbrc.jp/alignment/software/$latestVer -P $TRAL_EXT_SOFTWARE # download
+    fi
+    dpkg -i $TRAL_EXT_SOFTWARE/$latestVer # install latest version
     }
 
 # mafft is now accessible with the command "mafft"
 
 ######################
-### Uninstall MAFFT (default paths!)
+### Uninstallation of MAFFT (default paths!)
 
 # dpkg --remove mafft
 # rm -rf $TRAL_EXT_SOFTWARE/mafft*

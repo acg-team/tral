@@ -37,21 +37,23 @@ read -p "Do you wish to uninstall all external software as well? yes(y) or no (n
     case $yn in
         [Yy]* )
             . uninstall_all_ext_software.sh &&
-            rm -rf $TRAL_EXT_SOFTWARE && {
+            rm -rf $TRAL_EXT_SOFTWARE
             echo -e "\n----------------------------------------------" 
-            echo -e "\nExternal Software deleted." 
-            echo -e "----------------------------------------------\n" } || { 
+            echo -e "External Software deleted." 
+            echo -e "----------------------------------------------\n"
+            echo -e "\n----------------------------------------------"
+            echo -e 'Uninstallation of TRAL successfully completed.'
+            echo -e "----------------------------------------------\n" ||
             echo -e "\nA problem occured while trying to delete the external software."
-            exit 1 
-            }
+            exit 1
             ;;
         [Nn]* ) 
             echo -e "\nExternal Software was not deleted and can (if it was available before) still be found in $TRAL_EXT_SOFTWARE."
+            echo -e "\n----------------------------------------------"
+            echo -e 'Uninstallation of TRAL successfully completed.'
+            echo -e "----------------------------------------------\n" 
             ;;
     esac
 
 
 
-echo -e "\n----------------------------------------------"
-echo -e 'Uninstallation of TRAL successfully completed.'
-echo -e "----------------------------------------------\n"
