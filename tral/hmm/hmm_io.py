@@ -1,18 +1,20 @@
 # (C) 2015 Elke Schaper
 
 """
-    :synopsis: Input/output for hmms.
+:synopsis: Input/output for hmms.
 
-    .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+.. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
 """
 
 import logging
 import os
 import re
+import math
+import tral
 
 LOG = logging.getLogger(__name__)
 
-################################## READ HMMMER3  #########################
+# ################################ READ HMMMER3  #########################
 
 
 def read(hmm_filename, id=None):
@@ -54,8 +56,6 @@ def read(hmm_filename, id=None):
         of 0 probability is stored as ``*`` which in fact means -∞ (minus
         infinity).
 
-    .. todo:: What does this mean: "Store probabilities as log10arithms. [???]"
-
     Args:
         hmm_filename (str): Path to the file with model data in the HMMER3
             file format.
@@ -91,7 +91,6 @@ def read(hmm_filename, id=None):
             }
 
     """
-
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_HMM = re.compile(r"HMM")
@@ -233,8 +232,8 @@ def read(hmm_filename, id=None):
 
 
 def split_HMMER3_file(hmm_filename, resultdir):
-    """ Split HMMER3 models from a single file ``hmm_filename`` into many files
-     in ``resultdir``.
+    """Split HMMER3 models from a single file ``hmm_filename`` into many files
+    in ``resultdir``.
 
     Helper function: split HMMER3 models from a single file ``hmm_filename``
     into many files in ``resultdir``. The models are named after the HMM
@@ -245,12 +244,12 @@ def split_HMMER3_file(hmm_filename, resultdir):
       resultdir (str): Path to directory where result files are stored.
 
     """
-
     pat_start_HMMER3 = re.compile(r"HMMER3")
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     tmp_file = os.path.join(resultdir, "tmp.hmm")
     state = 0
     fh = None
+    acc = None
 
     with open(hmm_filename, "rt") as infile:
 
@@ -297,7 +296,6 @@ def read_HMMER_acc_lengths(hmm_filename):
       ..  todo:: Decide whether this function is needed.
 
     """
-
     pat_accession = re.compile(r"ACC\s+([\w\.]+)")
     pat_length = re.compile(r"LENG\s+([\w\.]+)")
     state = 0
@@ -322,13 +320,151 @@ def read_HMMER_acc_lengths(hmm_filename):
 
     return data
 
-# def write_HMMER(hmm, hmm_filename):
-#
-#     ''' Write <hmm> too <hmm_filename> in HMMER3 format.
-#        Compare ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf
-#        // 8.File formats '''
-#
-#
+
+def to_fixed_width(n, max_width, allow_overflow=True, do_round=True):
+    """Format a float to a fixed-width string.
+
+    Args:
+      - n (float):              number to format
+      - max_width (int):        width of output string
+      - allow_overflow (bool):  allow the result to be larger than max_width for
+                                large n? Raises OverflowError if False
+      - do_round (bool):        Round final digit?
+    Returns:
+        (str)   string representation of n, either padded or rounded to have
+                max_width characters
+    """
+    # Adapted from https://stackoverflow.com/a/43397325/81658
+    if do_round:
+        for i in range(max_width - 2, -1, -1):
+            str0 = '{:.{}f}'.format(n, i)
+            if len(str0) <= max_width:
+                break
+    else:
+        str0 = '{:.42f}'.format(n)
+        int_part_len = str0.index('.')
+        if int_part_len <= max_width - 2:
+            str0 = str0[:max_width]
+        else:
+            str0 = str0[:int_part_len]
+    if (not allow_overflow) and (len(str0) > max_width):
+        raise OverflowError("Impossible to represent in fixed-width non-scientific format")
+    return str0
+
+
+def write_HMMER(hmm, hmm_file):
+    """Write <hmm> too <hmm_filename> in HMMER3 format.
+
+    See Section 8 (File Formats) of
+    ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf
+    for the file format specification.
+
+    Args:
+        hmm (HMM): HMM object to write
+        hmm_file (str or file): filename or file-like object to write to
+    """
+    close = False
+    out = None
+    try:
+        # file or filename
+        if hasattr(hmm_file, 'write'):
+            out = hmm_file
+        else:
+            close = True
+            out = open(hmm_file, 'w')
+
+        # Header section
+        out.write("HMMER3/f [TRAL {}]\n".format(tral.__version__))
+
+        if hmm.id:
+            name = hmm.id
+        elif type(hmm_file) == str:
+            # use filename
+            name = os.path.splitext(os.path.basename(hmm_file))[0]
+        elif hasattr(hmm_file, "name"):
+            name = os.path.splitext(os.path.basename(hmm_file.name))[0]
+        else:
+            # final fallback
+            name = "TRAL"
+        out.write("NAME  {}\n".format(name))
+
+        if hmm.id:
+            out.write("ACC   {}\n".format(hmm.id))
+
+        out.write("LENG  {}\n".format(hmm.l_effective))
+
+        if len(hmm.alphabet) == 20:
+            alphabet = "amino"
+        elif len(hmm.alphabet) == 4:
+            if set(hmm.alphabet) == {"A", "G", "C", "T"}:
+                alphabet = "DNA"
+            elif set(hmm.alphabet) == {"A", "G", "C", "U"}:
+                alphabet = "RNA"
+            else:
+                alphabet = "custom"
+        else:
+            alphabet = "custom"
+
+        out.write("ALPH  {}\n".format(alphabet))
+        out.write("MAP   yes\n")
+        out.write("CONS  no\n")
+        out.write("RF    no\n")
+        out.write("MM    no\n")
+        out.write("CS    no\n")
+        # HMM header line
+        out.write("HMM       ")
+        out.write(" ".join([l.center(7) for l in hmm.alphabet]))
+        out.write("\n")
+        out.write(" " * 10)
+        transitions = ["m->m", "m->i", "m->d", "i->m", "i->i", "d->m", "d->d"]
+        out.write(" ".join([l.center(7) for l in transitions]))
+        out.write("\n")
+
+        # Model section
+        # TODO is hmm.hmmer always consistent with hmm.p_0/p_e/p_t?
+        if not hmm.hmmer:
+            raise Exception("Unsupported: HMM lacks hmmer-style states")
+
+        # Composition
+        if "COMPO" not in hmm.hmmer:
+            # TODO Read BEGIN probabilites independently of COMPO line
+            raise KeyError("COMPO currently required")
+
+        def fmt_prob(p):
+            if p > 1e8 or math.isinf(p):
+                return "      *"
+            else:
+                return to_fixed_width(p, 7)
+
+        out.write("  COMPO   ")
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['emissions']]))
+        out.write("\n")
+        # BEGIN probabilities
+        out.write(" " * 10)
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['insertion_emissions']]))
+        out.write("\n")
+        out.write(" " * 10)
+        out.write("  ".join([fmt_prob(p) for p in hmm.hmmer['COMPO']['transition']]))
+        out.write("\n")
+
+        # Main states
+        for i in range(1, hmm.l_effective + 1):
+            out.write("{:>7}   ".format(i))
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['emissions']]))
+            out.write(" {map} {cons} {rf} {mm} {cs}\n".format(map=i, cons="-", rf="-", mm="-", cs="-"))
+            out.write(" " * 10)
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['insertion_emissions']]))
+            out.write("\n")
+            out.write(" " * 10)
+            out.write("  ".join([fmt_prob(p) for p in hmm.hmmer[str(i)]['transition']]))
+            out.write("\n")
+        out.write("//")
+
+    finally:
+        if close and out:
+            out.close()
+
+
 #
 #
 # def read_HMM_smart(hmm_filename, id = None, type = "ACC"):
