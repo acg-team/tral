@@ -54,7 +54,7 @@ In the end of each installation script for the external software an uninstallati
 Either outcomment all installation part and uncomment uninstallation part or run the commands directly in the commandline.
 
 
-### Activation and Use of TRAL
+## Activation and Use of TRAL
 
 Since TRAL will be installed within a virtual environment, you need to activate it, each time you want to use TRAL.
 For tactivation you can run the script activateTRAL.sh either with
@@ -67,7 +67,7 @@ or
 source activateTRAL.sh
 ```
 
-### Uninstallation of TRAL and its external software
+## Uninstallation of TRAL and its external software
 
 To uninstall TRAL (and is external software if you wish) run the script deleteTRAL.sh.
 
