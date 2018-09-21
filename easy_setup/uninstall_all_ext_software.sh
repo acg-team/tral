@@ -65,3 +65,8 @@ rm -rf /usr/local/bin/trf409.linux64
 rm -rf $TRAL_EXT_SOFTWARE/TRUST_Align
 rm -rf /usr/local/bin/TRUST
 
+### HHrepID
+
+rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
+rm -rf /usr/local/bin/hhrepid_64
+

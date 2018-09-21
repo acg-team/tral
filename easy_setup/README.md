@@ -43,6 +43,7 @@ Currently, installation scripts for the following external software are availabl
 
 - alf
 - hmmer
+- hhrepid
 - mafft
 - phobos
 - tredparse
