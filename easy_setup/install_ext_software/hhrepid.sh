@@ -52,7 +52,7 @@ mkdir -p $TRAL_EXT_SOFTWARE/HHrepID
 
 
 if [ ! -f $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 ]; then # test if not already in directory
-    LINK_HHREPID=ftp://ftp.tuebingen.mpg.de/pub/protevo/HHrepID # TRF Version 4.09 (Feb 22, 2016) Linux64
+    LINK_HHREPID=ftp://ftp.tuebingen.mpg.de/pub/protevo/HHrepID # HHrepID Nov 22 2007
     wget $LINK_HHREPID/hhrepid_64 -P $TRAL_EXT_SOFTWARE/HHrepID   # download execution file
     wget $LINK_HHREPID/README -P $TRAL_EXT_SOFTWARE/HHrepID    # download README
 fi
