@@ -73,6 +73,13 @@ def count_repeats(states, hmm_length=0):
 
 
 def tralfilter(results, repeats=2, log_odds=8.0):
+    """Get the set of hits passing the specified filter
+
+    :param results: TSV file with TRAL hits
+    :param repeats: minimum number of repeats
+    :param log_odds: minimum log odds score
+    :return: Generator for all hits
+    """
     hits = parsehits(results)
     filtered = filter(lambda hit: hit.logodds >= log_odds and \
                                   hit.states and \
@@ -80,6 +87,7 @@ def tralfilter(results, repeats=2, log_odds=8.0):
                       hits)
     for hit in filtered:
         yield hit
+
 
 def filterfasta(databasefile, outfile, hits):
     """Filter a fasta file to IDs contained in the hits
@@ -127,21 +135,48 @@ def parsehits(results):
         except ValueError as e:
             logging.error("{} in results file line {}".format(e, linenr))
 
+def writehits(hits, outfile):
+    """Write a collection of hits to a file
+
+    :param hits: iterable of TralHit
+    :param outfile: filename
+    """
+    with open(outfile, 'w') as results:
+        # header
+        results.write(TralHit.header)
+        results.write("\n")
+
+        for hit in hits:
+            results.write(hit.to_line())
+            results.write("\n")
+
+
 def main(args=None):
     parser = argparse.ArgumentParser(description='Filter hits from tral_search')
     parser.add_argument("hits", help="TSV file, as produced by tral_search, containing HMM hits")
     parser.add_argument("database", help="database to filter, in fasta format (may be gzip compressed)")
-    parser.add_argument("outfile", help="output fasta file, filtered by hits")
-    parser.add_argument("-r", "--min-repeats", help="Minimum number of repeats", type=float, default=2.0)
-    parser.add_argument("-t", "--log-odds", help="Threshold for minimum log-odds ratio", type=float, default=8.0)
+    group = parser.add_argument_group('outputs')
+    group.add_argument("-f", "--filtered-fasta", help="output fasta file, filtered by hits")
+    group.add_argument("-o", "--filtered-tsv", help="Filtered TSV file")
+    group = parser.add_argument_group('Thresholds')
+    group.add_argument("-r", "--min-repeats", help="Minimum number of repeats", type=float, default=2.0)
+    group.add_argument("-t", "--log-odds", help="Threshold for minimum log-odds ratio", type=float, default=8.0)
     parser.add_argument("-v", "--verbose", help="Long messages",
                         default=False, action="store_true")
     args = parser.parse_args(args)
 
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
+    # parse and filter hits
     hits = tralfilter(args.hits, args.min_repeats, args.log_odds)
-    filterfasta(args.database, args.outfile, hits)
+    # output filtered tsv
+    if args.filtered_tsv:
+        if args.filtered_fasta:
+            hits = list(hits)  # preserve iterable
+        writehits(hits, args.filtered_tsv)
+    # output filtered fasta
+    if args.filtered_fasta:
+        filterfasta(args.database, args.filtered_fasta, hits)
 
 if __name__ == "__main__":
     main()
