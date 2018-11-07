@@ -21,6 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.eggs
 
 # Installer logs
 pip-log.txt
@@ -57,3 +58,5 @@ docs/_build/
 
 # IDE
 .idea
+.vscode/settings.json
+
