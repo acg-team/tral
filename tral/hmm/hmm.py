@@ -25,9 +25,8 @@ LOG = logging.getLogger(__name__)
 CONFIG_GENERAL = configuration.Configuration.instance().config
 CONFIG = CONFIG_GENERAL["hmm"]
 
+
 ################################### HMM class ############################
-
-
 class HMM:
 
     """ Sequence profile hidden Markov models (HMMs) are used to model genomic
@@ -113,7 +112,7 @@ class HMM:
                 self.id,
                 self.l_effective)
             hmm += "Most likely motif: {}".format(tmp)
-        except:
+        except (AttributeError, TypeError):
             hmm = "<HMM instance>"
             LOG.warning("Could not create string of HMM instance.")
 
@@ -220,7 +219,7 @@ class HMM:
         self.alphabet = self.hmmer['letters']
         self.sequence_type = sequence_type
 
-        self.l_effective = max([int(key) for key \
+        self.l_effective = max([int(key) for key
                                in hmmer_probabilities.keys() if key.isdigit()])
 
         # Initialise all HMM states to default value (e.g. transition to or
@@ -246,8 +245,7 @@ class HMM:
                 i_emission_probabilities)
         for i_state in (self.insertion_states + self.terminal_states):
             i_emission_probabilities = \
-                self.hmmer[d_translate_states[i_state]] \
-                ['insertion_emissions'][:len(self.alphabet)]
+                self.hmmer[d_translate_states[i_state]]['insertion_emissions'][:len(self.alphabet)]
             self.set_emission_probability_hmmer3(
                 i_state,
                 i_emission_probabilities)
@@ -295,7 +293,7 @@ class HMM:
         self.states = [self.terminal_states[
             0]] + self.match_states + self.insertion_states + [self.terminal_states[1]]
         self.p_t = {i_state: {i: j for i, j in self.p_t[
-            i_state].items() if not i in self.deletion_states} for i_state in self.states}
+            i_state].items() if i not in self.deletion_states} for i_state in self.states}
         self.p_0 = {
             i: j for i,
             j in self.p_0.items() if i not in self.deletion_states}
@@ -456,7 +454,7 @@ class HMM:
     def hmm_example(self):
         """ .. todo:: Is this method needed?
         """
-        #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
+        # states = ["N", "B", "M1", "M2", "M3", "E", "C"]
         self.states = ["N", "M1", "M2", "C"]
 
         # Initialisation
@@ -521,8 +519,7 @@ class HMM:
         for i in range(l_effective):
             self.p_t["N"]["M{0}".format(i % l_effective + 1)] = 0
             self.p_t["M{0}".format(i % l_effective + 1)]["C"] = 0
-            self.p_t["M{0}".format(i % l_effective + 1)] \
-                    ["M{0}".format((i + 1) % l_effective + 1)] = 0
+            self.p_t["M{0}".format(i % l_effective + 1)]["M{0}".format((i + 1) % l_effective + 1)] = 0
         self.p_t["N"]["N"] = 0
         self.p_t["C"]["C"] = 0
 
@@ -558,8 +555,8 @@ class HMM:
         l_emission_probabilities = \
             [-(i) * np.log10(np.exp(1)) for i in l_emission_probabilities]
         self.p_e[state] = \
-            {iL: iEP for iL, iEP in \
-            zip(self.alphabet, l_emission_probabilities)}
+            {iL: iEP for iL, iEP in
+             zip(self.alphabet, l_emission_probabilities)}
 
     def set_circle_transition_probability_hmmer3(
             self,
@@ -666,7 +663,7 @@ class HMM:
                 '0.77255', '0.48576', '0.95510']
         """
 
-        l_transition_probabilities = [-(i) * np.log10(np.exp(1)) for i \
+        l_transition_probabilities = [-(i) * np.log10(np.exp(1)) for i
                                       in l_transition_probabilities]
 
         # Match state state_index -> Match state state_index + 1
