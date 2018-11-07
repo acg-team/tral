@@ -29,3 +29,18 @@ or mv the TRAL configuration directory from your root dir to your home, e.g.::
     $ cd ~
     $ sudo mv /root/.tral ./
     $ sudo chown -R $(whoami) .tral
+
+
+Development
+-----------
+
+To compile locally, run
+
+    $ pip install -r requirements_dev.py
+    $ python setup.py install
+
+TRAL uses tox and pytest for testing. The following commands relate to testing and code style:
+
+    $ flake8  # check code style
+    $ python setup.py test  # Run tests
+    $ tox  # Run comprehensive test suite on multiple python versions

@@ -59,15 +59,30 @@ setup(
         "Operating System :: OS Independent",
         ],
     install_requires=[
-        "Biopython >= 1.64",
+        "biopython >= 1.64",
         "configobj >= 5.0.6",
-        #"docutils >= 0.11", # Uncomment if you wish to create the documentation locally.
         "numpy >= 1.6.1",
-        #"pypandoc >= 0.9.6" # Uncomment if you wish to convert the markdown readme to a rest readme for upload on Pypi.
-        #"pytest >= 2.5.2", # Uncomment if you wish to run the tests locally.
         "scipy >=0.12.0",
-        #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
+    setup_requires=["pytest-runner"],
+    tests_require=[
+        "pytest >= 2.5.2",
+    ],
+    # Install with e.g. `python setup.py install tral[docs]`
+    extras_require={
+        'docs': [
+            "docutils >= 0.11",
+            "pypandoc >= 0.9.6",
+            "Sphinx >= 1.2.2",
+            ],
+        'develop': [
+            "flake8 >= 3.6",
+            "tox >= 3.5",
+        ],
+        'workflow': [
+            "pyfaidx==0.4.7.1",  # Used by the workflow example for fasta indexing
+        ]
+    },
     # package_data: None-module files, which should still be distributed are mentioned here:
     package_data={"tral": ["tral_configuration/*.ini",
                            "tral_configuration/data/hhrepid/*",
