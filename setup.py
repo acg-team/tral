@@ -1,10 +1,13 @@
 import os
 import shutil
+import sys
 
 try:
-    from setuptools import setup, Command
+    from setuptools import setup
+    from setuptools.command.install import install
 except ImportError:
-    from distutils.core import setup, Command
+    from distutils.core import setup
+    from distutils.core import Command as install
 
 
 def read(*paths):
@@ -13,22 +16,31 @@ def read(*paths):
         return f.read()
 
 
-# Set the home variable with user argument:
-class InstallCommand(Command):
+# The previous --home option has been changed to --tral-home (0.3.7)
+# Warn users about backwards incompatibility
+if "--home" in sys.argv:
+    print("WARNING: The option to set the TRAL data directory has been renamed from --home to --tral-home."
+          "         The --home option now triggers the package itself to install in the user's home directory.",
+          file=sys.stderr)
+
+# Customize install command to add --tral-home command
+class InstallCommand(install):
     description = "Installs TRAL"
-    user_options = [
-        ('home=', None, 'Directory containing the `.tral` data directory (default to user home)'),
+    user_options = getattr(install, 'user_options', []) + [
+        ('tral-home=', None, 'Directory containing the `.tral` data directory (default to user home)'),
     ]
 
     def initialize_options(self):
-        self.home = None
+        super().initialize_options()
+        self.tral_home = os.path.expanduser("~")
 
     def finalize_options(self):
-        if not os.path.exists(self.home):
-            raise ValueError("The argument supplied in --home is not a valid path: {}".format(self.home))
+        super().finalize_options()
+        if not os.path.exists(self.tral_home):
+            raise ValueError("The argument supplied in --tral-home is not a valid path: {}".format(self.tral_home))
 
     def run(self):
-        datadir = os.path.join(self.home, ".tral")
+        datadir = os.path.join(self.tral_home, ".tral")
         if os.path.exists(datadir):
             print("The TRAL configuration directory {} already exists. The "
                   "template configuration and datafiles are not copied to the "
@@ -36,6 +48,9 @@ class InstallCommand(Command):
         else:
             shutil.copytree("tral/tral_configuration", datadir)
             print("The TRAL configuration files and data files are now located in {}".format(datadir))
+
+        #self.do_egg_install()
+        super().run()
 
 
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]

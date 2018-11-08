@@ -58,5 +58,5 @@ docs/_build/
 
 # IDE
 .idea
-.vscode/settings.json
+.vscode
 
