@@ -35,7 +35,7 @@ TEST_SEQUENCE_TAG = 'test_sequence_tag'
 def path():
     """Return the path to the test data files.
     """
-    return os.path.join(os.path.abspath('.'), 'hmm', 'test')
+    return os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.mark.no_external_software_required
@@ -45,8 +45,8 @@ def test_initialise_sequence():
 
 
 @pytest.mark.no_external_software_required
-def test_detect_repeats_with_hmm():
-    test_hmm = HMM.create(input_format = 'hmmer', file = os.path.join(path(), TEST_FILE_WITH_ID))
+def test_detect_repeats_with_hmm(path):
+    test_hmm = HMM.create(input_format = 'hmmer', file = os.path.join(path,"..","..","hmm","test",TEST_FILE_WITH_ID))
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
 
@@ -98,11 +98,11 @@ def test_detect_repeats_denovo():
 
 
 @pytest.mark.no_external_software_required
-def test_sequence_pickle():
+def test_sequence_pickle(tmpdir):
 
     test_seq = sequence.Sequence(TEST_SEQUENCE)
 
-    test_pickle = os.path.join(path(), "test.pickle")
+    test_pickle = tmpdir.join("test.pickle")
     test_seq.write(test_pickle, 'pickle')
     test_seq_new = sequence.Sequence.create(test_pickle, 'pickle')
 
