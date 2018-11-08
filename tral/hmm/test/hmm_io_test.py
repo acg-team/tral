@@ -35,7 +35,7 @@ TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
 def path():
     """Return the path to the test data files.
     """
-    return os.path.join(os.path.abspath('.'), 'hmm', 'test')
+    return os.path.dirname(os.path.abspath(__file__))
 
 @pytest.mark.no_external_software_required
 def test_single_hmm_with_id_read(path):

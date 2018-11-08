@@ -15,15 +15,6 @@ TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
 TEST_HMM_STATES_SINGLE = ["N", "M1", "I1","C"]
 TEST_HMM_P0_SINGLE = {i:0 for i in TEST_HMM_STATES_SINGLE}
 
-# Test file names
-TEST_FILE_WITH_ID = 'carcinustatin.hmm'
-
-@pytest.fixture
-def path():
-    """Return the path to the test data files.
-    """
-    return os.path.join(os.path.abspath('.'), 'hmm', 'test')
-
 
 def test_create_HMM_from_Repeat():
 
@@ -62,12 +53,12 @@ def test_create_HMM_from_DNA_Repeat():
         assert set(list(ip_e.keys())) == set(["A","C","G","T"])
     #assert test_hmm.p_t == TEST_HMM_P0_DOUBLE
 
-def test_hmm_pickle():
+def test_hmm_pickle(tmpdir):
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
     test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
 
-    test_pickle = os.path.join(path(), "test.pickle")
+    test_pickle = tmpdir.join("test.pickle")
     test_hmm.write(test_pickle, 'pickle')
     test_hmm_new = HMM.create(input_format = 'pickle', file = test_pickle)
 

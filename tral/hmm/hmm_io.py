@@ -100,8 +100,6 @@ def read(hmm_filename, id=None):
     pat_transition = re.compile(r"[\d\.\*]+")
     pat_end = re.compile(r"//")
 
-    size_alphabet = 20
-
     # Our possible parser states:
     #
     # 0: searching for HMMER3 Tag
@@ -179,11 +177,12 @@ def read(hmm_filename, id=None):
                     if current_hmm_state == 'COMPO':
                         string_emissions = findall[1:]
                     else:
-                        string_emissions = findall[1:1 + size_alphabet]
+                        string_emissions = findall[1:1 + len(hmm['letters'])]
                     LOG.debug(" * (3->4) Found emission probabilities")
                     LOG.debug("Current HMM state: %s", current_hmm_state)
                     emissions = [float(i) if i != '*' else -float('inf')
                                  for i in string_emissions]
+
                     LOG.debug("Emission probabilities: %s", emissions)
                     hmm[current_hmm_state] = {'emissions': emissions}
                     state = 4
