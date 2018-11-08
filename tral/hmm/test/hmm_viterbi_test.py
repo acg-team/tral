@@ -6,7 +6,6 @@ from tral.hmm.hmm_viterbi import *
 from tral.repeat import repeat
 from tral.repeat import repeat_align
 
-notfixed = pytest.mark.notfixed
 
 @pytest.mark.no_external_software_required
 def test_hmm_path_to_non_aligned_tandem_repeat_units():
@@ -50,7 +49,7 @@ def test_viterbi():
 
 # The following test functions were copy-pasted from hmm_viterbi.py. They need to be either
 # strongly adapted, or - if not useful - erased.
-@notfixed
+@pytest.mark.notfixed
 @pytest.mark.no_external_software_required
 def test_conversion_multiple():
     """ Test <hmm_path_to_maximal_complete_tandem_repeat_units>.
@@ -64,7 +63,7 @@ def test_conversion_multiple():
     lSequence = ['XXXABCADBCABCXXX','XXXBCABCABCAXXX','XXXCABCABCABXXX']
     lMSA = hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPaths, 3)
 
-@notfixed
+@pytest.mark.notfixed
 @pytest.mark.no_external_software_required
 def test_create_viterbi():
     """ This test needs to be fixed, the HMM cannot be initialised in this way.
@@ -94,7 +93,7 @@ def test_create_viterbi():
     else:
         print("Test FAILED")
 
-@notfixed
+@pytest.mark.notfixed
 def test_init_with_repeat():
     """ This test needs to be fixed.
     """

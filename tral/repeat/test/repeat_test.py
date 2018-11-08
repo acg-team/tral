@@ -13,19 +13,11 @@ TEST_SCORE = "phylo_gap01"
 # defaultdict(<class 'int'>, {'pSim': 0.66666666669999997, 'parsimony': 0.66666666669999997, 'entropy': 0.66666666666666663, 'phylo': 0.11368675605567802})
 # pvalue 'phylo': 0.3821
 
-notfixed = pytest.mark.notfixed
-
-@pytest.fixture
-def path():
-    """Return the path to the test data files.
-    """
-    return os.path.join(os.path.abspath('.'), 'repeat', 'test')
-
 
 @pytest.mark.no_external_software_required
 def test_standardize_amino_acids():
 
-    assert repeat.standardize("ABDEF-G") == "ADDEF-G"
+    assert repeat.standardize("ABDEF-G", "AA") == "ADDEF-G"
 
 
 @pytest.mark.no_external_software_required
@@ -46,11 +38,11 @@ def test_repeat_ambiguous():
 
 
 @pytest.mark.no_external_software_required
-def test_repeat_pickle():
+def test_repeat_pickle(tmpdir):
 
     myTR_O = repeat.Repeat(msa = TEST_MSA_O)
 
-    test_pickle = os.path.join(path(), "test.pickle")
+    test_pickle = tmpdir.join("test.pickle")
     myTR_O.write(test_pickle, 'pickle')
     myTR_O_new = repeat.Repeat.create(test_pickle, 'pickle')
 

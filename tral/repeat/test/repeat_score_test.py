@@ -7,9 +7,7 @@ from tral.repeat import repeat_io
 TEST_MSA = ['HPFGFV-------------AVPTKNP-DGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPS---SPPKCKFEPPLFHPNV', 'YPSGTVCLsileedkdwrpAITIKQIlLGIQELLN-E---PNIQ-DPAQAEAYTIYCQNRVEYEKrvrAQAK-KFAP-------']
 TEST_BEGIN = 0
 
-notfixed = pytest.mark.notfixed
-
-@notfixed
+@pytest.mark.notfixed
 @pytest.mark.no_external_software_required
 def test_repeat_score():
 

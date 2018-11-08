@@ -31,8 +31,6 @@ TEST_FILE_WITH_ID = 'carcinustatin.hmm'
 TEST_SEQUENCE_TAG = 'test_sequence_tag'
 
 
-notfixed = pytest.mark.notfixed
-
 @pytest.fixture
 def path():
     """Return the path to the test data files.
@@ -53,7 +51,6 @@ def test_detect_repeats_with_hmm():
     test_optimized_repeat = test_seq.detect([test_hmm])
 
 
-#@notfixed
 def test_detect_repeats_with_repeat():
 
     test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
@@ -89,7 +86,6 @@ def test_too_big_hmms():
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 0
 
-#@notfixed
 def test_detect_repeats_denovo():
 
     test_parameters = {"detection": {"detectors": ["TRUST"]}}

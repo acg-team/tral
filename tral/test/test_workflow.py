@@ -54,8 +54,6 @@ TEST_RESULT_SEQ1 = [3,
                     [["FNCGG-EF", "FYCNTSNL", "FNSTKLEL", "FNSST-NL"],
                         ["GDII", "GDIR"], ["FLG", "FLG"]]]
 
-notfixed = pytest.mark.notfixed
-
 
 @pytest.fixture
 def path():

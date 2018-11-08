@@ -385,7 +385,7 @@ def loglikelihood_substitution(t, Q, eq_freq, alphabet, tandem_repeat):
     # First sum: Over all sites
     # Second sum: Over all possible ancestral characters
     # Third product: Over all repeat units
-    likelihood = sum(np.log(np.sum(iJ * np.product(np.power(P[i], column))
+    likelihood = sum(np.log(sum(iJ * np.product(np.power(P[i], column))
                                    for i, iJ in enumerate(eq_freq)))
                      for column in tandem_repeat.msaTDN)
     return likelihood

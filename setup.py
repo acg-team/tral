@@ -106,6 +106,7 @@ setup(
         'develop': [
             "flake8 >= 3.6",
             "tox >= 3.5",
+            "pytest >= 2.5.2",
         ],
         'workflow': [
             "pyfaidx==0.4.7.1",  # Used by the workflow example for fasta indexing

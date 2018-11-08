@@ -30,7 +30,6 @@ TEST_FILE_WITHOUT_ID = 'carcinustatin_no_id.hmm'
 
 TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
 
-notfixed = pytest.mark.notfixed
 
 @pytest.fixture
 def path():
