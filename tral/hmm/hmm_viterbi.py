@@ -473,7 +473,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
     if begin == len(sequence) or path.count('C') == len(sequence):
         return None
 
-    splitter = re.compile("(\w)(\d+)")
+    splitter = re.compile(r"(\w)(\d+)")
     mapping = [
         ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)
         for iS, iP in zip(sequence[begin:], path[begin:]) if iP != 'C']
@@ -561,7 +561,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
         most_likely_path = [
             i if i in ["C", "N"] else i[0] + str(int(i[1:]) - 1) for i in most_likely_path]
 
-    splitter = re.compile("(\w)(\d+)")
+    splitter = re.compile(r"(\w)(\d+)")
 
     mapping = [
         ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)

@@ -438,7 +438,7 @@ class Repeat:
         self.msaTD = [column for column in self.msaT
                       if (2 * column.count('-') < len(column))
                       ]
-        self.insertions = re.compile("-+").findall(''.join([
+        self.insertions = re.compile(r"-+").findall(''.join([
             'p' if (2 * column.count('-') < len(column)) else '-'
             for column in self.msaT
         ])
@@ -485,7 +485,7 @@ class Repeat:
         # insertions in the last column
         # and the first column as associated (= of the same origin)
         # Lastly, detect the length of all insertions.
-        insertions = re.compile("-+").findall(2 * (''.join([
+        insertions = re.compile(r"-+").findall(2 * (''.join([
             'p' if (2 * column.count('-') < len(column)) else '-'
             for column in self.msaT
         ])))
@@ -498,7 +498,7 @@ class Repeat:
         # 2. Detect deletions
         # CHECK this lines. you used msaTD before, but swapped to msaD
         deletions = [(m.start() % self.l_msa, len(m.group()))
-                     for m in re.finditer(re.compile("-+"), "".join(self.msaD))]
+                     for m in re.finditer(re.compile(r"-+"), "".join(self.msaD))]
         self.deletions['row_wise'] = [i[1] for i in deletions]
         self.gaps['row_wise'] = self.insertions + self.deletions['row_wise']
 
@@ -525,7 +525,7 @@ class Repeat:
         # CHECK this lines. you used msaTD before, but swapped to msaD
         # msaTD = ["".join(c) for c in zip(*msaD)]
         deletions = [(m.start() % self.l_msa, len(m.group()))
-                     for m in re.finditer(re.compile("-+"), "".join(msaD))]
+                     for m in re.finditer(re.compile(r"-+"), "".join(msaD))]
         self.deletions['ignore_trailing_gaps'] = [i[1] for i in deletions]
         self.gaps['ignore_trailing_gaps'] = self.insertions + \
             self.deletions['ignore_trailing_gaps']
@@ -624,14 +624,14 @@ class Repeat:
                             begin +
                             length)]
                     insertion_lengths[iL].extend(
-                        [len(iI) for iI in re.findall('\w+', insertion)])
+                        [len(iI) for iI in re.findall(r'\w+', insertion)])
 
                 # In case the insertion blocks bridges over then end of the
                 # repeat unit:
                 if begin > end:
                     insertion = repeat_sequence[:end + 1]
                     insertion_lengths[iL].extend(
-                        [len(iI) for iI in re.findall('\w+', insertion)])
+                        [len(iI) for iI in re.findall(r'\w+', insertion)])
 
         LOG.debug(
             "The insertion_lengths of the current TR are: {0}".format(insertion_lengths))

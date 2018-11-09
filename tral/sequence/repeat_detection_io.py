@@ -306,7 +306,7 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length=20):
         ['1' if i_gap <= maximal_gap_length else '0' for i_gap in gaps])
 
     count_valid_pairs = [len(m.group())
-                         for m in re.finditer(re.compile('1+'), gap_valid)]
+                         for m in re.finditer(re.compile(r'1+'), gap_valid)]
     # All repeat units are further apart than maximal_gap_length? -> Discard
     # the repeat
     if len(count_valid_pairs) == 0:
@@ -376,8 +376,8 @@ def trust_get_repeats(infile):
     pat_repeat_info = re.compile(r"(\d+) (\d+).*$")
     pat_repeat_header = re.compile(r">Repeat \d+")
     # FIXME find proper character set here
-    pat_repeat_sequence = re.compile("([A-Za-z-]+)")
-    pat_protein_end = re.compile("//")
+    pat_repeat_sequence = re.compile(r"([A-Za-z-]+)")
+    pat_protein_end = re.compile(r"//")
 
     # Our possible parser states:
     #
@@ -557,16 +557,16 @@ def trf_get_repeats(infile):
     """
 
     # find the name of the sequence ## CURRENTLY NOT IMPLEMENTED
-    #pat_identifier = re.compile("Sequence: (\S+)")
+    #pat_identifier = re.compile(r"Sequence: (\S+)")
 
     # find coordinates of the repeat region in the protein
-    pat_coordinates = re.compile("Indices: (\d+)--(\d+)")
+    pat_coordinates = re.compile(r"Indices: (\d+)--(\d+)")
 
     # find a part of a repeat unit and its coordinate
-    pattern_seq = re.compile("\s+(\d+) ([ACGT\- ]+)")
+    pattern_seq = re.compile(r"\s+(\d+) ([ACGT\- ]+)")
 
     # find the final tag 'Statistics'
-    pat_statistics = re.compile("Statistics")
+    pat_statistics = re.compile(r"Statistics")
 
     # Our possible parser states:
     #
@@ -820,8 +820,8 @@ def hhpredid_get_repeats(infile):
     # find a part of a repeat unit and its first coordinate
     # minus or \minus?
 
-    pattern_repeat_unit_count = re.compile("Repeats\s+(\d+)")
-    pattern_seq = re.compile("[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)")
+    pattern_repeat_unit_count = re.compile(r"Repeats\s+(\d+)")
+    pattern_seq = re.compile(r"[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)")
 
     # Our possible parser states:
 
@@ -898,8 +898,8 @@ def phobos_get_repeats(infile):
     .. todo:: Show PHOBOS output syntax.
     """
 
-    pattern_begin = re.compile("(\d+) :\s+\d")
-    pattern_seq = re.compile("([\-ACGT]+)")
+    pattern_begin = re.compile(r"(\d+) :\s+\d")
+    pattern_seq = re.compile(r"([\-ACGT]+)")
 
     # Our possible parser states:
     #

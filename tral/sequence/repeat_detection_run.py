@@ -793,7 +793,7 @@ class DetectorXStream(TRDetector):
         files = os.listdir(searchdir)
 
         # look for the first file that matches XSTREAM_something_chart.xl
-        pat_chartfilename = re.compile("^XSTREAM_.*_chart\.xls$")
+        pat_chartfilename = re.compile(r"^XSTREAM_.*_chart\.xls$")
         for f in files:
             if pat_chartfilename.match(f):
                 return os.path.join(searchdir, f)
