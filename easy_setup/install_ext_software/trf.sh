@@ -35,7 +35,7 @@ fi
 
 chmod +x $TRAL_EXT_SOFTWARE/trf409.linux64
 cp $TRAL_EXT_SOFTWARE/trf409.linux64 /usr/local/bin/ # copy into system path
-chmod +x /usr/local/bin/trf409.linux64 && echo -e  "\nTREKS is in your system path /usr/local/bin/ and can be executed with the command trf409.linux64"
+chmod +x /usr/local/bin/trf409.linux64 && echo -e  "\nTRF is in your system path /usr/local/bin/ and can be executed with the command trf409.linux64"
 
 # TRF is now executable with trf409.linux64
 

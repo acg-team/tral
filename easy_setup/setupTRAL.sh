@@ -58,7 +58,7 @@ virtualenv $TRAL_ENV/python3_5 -p python3.5
 . $TRAL_ENV/python3_5/bin/activate
 
 ######################
-### install ipython3 in virtualenv
+### install software in virtualenv
 pip install ipython
 
 ######################

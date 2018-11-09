@@ -29,19 +29,19 @@ else # Create an executable file for TREKS
     echo '#!/bin/sh
     # wrapper file to easily start T-REKS
 
-    java -jar' $TRAL_EXT_SOFTWARE/T-Reks.jar ' "$@"' > $TRAL_EXT_SOFTWARE/TREKS
-    chmod +x $TRAL_EXT_SOFTWARE/TREKS
-    cp $TRAL_EXT_SOFTWARE/TREKS /usr/local/bin/  # copy wrapper file to execute T-REKS into system path
-    chmod +x /usr/local/bin/TREKS && echo -e "\nTREKS is in your system path /usr/local/bin/ and can be executed with the command \"TREKS\""
+    java -jar' $TRAL_EXT_SOFTWARE/T-Reks.jar ' "$@"' > $TRAL_EXT_SOFTWARE/T-REKS
+    chmod +x $TRAL_EXT_SOFTWARE/T-REKS
+    cp $TRAL_EXT_SOFTWARE/T-REKS /usr/local/bin/  # copy wrapper file to execute T-REKS into system path
+    chmod +x /usr/local/bin/T-REKS && echo -e "\nT-REKS is in your system path /usr/local/bin/ and can be executed with the command \"T-REKS\""
 
 
-# TREKS is executalbe with the command "TREKS"
+# TREKS is executalbe with the command "T-REKS"
 fi
 
 ######################
 ### Uninstallation of T-REKS
 
 # rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
-# rm -rf $TRAL_EXT_SOFTWARE/TREKS
-# rm -rf /usr/local/bin/TREKS
+# rm -rf $TRAL_EXT_SOFTWARE/T-REKS
+# rm -rf /usr/local/bin/T-REKS
 

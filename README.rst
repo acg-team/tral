@@ -36,7 +36,7 @@ instructions <http://acg-team.github.io/tral/install.html#install>`__.
 License
 ~~~~~~~
 
-GPL
+GPL-2.0
 
 Dependencies
 ~~~~~~~~~~~~

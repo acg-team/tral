@@ -64,7 +64,7 @@ setup(
         #"docutils >= 0.11", # Uncomment if you wish to create the documentation locally.
         "numpy >= 1.6.1",
         #"pypandoc >= 0.9.6" # Uncomment if you wish to convert the markdown readme to a rest readme for upload on Pypi.
-        #"pytest >= 2.5.2", # Uncomment if you wish to run the tests locally.
+        "pytest >= 2.5.2", # Uncomment if you wish to run the tests locally.
         "scipy >=0.12.0",
         #"Sphinx >= 1.2.2", # Uncomment if you wish to create the documentation locally.
     ],
