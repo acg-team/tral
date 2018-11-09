@@ -34,7 +34,7 @@ read -p "Would you like to install any external software? yes(y) or no (n):" yn
 case $yn in
     [Yy]* )
         echo -e "\n"
-        install_ext_software alf hhrepid hmmer mafft phobos tredparse treks trf trust      
+        install_ext_software alf hhrepid hmmer mafft phobos tredparse treks trf trust xstream     
         ;;
     [Nn]* ) 
         echo -e "\nNo external software will be installed right now."

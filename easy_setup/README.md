@@ -3,7 +3,7 @@
 > **ATTENTION: This easy_setup is a first version which can have some unknown bugs. Moreover, the README may not be complete. Adaption is coming soon.**
 
 These scripts will help you to easily install TRAL and its dependencies without going to deep into detail of the different installation procedures.
-It automatically sets up a little filesystem, where a virtual environment (virtenv) for TRAL will be ininitalized.
+It automatically sets up a little filesystem, where a virtual environment (virtenv) for TRAL will be initalized.
 Moreover, you can decide which external software should be downloaded and installed without the need to read through their (sometimes complicated) installation procedures.
 
 ## Getting Started
@@ -29,7 +29,7 @@ Currently the version provided in "pypi" is not up-to-date, therefore it is reco
 ```
 sudo ./setupTRAL.sh git
 ```
-If you haven't git installed, you may need to download the github repository manually (https://github.com/acg-team/tral.git).
+If you haven't git installed, you may need install git or to download the github repository manually (https://github.com/acg-team/tral.git).
 
 
 ### Installation of external software for TRAL
@@ -50,9 +50,10 @@ Currently, installation scripts for the following external software are availabl
 - t-reks
 - trf
 - trust
+- xstream
 
 In the end of each installation script for the external software an uninstallation procedure can be found.
-Either outcomment all installation part and uncomment uninstallation part or run the commands directly in the commandline.
+Either comment all installation part and uncomment uninstallation part or run the commands directly in the commandline.
 
 
 ## Activation and Use of TRAL

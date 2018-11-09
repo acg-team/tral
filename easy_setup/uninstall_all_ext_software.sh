@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# TODO -- add the remaining external software
-# TODO -- add some comments
-
 ######################
 ### Explanation
 
@@ -52,8 +49,8 @@ rm /usr/local/bin/tred
 ### TREKS
 
 rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
-rm -rf $TRAL_EXT_SOFTWARE/TREKS
-rm -rf /usr/local/bin/TREKS
+rm -rf $TRAL_EXT_SOFTWARE/T-REKS
+rm -rf /usr/local/bin/T-REKS
 
 ### TRF
 
@@ -69,4 +66,10 @@ rm -rf /usr/local/bin/TRUST
 
 rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
 rm -rf /usr/local/bin/hhrepid_64
+
+
+### XSTREAM
+
+rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
+rm -rf /usr/local/bin/XSTREAM
 
