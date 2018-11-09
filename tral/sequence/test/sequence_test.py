@@ -12,20 +12,20 @@ TEST_SEQUENCE = "FFAAAAAAFF"
 TEST_SEQUENCE_Q9BRR0 = "MARELSESTALDAQSTEDQMELLVIKVEEEEAGFPSSPDLGSEGSRERFRGFRYPEAAGPREALSRLRELCRQWLQPEMHSKEQILELLVLEQFLTILPGNLQSWVREQHPESGEEVVVLLEYLERQLDEPAPQVSGVDQGQELLCCKMALLTPAPGSQSSQFQLMKALLKHESVGSQPLQDRVLQVPVLAHGGCCREDKVVASRLTPESQGLLKVEDVALTLTPEWTQQDSSQGNLCRDEKQENHGSLVSLGDEKQTKSRDLPPAEELPEKEHGKISCHLREDIAQIPTCAEAGEQEGRLQRKQKNATGGRRHICHECGKSFAQSSGLSKHRRIHTGEKPYECEECGKAFIGSSALVIHQRVHTGEKPYECEECGKAFSHSSDLIKHQRTHTGEKPYECDDCGKTFSQSCSLLEHHRIHTGEKPYQCSMCGKAFRRSSHLLRHQRIHTGDKNVQEPEQGEAWKSRMESQLENVETPMSYKCNECERSFTQNTGLIEHQKIHTGEKPYQCNACGKGFTRISYLVQHQRSHVGKNILSQ"
 
 
-TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
-TEST_RESULT_REPEAT_MSA_SINGLE = ["A","A","A","A","A","A"]
+TEST_REPEAT_MSA_SINGLE = ["A", "A", "A"]
+TEST_RESULT_REPEAT_MSA_SINGLE = ["A", "A", "A", "A", "A", "A"]
 
-TEST_REPEAT_MSA_DOUBLE = ["AA","AA"]
-TEST_RESULT_REPEAT_MSA_DOUBLE = ["AA","AA","AA"]
+TEST_REPEAT_MSA_DOUBLE = ["AA", "AA"]
+TEST_RESULT_REPEAT_MSA_DOUBLE = ["AA", "AA", "AA"]
 
-TEST_RESULT_REPEAT_MSA_LONG = [10*"A", 10*"A"]
-TEST_SEQUENCE_A = 18*"A"
+TEST_RESULT_REPEAT_MSA_LONG = [10 * "A", 10 * "A"]
+TEST_SEQUENCE_A = 18 * "A"
 
-TEST_RESULT_REPEAT_MSA_SUPER_LONG = [100*"A", 100*"A"]
-TEST_SEQUENCE_SUPER_LONG_A = 200*"A"
+TEST_RESULT_REPEAT_MSA_SUPER_LONG = [100 * "A", 100 * "A"]
+TEST_SEQUENCE_SUPER_LONG_A = 200 * "A"
 
 
-#Test file names
+# Test file names
 TEST_FILE_WITH_ID = 'carcinustatin.hmm'
 
 TEST_SEQUENCE_TAG = 'test_sequence_tag'
@@ -46,23 +46,23 @@ def test_initialise_sequence():
 
 @pytest.mark.no_external_software_required
 def test_detect_repeats_with_hmm(path):
-    test_hmm = HMM.create(input_format = 'hmmer', file = os.path.join(path,"..","..","hmm","test",TEST_FILE_WITH_ID))
+    test_hmm = HMM.create(input_format='hmmer', file=os.path.join(path, "..", "..", "hmm", "test", TEST_FILE_WITH_ID))
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
 
 
 def test_detect_repeats_with_repeat():
 
-    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE)
+    test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 1
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_DOUBLE
 
-    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_SINGLE)
-    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_SINGLE)
+    test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 1
@@ -72,26 +72,27 @@ def test_detect_repeats_with_repeat():
 @pytest.mark.no_external_software_required
 def test_too_big_hmms():
 
-    test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_LONG)
-    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+    test_repeat = repeat.Repeat(msa=TEST_RESULT_REPEAT_MSA_LONG)
+    test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE_A)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 0
 
-    test_repeat = repeat.Repeat(msa = TEST_RESULT_REPEAT_MSA_SUPER_LONG)
-    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+    test_repeat = repeat.Repeat(msa=TEST_RESULT_REPEAT_MSA_SUPER_LONG)
+    test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
     test_seq = sequence.Sequence(TEST_SEQUENCE_SUPER_LONG_A)
     test_optimized_repeat = test_seq.detect([test_hmm])
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 0
+
 
 def test_detect_repeats_denovo():
 
     test_parameters = {"detection": {"detectors": ["TRUST"]}}
 
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
-    test_optimized_repeat = test_seq.detect(denovo = True, **test_parameters)
+    test_optimized_repeat = test_seq.detect(denovo=True, **test_parameters)
 
     assert type(test_optimized_repeat) == repeat_list.RepeatList
     assert len(test_optimized_repeat.repeats) == 3
@@ -108,8 +109,8 @@ def test_sequence_pickle(tmpdir):
 
     assert test_seq.seq == test_seq_new.seq
 
-    test_repeat = repeat.Repeat(msa = TEST_REPEAT_MSA_DOUBLE)
-    test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat)
+    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE)
+    test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
     test_optimized_repeat = test_seq.detect([test_hmm])
     test_seq.set_repeatlist(test_optimized_repeat, TEST_SEQUENCE_TAG)
 

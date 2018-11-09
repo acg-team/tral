@@ -67,6 +67,7 @@ class Configuration:
     Attributes:
         config (configobj.ConfigObj): The `ConfigObj` instance.
     """
+
     def __init__(self):
         self.config = configobj.ConfigObj(
             P_CONFIG,

@@ -30,8 +30,6 @@ def path():
 @pytest.mark.no_external_software_required
 def test_read_fasta(path):
 
-    test_lSeq = list(sequence_io.read_fasta( os.path.join(path, TEST_FAA_FILE) ))
+    test_lSeq = list(sequence_io.read_fasta(os.path.join(path, TEST_FAA_FILE)))
     assert len(test_lSeq) == 9
     assert test_lSeq[0] == (TEST_SEQ_1, TEST_SEQ_1_ID)
-
-

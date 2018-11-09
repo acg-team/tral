@@ -177,7 +177,7 @@ def workflow(
             rl_tmp.intersection(
                 iS.get_repeatlist(PFAM_ALL_TAG)), PFAM_TAG)
         iS.set_repeatlist(
-            rl_tmp.intersection(iS.get_repeatlist(DE_NOVO_ALL_TAG)),DE_NOVO_TAG)
+            rl_tmp.intersection(iS.get_repeatlist(DE_NOVO_ALL_TAG)), DE_NOVO_TAG)
 
         # 4. calculate_overlap()
 
@@ -339,7 +339,6 @@ def concatenate_csv_files(directory, result_file, file_extension=".csv"):
                 fh2.readline()
                 for line in fh2.readlines():
                     fh.write(line)
-
 
 
 def main():

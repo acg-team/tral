@@ -23,8 +23,8 @@ def test_standardize_amino_acids():
 @pytest.mark.no_external_software_required
 def test_repeat_ambiguous():
 
-    myTR_O = repeat.Repeat(msa = TEST_MSA_O)
-    myTR_K = repeat.Repeat(msa = TEST_MSA_K)
+    myTR_O = repeat.Repeat(msa=TEST_MSA_O)
+    myTR_K = repeat.Repeat(msa=TEST_MSA_K)
 
     assert myTR_O.msaTD_standard_aa == myTR_K.msaTD
     assert myTR_O.msaTD_standard_aa == myTR_K.msaTD_standard_aa
@@ -40,7 +40,7 @@ def test_repeat_ambiguous():
 @pytest.mark.no_external_software_required
 def test_repeat_pickle(tmpdir):
 
-    myTR_O = repeat.Repeat(msa = TEST_MSA_O)
+    myTR_O = repeat.Repeat(msa=TEST_MSA_O)
 
     test_pickle = tmpdir.join("test.pickle")
     myTR_O.write(test_pickle, 'pickle')

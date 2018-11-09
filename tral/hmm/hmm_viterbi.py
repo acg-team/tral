@@ -89,7 +89,7 @@ def viterbi_with_prob(hmm, emission):
         d_ambiguous_local[iA] = {}
         if iA in emission:
             total = np.log10(sum(10 ** p_e['N'][i_ambiguous]
-                    for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
+                                 for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
             for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]:
                 d_ambiguous_local[iA][i_ambiguous] = p_e['N'][i_ambiguous] - total
 
@@ -248,7 +248,7 @@ def logodds(hmm, emission, logprob):
                 for concrete in CONFIG[hmm.sequence_type]['ambiguous_chars'][e]:
                     p = 10 ** background[concrete]
                     total += p
-                    squares += p*p
+                    squares += p * p
                 background[e] = np.log10(squares) - np.log10(total)
 
         # may throw KeyError if still unrecognized
@@ -390,7 +390,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
         start_index = l_used_indices[0]
     else:
         distances = [i - j for j, i in
-                        zip(l_used_indices[:-1], l_used_indices[1:])] + \
+                     zip(l_used_indices[:-1], l_used_indices[1:])] + \
                     [l_effective - l_used_indices[-1] + l_used_indices[0]]
         max_distance_index, max_distance = max(enumerate(distances),
                                                key=operator.itemgetter(1))
@@ -480,7 +480,7 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
 
     shift = mapping[0][0][1]
     index_shift = ["Empty"] + [(i + l_effective + 1 - shift) %
-                              l_effective for i in range(l_effective)]
+                               l_effective for i in range(l_effective)]
     LOG.debug("The tandem repeat is shifted by: %d", shift)
 
     repeat_msa = []
@@ -594,7 +594,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
             max_used_index_I = index_shift[iM[1]] - 1
 
         elif iM[0] == "I" and (index_shift[iM[1] - 1] < max_used_index_I or
-                              index_shift[iM[1] - 1] < max_used_index_M):
+                               index_shift[iM[1] - 1] < max_used_index_M):
             insertions.append(defaultdict(str))
             max_used_index_I = index_shift[iM[1] - 1]
             max_used_index_M = index_shift[iM[1] - 1]

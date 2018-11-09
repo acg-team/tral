@@ -586,7 +586,7 @@ def trf_get_repeats(infile):
     #  0: save sequence to tmp_consensus -> 5
 
     state = 1
-    #identifier = ""  # Currently not implemented.
+    # identifier = ""  # Currently not implemented.
     preMSA = []
     consensus = []
     for i, line in enumerate(infile):

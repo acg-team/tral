@@ -114,11 +114,11 @@ class Repeat:
                 return pickle.load(fh)
         elif input_format == 'fasta':
             l_repeat = repeat_io.read_fasta(file, **kwargs)
-            return [Repeat(msa=i_msa, sequence_type=i_sequence_type) \
+            return [Repeat(msa=i_msa, sequence_type=i_sequence_type)
                     for i_msa, i_sequence_type in l_repeat]
         elif input_format == 'simulate':
             l_repeat = repeat_io.random_sequence(return_type='repeat', **kwargs)
-            return [Repeat(msa=i_msa, sequence_type=i_sequence_type) \
+            return [Repeat(msa=i_msa, sequence_type=i_sequence_type)
                     for i_msa, i_sequence_type in l_repeat]
         else:
             raise Exception('file_format is unknown: {}.'.format(file_format))
@@ -314,8 +314,8 @@ class Repeat:
             if 'phylo_gap01' in scoreslist:
                 self.d_divergence['phylo_gap01'], self.d_score['phylo_gap01'] = \
                     repeat_score.phylo_star_topology_local(self,
-                                                         gaps='row_wise',
-                                                         indel_rate_per_site=0.01)
+                                                           gaps='row_wise',
+                                                           indel_rate_per_site=0.01)
             if 'phylo_gap01_ignore_trailing_gaps' in scoreslist:
                 self.d_divergence['phylo_gap01_ignore_trailing_gaps'], \
                     self.d_score['phylo_gap01_ignore_trailing_gaps'] = \
@@ -326,7 +326,8 @@ class Repeat:
             if 'phylo_gap01_ignore_trailing_gaps_and_coherent_deletions' in scoreslist:
                 self.d_divergence['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'], \
                     self.d_score['phylo_gap01_ignore_trailing_gaps_and_coherent_deletions'] = \
-                    repeat_score.phylo_star_topology_local(self, gaps='ignore_trailing_gaps_and_coherent_deletions', indel_rate_per_site=0.01)
+                    repeat_score.phylo_star_topology_local(
+                        self, gaps='ignore_trailing_gaps_and_coherent_deletions', indel_rate_per_site=0.01)
             if 'phylo_gap001' in scoreslist:
                 self.d_divergence['phylo_gap001'], self.d_score['phylo_gap001'] = repeat_score.phylo_star_topology_local(
                     self, gaps='row_wise', indel_rate_per_site=0.001)
@@ -523,7 +524,7 @@ class Repeat:
 
         # CHECK this lines. you used msaTD before, but swapped to msaD
         # msaTD = ["".join(c) for c in zip(*msaD)]
-        deletions = [(m.start() % self.l_msa, len(m.group())) \
+        deletions = [(m.start() % self.l_msa, len(m.group()))
                      for m in re.finditer(re.compile("-+"), "".join(msaD))]
         self.deletions['ignore_trailing_gaps'] = [i[1] for i in deletions]
         self.gaps['ignore_trailing_gaps'] = self.insertions + \
@@ -641,9 +642,9 @@ class Repeat:
         deletions_all = [(m.start(), len(m.group()))
                          for m in re.finditer('-+', ''.join(self.msaD))]
         # Group the deletions with respect to the column in which they start:
-        deletion_lengths = {iL: \
-            [iD[1] for iD in deletions_all if iD[0] % self.l_effective == iL] \
-            for iL in range(self.l_effective)}
+        deletion_lengths = {iL:
+                            [iD[1] for iD in deletions_all if iD[0] % self.l_effective == iL]
+                            for iL in range(self.l_effective)}
         LOG.debug(
             "The deletion_lengths of the current TR are: {0}".format(deletion_lengths))
 

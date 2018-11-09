@@ -10,30 +10,30 @@ from tral.repeat import repeat_align
 @pytest.mark.no_external_software_required
 def test_hmm_path_to_non_aligned_tandem_repeat_units():
 
-    TEST = {"Double": ["AAAA", ["M1","M2","M1","M2"], 2, ["AA","AA"]],
-            "Double_converted": ["ABCD", ["M2","M1","M2","M1"], 2, ["AB","CD"]],
-            "Double_converted_complex": ["NNAAAACC", ["N","N","M2","M1","M2","M1","C","C"], 2, ["AA","AA"]],
-            "Double_converted_complex_insertions": ["NNAIAAACC", ["N","N","M2","I2","M1","M2","M1","C","C"], 2, ["AIA","AA"]],
-            "Single": ["AAAA", ["M1","M1","M1","M1"], 1, ["A","A","A","A"]],
-            "Single_Complex": ["NNAAIIIAA", ["N","N","M1","M1","I1","I1","I1","M1","M1"], 1, ["A","AIII","A","A"]],
-            "Long": ["GYRADKLADKLADKL", ["N","N","N","M1","M2","M3","M4","M1","M2","M3","M4","M1","M2","M3","M4"], 4, ["ADKL","ADKL","ADKL"]],
+    TEST = {"Double": ["AAAA", ["M1", "M2", "M1", "M2"], 2, ["AA", "AA"]],
+            "Double_converted": ["ABCD", ["M2", "M1", "M2", "M1"], 2, ["AB", "CD"]],
+            "Double_converted_complex": ["NNAAAACC", ["N", "N", "M2", "M1", "M2", "M1", "C", "C"], 2, ["AA", "AA"]],
+            "Double_converted_complex_insertions": ["NNAIAAACC", ["N", "N", "M2", "I2", "M1", "M2", "M1", "C", "C"], 2, ["AIA", "AA"]],
+            "Single": ["AAAA", ["M1", "M1", "M1", "M1"], 1, ["A", "A", "A", "A"]],
+            "Single_Complex": ["NNAAIIIAA", ["N", "N", "M1", "M1", "I1", "I1", "I1", "M1", "M1"], 1, ["A", "AIII", "A", "A"]],
+            "Long": ["GYRADKLADKLADKL", ["N", "N", "N", "M1", "M2", "M3", "M4", "M1", "M2", "M3", "M4", "M1", "M2", "M3", "M4"], 4, ["ADKL", "ADKL", "ADKL"]],
             }
     for test, p in TEST.items():
-        test_repeat_msa = hmm_path_to_non_aligned_tandem_repeat_units(sequence = p[0], path = p[1], l_effective = p[2])
+        test_repeat_msa = hmm_path_to_non_aligned_tandem_repeat_units(sequence=p[0], path=p[1], l_effective=p[2])
         assert test_repeat_msa == p[3]
 
 
 def test_viterbi():
 
     # {Test_name: [Original_TR_MSA, Sequence, Viterbi_path, Refined_TR_MSA], ... }
-    TEST = {"Single": [["A","A","A"], "AAAAAA", ["M1","M1","M1","M1","M1","M1"], ["A","A","A","A","A","A"]],
-        "Double": [["AA","AA"], "AAAAAA", ["M1","M2","M1","M2","M1","M2"], ["AA","AA","AA"]],
-        "Long": [["ADKL","ADKL"], "GYRADKLADKLADKL", ["N","N","N","M1","M2","M3","M4","M1","M2","M3","M4","M1","M2","M3","M4"], ["ADKL","ADKL","ADKL"]]
-        }
+    TEST = {"Single": [["A", "A", "A"], "AAAAAA", ["M1", "M1", "M1", "M1", "M1", "M1"], ["A", "A", "A", "A", "A", "A"]],
+            "Double": [["AA", "AA"], "AAAAAA", ["M1", "M2", "M1", "M2", "M1", "M2"], ["AA", "AA", "AA"]],
+            "Long": [["ADKL", "ADKL"], "GYRADKLADKLADKL", ["N", "N", "N", "M1", "M2", "M3", "M4", "M1", "M2", "M3", "M4", "M1", "M2", "M3", "M4"], ["ADKL", "ADKL", "ADKL"]]
+            }
 
     for test, p in TEST.items():
-        test_repeat = repeat.Repeat(msa = p[0])
-        test_hmm = HMM.create(input_format = "repeat", repeat = test_repeat)
+        test_repeat = repeat.Repeat(msa=p[0])
+        test_hmm = HMM.create(input_format="repeat", repeat=test_repeat)
 
         for iHMM in [test_hmm]:
             # Detect TRs on self.seq with hmm using the Viterbi algorithm.
@@ -49,6 +49,8 @@ def test_viterbi():
 
 # The following test functions were copy-pasted from hmm_viterbi.py. They need to be either
 # strongly adapted, or - if not useful - erased.
+
+
 @pytest.mark.notfixed
 @pytest.mark.no_external_software_required
 def test_conversion_multiple():
@@ -57,11 +59,12 @@ def test_conversion_multiple():
     """
     assert 0, "Test not fixed"
     l_effective = 3
-    lPaths = [['N','N','N', 'M0','M1','M2','M0','I1','M1','M2','M0','M1','M2','N','N','N'],
-            ['N','N','N','M1','M2','M0','M1','M2','M0','M1','M2', 'M0', 'N','N','N'],
-            ['N','N','N','M2','M0','M1','M2','M0','M1','M2','M0','M1', 'N','N','N']]
-    lSequence = ['XXXABCADBCABCXXX','XXXBCABCABCAXXX','XXXCABCABCABXXX']
+    lPaths = [['N', 'N', 'N', 'M0', 'M1', 'M2', 'M0', 'I1', 'M1', 'M2', 'M0', 'M1', 'M2', 'N', 'N', 'N'],
+              ['N', 'N', 'N', 'M1', 'M2', 'M0', 'M1', 'M2', 'M0', 'M1', 'M2', 'M0', 'N', 'N', 'N'],
+              ['N', 'N', 'N', 'M2', 'M0', 'M1', 'M2', 'M0', 'M1', 'M2', 'M0', 'M1', 'N', 'N', 'N']]
+    lSequence = ['XXXABCADBCABCXXX', 'XXXBCABCABCAXXX', 'XXXCABCABCABXXX']
     lMSA = hmm_path_to_maximal_complete_tandem_repeat_units(lSequence, lPaths, 3)
+
 
 @pytest.mark.notfixed
 @pytest.mark.no_external_software_required
@@ -84,8 +87,8 @@ def test_create_viterbi():
     my_hmm.emissions = ["D", "C", "N"]
 
     # emission probabilities
-    my_hmm.p_e['H'] = {"D":0.1, "C":0.4, "N":0.5}
-    my_hmm.p_e['F'] = {"D":0.6, "C":0.3, "N":0.1}
+    my_hmm.p_e['H'] = {"D": 0.1, "C": 0.4, "N": 0.5}
+    my_hmm.p_e['F'] = {"D": 0.6, "C": 0.3, "N": 0.1}
 
     my_viterbi = Viterbi(my_hmm, "NCD")
     if my_viterbi.viterbi() == "HHF":
@@ -93,12 +96,13 @@ def test_create_viterbi():
     else:
         print("Test FAILED")
 
+
 @pytest.mark.notfixed
 def test_init_with_repeat():
     """ This test needs to be fixed.
     """
     assert 0, "Test not fixed"
-    my_TR = Repeat(begin = 0, msa = ['A-G', 'ACG', 'ACG'], sequence_type = 'DNA')
+    my_TR = Repeat(begin=0, msa=['A-G', 'ACG', 'ACG'], sequence_type='DNA')
     my_hmm = HMM.create(repeat=my_TR)
     from . import sequence
     my_sequence = sequence.Sequence()

@@ -28,7 +28,7 @@ TEST_FILE_WITH_ID = 'carcinustatin.hmm'
 TEST_FILE_WITHOUT_ID = 'carcinustatin_no_id.hmm'
 
 
-TEST_REPEAT_MSA_SINGLE = ["A","A","A"]
+TEST_REPEAT_MSA_SINGLE = ["A", "A", "A"]
 
 
 @pytest.fixture
@@ -36,6 +36,7 @@ def path():
     """Return the path to the test data files.
     """
     return os.path.dirname(os.path.abspath(__file__))
+
 
 @pytest.mark.no_external_software_required
 def test_single_hmm_with_id_read(path):
@@ -46,6 +47,7 @@ def test_single_hmm_with_id_read(path):
     compare_carcinustatin(test_dict)
 
     assert test_dict[ID_KEY_NAME] == CARCINUSTATIN_ID
+
 
 @pytest.mark.no_external_software_required
 def test_single_hmm_without_id_read(path):
@@ -61,27 +63,28 @@ def test_single_hmm_without_id_read(path):
 @pytest.mark.no_external_software_required
 def test_single_hmm_no_id_with_query_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITHOUT_ID),
-                              id=CARCINUSTATIN_ID))
+                                   id=CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
 @pytest.mark.no_external_software_required
 def test_single_hmm_with_wrong_query_read(path):
     test_dict_list = list(HMM.read(os.path.join(path, TEST_FILE_WITH_ID),
-                              id=WRONG_CARCINUSTATIN_ID))
+                                   id=WRONG_CARCINUSTATIN_ID))
     assert len(test_dict_list) == 0
 
 
 @pytest.mark.no_external_software_required
 def test_single_hmm_with_short_query_read(path):
     test_dict_list = list(hmm_io.read(os.path.join(path, TEST_FILE_WITH_ID),
-                              id=SHORT_CARCINUSTATIN_ID))
+                                      id=SHORT_CARCINUSTATIN_ID))
     assert len(test_dict_list) == 1
     test_dict = test_dict_list[0]
 
     compare_carcinustatin(test_dict)
 
     assert test_dict[ID_KEY_NAME] == CARCINUSTATIN_ID
+
 
 @pytest.mark.no_external_software_required
 def compare_carcinustatin(test_dict):

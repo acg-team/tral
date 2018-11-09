@@ -1,6 +1,9 @@
 # (C) 2012-2015 Elke Schaper
 # coding: utf-8
 
+from tral.hmm import hmm_io
+from tral.repeat.repeat_score import load_model
+from tral.repeat import repeat
 import math
 import numpy as np
 import scipy as sp
@@ -12,9 +15,6 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.ERROR)
 
-from tral.repeat import repeat
-from tral.repeat.repeat_score import load_model
-from tral.hmm import hmm_io
 
 ################################### HMM class ############################
 
@@ -461,15 +461,10 @@ class HMM:
 
                 # Ii -> Ii+l_effective insertion_stop(i) + deletion(i;l_effective) +
                 # insertion_formation(i+l_effective+1)
-                self.p_t["I{0}".format(index(i,
-                                             l_effective))]["I{0}".format(index(i + iC,
-                                                                       l_effective))] = self.p_t["I{0}".format(index(i,
-                                                                                                            l_effective))]["M{0}".format(index(i,
-                                                                                                                                      l_effective))] + self.p_t["M{0}".format(index(i - 1,
-                                                                                                                                                                           l_effective))]["M{0}".format(index(i + iC,
-                                                                                                                                                                                                     l_effective))] + self.p_t["M{0}".format(index(i + iC - 1,
-                                                                                                                                                                                                                                          l_effective))]["I{0}".format(index(i + iC,
-                                                                                                                                                                                                                                                                    l_effective))]
+                self.p_t["I{0}".format(index(i, l_effective))]["I{0}".format(index(i + iC, l_effective))] = \
+                    self.p_t["I{0}".format(index(i, l_effective))]["M{0}".format(index(i, l_effective))] + \
+                    self.p_t["M{0}".format(index(i - 1, l_effective))]["M{0}".format(index(i + iC, l_effective))] + \
+                    self.p_t["M{0}".format(index(i + iC - 1, l_effective))]["I{0}".format(index(i + iC, l_effective))]
 
         logger.debug("Transition probabilities: {0}".format(self.p_t))
 
@@ -935,6 +930,7 @@ def main():
     #print(calculate_indel_rate(1, 6, 1.5))
 
     # print(calculate_probability_indel_lengths(0.366869,6,'exponential'))
+
 
 if __name__ == "__main__":
     main()

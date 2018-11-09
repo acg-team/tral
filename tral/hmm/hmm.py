@@ -220,7 +220,7 @@ class HMM:
         self.sequence_type = sequence_type
 
         self.l_effective = max([int(key) for key
-                               in hmmer_probabilities.keys() if key.isdigit()])
+                                in hmmer_probabilities.keys() if key.isdigit()])
 
         # Initialise all HMM states to default value (e.g. transition to or
         # from terminal state all have the same cost 0).

@@ -1,3 +1,5 @@
+from tral.hmm import hmm
+from tral.sequence import repeat_detection_run, sequence
 import logging
 import logging.config
 import os
@@ -8,8 +10,6 @@ from tral.paths import *
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
-from tral.sequence import repeat_detection_run, sequence
-from tral.hmm import hmm
 
 TEST_FAA_FILE_MBE_2014 = "P51610.fasta"
 TEST_HMM_FILES_MBE_2014 = ["Kelch_1.hmm", "Kelch_2.hmm"]
