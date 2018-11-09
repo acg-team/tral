@@ -72,10 +72,3 @@ source activateTRAL.sh
 ## Uninstallation of TRAL and its external software
 
 To uninstall TRAL (and is external software if you wish) run the script deleteTRAL.sh.
-
-
-
-## Author
-
-Paulina Naef
-
