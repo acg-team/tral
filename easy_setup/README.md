@@ -51,6 +51,7 @@ Currently, installation scripts for the following external software are availabl
 - trf
 - trust
 - xstream
+- phyml
 
 In the end of each installation script for the external software an uninstallation procedure can be found.
 Either comment all installation part and uncomment uninstallation part or run the commands directly in the commandline.

@@ -73,3 +73,8 @@ rm -rf /usr/local/bin/hhrepid_64
 rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
 rm -rf /usr/local/bin/XSTREAM
 
+
+### PhyML
+
+rm -rf $TRAL_EXT_SOFTWARE/PhyML-3.1
+rm -rf /usr/local/bin/PhyML-3.1_linux64
