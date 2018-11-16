@@ -10,6 +10,10 @@
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
+if [[ ! "$1" =~ ^(git|pip)$ ]]; then
+    echo -e "\nPlease provide as argument how you want to install TRAL (\"git\" or \"pip\").\n"
+    exit 1
+fi
 
 ######################
 ### Prepare Filesystem
@@ -24,22 +28,22 @@ mkdir -p $TRAL_EXT_SOFTWARE # create directory for installation of external soft
 # directories will be added temporarely to PATH 
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
 
-if [[ ! "$1" =~ ^(git|pip)$ ]]; then
-    echo -e "\nPlease provide as argument how you want to install TRAL (\"git\" or \"pip\").\n"
-    exit 1
-fi
-
-
 ######################
 ### Install virtualenv and activate
 
+# check for pip
+if ! hash "${PIP3:-pip}"; then
+    echo "${PIP3:-pip} is required. Set the PIP variable in configTRAL_path.cfg" >&2
+    exit 1
+fi
+
 # check if virtualenv is installed
-while [ hash virtualenv 2>/dev/null ] ; do
-    echo "Installing virtualenv required by: apt-get install virtualenv."
+while [ ! -x $(which virtualenv 2>/dev/null) ]; do
+    echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
     read -p "Do you wish to install this program? yes(y) or no (n):" yn
         case $yn in
             [Yy]* )
-                apt-get install virtualenv || { 
+                "${PIP3:-pip}" install virtualenv || { 
                 echo -e "\nA problem occured while trying to install virtualenv."
                 exit 1 
                 }
@@ -51,15 +55,11 @@ while [ hash virtualenv 2>/dev/null ] ; do
         esac
 done
 
-# create virtual environment called "python3_5" with python3.5
-virtualenv $TRAL_ENV/python3_5 -p python3.5
+# create virtual environment called "python3" with python3.5
+virtualenv $TRAL_ENV/python3 -p $PYTHON3 || exit $?
 
 # activate the virtual environment
-. $TRAL_ENV/python3_5/bin/activate
-
-######################
-### install software in virtualenv
-pip install ipython
+. $TRAL_ENV/python3/bin/activate || exit $?
 
 ######################
 ### installing TRAL
@@ -72,9 +72,10 @@ if [[ $1 == "git" ]]; then
     ### install tral with git and setup.py
     
     # check if git is installed
-    while [ hash git 2>/dev/null ] ; do
-        echo "Git is required to install TRAL."
-    done
+    if ! hash git 2>/dev/null; then
+        echo "Git is required to install TRAL." >&2
+        exit 1
+    fi
     
     # installing with git
     echo -e "\nPlease clone the TRAL repository from github into $TRAL_PATH.\n"
@@ -100,7 +101,7 @@ elif [[ $1 == "pip" ]]; then
     # -- TODO .tral will not automatically be added to $HOME
 
     echo -e "start installation"
-    $TRAL_ENV/python3_5/bin/pip3 install --target=$TRAL_ENV/python3_5/bin/ tral && 
+    $TRAL_ENV/python3/bin/pip3 install --target=$TRAL_ENV/python3/bin/ tral && 
 
     echo -e "\n---------------------------------"
     echo -e "Installing TRAL with pip successful"

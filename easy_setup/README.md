@@ -17,6 +17,7 @@ easy_setup only works for linux64 by now. If you use another operating system, y
 To install TRAL and its external software within usr/local/bin (default) you need to execute the scripts as root.
 In case you want to install TRAL from the git repository automatically, you need to have git installed on your computer.
 
+These setup scripts require ubuntu, python 3, pip, unzip, and git.
 
 ## Installation of TRAL
 
