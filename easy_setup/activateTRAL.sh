@@ -9,7 +9,7 @@
 . configTRAL_path.cfg 
 
 # activate the virtual environment
-. $TRAL_ENV/python3_5/bin/activate
+. $TRAL_ENV/python3/bin/activate
 
 # add directory with tral and with external software to path (beginning)
 

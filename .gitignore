@@ -54,10 +54,9 @@ docs/_build/
 
 # Other stuff
 .DS_Store
+.vagrant
 
 # IDE
 .idea
+<<<<<<< HEAD
 
-
-# Jupyter
-*.ipynb
