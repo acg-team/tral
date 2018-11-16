@@ -57,3 +57,7 @@ docs/_build/
 
 # IDE
 .idea
+
+
+# Jupyter
+*.ipynb
