@@ -16,27 +16,27 @@
 
 
 install_ext_software () {
-    for var in "$@"
-    do
-        read -p "Would you like to install $var? Type \"y\" if YES:" y
-        case $y in
-            [Yy]* )
-                . install_ext_software/$var.sh
-                ;;
-            * ) 
-                echo -e "\nYou can install it later with the script $var.sh.\n"
-                ;;
-        esac
-    done
+
+    read -p "Would you like to install "$(basename "${software%%.sh}")"? Type \"y\" if YES:" y
+    case $y in
+        [Yy]* )
+            echo ". install_ext_software/"$(basename "$software")""
+            ;;
+        * ) 
+            echo -e "\nYou can install it later with the script $software.sh.\n"
+            ;;
+    esac
+
 }
 
 read -p "Would you like to install any external software? yes(y) or no (n):" yn
 case $yn in
     [Yy]* )
         echo -e "\n"
-        install_ext_software alf hhrepid hmmer mafft phobos tredparse treks trf trust xstream     
+        for software in install_ext_software/*.sh ; do install_ext_software $software ; done
         ;;
     [Nn]* ) 
         echo -e "\nNo external software will be installed right now."
         ;;
 esac
+

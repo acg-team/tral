@@ -10,8 +10,8 @@
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
-if [[ ! "$1" =~ ^(git|pip)$ ]]; then
-    echo -e "\nPlease provide as argument how you want to install TRAL (\"git\" or \"pip\").\n"
+if [[ ! "$1" =~ ^(setup|pip)$ ]]; then
+    echo -e "\nPlease provide as argument how you want to install TRAL with setup.py \"setup\" or \"pip\").\n"
     exit 1
 fi
 
@@ -62,34 +62,46 @@ virtualenv $TRAL_ENV/python3 -p $PYTHON3 || exit $?
 . $TRAL_ENV/python3/bin/activate || exit $?
 
 ######################
-### installing TRAL
+### Installing TRAL
 
-# TODO -- to use this script, the TRAL repository should already be downloaded (?)
 
-if [[ $1 == "git" ]]; then
+
+
+if [[ $1 == "setup" ]]; then
 
     ######################
-    ### install tral with git and setup.py
+    ### install tral with setup.py
     
-    # check if git is installed
-    if ! hash git 2>/dev/null; then
-        echo "Git is required to install TRAL." >&2
-        exit 1
+    PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
+    CURRENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P ) # do not use only pwd (shortcuts could have other path)
+
+    # test if TRAL repository is already downloaded
+    if [[ "${CURRENT_PATH%%/easy_setup}" == $PARENT_PATH ]] && [ -e "$PARENT_PATH/setup.spy" ] ; then
+        python $PARENT_PATH/setup.py install
+    else
+
+        ### installing with git and setup.py
+        # if the tral directory is not already downloaded, it has to be cloned from github
+        echo -e "\nPlease clone the TRAL repository from github.\n"
+        read -p "Do you want to clone the TRAL repository from github in the home directory? yes(y) or no (n):" yn
+        case $yn in
+            [Yy]* )
+                # check if git is installed
+                if ! hash git 2>/dev/null; then
+                    echo "Git is required to clone the repository of TRAL. Otherwise you can download the directory manually." >&2
+                    exit 1
+                fi
+
+                git clone https://github.com/acg-team/tral.git $HOME
+                (cd $HOME && python tral/setup.py install)
+                ;;
+            [Nn]* ) 
+                echo -e "\nAbort."
+                exit 1
+                ;;
+        esac
     fi
     
-    # installing with git
-    echo -e "\nPlease clone the TRAL repository from github into $TRAL_PATH.\n"
-    read -p "Do you want to clone the TRAL repository from github in the given directory? yes(y) or no (n):" yn
-    case $yn in
-        [Yy]* )
-            git clone https://github.com/acg-team/tral.git $TRAL
-            (cd $TRAL && python $TRAL/setup.py develop)                   ## TODO change from develop to install
-            ;;
-        [Nn]* ) 
-            echo -e "\nAbort."
-            exit 1
-            ;;
-    esac
 
     
 elif [[ $1 == "pip" ]]; then
@@ -106,10 +118,6 @@ elif [[ $1 == "pip" ]]; then
     echo -e "\n---------------------------------"
     echo -e "Installing TRAL with pip successful"
     echo -e "-----------------------------------\n"
-
-else
-    echo -e "\nPlease give as argument if you want to install TRAL with git or with pip."
-    exit 1
 
 
 fi
