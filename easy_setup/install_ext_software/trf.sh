@@ -34,8 +34,8 @@ else
 fi
 
 chmod +x $TRAL_EXT_SOFTWARE/trf409.linux64
-cp $TRAL_EXT_SOFTWARE/trf409.linux64 /usr/local/bin/ # copy into system path
-chmod +x /usr/local/bin/trf409.linux64 && echo -e  "\nTRF is in your system path /usr/local/bin/ and can be executed with the command trf409.linux64"
+cp $TRAL_EXT_SOFTWARE/trf409.linux64 $INSTALLATION_PATH # copy into system path
+chmod +x $INSTALLATION_PATH/trf409.linux64 && echo -e  "\nTRF is in your system path $INSTALLATION_PATH and can be executed with the command trf409.linux64"
 
 # TRF is now executable with trf409.linux64
 
@@ -43,4 +43,4 @@ chmod +x /usr/local/bin/trf409.linux64 && echo -e  "\nTRF is in your system path
 ### Uninstall TRF
 
 # rm -rf $TRAL_EXT_SOFTWARE/trf409.linux64
-# rm -rf /usr/local/bin/trf409.linux64
+# rm -rf $INSTALLATION_PATH/trf409.linux64

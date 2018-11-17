@@ -58,8 +58,8 @@ if [ ! -f $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 ]; then # test if not already in
 fi
 
 chmod +x $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64
-cp $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 /usr/local/bin/ # copy into system path
-chmod +x /usr/local/bin/hhrepid_64 && echo -e  "\nHHrepID is in your system path /usr/local/bin/ and can be executed with the command hhrepid_64"
+cp $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 $INSTALLATION_PATH # copy into system path
+chmod +x $INSTALLATION_PATH/hhrepid_64 && echo -e  "\nHHrepID is in your system path $INSTALLATION_PATH and can be executed with the command hhrepid_64"
 
 # HHrepID is now executable with hhrepid_64
 
@@ -67,4 +67,4 @@ chmod +x /usr/local/bin/hhrepid_64 && echo -e  "\nHHrepID is in your system path
 ### Uninstall HHrepID
 
 # rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
-# rm -rf /usr/local/bin/hhrepid_64
+# rm -rf $INSTALLATION_PATH/hhrepid_64

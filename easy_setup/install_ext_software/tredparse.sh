@@ -65,8 +65,8 @@ echo -e '#!/bin/sh
 tred.py "$@"' > $TRAL_EXT_SOFTWARE/tred
 
 chmod +x $TRAL_EXT_SOFTWARE/tred
-cp $TRAL_EXT_SOFTWARE/tred /usr/local/bin # copy wrapper file to system path
-chmod +x /usr/local/bin/tred && echo -e "\ntred is in your system path /usr/local/bin/ and can be executed with the command \"tred\""
+cp $TRAL_EXT_SOFTWARE/tred $INSTALLATION_PATH # copy wrapper file to system path
+chmod +x $INSTALLATION_PATH/tred && echo -e "\ntred is in your system path $INSTALLATION_PATH and can be executed with the command \"tred\""
 deactivate
 
 ######################
@@ -76,4 +76,4 @@ deactivate
 
 # rm -rf $TRAL_ENV/python2
 # rm $TRAL_EXT_SOFTWARE/tred
-# rm /usr/local/bin/tred
+# rm $INSTALLATION_PATH/tred

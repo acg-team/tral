@@ -21,8 +21,9 @@ fi
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg 
 
+
 # create needed directories to install tral
-mkdir -p $TRAL_PATH/{tral,tral_env,output}
+mkdir -p $TRAL_PATH/{tral_env,output}
 mkdir -p $TRAL_EXT_SOFTWARE # create directory for installation of external software
 
 # directories will be added temporarely to PATH 
@@ -73,17 +74,16 @@ if [[ $1 == "setup" ]]; then
     ### install tral with setup.py
     
     PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-    CURRENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P ) # do not use only pwd (shortcuts could have other path)
 
     # test if TRAL repository is already downloaded
-    if [[ "${CURRENT_PATH%%/easy_setup}" == $PARENT_PATH ]] && [ -e "$PARENT_PATH/setup.spy" ] ; then
-        python $PARENT_PATH/setup.py install
+    if [ -d "$PARENT_PATH/tral" ] && [ -e "$PARENT_PATH/setup.pyx" ] ; then
+        echo "python $PARENT_PATH/setup.py install"
     else
 
         ### installing with git and setup.py
         # if the tral directory is not already downloaded, it has to be cloned from github
         echo -e "\nPlease clone the TRAL repository from github.\n"
-        read -p "Do you want to clone the TRAL repository from github in the home directory? yes(y) or no (n):" yn
+        read -p "Do you want to clone the TRAL repository from github in $TRAL_PATH? yes(y) or no (n):" yn
         case $yn in
             [Yy]* )
                 # check if git is installed
@@ -92,8 +92,8 @@ if [[ $1 == "setup" ]]; then
                     exit 1
                 fi
 
-                git clone https://github.com/acg-team/tral.git $HOME
-                (cd $HOME && python tral/setup.py install)
+                git clone https://github.com/acg-team/tral.git $TRAL_PATH/tral_repository
+                echo "(cd $TRAL_PATH/tral_repository && python setup.py install)"
                 ;;
             [Nn]* ) 
                 echo -e "\nAbort."

@@ -38,8 +38,8 @@ echo '#!/bin/sh
 
 java -Xmx30G -cp' $Align ' nl.vu.cs.align.SelfSimilarity "$@"' > $TRAL_EXT_SOFTWARE/TRUST_Align/TRUST
 chmod +x $TRAL_EXT_SOFTWARE/TRUST_Align/TRUST
-cp $TRAL_EXT_SOFTWARE/TRUST_Align/TRUST /usr/local/bin/  # copy wrapper file to execute TRUST into system path
-chmod +x /usr/local/bin/TRUST && echo -e "\nTRUST is in your system path /usr/local/bin/ and can be executed with the command \"TRUST\""
+cp $TRAL_EXT_SOFTWARE/TRUST_Align/TRUST $INSTALLATION_PATH  # copy wrapper file to execute TRUST into system path
+chmod +x $INSTALLATION_PATH/TRUST && echo -e "\nTRUST is in your system path $INSTALLATION_PATH and can be executed with the command \"TRUST\""
 
 # TRUST is executable with the command TRUST
 
@@ -48,4 +48,4 @@ chmod +x /usr/local/bin/TRUST && echo -e "\nTRUST is in your system path /usr/lo
 ### Uninstall TRUST
 
 # rm -rf $TRAL_EXT_SOFTWARE/TRUST_Align
-# rm -rf /usr/local/bin/TRUST
+# rm -rf $INSTALLATION_PATH/TRUST

@@ -31,8 +31,8 @@ else # Create an executable file for TREKS
 
     java -jar' $TRAL_EXT_SOFTWARE/T-Reks.jar ' "$@"' > $TRAL_EXT_SOFTWARE/T-REKS
     chmod +x $TRAL_EXT_SOFTWARE/T-REKS
-    cp $TRAL_EXT_SOFTWARE/T-REKS /usr/local/bin/  # copy wrapper file to execute T-REKS into system path
-    chmod +x /usr/local/bin/T-REKS && echo -e "\nT-REKS is in your system path /usr/local/bin/ and can be executed with the command \"T-REKS\""
+    cp $TRAL_EXT_SOFTWARE/T-REKS $INSTALLATION_PATH  # copy wrapper file to execute T-REKS into system path
+    chmod +x $INSTALLATION_PATH/T-REKS && echo -e "\nT-REKS is in your system path $INSTALLATION_PATH and can be executed with the command \"T-REKS\""
 
 
 # TREKS is executalbe with the command "T-REKS"
@@ -43,5 +43,5 @@ fi
 
 # rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
 # rm -rf $TRAL_EXT_SOFTWARE/T-REKS
-# rm -rf /usr/local/bin/T-REKS
+# rm -rf $INSTALLATION_PATH/T-REKS
 

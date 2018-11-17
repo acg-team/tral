@@ -38,8 +38,8 @@ echo '#!/bin/sh
 
 java -jar' $TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar ' "$@"' > $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM
 chmod +x $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM
-cp $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM /usr/local/bin/  # copy wrapper file to execute XSTREAM into system path
-chmod +x /usr/local/bin/XSTREAM && echo -e "\nXSTREAM is in your system path /usr/local/bin/ and can be executed with the command \"XSTREAM\""
+cp $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM $INSTALLATION_PATH  # copy wrapper file to execute XSTREAM into system path
+chmod +x $INSTALLATION_PATH/XSTREAM && echo -e "\nXSTREAM is in your system path $INSTALLATION_PATH/ and can be executed with the command \"XSTREAM\""
 
 # XSTREAM is executable with the command XSTREAM
 
@@ -48,4 +48,4 @@ chmod +x /usr/local/bin/XSTREAM && echo -e "\nXSTREAM is in your system path /us
 ### Uninstall XSTREAM
 
 # rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
-# rm -rf /usr/local/bin/XSTREAM
+# rm -rf $INSTALLATION_PATH/XSTREAM

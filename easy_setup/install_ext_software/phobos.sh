@@ -55,8 +55,8 @@ if [ ! -f phobos_* ]; then # test if not already in directory
                     wget $LINK_PHOBOS -P $TRAL_EXT_SOFTWARE
                     tar zxf $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz -C $TRAL_EXT_SOFTWARE
                     rm -rf $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz
-                    cp $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_* /usr/local/bin/      # copies binaries to system path /usr/local/bin/
-                    echo -e "\nPHOBOS binaries are now in the user path /usr/local/bin/"
+                    cp $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_* $INSTALLATION_PATH      # copies binaries to system path $INSTALLATION_PATH/
+                    echo -e "\nPHOBOS binaries are now in the user path $INSTALLATION_PATH/"
                     ;;
                 [Nn]* ) 
                     echo -e "Abort."
@@ -78,6 +78,6 @@ fi
 ### Uninstall PHOBOS
 
 # rm -rf $TRAL_EXT_SOFTWARE/phobos*
-# rm -rf /usr/local/bin/phobos*
+# rm -rf $INSTALLATION_PATH/phobos*
 
 
