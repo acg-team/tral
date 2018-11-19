@@ -17,7 +17,11 @@
 
 install_ext_software () {
     
-    read -p "Would you like to install "$(basename "${software%%.sh}")"? Type \"y\" if YES:" y
+    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+        y=y
+    else read -p "Would you like to install "$(basename "${software%%.sh}")"? Type \"y\" if YES:" y
+    fi
+    
     case $y in
         [Yy]* )
             . install_ext_software/"$(basename "$software")" || {
@@ -32,7 +36,11 @@ install_ext_software () {
     
 }
 
-read -p "Would you like to install any external software? yes(y) or no (n):" yn
+if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+else read -p "Would you like to install any external software? yes(y) or no (n):" yn
+fi
+
 case $yn in
     [Yy]* )
         echo -e "\n"

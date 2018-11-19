@@ -27,8 +27,10 @@ rm -rf /usr/local/share/alfdarwin
 rm -rf /usr/local/bin/alfdarwin*
 
 ### HMMER
-
-apt-get remove hmmer
+if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yes | apt-get remove hmmer
+else apt-get remove hmmer
+fi
 
 ### MAFFT
 

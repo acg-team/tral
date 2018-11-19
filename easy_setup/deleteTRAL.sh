@@ -16,11 +16,30 @@
 ### Delete TRAL
 
 # delete tral path system
-rm -rf "$TRAL_PATH"
+if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+else read -p "Are you sure to delete TRAL? yes(y) or no (n):" yn
+fi
+
+case $yn in
+    [Yy]* )
+        rm -rf "$TRAL_PATH" || {
+            echo -e "Was not able to delete TRAL"
+            exit 1
+        }
+    ;;
+    [Nn]* )
+        echo -e ".tral was not removed."
+    ;;
+esac
+
 
 # delete all the config files of the virtualenvs
+if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+else read -p "Do you wish to delete all configuration files and data as well? yes(y) or no (n):" yn
+fi
 
-read -p "Do you wish to delete all configuration files and data as well? yes(y) or no (n):" yn
 case $yn in
     [Yy]* )
         rm -rf "$TRAL_CONF" || {
@@ -42,7 +61,11 @@ echo -e "---------------------------------------------\n"
 ### Delete external software of TRAL
 
 # delete the directory with external software used by TRAL
-read -p "Do you wish to uninstall all external software as well? yes(y) or no (n):" yn
+if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+else read -p "Do you wish to uninstall all external software as well? yes(y) or no (n):" yn
+fi
+
 case $yn in
     [Yy]* )
         {

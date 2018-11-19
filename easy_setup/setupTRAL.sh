@@ -41,7 +41,12 @@ fi
 # check if virtualenv is installed
 while [ ! -x $(which virtualenv 2>/dev/null) ]; do
     echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
-    read -p "Do you wish to install this program? yes(y) or no (n):" yn
+
+    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+    else read -p "Do you wish to install this program? yes(y) or no (n):" yn
+    fi
+
     case $yn in
         [Yy]* )
             "${PIP3:-pip}" install virtualenv || {
@@ -86,7 +91,12 @@ if [[ $1 == "setup" ]]; then
         ### installing with git and setup.py
         # if the tral directory is not already downloaded, it has to be cloned from github
         echo -e "\nPlease clone the TRAL repository from github.\n"
-        read -p "Do you want to clone the TRAL repository from github in "$TRAL_PATH"? yes(y) or no (n):" yn
+
+        if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+        yn=y
+        else read -p "Do you want to clone the TRAL repository from github in "$TRAL_PATH"? yes(y) or no (n):" yn
+        fi
+        
         case $yn in
             [Yy]* )
                 # check if git is installed
@@ -146,7 +156,12 @@ deactivate
 
 if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
     echo -e  "\nIn order to calculate the p-Value of tandem repeat scores, available p-Value distributions need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue."
-    read -p "Would you like to do this? yes(y) or no (n):a" yn
+    
+    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    yn=y
+    else read -p "Would you like to do this? yes(y) or no (n):a" yn
+    fi
+    
     case $yn in
         [Yy]* )
             {
