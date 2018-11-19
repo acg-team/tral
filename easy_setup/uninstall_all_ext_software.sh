@@ -33,43 +33,43 @@ apt-get remove hmmer
 ### MAFFT
 
 dpkg --remove mafft
-rm -rf $TRAL_EXT_SOFTWARE/mafft*
+rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
 
 ### PHOBOS
 
-rm -rf $TRAL_EXT_SOFTWARE/phobos*
-rm -rf $INSTALLATION_PATH/phobos*
+rm -rf "$TRAL_EXT_SOFTWARE"/phobos*
+rm -rf "$INSTALLATION_PATH"/phobos*
 
 ### TREDPARSE
 
-rm -rf $TRAL_ENV/python2
-rm $TRAL_EXT_SOFTWARE/tred
-rm $INSTALLATION_PATH/tred
+rm -rf "$TRAL_ENV/python2"
+rm "$TRAL_EXT_SOFTWARE/tred"
+rm "$INSTALLATION_PATH/tred"
 
 ### TREKS
 
-rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
-rm -rf $TRAL_EXT_SOFTWARE/T-REKS
-rm -rf $INSTALLATION_PATH/T-REKS
+rm -rf "$TRAL_EXT_SOFTWARE/T-Reks.jar"
+rm -rf "$TRAL_EXT_SOFTWARE/T-REKS"
+rm -rf "$INSTALLATION_PATH/T-REKS"
 
 ### TRF
 
-rm -rf $TRAL_EXT_SOFTWARE/trf409.linux64
-rm -rf $INSTALLATION_PATH/trf409.linux64
+rm -rf "$TRAL_EXT_SOFTWARE/trf409.linux64"
+rm -rf "$INSTALLATION_PATH/trf409.linux64"
 
 ### TRUST
 
-rm -rf $TRAL_EXT_SOFTWARE/TRUST_Align
-rm -rf $INSTALLATION_PATH/TRUST
+rm -rf "$TRAL_EXT_SOFTWARE/TRUST_Align"
+rm -rf "$INSTALLATION_PATH/TRUST"
 
 ### HHrepID
 
-rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
-rm -rf $INSTALLATION_PATH/hhrepid_64
+rm -rf "$TRAL_EXT_SOFTWARE/HHrepID/"
+rm -rf "$INSTALLATION_PATH/hhrepid_64"
 
 
 ### XSTREAM
 
-rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
-rm -rf $INSTALLATION_PATH/XSTREAM
+rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM"
+rm -rf "$INSTALLATION_PATH/XSTREAM"
 

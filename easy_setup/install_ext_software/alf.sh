@@ -14,7 +14,10 @@
 ### Housekeeping
 
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 [[ ":$PATH:" != *"$TRAL_EXT_SOFTWARE/bin:$PATH"* ]] && export PATH="$TRAL_EXT_SOFTWARE/bin:$PATH"
 
@@ -22,14 +25,20 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 ######################
 ### Download and Installation ALF
 
-if [ ! -d $TRAL_EXT_SOFTWARE/ALF_standalone ]; then # test if not already in directory
-    LINK_ALF=http://abacus.gene.ucl.ac.uk/daniel/alf/ALF_standalone.tar.gz
-    wget $LINK_ALF -P $TRAL_EXT_SOFTWARE    # download
-    tar -xvzf $TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz -C $TRAL_EXT_SOFTWARE
+if [ ! -d "$TRAL_EXT_SOFTWARE/ALF_standalone" ]; then # test if not already in directory
+    {
+    LINK_ALF="http://abacus.gene.ucl.ac.uk/daniel/alf/ALF_standalone.tar.gz"
+    wget "$LINK_ALF" -P "$TRAL_EXT_SOFTWARE"    # download
+    tar -xvzf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz" -C "$TRAL_EXT_SOFTWARE"
+    } || {
+        echo "Couldn't download or unzip ALF."
+        exit $?
+    }
+
 fi
 
-rm -rf $TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz
-(cd $TRAL_EXT_SOFTWARE/ALF_standalone && $TRAL_EXT_SOFTWARE/ALF_standalone/install.sh) # installation of ALF
+rm -rf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz"
+(cd "$TRAL_EXT_SOFTWARE/ALF_standalone" && "$TRAL_EXT_SOFTWARE/ALF_standalone/install.sh") # installation of ALF
 
 
 ######################

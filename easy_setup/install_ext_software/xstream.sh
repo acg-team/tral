@@ -14,20 +14,25 @@
 ######################
 ### Housekeeping
  
-PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-# other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
+PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 
 ######################
 ### Installation XSTREAM
 
-mkdir -p $TRAL_EXT_SOFTWARE/XSTREAM
-if [ ! -f $TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar ]; then # test if not already in directory
-    LINK_XSTREAM=http://jimcooperlab.mcdb.ucsb.edu/xstream/XSTREAMprog/xstream.zip
-    wget $LINK_XSTREAM -P $TRAL_EXT_SOFTWARE/XSTREAM
-    unzip $TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip -d $TRAL_EXT_SOFTWARE/XSTREAM
-    rm -rf $TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip
+mkdir -p "$TRAL_EXT_SOFTWARE/XSTREAM"
+if [ ! -f "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar" ]; then # test if not already in directory
+    LINK_XSTREAM="http://jimcooperlab.mcdb.ucsb.edu/xstream/XSTREAMprog/xstream.zip"
+    wget "$LINK_XSTREAM" -P "$TRAL_EXT_SOFTWARE/XSTREAM"
+    unzip "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" -d "$TRAL_EXT_SOFTWARE/XSTREAM"
+    rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" || {
+        echo "Was not able to download or unzip XSTREAM"
+        exit $?
+    }
 fi
 
 
@@ -36,10 +41,10 @@ fi
 echo '#!/bin/sh
 # wrapper file to easily start XSTREAM
 
-java -jar' $TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar ' "$@"' > $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM
-chmod +x $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM
-cp $TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM $INSTALLATION_PATH  # copy wrapper file to execute XSTREAM into system path
-chmod +x $INSTALLATION_PATH/XSTREAM && echo -e "\nXSTREAM is in your system path $INSTALLATION_PATH/ and can be executed with the command \"XSTREAM\""
+java -jar' "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar" ' "$@"' > "$TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM"
+chmod +x "$TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM"
+cp "$TRAL_EXT_SOFTWARE/XSTREAM/XSTREAM" "$INSTALLATION_PATH"  # copy wrapper file to execute XSTREAM into system path
+chmod +x "$INSTALLATION_PATH/XSTREAM" && echo -e "\nXSTREAM is in your system path $INSTALLATION_PATH and can be executed with the command \"XSTREAM\""
 
 # XSTREAM is executable with the command XSTREAM
 
@@ -47,5 +52,5 @@ chmod +x $INSTALLATION_PATH/XSTREAM && echo -e "\nXSTREAM is in your system path
 ######################
 ### Uninstall XSTREAM
 
-# rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
-# rm -rf $INSTALLATION_PATH/XSTREAM
+# rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM"
+# rm -rf "$INSTALLATION_PATH/XSTREAM"

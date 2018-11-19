@@ -33,40 +33,46 @@
 ######################
 ### Housekeeping
 
-PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-# other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
+PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 
 # install virtual environment called "tral2" with python2
-virtualenv $TRAL_ENV/python2 -p python2
+virtualenv "$TRAL_ENV/python2" -p python2
 
-. $TRAL_ENV/python2/bin/activate
+. "$TRAL_ENV/python2/bin/activate" || {
+    echo "Was not able to activate the virtual environment with Python2 to install tredparse"
+    exit $?
+}
 
+# install ipython within the virtual environment
 
-## -- TODO possible to use apt within virtenv?
-
-apt-get install python-dev # install header files and static libraries for python2 dev
-apt install ipython
+pip install python-dev # install header files and static libraries for python2 dev
+pip install ipython
 
 ######################
 ### Installation tredparse
 
-$TRAL_ENV/python2/bin/pip install tredparse
+"$TRAL_ENV/python2/bin/pip" install tredparse || {
+    echo "Was not able to install tredparse.; exit $?"
+}
 
 # Wrapper, sourcing tral2, call tred.py with all arguments "$@"
 # with the command "tred" tred.py can be started from everywhere
 
-activateEnv=$TRAL_ENV/python2/bin/activate
+activateEnv="$TRAL_ENV/python2/bin/activate"
 echo -e '#!/bin/sh
 # wrapper file to easily start tredparse
 
 .' $activateEnv '
-tred.py "$@"' > $TRAL_EXT_SOFTWARE/tred
+tred.py "$@"' > "$TRAL_EXT_SOFTWARE/tred"
 
-chmod +x $TRAL_EXT_SOFTWARE/tred
-cp $TRAL_EXT_SOFTWARE/tred $INSTALLATION_PATH # copy wrapper file to system path
-chmod +x $INSTALLATION_PATH/tred && echo -e "\ntred is in your system path $INSTALLATION_PATH and can be executed with the command \"tred\""
+chmod +x "$TRAL_EXT_SOFTWARE/tred"
+cp "$TRAL_EXT_SOFTWARE/tred" "$INSTALLATION_PATH" # copy wrapper file to system path
+chmod +x "$INSTALLATION_PATH/tred" && echo -e "\ntred is in your system path $INSTALLATION_PATH and can be executed with the command \"tred\""
 deactivate
 
 ######################
@@ -74,6 +80,6 @@ deactivate
 
 # simply delete the virtenv in which tred is installed + wrapper file
 
-# rm -rf $TRAL_ENV/python2
-# rm $TRAL_EXT_SOFTWARE/tred
-# rm $INSTALLATION_PATH/tred
+# rm -rf "$TRAL_ENV/python2"
+# rm "$TRAL_EXT_SOFTWARE/tred"
+# rm "$INSTALLATION_PATH/tred"

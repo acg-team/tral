@@ -8,7 +8,7 @@
 ### Prepare Filesystem
 
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
-. configTRAL_path.cfg 
+. configTRAL_path.cfg
 
 
 ######################
@@ -16,27 +16,30 @@
 
 
 install_ext_software () {
-
+    
     read -p "Would you like to install "$(basename "${software%%.sh}")"? Type \"y\" if YES:" y
     case $y in
         [Yy]* )
-            echo ". install_ext_software/"$(basename "$software")""
-            ;;
-        * ) 
+            . install_ext_software/"$(basename "$software")" || {
+                echo -e "\nA problem occured while trying to run install_ext_software/"$(basename "$software")"."
+                exit 1
+            }
+        ;;
+        * )
             echo -e "\nYou can install it later with the script $software.sh.\n"
-            ;;
+        ;;
     esac
-
+    
 }
 
 read -p "Would you like to install any external software? yes(y) or no (n):" yn
 case $yn in
     [Yy]* )
         echo -e "\n"
-        for software in install_ext_software/*.sh ; do install_ext_software $software ; done
-        ;;
-    [Nn]* ) 
+        for software in "install_ext_software"/*.sh ; do install_ext_software $software ; done
+    ;;
+    [Nn]* )
         echo -e "\nNo external software will be installed right now."
-        ;;
+    ;;
 esac
 

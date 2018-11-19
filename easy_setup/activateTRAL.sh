@@ -6,10 +6,13 @@
 
 
 # provide paths from config file (has to be in the same directory than setupTRAL.sh)
-. configTRAL_path.cfg 
+. configTRAL_path.cfg
 
 # activate the virtual environment
-. $TRAL_ENV/python3/bin/activate
+. "$TRAL_ENV/python3/bin/activate"  || {
+    echo -e "\nA problem occured while trying to activate the virtual environment."
+    exit 1
+}
 
 # add directory with tral and with external software to path (beginning)
 

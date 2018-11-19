@@ -20,15 +20,16 @@
 ######################
 ### Housekeeping
 
-PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-# other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
-
+PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 ######################
 ### Download and Installation PHOBOS
 
-if [ ! -f phobos_* ]; then # test if not already in directory
+if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in directory
 
     echo -e  "\nThis program Phobos is copyright protected. It is only distributed from the authors web page (www.rub.de/spezzoo/cm/cm_phobos.htm).\n"
     echo -e  "\nWould you like to register and download the program manually? A popup will open."
@@ -38,10 +39,10 @@ if [ ! -f phobos_* ]; then # test if not already in directory
         [Mm]* )                                                                 # redirects user to download page
             if which xdg-open > /dev/null
             then
-                xdg-open https://www.ruhr-uni-bochum.de/ecoevo/cm/regist_form.htm
+                xdg-open "https://www.ruhr-uni-bochum.de/ecoevo/cm/regist_form.htm"
             elif which gnome-open > /dev/null
             then
-                gnome-open https://www.ruhr-uni-bochum.de/ecoevo/cm/regist_form.htm
+                gnome-open "https://www.ruhr-uni-bochum.de/ecoevo/cm/regist_form.htm"
             fi
 
             echo -e  "\nAfter downloading your version of choice you can unzip it and put the binaries into your PATH.\n"
@@ -51,12 +52,12 @@ if [ ! -f phobos_* ]; then # test if not already in directory
             read -p "Would you like to download the phobos-v3.3.12-linux version? yes(y) or no (n):" yn
             case $yn in
                 [Yy]* )                                                             
-                    LINK_PHOBOS=http://www.rub.de/ecoevo/cm/phobos-v3.3.12-linux.tar.gz 
-                    wget $LINK_PHOBOS -P $TRAL_EXT_SOFTWARE
-                    tar zxf $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz -C $TRAL_EXT_SOFTWARE
-                    rm -rf $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz
-                    cp $TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_* $INSTALLATION_PATH      # copies binaries to system path $INSTALLATION_PATH/
-                    echo -e "\nPHOBOS binaries are now in the user path $INSTALLATION_PATH/"
+                    LINK_PHOBOS="http://www.rub.de/ecoevo/cm/phobos-v3.3.12-linux.tar.gz "
+                    wget "$LINK_PHOBOS" -P "$TRAL_EXT_SOFTWARE"
+                    tar zxf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz" -C "$TRAL_EXT_SOFTWARE"
+                    rm -rf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz"
+                    cp "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH"     # copies binaries to system path $INSTALLATION_PATH/
+                    echo -e "\nPHOBOS binaries are now in the user path $INSTALLATION_PATH"
                     ;;
                 [Nn]* ) 
                     echo -e "Abort."
@@ -77,7 +78,7 @@ fi
 ######################
 ### Uninstall PHOBOS
 
-# rm -rf $TRAL_EXT_SOFTWARE/phobos*
-# rm -rf $INSTALLATION_PATH/phobos*
+# rm -rf "$TRAL_EXT_SOFTWARE"/phobos*
+# rm -rf "$INSTALLATION_PATH"/phobos*"
 
 
