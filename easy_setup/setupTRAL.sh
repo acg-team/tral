@@ -133,16 +133,18 @@ if [[ $1 == "setup" ]]; then
     
     {
         echo -e "start installation"
-        "$TRAL_ENV/python3/bin/pip3 install" --target="$TRAL_ENV/python3/bin" tral &&
-        
-        echo -e "\n---------------------------------"
-        echo -e "Installing TRAL with pip successful"
-        echo -e "-----------------------------------\n"
-        
-        } || {
+        "$TRAL_ENV/python3/bin/"${PIP:-pip} install tral || {
         
         echo -e "\nA problem occured while trying to install TRAL with \"pip install\"."
         exit 1
+        }
+        
+        } && {
+            
+        echo -e "\n---------------------------------"
+        echo -e "Installing TRAL with pip successful"
+        echo -e "-----------------------------------\n"        
+
     }
     
     
@@ -159,7 +161,7 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
     
     if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
     yn=y
-    else read -p "Would you like to do this? yes(y) or no (n):a" yn
+    else read -p "Would you like to do this? yes(y) or no (n):" yn
     fi
     
     case $yn in
