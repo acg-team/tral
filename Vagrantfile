@@ -68,9 +68,22 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   config.vm.provision "shell", inline: <<-SHELL
+    # Install dependencies
     apt-get update
     apt-get -y dist-upgrade
     apt-get -y install python3 python3-pip unzip
+    pip3 install virtualenv
+
+    cd /vagrant/easy_setup
+
+    # accept all licenses
+    sed -i 's/ACCEPT_ALL=no/ACCEPT_ALL=yes/i' configTRAL_path.cfg
+
+    # Install TRAL software
+    ./setupTRAL.sh setup
+    echo
+    echo "THIS MACHINE CONTAINS PROPRIETARY SOFTWARE."
+    echo "Please check the licenses before using (e.g. no commercial use permitted)"
   SHELL
   
 end
