@@ -70,9 +70,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get -y dist-upgrade
-    apt-get install python3 python3-pip unzip
-    #sudo -u vagrant -i
-    #cd /vagrant/easy_setup/
+    apt-get -y install python3 python3-pip unzip
   SHELL
   
 end
