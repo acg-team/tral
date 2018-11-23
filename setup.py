@@ -48,6 +48,8 @@ class InstallCommand(install):
         else:
             shutil.copytree("tral/tral_configuration", datadir)
             print("The TRAL configuration files and data files are now located in {}".format(datadir))
+        
+        super().run()
 
         #self.do_egg_install()
         super().run()
@@ -105,6 +107,7 @@ setup(
             ],
         'develop': [
             "flake8 >= 3.6",
+            "flake8-colors",
             "tox >= 3.5",
             "pytest >= 2.5.2",
         ],

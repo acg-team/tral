@@ -41,6 +41,6 @@ To compile locally, run
 
 TRAL uses tox and pytest for testing. The following commands relate to testing and code style:
 
-    $ flake8  # check code style
+    $ flake8 tral  # check code style
     $ python setup.py test  # Run tests
     $ tox  # Run comprehensive test suite on multiple python versions
