@@ -28,7 +28,7 @@ See also more extensive [Installation instructions].
 
 ### License
 
-GPL
+GPL-2.0
 
 
 ### Dependencies
