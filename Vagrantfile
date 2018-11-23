@@ -74,10 +74,14 @@ Vagrant.configure("2") do |config|
     apt-get -y install python3 python3-pip unzip
     pip3 install virtualenv
 
+    # reduce wget output during provisioning
+    echo 'verbose = off' >> ~/.wgetrc
+
     cd /vagrant/easy_setup
 
     # accept all licenses
     sed -i 's/ACCEPT_ALL=no/ACCEPT_ALL=yes/i' configTRAL_path.cfg
+
 
     # Install TRAL software
     ./setupTRAL.sh setup
