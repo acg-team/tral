@@ -13,6 +13,8 @@
 ######################
 ### Housekeeping
 
+shopt -s nocasematch # making comparisons case-insensitive
+
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
@@ -44,7 +46,7 @@ rm -rf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz"
 ######################
 ### Uninstall ALF (default paths!)
 
-# rm -rf /usr/local/bin/darwin*
+# rm -rf /usr/local/bin/alfdarwin.linux64
 # rm -rf /usr/local/bin/alfsim
 # rm -rf /usr/local/share/alfdarwin
 

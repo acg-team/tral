@@ -18,6 +18,8 @@
 ######################
 ### Housekeeping
 
+shopt -s nocasematch # making comparisons case-insensitive
+
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
@@ -40,7 +42,12 @@ fi
 
 chmod +x "$TRAL_EXT_SOFTWARE/trf409.linux64"
 cp "$TRAL_EXT_SOFTWARE/trf409.linux64" "$INSTALLATION_PATH" # copy into system path
-chmod +x "$INSTALLATION_PATH/trf409.linux64" && echo -e  "\nTRF is in your system path $INSTALLATION_PATH and can be executed with the command trf409.linux64"
+chmod +x "$INSTALLATION_PATH/trf409.linux64" 
+{
+if [ ! -h "$INSTALLATION_PATH/trf" ]; then    
+    ln -s trf409.linux64 "$INSTALLATION_PATH/trf" # create symlink to executable file
+fi
+} && echo -e  "\nTRF is in your system path $INSTALLATION_PATH and can be executed with the command trf"
 
 # TRF is now executable with trf409.linux64
 
@@ -49,3 +56,4 @@ chmod +x "$INSTALLATION_PATH/trf409.linux64" && echo -e  "\nTRF is in your syste
 
 # rm -rf "$TRAL_EXT_SOFTWARE/trf409.linux64"
 # rm -rf "$INSTALLATION_PATH/trf409.linux64"
+# rm -rf "$INSTALLATION_PATH/trf"

@@ -5,8 +5,10 @@
 # to deactivate the virtual tral environment type "deactivate" into the shell
 
 
+
 # provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg
+shopt -s nocasematch # making comparisons case-insensitive
 
 # activate the virtual environment
 . "$TRAL_ENV/python3/bin/activate"  || {

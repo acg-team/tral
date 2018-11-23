@@ -11,14 +11,12 @@
 # with this program can be published without restrictions, provided the program and its author are acknowledged by name.
 # A commercial license for Phobos can be obtained from the author.
 
-# TODO -- PHOBOS should only be downloaded from the authors webpage. Therefore a popup will show up, which tells the user to download the distribution
-# into their $TRAL_EXT_SOFTWARE
-# TODO -- this script is only to help install, the authors right have to be respected
 # TODO -- change default way to access PHOBOS in the config.ini file (phobos_*)
-
 
 ######################
 ### Housekeeping
+
+shopt -s nocasematch # making comparisons case-insensitive
 
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
@@ -31,7 +29,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in directory
     
-    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    if [[ "$ACCEPT_ALL" = "yes" ]]; then
         ma=a
     else
         {
@@ -56,20 +54,28 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
         [Aa]* )
             echo -e "\nDo you confirm to the authors copyright (Copyright (c) Christoph Mayer 2006-2017)?\n This program is for academic and non-commercial usage only."
             
-            if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+            if [[ "$ACCEPT_ALL" = "yes" ]]; then
                 yn=y
             else read -p "Would you like to download the phobos-v3.3.12-linux version? yes(y) or no (n):" yn
             fi
             
             case $yn in
                 [Yy]* )
-                    LINK_PHOBOS="http://www.rub.de/ecoevo/cm/phobos-v3.3.12-linux.tar.gz "
+                    {
+                    LINK_PHOBOS="http://www.rub.de/ecoevo/cm/phobos-v3.3.12-linux.tar.gz"
                     wget "$LINK_PHOBOS" -P "$TRAL_EXT_SOFTWARE"
                     tar zxf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz" -C "$TRAL_EXT_SOFTWARE"
                     rm -rf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz"
-                    cp "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH"     # copies binaries to system path $INSTALLATION_PATH/
+                    cp "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH" # copies binaries to system path $INSTALLATION_PATH/
+                    if [ ! -h "$INSTALLATION_PATH/phobos" ]; then 
+                        ln -s "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH/phobos" # create symlink to executable file
+                    fi
+                    } || {
+                        echo -e "Something went wrong with downloading or installing phobos."
+                        exit $?
+                    }
                     echo -e "\nPHOBOS binaries are now in the user path $INSTALLATION_PATH"
-                ;;
+                    ;;
                 [Nn]* )
                     echo -e "Abort."
                 ;;
@@ -83,13 +89,15 @@ else
 fi
 
 
-# Per default phobos is accessible via phobos_* (as long as the binary is copied to the system path).
+
+# Per default phobos is accessible via phobos (as long as the binary is copied to the system path).
 
 
 ######################
 ### Uninstall PHOBOS
 
-# rm -rf "$TRAL_EXT_SOFTWARE"/phobos*
-# rm -rf "$INSTALLATION_PATH"/phobos*"
+# rm -rf "$TRAL_EXT_SOFTWARE/phobos_64_libstdc++6"
+# rm -rf "$INSTALLATION_PATH/phobos_64_libstdc++6"
+# rm -rf "$INSTALLATION_PATH/phobos"
 
 

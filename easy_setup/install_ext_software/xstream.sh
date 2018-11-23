@@ -13,6 +13,8 @@
 
 ######################
 ### Housekeeping
+
+shopt -s nocasematch # making comparisons case-insensitive
  
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file

@@ -10,6 +10,8 @@
 # PREPARING FILESYSTEM AND INSTALLING TRAL
 ######################
 
+shopt -s nocasematch # making comparisons case-insensitive
+
 if [[ ! "$1" =~ ^(setup|pip)$ ]]; then
     echo -e "\nPlease provide as argument how you want to install TRAL with setup.py \"setup\" or \"pip\").\n"
     exit 1
@@ -42,7 +44,7 @@ fi
 while [ ! -x $(which virtualenv 2>/dev/null) ]; do
     echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
 
-    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    if [[ "$ACCEPT_ALL" = "yes" ]]; then
     yn=y
     else read -p "Do you wish to install this program? yes(y) or no (n):" yn
     fi
@@ -71,8 +73,6 @@ virtualenv "$TRAL_ENV/python3" -p "$PYTHON3" || exit $?
 ### Installing TRAL
 
 
-
-
 if [[ $1 == "setup" ]]; then
     
     ######################
@@ -92,7 +92,7 @@ if [[ $1 == "setup" ]]; then
         # if the tral directory is not already downloaded, it has to be cloned from github
         echo -e "\nPlease clone the TRAL repository from github.\n"
 
-        if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+        if [[ "$ACCEPT_ALL" = "yes" ]]; then
         yn=y
         else read -p "Do you want to clone the TRAL repository from github in "$TRAL_PATH"? yes(y) or no (n):" yn
         fi
@@ -123,7 +123,7 @@ if [[ $1 == "setup" ]]; then
     
     
     
-    elif [[ $1 == "pip" ]]; then
+elif [[ $1 == "pip" ]]; then
     
     #####################
     ## install tral with pip
@@ -133,13 +133,13 @@ if [[ $1 == "setup" ]]; then
     
     {
         echo -e "start installation"
-        "$TRAL_ENV/python3/bin/"${PIP:-pip} install tral || {
+        "$TRAL_ENV/python3/bin/"${PIP:-pip} install tral|| {
         
         echo -e "\nA problem occured while trying to install TRAL with \"pip install\"."
-        exit 1
+        exit $?
         }
         
-        } && {
+    } && {
             
         echo -e "\n---------------------------------"
         echo -e "Installing TRAL with pip successful"
@@ -154,12 +154,18 @@ deactivate
 
 
 ######################
+### Check if $TRAL_CONF was created during installation
+if [ ! -d "$TRAL_CONF" ]; then
+    echo -e ".tral directory was not created."
+fi
+
+######################
 ### Download p-Value distribution files
 
 if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
     echo -e  "\nIn order to calculate the p-Value of tandem repeat scores, available p-Value distributions need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue."
     
-    if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
+    if [[ "$ACCEPT_ALL" = "yes" ]]; then
     yn=y
     else read -p "Would you like to do this? yes(y) or no (n):" yn
     fi
@@ -175,12 +181,13 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
             }
         ;;
         [Nn]* )
-            echo -e "\nYou can download this files later from ftp: //ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper.\n"
+            echo -e "\nYou can download this file later from ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper.\n"
         ;;
     esac
 else
-    echo -e "\nDirectory for p-Value distribution files already exists.\nWill not be updated."
+    echo -e "\nDirectory for p-Value distribution file already exists.\nWill not be updated."
 fi
+
 
 ######################
 ### Installation of external software for TRAL

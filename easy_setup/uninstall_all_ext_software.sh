@@ -14,6 +14,7 @@
 
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg 
+shopt -s nocasematch # making comparisons case-insensitive
 
 
 ######################
@@ -21,16 +22,13 @@
 
 ### ALF
 
-rm -rf /usr/local/bin/darwin*
+rm -rf /usr/local/bin//alfdarwin.linux64
 rm -rf /usr/local/bin/alfsim
 rm -rf /usr/local/share/alfdarwin
-rm -rf /usr/local/bin/alfdarwin*
+
 
 ### HMMER
-if [[ "$ACCEPT_ALL" = "yes" ]] || [[ "$ACCEPT_ALL" = "Yes" ]]; then
-    yes | apt-get remove hmmer
-else apt-get remove hmmer
-fi
+apt-get remove hmmer
 
 ### MAFFT
 
@@ -39,8 +37,9 @@ rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
 
 ### PHOBOS
 
-rm -rf "$TRAL_EXT_SOFTWARE"/phobos*
-rm -rf "$INSTALLATION_PATH"/phobos*
+rm -rf "$TRAL_EXT_SOFTWARE/phobos_64_libstdc++6"
+rm -rf "$INSTALLATION_PATH/phobos_64_libstdc++6"
+rm -rf "$INSTALLATION_PATH/phobos"
 
 ### TREDPARSE
 
@@ -58,6 +57,7 @@ rm -rf "$INSTALLATION_PATH/T-REKS"
 
 rm -rf "$TRAL_EXT_SOFTWARE/trf409.linux64"
 rm -rf "$INSTALLATION_PATH/trf409.linux64"
+rm -rf "$INSTALLATION_PATH/trf"
 
 ### TRUST
 

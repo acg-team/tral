@@ -33,6 +33,8 @@
 ######################
 ### Housekeeping
 
+shopt -s nocasematch # making comparisons case-insensitive
+
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
@@ -41,7 +43,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 
 # install virtual environment called "tral2" with python2
-virtualenv "$TRAL_ENV/python2" -p python2
+virtualenv "$TRAL_ENV/python2" -p ${PYTHON2:-python2}
 
 . "$TRAL_ENV/python2/bin/activate" || {
     echo "Was not able to activate the virtual environment with Python2 to install tredparse"
