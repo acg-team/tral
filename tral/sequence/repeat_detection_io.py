@@ -25,7 +25,7 @@ class RepeatRegion:
 
 
 def tred_get_repeats(infile):
-    """ Read repeats from a TRED standard output (stdout) file stream successively.
+    r"""Read repeats from a TRED standard output (stdout) file stream successively.
 
     Read repeats from a TRED standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
@@ -122,7 +122,7 @@ def tred_msa_from_pairwise(repeat_units):
         ru = repeat_units[iR]
 
         # The next repeat unit
-        if ru[1] == True:
+        if ru[1]:
             result.append('-' * index + ru[0])
             # How many gaps in the beginning of this repeat unit?
             index += len(pat_gap.match(ru[0]).group())
@@ -326,7 +326,6 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length=20):
     position = position[valid_index:valid_index + max(count_valid_pairs) + 1]
 
     # Add missing sequence to the repeat units
-    repeat_unit_length = len(msa[0])
     gap_count_before = 0
     for i, i_gap in enumerate(gaps):
         gap_count_after = gap_count_before + i_gap
@@ -519,7 +518,7 @@ def trust_get_repeats(infile):
 
 
 def trf_get_repeats(infile):
-    """ Read repeats from a TRF txt.html file stream file stream successively.
+    r"""Read repeats from a TRF txt.html file stream file stream successively.
 
     Read repeats from a TRF txt.html file stream file stream successively.
     Postcondition: infile points to EOF.
@@ -589,6 +588,7 @@ def trf_get_repeats(infile):
     # identifier = ""  # Currently not implemented.
     preMSA = []
     consensus = []
+    tmp_consensus = None
     for i, line in enumerate(infile):
         LOG.debug("Line %d: %s", i, line[0:-1])
 
@@ -795,7 +795,7 @@ def getMSA(sequenceMSA, consensusMSA):
 
 
 def hhpredid_get_repeats(infile):
-    """ Read repeats from a HHREPID standard output (stdout) file stream successively.
+    r"""Read repeats from a HHREPID standard output (stdout) file stream successively.
 
     Read repeats from a HHREPID standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
@@ -873,7 +873,7 @@ def hhpredid_get_repeats(infile):
                                 region.msa))
 
     # Yield final repeat region.
-    if not region is None:
+    if region is not None:
         if len(region.msa) >= 2:
             yield region
         else:
@@ -912,7 +912,7 @@ def phobos_get_repeats(infile):
         LOG.debug("Line %d: %s", i, line[0:-1])
         if 1 == state:  # Find TR offset
             search = pattern_begin.search(line)
-            if search and search.groups()[0] != None:
+            if search and search.groups()[0] is not None:
                 LOG.debug(" *(1->2) Found tandem repeat begin")
                 state = 2
                 region = RepeatRegion()
@@ -921,14 +921,14 @@ def phobos_get_repeats(infile):
 
         elif 2 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
-            if match and match.groups()[0] != None:
+            if match and match.groups()[0] is not None:
                 LOG.debug(" *(2->3) Found first repeat unit")
                 region.msa.append(match.groups()[0])
                 state = 3
 
         elif 3 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
-            if match and match.groups()[0] != None:
+            if match and match.groups()[0] is not None:
                 LOG.debug(" *(3->3) Found a repeat unit")
                 region.msa.append(match.groups()[0])
             else:

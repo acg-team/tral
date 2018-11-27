@@ -8,7 +8,6 @@ import logging.config
 import os
 import pickle
 import shutil
-import sys
 
 from pyfaidx import Fasta
 
@@ -200,7 +199,7 @@ def workflow(
         denovo_final = []
         denovo_refined = [None] * len(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats)
         for i, iTR in enumerate(iS.get_repeatlist(DE_NOVO_ALL_TAG).repeats):
-            if not iTR in iS.get_repeatlist(DE_NOVO_TAG).repeats:
+            if iTR not in iS.get_repeatlist(DE_NOVO_TAG).repeats:
                 continue
             # Create HMM from TR
             denovo_hmm = hmm.HMM.create(input_format='repeat', repeat=iTR)

@@ -9,11 +9,9 @@
 
 from collections import OrderedDict
 import distutils
-import itertools
 import logging
 import os
 import re
-import resource
 import shutil
 import subprocess
 import sys

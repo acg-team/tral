@@ -3,20 +3,18 @@
 import configobj
 import os
 import os.path
-import re
 import shlex
 import shutil
 import sqlalchemy as sqla
-import sys
 
 # Interface to Gc3libs
 
 import gc3libs
-from gc3libs import Application, Run, Task
-from gc3libs.cmdline import SessionBasedScript, _Script
-from gc3libs.workflow import RetryableTask, SequentialTaskCollection, ParallelTaskCollection
+from gc3libs import Application, Run
+from gc3libs.cmdline import SessionBasedScript
+from gc3libs.workflow import SequentialTaskCollection, ParallelTaskCollection
 from gc3libs.persistence.accessors import GetValue
-from gc3libs.quantity import kB, MB, GB
+from gc3libs.quantity import MB
 import gc3libs.debug
 import gc3libs.utils
 

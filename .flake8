@@ -9,4 +9,5 @@ format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(co
 # E741 ambiguous variable name
 # E722 do not use bare 'except' (REMOVE LATER! Important but hard to fix)
 # E501 line too long (REMOVE LATER! Annoying to fix)
-ignore = E265,E266,E501,E722,E731,E741,W504
+# F821 undefined name (REMOVE LATER! Essential but hard to fix)
+ignore = E265,E266,E501,E722,E731,E741,F821,W504

@@ -1,5 +1,3 @@
-import collections
-import os
 import pytest
 
 from tral.repeat_list import repeat_list as rl

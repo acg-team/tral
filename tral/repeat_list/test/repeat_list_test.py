@@ -1,11 +1,9 @@
-import collections
 import os
 import pytest
 
 from tral.repeat_list import repeat_list as rl
 from tral.repeat import repeat
 from tral.sequence import sequence
-from tral.paths import PACKAGE_DIRECTORY
 
 TEST_REPEATS = [["AA", "AA"], ["AAA", "AAA"], ["AAAA", "AAAA"], ["AAA-", "AAAA"]]
 TEST_SCORE = "phylo_gap01"
@@ -70,11 +68,11 @@ def test_pairwise_overlap():
     for i, j in zip(test_repeats, TEST_BEGIN_LIST):
         i.begin = j
 
-    assert rl.two_repeats_overlap("common_ancestry", *test_repeats[:2]) == False
-    assert rl.two_repeats_overlap("common_ancestry", *test_repeats[1:3]) == False
-    assert rl.two_repeats_overlap("common_ancestry", *test_repeats[2:]) == False
-    assert rl.two_repeats_overlap("shared_char", *test_repeats[:2]) == False
-    assert rl.two_repeats_overlap("shared_char", *test_repeats[1:3]) == True
+    assert not rl.two_repeats_overlap("common_ancestry", *test_repeats[:2])
+    assert not rl.two_repeats_overlap("common_ancestry", *test_repeats[1:3])
+    assert not rl.two_repeats_overlap("common_ancestry", *test_repeats[2:])
+    assert not rl.two_repeats_overlap("shared_char", *test_repeats[:2])
+    assert rl.two_repeats_overlap("shared_char", *test_repeats[1:3])
 
 
 @pytest.mark.no_external_software_required
