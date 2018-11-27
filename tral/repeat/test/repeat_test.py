@@ -1,16 +1,15 @@
-import numpy as np
 import os
 import pytest
 
 from tral.repeat import repeat
-from tral.repeat import repeat_io
 
 
 TEST_MSA_O = ['OCC', 'OOO']
 TEST_MSA_K = ['KCC', 'KKK']
 TEST_SCORE = "phylo_gap01"
 
-# defaultdict(<class 'int'>, {'pSim': 0.66666666669999997, 'parsimony': 0.66666666669999997, 'entropy': 0.66666666666666663, 'phylo': 0.11368675605567802})
+# defaultdict(<class 'int'>, {'pSim': 0.66666666669999997, 'parsimony': 0.66666666669999997,
+#                             'entropy': 0.66666666666666663, 'phylo': 0.11368675605567802})
 # pvalue 'phylo': 0.3821
 
 

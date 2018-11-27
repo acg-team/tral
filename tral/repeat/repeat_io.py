@@ -16,6 +16,7 @@ import shutil
 import tempfile
 import subprocess
 import numpy as np
+from tral.repeat import repeat
 
 from tral.paths import DATA_DIR, EXEC_DIR
 

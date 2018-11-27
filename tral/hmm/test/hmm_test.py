@@ -1,5 +1,4 @@
 import os
-import pytest
 
 from tral.hmm.hmm import HMM
 from tral.repeat import repeat

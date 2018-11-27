@@ -2,9 +2,12 @@ import pytest
 
 from tral.repeat import repeat
 from tral.repeat import repeat_io
+from tral.repeat.repeat_score import loglikelihood_gaps_starphylogeny_zipfian, \
+    optimisation, loglikelihood_substitution, loglikelihood_substitutions_gaps
 
 
-TEST_MSA = ['HPFGFV-------------AVPTKNP-DGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPS---SPPKCKFEPPLFHPNV', 'YPSGTVCLsileedkdwrpAITIKQIlLGIQELLN-E---PNIQ-DPAQAEAYTIYCQNRVEYEKrvrAQAK-KFAP-------']
+TEST_MSA = ['HPFGFV-------------AVPTKNP-DGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPS---SPPKCKFEPPLFHPNV',
+            'YPSGTVCLsileedkdwrpAITIKQIlLGIQELLN-E---PNIQ-DPAQAEAYTIYCQNRVEYEKrvrAQAK-KFAP-------']
 TEST_BEGIN = 0
 
 
@@ -21,6 +24,7 @@ def test_repeat_score():
 
     print(loglikelihood_gaps_starphylogeny_zipfian(t=1, tandem_repeat=myTR))
     print(optimisation(function=loglikelihood_substitution, args=[Q, eqFreq, alphabet, myTR]))
-    print(optimisation(function=loglikelihood_substitutions_gaps, args=[[Q, eqFreq, alphabet, myTR], [myTR, indelRatePerSite]]))
+    print(optimisation(function=loglikelihood_substitutions_gaps,
+                       args=[[Q, eqFreq, alphabet, myTR], [myTR, indelRatePerSite]]))
 
     assert 1 == 2

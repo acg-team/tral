@@ -111,7 +111,7 @@ def viterbi_with_prob(hmm, emission):
                     emission[0]]]
             max_p = max(l_p_emission)
             path[iS]['probability'] += \
-               np.log10(sum([10 ** (i - max_p) for i in l_p_emission])) + max_p
+                np.log10(sum([10 ** (i - max_p) for i in l_p_emission])) + max_p
 
     else:
         path = {iS: {'probability': p_0[iS] + p_e[iS][emission[0]],
@@ -140,7 +140,7 @@ def viterbi_with_prob(hmm, emission):
                             p_e,
                             p_t,
                             path,
-                            ) for i_ambiguous in d_ambiguous_local[iE].keys()}
+                        ) for i_ambiguous in d_ambiguous_local[iE].keys()}
                     d_p_former = {
                         i_ambiguous: j for i_ambiguous,
                         j in d_p_former.items() if j}
@@ -418,8 +418,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
                 continue
             elif iP == 'C':
                 break
-            match_state_index = (int(iP[1:]) + (l_effective - start_index)) % \
-                                                l_effective + 1
+            match_state_index = (int(iP[1:]) + (l_effective - start_index)) % l_effective + 1
             if match_state_index >= current_index:
                 # We are staying within the same repeat unit.
                 msa_unit += iS
@@ -437,7 +436,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
             if len(msa[0]) < alpha * l_effective:
                 msa = msa[1:]
             lMSA.append(msa)
-        except:
+        except IndexError:
             lMSA.append([])
 
     return lMSA

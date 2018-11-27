@@ -23,6 +23,7 @@ if "--home" in sys.argv:
           "         The --home option now triggers the package itself to install in the user's home directory.",
           file=sys.stderr)
 
+
 # Customize install command to add --tral-home command
 class InstallCommand(install):
     description = "Installs TRAL"
@@ -87,7 +88,7 @@ setup(
         "Topic :: Software Development",
         "Topic :: Scientific/Engineering",
         "Operating System :: OS Independent",
-        ],
+    ],
     install_requires=[
         "biopython >= 1.64",
         "configobj >= 5.0.6",
@@ -104,7 +105,7 @@ setup(
             "docutils >= 0.11",
             "pypandoc >= 0.9.6",
             "Sphinx >= 1.2.2",
-            ],
+        ],
         'develop': [
             "flake8 >= 3.6",
             "flake8-colors",

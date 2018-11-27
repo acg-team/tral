@@ -1,7 +1,6 @@
 # (C) 2015 Elke Schaper
 
 from tral import configuration
-from tral.repeat import repeat
 """
     :synopsis: Alignment of tandem repeat units.
 
@@ -12,7 +11,6 @@ import logging
 import os
 import subprocess
 import tempfile
-from Bio import AlignIO
 
 log = logging.getLogger(__name__)
 

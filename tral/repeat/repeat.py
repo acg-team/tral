@@ -121,7 +121,7 @@ class Repeat:
             return [Repeat(msa=i_msa, sequence_type=i_sequence_type)
                     for i_msa, i_sequence_type in l_repeat]
         else:
-            raise Exception('file_format is unknown: {}.'.format(file_format))
+            raise Exception('input_format is unknown: {}.'.format(input_format))
 
     def write(self, file, file_format):
         """ Write tandem repeat to file.

@@ -1,7 +1,8 @@
-import os
-import pytest
+import logging
+import logging.config
+logging.config.fileConfig("/Users/blieadmin/.tral/logging.ini")
 
-from tral.paths import config_file
+# import pytest
 
 from tral.sequence import repeat_detection_run, sequence
 
@@ -40,4 +41,14 @@ def test_detect_HHrepID():
     test_seq = sequence.Sequence(TEST_SEQUENCE_Q9BRR0)
     predicted_repeats = repeat_detection_run.run_detector(seq_records=[test_seq], detectors=["HHrepID"])[0]['HHrepID']
     assert len(predicted_repeats) == 1
-    assert predicted_repeats[0].msa == ['------------------IPTCAEAGEQ----', 'EGRLQRKQKNATGGRRHICHECGKSFAQ----', 'SSGLSKHRRIHTGEKPYECEECGKAFIG----', 'SSALVIHQRVHTGEKPYECEECGKAFSH----', 'SSDLIKHQRTHTGEKPYECDDCGKTFSQ----', 'SCSLLEHHRIHTGEKPYQCSMCGKAFRR----', 'SSHLLRHQRIHTGDKNVQEPEQGEAWKSRMES', '------QLENVETPMSYKCNECERSFTQ----', 'NTGLIEHQKIHTGEKPYQCNACGKGFTR----', 'ISYLVQHQRSHVG-------------------']
+    expected_msa = ['------------------IPTCAEAGEQ----',
+                    'EGRLQRKQKNATGGRRHICHECGKSFAQ----',
+                    'SSGLSKHRRIHTGEKPYECEECGKAFIG----',
+                    'SSALVIHQRVHTGEKPYECEECGKAFSH----',
+                    'SSDLIKHQRTHTGEKPYECDDCGKTFSQ----',
+                    'SCSLLEHHRIHTGEKPYQCSMCGKAFRR----',
+                    'SSHLLRHQRIHTGDKNVQEPEQGEAWKSRMES',
+                    '------QLENVETPMSYKCNECERSFTQ----',
+                    'NTGLIEHQKIHTGEKPYQCNACGKGFTR----',
+                    'ISYLVQHQRSHVG-------------------']
+    assert predicted_repeats[0].msa == expected_msa
