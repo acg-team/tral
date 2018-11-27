@@ -395,7 +395,7 @@ def random_sequence(n_samples, sequence_type='AA', return_type='repeat',
             a = f.readline()[:-1]
         b = [i.split(' ') for i in a.split('  ')]
         frequencies = {i[0]: int(i[1]) for i in b}
-        alphabet = np.unique(i[0] for i in frequencies.keys())
+        alphabet = np.unique([i[0] for i in frequencies.keys()])
 
         for _ in range(n_samples):
             seed_int = random.randint(1, sum(frequencies.values()))
