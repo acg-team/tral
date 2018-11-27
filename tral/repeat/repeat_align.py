@@ -44,13 +44,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                               msa_file],
                              stdout=subprocess.PIPE)
         mafft_output = [line.decode('utf8').rstrip() for line in p.stdout]
-        msa = []
-        for iLine in mafft_output:
-            if iLine[0] == '>':
-                msa.append('')
-            else:
-                msa[-1] += iLine
-        msa = [i for i in msa if i != '']
+        msa = [iLine for iLine in mafft_output if iLine[0] != '>']
         log.debug('\n'.join(msa))
         p.wait()
         try:
