@@ -14,6 +14,7 @@
 
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg 
+shopt -s nocasematch # making comparisons case-insensitive
 
 
 ######################
@@ -21,55 +22,56 @@
 
 ### ALF
 
-rm -rf /usr/local/bin/darwin*
+rm -rf /usr/local/bin//alfdarwin.linux64
 rm -rf /usr/local/bin/alfsim
 rm -rf /usr/local/share/alfdarwin
-rm -rf /usr/local/bin/alfdarwin*
+
 
 ### HMMER
-
 apt-get remove hmmer
 
 ### MAFFT
 
 dpkg --remove mafft
-rm -rf $TRAL_EXT_SOFTWARE/mafft*
+rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
 
 ### PHOBOS
 
-rm -rf $TRAL_EXT_SOFTWARE/phobos*
-rm -rf /usr/local/bin/phobos*
+rm -rf "$TRAL_EXT_SOFTWARE/phobos_64_libstdc++6"
+rm -rf "$INSTALLATION_PATH/phobos_64_libstdc++6"
+rm -rf "$INSTALLATION_PATH/phobos"
 
 ### TREDPARSE
 
-rm -rf $TRAL_ENV/python2
-rm $TRAL_EXT_SOFTWARE/tred
-rm /usr/local/bin/tred
+rm -rf "$TRAL_ENV/python2"
+rm "$TRAL_EXT_SOFTWARE/tred"
+rm "$INSTALLATION_PATH/tred"
 
 ### TREKS
 
-rm -rf $TRAL_EXT_SOFTWARE/T-Reks.jar
-rm -rf $TRAL_EXT_SOFTWARE/T-REKS
-rm -rf /usr/local/bin/T-REKS
+rm -rf "$TRAL_EXT_SOFTWARE/T-Reks.jar"
+rm -rf "$TRAL_EXT_SOFTWARE/T-REKS"
+rm -rf "$INSTALLATION_PATH/T-REKS"
 
 ### TRF
 
-rm -rf $TRAL_EXT_SOFTWARE/trf409.linux64
-rm -rf /usr/local/bin/trf409.linux64
+rm -rf "$TRAL_EXT_SOFTWARE/trf409.linux64"
+rm -rf "$INSTALLATION_PATH/trf409.linux64"
+rm -rf "$INSTALLATION_PATH/trf"
 
 ### TRUST
 
-rm -rf $TRAL_EXT_SOFTWARE/TRUST_Align
-rm -rf /usr/local/bin/TRUST
+rm -rf "$TRAL_EXT_SOFTWARE/TRUST_Align"
+rm -rf "$INSTALLATION_PATH/TRUST"
 
 ### HHrepID
 
-rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
-rm -rf /usr/local/bin/hhrepid_64
+rm -rf "$TRAL_EXT_SOFTWARE/HHrepID/"
+rm -rf "$INSTALLATION_PATH/hhrepid_64"
 
 
 ### XSTREAM
 
-rm -rf $TRAL_EXT_SOFTWARE/XSTREAM
-rm -rf /usr/local/bin/XSTREAM
+rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM"
+rm -rf "$INSTALLATION_PATH/XSTREAM"
 

@@ -27,7 +27,7 @@
 
 # For any reuse or distribution, you must make clear to others the license terms of this work.
 
-# Any of these conditions, in particular the second condition restricting the use for commercial purposes, 
+# Any of these conditions, in particular the second condition restricting the use for commercial purposes,
 # can be waived if you get permission from the copyright holder.
 
 # Your fair use and other rights are in no way affected by the above.
@@ -39,32 +39,38 @@
 ######################
 ### Housekeeping
 
-PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-# other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
+shopt -s nocasematch # making comparisons case-insensitive
 
+PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 ######################
 ### Installation HHREPID
 
-mkdir -p $TRAL_EXT_SOFTWARE/HHrepID
+mkdir -p "$TRAL_EXT_SOFTWARE/HHrepID"
 
-
-
-if [ ! -f $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 ]; then # test if not already in directory
-    LINK_HHREPID=ftp://ftp.tuebingen.mpg.de/pub/protevo/HHrepID # HHrepID Nov 22 2007
-    wget $LINK_HHREPID/hhrepid_64 -P $TRAL_EXT_SOFTWARE/HHrepID   # download execution file
-    wget $LINK_HHREPID/README -P $TRAL_EXT_SOFTWARE/HHrepID    # download README
+if [ ! -f "$TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64" ]; then # test if not already in directory
+    {
+        LINK_HHREPID="ftp://ftp.tuebingen.mpg.de/pub/protevo/HHrepID" # HHrepID Nov 22 2007
+        wget "$LINK_HHREPID/hhrepid_64" -P "$TRAL_EXT_SOFTWARE/HHrepID"   # download execution file
+        wget "$LINK_HHREPID/README" -P "$TRAL_EXT_SOFTWARE/HHrepID"  # download README
+        } || {
+        echo "Couldn't download HHrepID."
+        exit $?
+    }
 fi
 
-chmod +x $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64
-cp $TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64 /usr/local/bin/ # copy into system path
-chmod +x /usr/local/bin/hhrepid_64 && echo -e  "\nHHrepID is in your system path /usr/local/bin/ and can be executed with the command hhrepid_64"
+chmod +x "$TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64"
+cp "$TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64" "$INSTALLATION_PATH" # copy into system path
+chmod +x "$INSTALLATION_PATH/hhrepid_64" && echo -e  "\nHHrepID is in your system path $INSTALLATION_PATH and can be executed with the command hhrepid_64"
 
 # HHrepID is now executable with hhrepid_64
 
 ######################
 ### Uninstall HHrepID
 
-# rm -rf $TRAL_EXT_SOFTWARE/HHrepID/
-# rm -rf /usr/local/bin/hhrepid_64
+# rm -rf "$TRAL_EXT_SOFTWARE/HHrepID/"
+# rm -rf "$INSTALLATION_PATH/hhrepid_64"

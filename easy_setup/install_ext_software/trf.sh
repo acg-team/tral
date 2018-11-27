@@ -18,29 +18,42 @@
 ######################
 ### Housekeeping
 
-PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P )
-# other files are located one directory above
-. $PARENT_PATH/configTRAL_path.cfg # provide paths from config file
+shopt -s nocasematch # making comparisons case-insensitive
+
+PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
+. "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
+    echo "configTRAL_path.cfg not found"
+    exit $?
+}
 
 
 ######################
 ### Installation TRF
 
-if [ ! -f $TRAL_EXT_SOFTWARE/trf* ]; then # test if not already in directory
-    LINK_TRF=tandem.bu.edu/trf/downloads/trf409.linux64 # TRF Version 4.09 (Feb 22, 2016) Linux64
-    wget $LINK_TRF -P $TRAL_EXT_SOFTWARE    # download
+if [ ! -f "$TRAL_EXT_SOFTWARE/trf409.linux64" ]; then # test if not already in directory
+    LINK_TRF="tandem.bu.edu/trf/downloads/trf409.linux64" # TRF Version 4.09 (Feb 22, 2016) Linux64
+    wget "$LINK_TRF" -P "$TRAL_EXT_SOFTWARE" || {   # download
+    echo "Was not able to download TRF."
+    exit $?
+    }
 else
     echo "TRF is already installed"
 fi
 
-chmod +x $TRAL_EXT_SOFTWARE/trf409.linux64
-cp $TRAL_EXT_SOFTWARE/trf409.linux64 /usr/local/bin/ # copy into system path
-chmod +x /usr/local/bin/trf409.linux64 && echo -e  "\nTRF is in your system path /usr/local/bin/ and can be executed with the command trf409.linux64"
+chmod +x "$TRAL_EXT_SOFTWARE/trf409.linux64"
+cp "$TRAL_EXT_SOFTWARE/trf409.linux64" "$INSTALLATION_PATH" # copy into system path
+chmod +x "$INSTALLATION_PATH/trf409.linux64" 
+{
+if [ ! -h "$INSTALLATION_PATH/trf" ]; then    
+    ln -s trf409.linux64 "$INSTALLATION_PATH/trf" # create symlink to executable file
+fi
+} && echo -e  "\nTRF is in your system path $INSTALLATION_PATH and can be executed with the command trf"
 
 # TRF is now executable with trf409.linux64
 
 ######################
 ### Uninstall TRF
 
-# rm -rf $TRAL_EXT_SOFTWARE/trf409.linux64
-# rm -rf /usr/local/bin/trf409.linux64
+# rm -rf "$TRAL_EXT_SOFTWARE/trf409.linux64"
+# rm -rf "$INSTALLATION_PATH/trf409.linux64"
+# rm -rf "$INSTALLATION_PATH/trf"

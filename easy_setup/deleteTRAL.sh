@@ -5,24 +5,44 @@
 # UNINSTALLING TRAL AND ITS EXTERNAL SOFTWARE
 ######################
 
-# TODO-- include error handling
-
 ######################
 ### Prepare Filesystem
 
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
-. configTRAL_path.cfg 
-
+. configTRAL_path.cfg
+shopt -s nocasematch # making comparisons case-insensitive
 
 ######################
 ### Delete TRAL
 
 # delete tral path system
-rm -rf $TRAL_PATH
+read -p "Are you sure to delete TRAL? yes(y) or no (n):" yn
+case $yn in
+    [Yy]* )
+        rm -rf "$TRAL_PATH" || {
+            echo -e "Was not able to delete TRAL"
+            exit 1
+        }
+    ;;
+    [Nn]* )
+        echo -e ".tral was not removed."
+    ;;
+esac
+
 
 # delete all the config files of the virtualenvs
-rm -rf $TRAL_CONF
-#rm -rf $HOME/.tral2
+read -p "Do you wish to delete all configuration files and data as well? yes(y) or no (n):" yn
+case $yn in
+    [Yy]* )
+        rm -rf "$TRAL_CONF" || {
+            echo -e "Was not able to delete .tral"
+            exit 1
+        }
+    ;;
+    [Nn]* )
+        echo -e ".tral was not removed."
+    ;;
+esac
 
 echo -e "---------------------------------------------"
 echo -e "TRAL and its whole pathsystem is now deleted."
@@ -34,26 +54,26 @@ echo -e "---------------------------------------------\n"
 
 # delete the directory with external software used by TRAL
 read -p "Do you wish to uninstall all external software as well? yes(y) or no (n):" yn
-    case $yn in
-        [Yy]* )
+case $yn in
+    [Yy]* )
+        {
             . uninstall_all_ext_software.sh &&
-            rm -rf $TRAL_EXT_SOFTWARE
-            echo -e "\n----------------------------------------------" 
-            echo -e "External Software deleted." 
+            rm -rf "$TRAL_EXT_SOFTWARE"
+            echo -e "\n----------------------------------------------"
+            echo -e "External Software deleted."
             echo -e "----------------------------------------------\n"
             echo -e "\n----------------------------------------------"
             echo -e 'Uninstallation of TRAL successfully completed.'
-            echo -e "----------------------------------------------\n" ||
+            echo -e "----------------------------------------------\n"
+            } || {
             echo -e "\nA problem occured while trying to delete the external software."
             exit 1
-            ;;
-        [Nn]* ) 
-            echo -e "\nExternal Software was not deleted and can (if it was available before) still be found in $TRAL_EXT_SOFTWARE."
-            echo -e "\n----------------------------------------------"
-            echo -e 'Uninstallation of TRAL successfully completed.'
-            echo -e "----------------------------------------------\n" 
-            ;;
-    esac
-
-
-
+        }
+    ;;
+    [Nn]* )
+        echo -e "\nExternal Software was not deleted and can (if it was available before) still be found in $TRAL_EXT_SOFTWARE."
+        echo -e "\n----------------------------------------------"
+        echo -e 'Uninstallation of TRAL successfully completed.'
+        echo -e "----------------------------------------------\n"
+    ;;
+esac
