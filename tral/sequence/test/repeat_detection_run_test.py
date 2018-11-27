@@ -1,7 +1,3 @@
-import logging
-import logging.config
-logging.config.fileConfig("/Users/blieadmin/.tral/logging.ini")
-
 # import pytest
 
 from tral.sequence import repeat_detection_run, sequence
