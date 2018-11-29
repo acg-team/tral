@@ -1,7 +1,5 @@
 # easy_setup for TRAL
 
-> **ATTENTION: This easy_setup is a first version which can have some unknown bugs. Moreover, the README may not be complete. Adaption is coming soon.**
-
 These scripts will help you to easily install TRAL and its dependencies without going to deep into detail of the different installation procedures.
 It automatically sets up a little filesystem, where a virtual environment (virtenv) for TRAL will be initalized.
 Moreover, you can decide which external software should be downloaded and installed without the need to read through their (sometimes complicated) installation procedures.
@@ -13,11 +11,11 @@ You can adapt the default installing path within configTRAL_path.cfg. Please onl
 
 ## Prerequisites
 
-easy_setup only works for linux64 with ubuntu by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
+easy_setup only works for linux64 by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
 To install TRAL and its external software within usr/local/bin (default for variable $INSTALLATION_PATH) you need to execute the scripts as root.
 In case you want to install TRAL from the git repository automatically, you need to have git installed on your computer.
 
-These setup scripts require ubuntu, python 3, pip, unzip, and git.
+These setup scripts require python 3, pip, unzip, and git.
 
 ## Installation of TRAL
 

@@ -27,9 +27,6 @@ rm -rf /usr/local/bin/alfsim
 rm -rf /usr/local/share/alfdarwin
 
 
-### HMMER
-apt-get remove hmmer
-
 ### MAFFT
 
 dpkg --remove mafft
@@ -69,9 +66,27 @@ rm -rf "$INSTALLATION_PATH/TRUST"
 rm -rf "$TRAL_EXT_SOFTWARE/HHrepID/"
 rm -rf "$INSTALLATION_PATH/hhrepid_64"
 
-
 ### XSTREAM
 
 rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM"
 rm -rf "$INSTALLATION_PATH/XSTREAM"
+
+### HMMER
+
+if [[ ! -z $APT_CMD ]]; then            # Linux (Ubuntu, Debian...)
+    apt remove hmmer
+elif [[ ! -z $DNF_CMD ]]; then          # Linux (Fedora)
+    dnf remove hmmer
+elif [[ ! -z $YUM_CMD ]]; then          # Linux (older Fedora)
+    yum remove hmmer
+elif [[ ! -z $CONDA_CMD ]]; then        # Anaconda
+    conda remove bioconda hmmer
+elif [[ ! -z $BREW_CMD ]]; then         # OS/X, HomeBrew
+    brew remove hmmer
+elif [[ ! -z $PORT_CMD ]]; then         # OS/X, MacPorts
+    port uninstall hmmer
+else
+    echo "Error: Something went wrong while trying to remove HMMER, maybe it is already uninstalled."
+    exit 1;
+fi
 
