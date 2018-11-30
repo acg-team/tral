@@ -68,7 +68,7 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
                     rm -rf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz"
                     cp "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH" # copies binaries to system path $INSTALLATION_PATH/
                     if [ ! -h "$INSTALLATION_PATH/phobos" ]; then 
-                        ln -s "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH/phobos" # create symlink to executable file
+                        ln -s "$INSTALLATION_PATH/phobos_64_libstdc++6" "$INSTALLATION_PATH/phobos" # create symlink to executable file
                     fi
                     } || {
                         echo -e "Something went wrong with downloading or installing phobos."

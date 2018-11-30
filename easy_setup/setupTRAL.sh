@@ -55,7 +55,7 @@ if [[ $1 == "setup" ]]; then
     # test if TRAL repository is already downloaded
     if [ -d "$PARENT_PATH/tral" ] && [ -e "$PARENT_PATH/setup.py" ] ; then
         (cd "$PARENT_PATH" && python setup.py install) || {
-            echo -e "\nA problem occured while trying to install TRAL with \"python setup.py install\"."
+            echo -e "\nA problem occured while trying to install TRAL with \"python setup.py develop\"."
             exit 1
         }
     else
@@ -152,7 +152,7 @@ else
     echo -e "\nDirectory for p-Value distribution file already exists.\nWill not be updated."
 fi
 
-envecho -e "\n---------------------------------"
+echo -e "\n---------------------------------"
 echo -e "Installation of TRAL is completed."
 echo -e "-----------------------------------\n"
 
