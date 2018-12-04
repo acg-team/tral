@@ -18,7 +18,7 @@ class RepeatRegion:
 
     def __init__(self, protein_id="", begin=None, msa=None):
         self.protein_id = protein_id
-        self.begin = begin
+        self.begin = begin  # 1-based
         if msa is None:
             msa = []
         self.msa = msa
@@ -175,7 +175,11 @@ def treks_get_repeats(infile):
 
     # pattern for repeat properties
     pat_repeat_header = re.compile(
-        r"Length: \d+ residues - nb: (\d+)  from  (\d+) to (\d+) - Psim:([\d\.]+) region Length:(\d+)")
+        r"Length:\s*\d+\s+"
+        r"residues - nb:\s*(\d+)\s+"  # 1. number of repeats
+        r"from\s+(\d+)\s+to\s+(\d+)\s*"  # 2-3. start and end of repeat region (1-based)
+        r"-\s*Psim:\s*(-?[\d\.]+)\s+"  # 4. probability (accept negative for (malformed) log10 values)
+        r"region Length:\s*(\d+)")  # 5. length
 
     pat_repeat_end = re.compile(r"\*+")
 
@@ -199,13 +203,14 @@ def treks_get_repeats(infile):
     for i, line in enumerate(infile):
         LOG.debug("Line %d: %s", i, line[0:-1])
 
-        if 1 == state:
+        if 1 == state:  # Parsing header
             region = RepeatRegion(protein_id=identifier, msa=[])
             LOG.debug("msa: %s", "\n".join(region.msa))
             match = pat_repeat_header.match(line)
             if match:
                 LOG.debug(" * (1->2) Found properties")
-                region.begin = int(match.group(2))
+                region.begin = int(match.group(2))  # 1-based in T-Reks output
+                end = int(match.group(3))
                 state = 2
 
             match = pat_identifier.match(line)
@@ -214,7 +219,7 @@ def treks_get_repeats(infile):
                 identifier = match.group(1)
                 state = 1
 
-        elif 2 == state:
+        elif 2 == state:  # Parsing MSA
             match = pat_sequence.match(line)
             if match:
                 LOG.debug(" * (2->2) Found MSA line (appending)")
@@ -224,6 +229,12 @@ def treks_get_repeats(infile):
             if match:
                 LOG.debug(" * (2->1) Found end of repeat (yielding)")
                 state = 1
+
+                # Perform some checks before yielding
+                msalen = sum(1 for row in region.msa for c in row if c != '-')
+                if region.begin + msalen != end + 1:
+                    logging.warn("Inconsistency in T-Reks file: MSA length doesnt match start and end")
+
                 yield region
 
         else:
