@@ -2,7 +2,6 @@
 
 # By execution of this script a little filesystem will be created within the INSTALLATION_PATH (default: /usr/local/bin).
 # If you wish to change this path, do this within configTRAL_path.cfg
-# TRAL will be installed within a virtual environment (virtenv).
 # Run this script as as superuser if your INSTALLATION_PATH only can be accessed by root.
 
 
@@ -30,9 +29,6 @@ mkdir -p "$TRAL_EXT_SOFTWARE" # create directory for installation of external so
 
 # directories will be added temporarely to PATH
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
-
-######################
-### Install virtualenv and activate
 
 # check for pip
 if ! hash "${PIP3:-pip}"; then
