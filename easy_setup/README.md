@@ -1,7 +1,5 @@
 # easy_setup for TRAL
 
-> **ATTENTION: This easy_setup is a first version which can have some unknown bugs. Moreover, the README may not be complete. Adaption is coming soon.**
-
 These scripts will help you to easily install TRAL and its dependencies without going to deep into detail of the different installation procedures.
 It automatically sets up a little filesystem, where a virtual environment (virtenv) for TRAL will be initalized.
 Moreover, you can decide which external software should be downloaded and installed without the need to read through their (sometimes complicated) installation procedures.
@@ -13,11 +11,11 @@ You can adapt the default installing path within configTRAL_path.cfg. Please onl
 
 ## Prerequisites
 
-easy_setup only works for linux64 with ubuntu by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
+easy_setup only works for linux64 by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
 To install TRAL and its external software within usr/local/bin (default for variable $INSTALLATION_PATH) you need to execute the scripts as root.
 In case you want to install TRAL from the git repository automatically, you need to have git installed on your computer.
 
-These setup scripts require ubuntu, python 3, pip, unzip, and git.
+These setup scripts require python 3, pip, unzip, and git.
 
 ## Installation of TRAL
 
@@ -35,10 +33,10 @@ If you haven't git installed, you may need install git or to download the github
 
 ### Installation of external software for TRAL
 
-After setting up TRAL with setupTRAL.sh you can install external software. The script setupTRAL.sh automatically ask you if you want to install any of the recommended software.
-By pressing y/n you can decide wheter you want to install it now or later.
+After setting up TRAL with setupTRAL.sh you can install external software. 
+The script install_ext_software.sh automatically iterates through all installation scripts for each recommended external software of TRAL and ask you for each single software if you want to install it (press y/n). Please confirm to their respective licence.
 
-If you decide to install the external software later, you can install them later by executing the script install_ext_software. Otherwise, you can run an installation script for each external software individually which can be found within the directory setup_tral/install_ext_software.
+Otherwise, you can run an installation script for each external software individually which can be found within the directory setup_tral/install_ext_software.
 The software will be downloaded in the directory $FILES/tral_external_software.
 Currently, installation scripts for the following external software are available:
 
@@ -47,7 +45,7 @@ Currently, installation scripts for the following external software are availabl
 - hhrepid
 - mafft
 - phobos
-- tredparse
+- tredparse  (virtualenv required to run in python2)
 - t-reks
 - trf
 - trust
@@ -57,24 +55,23 @@ Currently, installation scripts for the following external software are availabl
 On the bottom of each installation script for the external software an uninstallation procedure can be found.
 Either comment all installation part and uncomment uninstallation part or run the commands directly in the commandline.
 
+It may be that you need to be root to install external software.
 
 ## Activation and Use of TRAL
 
-Since TRAL will be installed within a virtual environment, you need to activate it, each time you want to use TRAL.
-For activation you can run the script activateTRAL.sh either with
-
-```
-. activateTRAL.sh
-```
-or
-```
-source activateTRAL.sh
-```
+It is recommended to install TRAL within a virtual environment (e. g. virtualenv).
 
 ## Uninstallation of TRAL and its external software
 
 To uninstall TRAL (and is external software if you wish) run the script deleteTRAL.sh.
 
 ```
-sudo \.deleteTRAL.sh
+\.deleteTRAL.sh
+```
+You will be asked if you want to uninstall the external software as well.
+
+To uninstall only all installed external software run:
+
+```
+\.uninstall_all_ext_software.sh
 ```
