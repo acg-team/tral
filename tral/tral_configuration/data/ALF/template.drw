@@ -1,0 +1,245 @@
+# parameters for ALF
+# 
+# Daniel Dalquen, 2011
+
+# to run ALF with this parameter file, call
+# bin/alfsim
+# or, if you previously installed ALF, simply
+# alfsim
+
+SetRand(2345): # use this with any number, if you want reproducable results
+
+### parameters for root genome
+protStart := 200;      # number of proteins first organism have
+gammaLengthDist := [2.4, 133.8]; # parameters for the gene length distribution (~Gamma(k, theta))
+minGeneLength := 10; # minimum length of a gene
+# realorganism := 'realseed/se_ECOLI_core.db'; # real genome db as first organism
+###
+
+### substitution models
+## model definition
+# available models: nucleotide substitution: F84, GTR, HKY, TN93
+#                   codon substitution: CPAM, ECM, ECMu, M0, M2, M3, M8, CustomC
+#                   aa substitution: GCB, JTT, LG, WAG, CustomP
+#
+# format: SubstitutionModel(name:string, parameters:list, frequencies:list, neutralDNA:boolean)
+#     the number of arguments required depend on the model:
+#     models CPAM, ECM, ECMu, GCB, JTT, WAG and LG require just the name of the model
+#     when using a custom matrix, pass the path to the matrix file as parameter
+#     for M-series models, pass also the codon frequencies
+#     finally, for nucleotide models specify as fourth parameter whether non-sense mutations should be allowed
+#
+# order of parameters:
+#     for custom empirical models: parameters[1] should contain a path to a matrix in PAML format
+#     for M-series models:   kappa = parameters[1]
+#                            omega = parameters[2] (single value or list)
+#                            P     = parameters[3] (probabilities of w-class[es]) 
+#                            p     = parameters[4] (for M8, 1st parameter of beta distribution)
+#                            q     = parameters[5] (for M8, 2nd parameter of beta distribution)
+#     for nucleotide models: GTR: a..f  = parameters[1]..parameters[6]
+#                            HKY: alpha = parameters[1], beta = parameters[2]
+#                            F84: kappa = parameters[1], beta = parameters[2]
+#                            TN93: alpha1 = parameters[1], alpha2 = parameters[2], beta = parameters[3]
+substModels := [
+SubstitutionModel('CPAM'),
+SubstitutionModel('TN93', [.3, .4, .7], [seq(0.25,4)], true),
+#SubstitutionModel('M8', [0.7, 0.5, 0.2, 0.269, 4.669], [seq(1/64,64)]),
+#SubstitutionModel('M2', [0.7, 1, [0.4, 0.6]], [seq(1/64,64)]),
+#SubstitutionModel('M2', [0.7, 1.2, [0.4, 0.4]], [seq(1/64,64)]),
+#SubstitutionModel('WAG'),
+NULL
+]:
+
+# when no substitution model is given (pure gap simulation), select block size for gaps
+blocksize := 3:
+###
+
+### parameters for gap model
+## model definition
+# possible formats: no indels:
+#                   IndelModel(0)
+#
+#                   define one model for insertions and deletions with the same
+#                   rate:
+#                   IndelModel(rate:nonnegative, model:string, parameters:list,
+#                              maxLen:posint)
+#
+#                   define one model for insertions and deletions with separate
+#                   rates for insertions and deletions:
+#                   IndelModel(gainRate:nonnegative, model:string,
+#                              parameters:list, maxLen:posint,
+#                              lossRate:nonnegative)
+#
+#                   define separate models for insertions and deletions:
+#                   IndelModel(gainRrate:nonnegative, gainModel:string,
+#                              gainParameters:list, gainMaxLen:posint,
+#                              lossRate:nonnegative, lossModel:string,
+#                              lossParameters:list, lossMaxLen:posint)
+#
+# available models: ZIPF, NEGBIN, GEOM, QG (see manual for details on parameters)
+indelModels := [
+IndelModel(0.00005,'ZIPF', [1.821], 50),
+#IndelModel(0.001,'ZIPF', [1.821], 50),
+#IndelModel(0.00005, 'ZIPF', [1.821], 50, 0.0001, 'GEOM', [0.5], 50),
+NULL
+]:
+###
+
+### parameters for among site rate variability
+# areaPath := 'realseed/areaSet.drw'; # user defined domains (with custom root genome)
+
+## model definition
+# possible formats: no rate variation among sites:
+#                   RateVarModel()
+#
+#                   define model:
+#                   RateVarModel(model:string, areas:posint, motifFreq:nonnegative, alpha:nonnegative)
+
+# available models: 'Poisson' generates a random number of domains (at most areas) per
+#                             gene with rates drawn from a Poisson distribution around the mean
+#                             rate (given by mutRate). motifFreq defines the fraction of domains
+#                             with mutation rate 0 (motif).
+#                   'Gamma'   uses gamma rates. The number of bins is defined by the areas
+#                             parameter. Additionally, motifs occur with frequency motifFreq.
+#                             If user-defined rates are given, this option is ignored.
+#                             For M-series models this option is ignored and replaced with the classes of the model
+#
+# parameters:       areas     maximal number of areas with different mutRate within a gene
+#                   motifFreq rate for of invariable sites
+#                   alpha     alpha parameter of gamma function
+rateVarModels := [
+RateVarModel('Gamma', 5, 0.01, 1),
+NULL
+]:
+###
+
+###
+## model selection
+# enumerate combinations of substitution/indel/rate variation models that define
+# your different types of sequences
+seqTypes := [[1,1,1,'type1'], [2,1,1,'type2']]:
+
+# supply an array of frequencies of types 1..n defined above for random assignment
+# supply an array of of length protStart with type assignments for each initial gene
+#seqTypeAssignments := [1]:
+seqTypeAssignments := [0.75, 0.25]:
+#seqTypeAssignments := [0.25, 0.5, 0.25]:
+
+## type switch
+# matrix with probabilitis of switch from sequence type i to sequence type j
+# after speciation/duplication a switch is not possible between  M-series and
+# non M-series models
+#modelSwitchS := [[1]]:
+#modelSwitchD := [[1]]:
+modelSwitchS := [[1,0],[0,1]]:
+modelSwitchD := [[1,0],[0,1]]:
+#modelSwitchS := [[1,0,0],[0,1,0],[0,0,1]]:
+#modelSwitchD := [[1,0,0],[0,1,0],[0,0,1]]:
+###
+
+
+# GC content amelioration
+targetFreqs := ['Random']: # creates random target frequencies for all leaf species (overrides frequencies supplied in substitution model above)
+# If you want to have specific target frequencies per species and substitution model, give an array with the following structure:
+# targetFeqs := [freqs_for_subst_model_1, freqs_for_subst_model_2, ...] with
+# freqs_for_subst_model_i = [['species_name_1, [list_of_frequencies_1]], ['species_name_2, [list_of_frequencies_2]], ...]
+# example for a simulation with 4 species using a nucleotide model:
+# targetFreqs := [[['S1',[0.15, 0.35, 0.3, 0.2]],
+#                 ['S2',[0.2, 0.25, 0.3, 0.25]],
+#                 ['S3',[0.25, 0.2, 0.25, 0.3]],
+#                 ['S4',[0.35, 0.15, 0.2, 0.3]]]]:
+
+
+### tree parameters
+treeType := 'BDTree':       # BDTree, ToLSample, Custom
+mutRate := 100;        # PAM distance from origin to recent species (for random trees)
+scaleTree := false:          # scale tree to match Pam distance defined below (parameter mutRate)
+birthRate := 0.01:            # b parameter (for BDTree)
+deathRate := 0.001:           # d parameter (for BDTree)
+NSpecies := 15:            # number of species in the tree (for BD and ToL)
+ultrametric := false:     # for BDTree: should resulting tree be ultrametric
+
+#treeFile := 'tree.drw': # path to tree file with tree in darwin or Newick format OR a darwin tree structure
+# unitIsPam := true:   # set to false if branch lengths are in substitutions per site, set rate parameters accordingly.
+###
+
+
+### rate variation among sequences
+amongGeneDistr := 'None': # distribution of rates among genes. Use 'None' for no variation or 'Custom'
+                           # for using custom rates from file stored at aGPath.
+aGAlpha := 1:              # Shape parameter of among gene distribution. The mean is always moved to 1
+                           # in order to keep the mean branch length.
+aGPath := 'realseed/customRates.drw': # path to file with custom rates (see example file, only for custom root sequences)
+###
+
+### parameters for gene duplication
+geneDuplRate := 0.0005;    # rate that gene duplication occurs
+  transDupl := 0.5;     # ratio of tranlocation after duplication
+  numberDupl := 5;     # maximal number of genes involved in one duplication
+  fissionDupl := 0;   # rate of fission after duplication of a single gene
+  fusionDupl := 0;    # rate of fusion of two genes after duplication
+## duplicate evolves as pseudogene  (permanent rate change for duplicate)
+  P_pseudogene := 0: # probability of duplicate becoming a pseudogene
+  ratefac_pseudogene := 0.9: # rate change factor 
+## duplicate evolves under neofunctionalization (temporary rate change for duplicate)
+  P_neofunc := 0:          # probability of duplicate undergoing neofunctionalization
+  ratefac_neofunc := 1.5:    # rate change factor
+  life_neofunc := 10:        # life of increased rate (time to normalization of rate)
+## both copies evolving by subfunctionalization (temporary rate change for original and duplicate)
+  P_subfunc := 0:           # probability of both genes undergoing subfunctionalization
+  ratefac_subfunc := 1.2:     # rate change factor
+  life_subfunc := 10:         # life of rate change (time to normalization of rate)
+###  
+  
+### parameters for gene loss  
+geneLossRate := 0.0005;    # rate that gene loss occurs
+  numberLoss := 5:    # maximal number of genes involved in one duplication
+###
+
+### parameters for lateral gene transfer
+lgtRate := 0.0005;         # rate that single lateral gene transfer occurs
+  orthRep := 0;       # how much of the transfer will be orthologous
+                       # replacement (rest is novel gene acquisition)
+lgtGRate := 0.00005;	       # rate that lateral gene transfer of groups occurs
+  lgtGSize := 10;      # number of genes which are transferred in one go
+###
+
+### parameters for genome rearrangement
+invers := 0.00;	       # rate that gene inversion occurs
+  invSize := 1;        # number of genes which are inversed in one go
+transloc := 0.00;	       # rate that gene translocation occurs
+  transSize := 1;      # number of genes which are translocated in one go
+invtrans := 0.10;	       # rate that inversed translocation occurs
+###
+
+### parameters for gene fusion/fission
+fissionRate := 0;      # rate of gene fissions without prior duplication
+fusionRate := 0;       # rate of gene fusions occuring without prior duplication of fused genes
+  numberFusion := 3:   # maximum number of genes fused in one fusion event
+###
+
+### parameters for adding ambiguities to the final sequences
+ambiguousCharMean := 0.1:
+ambiguousCharVar := 0.009:
+# simulation name
+mname := 'test_simulation';
+
+# select the output you want (apart from the species tree and genomes)
+# - at least one output format (DarwinDB/Fasta) has to be selected
+# - at least one output format (DarwinTree/Newick) has to be selected
+simOutput := {
+              'GeneTrees',  # all gene trees
+              'DarwinTree', # output trees in Darwin format
+              'Newick',     # output trees in Newick format
+              'MSA',        # MSAs of all related sequences
+#              'VP',         # pairwise evolutionary relationships (ortho/para/xenologs)
+#              'DarwinDB',   # output genomes as Darwin databases
+              'Fasta',      # output genomes as Fasta files
+              'Ancestral',  # output ancestral genomes
+              'Dup',        # output ancestral sequences at time of gene duplications
+              NULL}:
+
+# directories for file storage
+#wdir := '~/alf-data/'; # default is current working directory, can also be set as argument of alfsim
+#dbdir := 'DB/'; # subdirectory for final sequence files (default is DB/)
+#dbAncdir := 'DBancestral/'; # subdirectory for ancestral sequence files (default is DBancestral)
