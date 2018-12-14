@@ -41,6 +41,29 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
     exit $?
 }
 
+# check if virtualenv is installed
+while [ ! -x $(which virtualenv 2>/dev/null) ]; do
+    echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
+
+    if [[ "$ACCEPT_ALL" = "yes" ]]; then
+    yn=y
+    else read -p "Do you wish to install this program? yes(y) or no (n):" yn
+    fi
+
+    case $yn in
+        [Yy]* )
+            "${PIP3:-pip}" install virtualenv || {
+                echo -e "\nA problem occured while trying to install virtualenv."
+                exit 1
+            }
+        ;;
+        [Nn]* )
+            echo -e "\nAbort."
+            exit 1
+        ;;
+    esac
+done
+
 
 # install virtual environment called "tral2" with python2
 virtualenv "$TRAL_ENV/python2" -p ${PYTHON2:-python2}

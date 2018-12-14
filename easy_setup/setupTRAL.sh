@@ -2,7 +2,6 @@
 
 # By execution of this script a little filesystem will be created within the INSTALLATION_PATH (default: /usr/local/bin).
 # If you wish to change this path, do this within configTRAL_path.cfg
-# TRAL will be installed within a virtual environment (virtenv).
 # Run this script as as superuser if your INSTALLATION_PATH only can be accessed by root.
 
 
@@ -31,43 +30,12 @@ mkdir -p "$TRAL_EXT_SOFTWARE" # create directory for installation of external so
 # directories will be added temporarely to PATH
 [[ ":$PATH:" != *"$TRAL:$PATH"* ]] && PATH="$TRAL:$PATH"
 
-######################
-### Install virtualenv and activate
-
 # check for pip
 if ! hash "${PIP3:-pip}"; then
     echo "${PIP3:-pip} is required. Set the PIP variable in configTRAL_path.cfg" >&2
     exit 1
 fi
 
-# check if virtualenv is installed
-while [ ! -x $(which virtualenv 2>/dev/null) ]; do
-    echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
-
-    if [[ "$ACCEPT_ALL" = "yes" ]]; then
-    yn=y
-    else read -p "Do you wish to install this program? yes(y) or no (n):" yn
-    fi
-
-    case $yn in
-        [Yy]* )
-            "${PIP3:-pip}" install virtualenv || {
-                echo -e "\nA problem occured while trying to install virtualenv."
-                exit 1
-            }
-        ;;
-        [Nn]* )
-            echo -e "\nAbort."
-            exit 1
-        ;;
-    esac
-done
-
-# create virtual environment called "python3" with python3.5
-virtualenv "$TRAL_ENV/python3" -p "$PYTHON3" || exit $?
-
-# activate the virtual environment
-. "$TRAL_ENV/python3/bin/activate" || exit $?
 
 ######################
 ### Installing TRAL
@@ -83,7 +51,7 @@ if [[ $1 == "setup" ]]; then
     # test if TRAL repository is already downloaded
     if [ -d "$PARENT_PATH/tral" ] && [ -e "$PARENT_PATH/setup.py" ] ; then
         (cd "$PARENT_PATH" && python setup.py install) || {
-            echo -e "\nA problem occured while trying to install TRAL with \"python setup.py install\"."
+            echo -e "\nA problem occured while trying to install TRAL with \"python setup.py develop\"."
             exit 1
         }
     else
@@ -150,14 +118,6 @@ elif [[ $1 == "pip" ]]; then
     
 fi
 
-deactivate
-
-
-######################
-### Check if $TRAL_CONF was created during installation
-if [ ! -d "$TRAL_CONF" ]; then
-    echo -e ".tral directory was not created."
-fi
 
 ######################
 ### Download p-Value distribution files
@@ -188,16 +148,15 @@ else
     echo -e "\nDirectory for p-Value distribution file already exists.\nWill not be updated."
 fi
 
-
-######################
-### Installation of external software for TRAL
-
-
-. install_ext_software.sh || exit $?
-
 echo -e "\n---------------------------------"
 echo -e "Installation of TRAL is completed."
 echo -e "-----------------------------------\n"
+
+######################
+### Check if $TRAL_CONF was created during installation
+if [ ! -d "$TRAL_CONF" ]; then
+    echo -e ".tral directory was not created."
+fi
 
 
 
