@@ -1,0 +1,13 @@
+[flake8]
+exclude = docs
+max-line-length = 120
+# This doesn't work within setup.cfg because the interpolated variables are only defined under flake8
+format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+
+# E265 block comment should start with '# '
+# E266 too many leading '#' for block comment
+# E741 ambiguous variable name
+# E722 do not use bare 'except' (REMOVE LATER! Important but hard to fix)
+# E501 line too long (REMOVE LATER! Annoying to fix)
+# F821 undefined name (REMOVE LATER! Essential but hard to fix)
+ignore = E265,E266,E501,E722,E731,E741,F821,W504

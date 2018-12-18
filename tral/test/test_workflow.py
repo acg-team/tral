@@ -1,15 +1,15 @@
+from tral.hmm import hmm
+from tral.sequence import sequence
 import logging
 import logging.config
 import os
 import pytest
 
-from tral.paths import *
+from tral.paths import config_file
 
 logging.config.fileConfig(config_file("logging.ini"))
 log = logging.getLogger('root')
 
-from tral.sequence import repeat_detection_run, sequence
-from tral.hmm import hmm
 
 TEST_FAA_FILE_MBE_2014 = "P51610.fasta"
 TEST_HMM_FILES_MBE_2014 = ["Kelch_1.hmm", "Kelch_2.hmm"]
@@ -54,23 +54,21 @@ TEST_RESULT_SEQ1 = [3,
                     [["FNCGG-EF", "FYCNTSNL", "FNSTKLEL", "FNSST-NL"],
                         ["GDII", "GDIR"], ["FLG", "FLG"]]]
 
-notfixed = pytest.mark.notfixed
-
 
 @pytest.fixture
 def path():
     """Return the path to the test data files.
     """
-    return os.path.join(os.path.abspath('.'), 'test')
+    return os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.mark.slow
-def test_MBE_2014_workflow():
+def test_MBE_2014_workflow(path):
     # The Schaper et al. (MBE, 2014) workflow is tested on a single sequence.
 
     test_lSeq = sequence.Sequence.create(
         os.path.join(
-            path(),
+            path,
             TEST_FAA_FILE_MBE_2014),
         input_format='fasta')
     test_seq = test_lSeq[0]
@@ -80,7 +78,7 @@ def test_MBE_2014_workflow():
         hmm.HMM.create(
             input_format='hmmer',
             file=os.path.join(
-                path(),
+                path,
                 i)) for i in TEST_HMM_FILES_MBE_2014]
 
     # The sequence is searched for tandem repetitions of the Pfam domain in
@@ -159,4 +157,4 @@ def test_MBE_2014_workflow():
     assert len(test_entire_set.repeats) == 3
 
     # Write result set of Pfam TRs
-    #test_entire_set.write(format = "tsv, ...")
+    # test_entire_set.write(format = "tsv, ...")

@@ -16,6 +16,7 @@ import shutil
 import tempfile
 import subprocess
 import numpy as np
+from tral.repeat import repeat
 
 from tral.paths import DATA_DIR, EXEC_DIR
 
@@ -309,8 +310,8 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
         based on a special flavour of  Felstein stein MSA files """
 
     # find a repeat uni
-    pattern_start = re.compile("\d+ \d+")
-    pattern_seq = re.compile("\S+[ ]+([A-Z\-]+)")
+    pattern_start = re.compile(r"\d+ \d+")
+    pattern_seq = re.compile(r"\S+[ ]+([A-Z\-]+)")
 
     # Our possible parser states:
     #

@@ -89,7 +89,7 @@ def viterbi_with_prob(hmm, emission):
         d_ambiguous_local[iA] = {}
         if iA in emission:
             total = np.log10(sum(10 ** p_e['N'][i_ambiguous]
-                    for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
+                                 for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]))
             for i_ambiguous in CONFIG[hmm.sequence_type]['ambiguous_chars'][iA]:
                 d_ambiguous_local[iA][i_ambiguous] = p_e['N'][i_ambiguous] - total
 
@@ -111,7 +111,7 @@ def viterbi_with_prob(hmm, emission):
                     emission[0]]]
             max_p = max(l_p_emission)
             path[iS]['probability'] += \
-               np.log10(sum([10 ** (i - max_p) for i in l_p_emission])) + max_p
+                np.log10(sum([10 ** (i - max_p) for i in l_p_emission])) + max_p
 
     else:
         path = {iS: {'probability': p_0[iS] + p_e[iS][emission[0]],
@@ -140,7 +140,7 @@ def viterbi_with_prob(hmm, emission):
                             p_e,
                             p_t,
                             path,
-                            ) for i_ambiguous in d_ambiguous_local[iE].keys()}
+                        ) for i_ambiguous in d_ambiguous_local[iE].keys()}
                     d_p_former = {
                         i_ambiguous: j for i_ambiguous,
                         j in d_p_former.items() if j}
@@ -248,7 +248,7 @@ def logodds(hmm, emission, logprob):
                 for concrete in CONFIG[hmm.sequence_type]['ambiguous_chars'][e]:
                     p = 10 ** background[concrete]
                     total += p
-                    squares += p*p
+                    squares += p * p
                 background[e] = np.log10(squares) - np.log10(total)
 
         # may throw KeyError if still unrecognized
@@ -390,7 +390,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
         start_index = l_used_indices[0]
     else:
         distances = [i - j for j, i in
-                        zip(l_used_indices[:-1], l_used_indices[1:])] + \
+                     zip(l_used_indices[:-1], l_used_indices[1:])] + \
                     [l_effective - l_used_indices[-1] + l_used_indices[0]]
         max_distance_index, max_distance = max(enumerate(distances),
                                                key=operator.itemgetter(1))
@@ -418,8 +418,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
                 continue
             elif iP == 'C':
                 break
-            match_state_index = (int(iP[1:]) + (l_effective - start_index)) % \
-                                                l_effective + 1
+            match_state_index = (int(iP[1:]) + (l_effective - start_index)) % l_effective + 1
             if match_state_index >= current_index:
                 # We are staying within the same repeat unit.
                 msa_unit += iS
@@ -437,7 +436,7 @@ def hmm_path_to_maximal_complete_tandem_repeat_units(
             if len(msa[0]) < alpha * l_effective:
                 msa = msa[1:]
             lMSA.append(msa)
-        except:
+        except IndexError:
             lMSA.append([])
 
     return lMSA
@@ -473,14 +472,14 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
     if begin == len(sequence) or path.count('C') == len(sequence):
         return None
 
-    splitter = re.compile("(\w)(\d+)")
+    splitter = re.compile(r"(\w)(\d+)")
     mapping = [
         ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)
         for iS, iP in zip(sequence[begin:], path[begin:]) if iP != 'C']
 
     shift = mapping[0][0][1]
     index_shift = ["Empty"] + [(i + l_effective + 1 - shift) %
-                              l_effective for i in range(l_effective)]
+                               l_effective for i in range(l_effective)]
     LOG.debug("The tandem repeat is shifted by: %d", shift)
 
     repeat_msa = []
@@ -561,7 +560,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
         most_likely_path = [
             i if i in ["C", "N"] else i[0] + str(int(i[1:]) - 1) for i in most_likely_path]
 
-    splitter = re.compile("(\w)(\d+)")
+    splitter = re.compile(r"(\w)(\d+)")
 
     mapping = [
         ((splitter.match(iP).group(1), int(splitter.match(iP).group(2))), iS)
@@ -594,7 +593,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
             max_used_index_I = index_shift[iM[1]] - 1
 
         elif iM[0] == "I" and (index_shift[iM[1] - 1] < max_used_index_I or
-                              index_shift[iM[1] - 1] < max_used_index_M):
+                               index_shift[iM[1] - 1] < max_used_index_M):
             insertions.append(defaultdict(str))
             max_used_index_I = index_shift[iM[1] - 1]
             max_used_index_M = index_shift[iM[1] - 1]

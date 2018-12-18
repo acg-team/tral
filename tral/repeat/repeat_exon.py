@@ -1,12 +1,6 @@
 # (C) 2013 Elke Schaper
 
-from os.path import join
-import re
 import logging
-import numpy as np
-from collections import defaultdict
-
-from tral.repeat import repeat
 
 logger = logging.getLogger(__name__)
 
@@ -99,36 +93,36 @@ def print_exon_structure(my_TR, exon_structure):
     return protein_structure
 
 
-def main():
-
-    exon_structure = [{'Exon Chr End (bp)': '43478424',
-                       'Exon Chr Start (bp)': '43477252',
-                       'CDS End': '272',
-                       'CDS Start': '1'},
-                      {'Exon Chr End (bp)': '43476658',
-                       'Exon Chr Start (bp)': '43476498',
-                       'CDS End': '433',
-                       'CDS Start': '273'},
-                      {'Exon Chr End (bp)': '43476158',
-                       'Exon Chr Start (bp)': '43476036',
-                       'CDS End': '556',
-                       'CDS Start': '434'},
-                      {'Exon Chr End (bp)': '43475664',
-                       'Exon Chr Start (bp)': '43475564',
-                       'CDS End': '657',
-                       'CDS Start': '557'},
-                      {'Exon Chr End (bp)': '43475416',
-                       'Exon Chr Start (bp)': '43475194',
-                       'CDS End': '880',
-                       'CDS Start': '658'},
-                      {'Exon Chr End (bp)': '43475046',
-                       'Exon Chr Start (bp)': '43474707',
-                       'CDS End': '951',
-                       'CDS Start': '881'}]
-
-    #[{'Exon Chr End (bp)': '120068186', 'Exon Chr Start (bp)': '120067591', 'CDS End': '500', 'CDS Start': '1'}, {'Exon Chr End (bp)': '120054800', 'Exon Chr Start (bp)': '120054672', 'CDS End': '629', 'CDS Start': '501'}, {'Exon Chr End (bp)': '120053986', 'Exon Chr Start (bp)': '120053709', 'CDS End': '907', 'CDS Start': '630'}, {'Exon Chr End (bp)': '120050255', 'Exon Chr Start (bp)': '120043356', 'CDS End': '1116', 'CDS Start': '908'}]
-    exon_structure = my_gene_tree['leafs']['ENSP00000295628']['exon']
-    my_TR = my_TR_data['homologs']['ENSP00000295628']['TR']['HMM']
-
-    exon_structure_aa = [[i['CDS Start'], i['CDS End']]
-                         for i in exon_structure]
+# def main():
+#
+#     exon_structure = [{'Exon Chr End (bp)': '43478424',
+#                        'Exon Chr Start (bp)': '43477252',
+#                        'CDS End': '272',
+#                        'CDS Start': '1'},
+#                       {'Exon Chr End (bp)': '43476658',
+#                        'Exon Chr Start (bp)': '43476498',
+#                        'CDS End': '433',
+#                        'CDS Start': '273'},
+#                       {'Exon Chr End (bp)': '43476158',
+#                        'Exon Chr Start (bp)': '43476036',
+#                        'CDS End': '556',
+#                        'CDS Start': '434'},
+#                       {'Exon Chr End (bp)': '43475664',
+#                        'Exon Chr Start (bp)': '43475564',
+#                        'CDS End': '657',
+#                        'CDS Start': '557'},
+#                       {'Exon Chr End (bp)': '43475416',
+#                        'Exon Chr Start (bp)': '43475194',
+#                        'CDS End': '880',
+#                        'CDS Start': '658'},
+#                       {'Exon Chr End (bp)': '43475046',
+#                        'Exon Chr Start (bp)': '43474707',
+#                        'CDS End': '951',
+#                        'CDS Start': '881'}]
+#
+#     #[{'Exon Chr End (bp)': '120068186', 'Exon Chr Start (bp)': '120067591', 'CDS End': '500', 'CDS Start': '1'}, {'Exon Chr End (bp)': '120054800', 'Exon Chr Start (bp)': '120054672', 'CDS End': '629', 'CDS Start': '501'}, {'Exon Chr End (bp)': '120053986', 'Exon Chr Start (bp)': '120053709', 'CDS End': '907', 'CDS Start': '630'}, {'Exon Chr End (bp)': '120050255', 'Exon Chr Start (bp)': '120043356', 'CDS End': '1116', 'CDS Start': '908'}]
+#     exon_structure = my_gene_tree['leafs']['ENSP00000295628']['exon']
+#     my_TR = my_TR_data['homologs']['ENSP00000295628']['TR']['HMM']
+#
+#     exon_structure_aa = [[i['CDS Start'], i['CDS End']]
+#                          for i in exon_structure]

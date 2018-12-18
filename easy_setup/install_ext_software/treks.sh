@@ -21,7 +21,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 ######################
 ### Installation T-REKS
 
-LINK_TREKS="https://dali.crbm.cnrs.fr/tools/treks/T-Reks.jar"
+LINK_TREKS="https://bioinfo.crbm.cnrs.fr/tools/treks/T-Reks.jar"
 wget --no-check-certificate "$LINK_TREKS" -P "$TRAL_EXT_SOFTWARE" # no check certificate because otherwise the download will fail
 
 if [ ! -f "$TRAL_EXT_SOFTWARE/T-Reks.jar" ]; then # test if T-Reks.jar is downloaded or manually put into the directory.
