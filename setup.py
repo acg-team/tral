@@ -1,14 +1,11 @@
 import os
 import shutil
 import sys
+import logging
 
-try:
-    from setuptools import setup
-    from setuptools.command.install import install
-except ImportError:
-    from distutils.core import setup
-    from distutils.core import Command as install
-
+from setuptools import setup
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
@@ -18,16 +15,17 @@ def read(*paths):
 
 # The previous --home option has been changed to --tral-home (0.3.7)
 # Warn users about backwards incompatibility
+# (`setup.py install` already has a --home option)
 if "--home" in sys.argv:
-    print("WARNING: The option to set the TRAL data directory has been renamed from --home to --tral-home."
-          "         The --home option now triggers the package itself to install in the user's home directory.",
-          file=sys.stderr)
+    logging.warning("The option to set the TRAL data directory has been renamed from --home to --tral-home. "
+                    "The --home option may be recognized instead to install in the user's home directory.")
 
 
-# Customize install command to add --tral-home command
-class InstallCommand(install):
-    description = "Installs TRAL"
-    user_options = getattr(install, 'user_options', []) + [
+class TralMixin(object):
+    """Mixin to add additional parameters to setuptools commands
+    """
+
+    user_options = [
         ('tral-home=', None, 'Directory containing the `.tral` data directory (default to user home)'),
     ]
 
@@ -49,11 +47,19 @@ class InstallCommand(install):
         else:
             shutil.copytree("tral/tral_configuration", datadir)
             print("The TRAL configuration files and data files are now located in {}".format(datadir))
-        
-        super().run()
 
         #self.do_egg_install()
         super().run()
+
+
+class InstallCommand(TralMixin, install):
+    "Add TRAL options to setup.py install"
+    user_options = getattr(install, 'user_options', []) + TralMixin.user_options
+
+
+class DevelopCommand(TralMixin, develop):
+    "Add TRAL options to setup.py develop"
+    user_options = getattr(develop, 'user_options', []) + TralMixin.user_options
 
 
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
@@ -128,5 +134,6 @@ setup(
     package_dir={"tral": "tral"},
     cmdclass={
         'install': InstallCommand,
+        'develop': DevelopCommand,
     }
 )
