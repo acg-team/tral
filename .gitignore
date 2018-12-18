@@ -62,3 +62,8 @@ docs/_build/
 # Jupyter Notebook
 *.ipynb
 
+# Testfiles
+my_test.py
+
+# additionally
+.gitignore
