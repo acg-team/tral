@@ -124,8 +124,7 @@ setup(
     },
     # package_data: None-module files, which should still be distributed are mentioned here:
     package_data={"tral": ["tral_configuration/*.ini",
-                           "tral_configuration/data/hhrepid/*",
-                           "tral_configuration/data/substitution_rate_matrices/*",
+                           "tral_configuration/data/*",
                            "examples/*.py", "examples/data/*",
                            "examples/workflow/*.py", "examples/workflow/*.tsv",
                            "examples/workflow/*.ini", "examples/workflow/*.hmm",

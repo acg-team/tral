@@ -40,7 +40,7 @@ if [ ! -d "$TRAL_EXT_SOFTWARE/ALF_standalone" ]; then # test if not already in d
 fi
 
 rm -rf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz"
-(cd "$TRAL_EXT_SOFTWARE/ALF_standalone" && "$TRAL_EXT_SOFTWARE/ALF_standalone/install.sh") # installation of ALF
+(cd "$TRAL_EXT_SOFTWARE/ALF_standalone" && "$TRAL_EXT_SOFTWARE/ALF_standalone/install.sh" "$INSTALLATION_PATH") # installation of ALF
 
 
 ######################

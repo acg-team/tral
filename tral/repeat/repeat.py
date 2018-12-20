@@ -354,7 +354,10 @@ class Repeat:
             ["phylo_gap01"]) for which p-Values are calculated on the
             Repeat instance `self`
         """
-
+        if type(scoreslist) != list:
+            raise ValueError("Please make sure that scoreslist is a list. " \
+                            "You can make this sure by a comma at the end of your Config-File.")
+        
         if not hasattr(self, 'd_pvalue'):
             self.d_pvalue = defaultdict(int)
 
