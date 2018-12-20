@@ -10,7 +10,7 @@ import os
 
 from tral.paths import config_file, PACKAGE_DIRECTORY
 
-from tral.sequence import repeat_detection_run, sequence
+from tral.sequence import sequence
 from tral.hmm import hmm
 
 logging.config.fileConfig(config_file("logging.ini"))

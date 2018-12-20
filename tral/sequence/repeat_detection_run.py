@@ -9,11 +9,9 @@
 
 from collections import OrderedDict
 import distutils
-import itertools
 import logging
 import os
 import re
-import resource
 import shutil
 import subprocess
 import sys
@@ -556,10 +554,10 @@ class DetectorTRF(TRDetector):
                 # no redundancy elimination # Already without the -r flag set,
                 # the three best redundant solutions are displayed
                 "-r": False,
-                #"-h"            : False,    # When -h is set, the output html of interest is not written :(
-                #"-d"            : False,    # produce data file, not needed at curren
-                #"-m"            : False,    # masked sequence file
-                #"-f"            : False,    # flanking sequence
+                # "-h"            : False,    # When -h is set, the output html of interest is not written :(
+                # "-d"            : False,    # produce data file, not needed at curren
+                # "-m"            : False,    # masked sequence file
+                # "-f"            : False,    # flanking sequence
             }
 
             # The order of TRF flags matters. Hence, we use an ordered
@@ -720,22 +718,22 @@ class DetectorXStream(TRDetector):
 
         def __init__(self):
             self.boolopts = {
-                #"-n" : False,   # sequence type: nucleotide
+                # "-n" : False,   # sequence type: nucleotide
                 "-l": False,   # don't look for periods >1000
-                #"-p" : False,   # don't print repeat alignmen
+                # "-p" : False,   # don't print repeat alignmen
                 "-h": True,    # write to console, not HTML
-                #"-C" : False,   # don't print any repeat info
+                # "-C" : False,   # don't print any repeat info
                 "-z": True,  # generate spreadsheet .xls output
-                #"-Z" : False,   # create statistics spreadshee
-                #"-s" : False,   # parse output by input sequence
+                # "-Z" : False,   # create statistics spreadshee
+                # "-s" : False,   # parse output by input sequence
                 "-f": False,   # perform divide & conquer on inpu
-                #"-G" : False,   # create color-coded TR block diagram
-                #"-G*" : False,  # create single color TR block diagram
-                #"-B" : False,   # create sequence comparison map PNG
-                #"-O" : False,   # print "mismatch/gaps colored" HTML outpu
+                # "-G" : False,   # create color-coded TR block diagram
+                # "-G*" : False,  # create single color TR block diagram
+                # "-B" : False,   # create sequence comparison map PNG
+                # "-O" : False,   # print "mismatch/gaps colored" HTML outpu
                 "-N": False,   # turn off nesting
                 "-o": False,   # don't remove overlapping TR domain
-                #"-S" : False,   # input strain into database
+                # "-S" : False,   # input strain into database
                 "-V": True,   # don't invoke D & C automatically for long inpu
             }
 
@@ -749,11 +747,11 @@ class DetectorXStream(TRDetector):
                 "-e": None,    # [any number>=2] set minimum copy number
                 # "-a" : None,    # [string] add identifier string to output file
                 "-f": None,    # [integer] set fragment length
-                #"-d" : None,    # [file path] specify output directory
-                #"-A" : None,    # [file] import substitution alphabe
+                # "-d" : None,    # [file path] specify output directory
+                # "-A" : None,    # [file] import substitution alphabe
                 "-L": 6,    # [integer] set minimum TR domain length
                 "-P": 0,    # [0-1] set minimum % sequence coverage
-                #"-Q" : None,    # [user,pass,db] send output to MySQL TR database
+                # "-Q" : None,    # [user,pass,db] send output to MySQL TR database
             }
 
         def tokens(self, infile=None):
@@ -793,7 +791,7 @@ class DetectorXStream(TRDetector):
         files = os.listdir(searchdir)
 
         # look for the first file that matches XSTREAM_something_chart.xl
-        pat_chartfilename = re.compile("^XSTREAM_.*_chart\.xls$")
+        pat_chartfilename = re.compile(r"^XSTREAM_.*_chart\.xls$")
         for f in files:
             if pat_chartfilename.match(f):
                 return os.path.join(searchdir, f)

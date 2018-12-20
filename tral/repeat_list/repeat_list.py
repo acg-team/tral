@@ -1,5 +1,6 @@
 # (C) 2015 Elke Schaper
 
+from tral.repeat_list import repeat_list_io
 """
     :synopsis: The RepeatList Class.
 
@@ -11,8 +12,6 @@ import pickle
 import sys
 
 LOG = logging.getLogger(__name__)
-
-from tral.repeat_list import repeat_list_io
 
 
 class RepeatList:

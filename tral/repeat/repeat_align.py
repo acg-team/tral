@@ -1,5 +1,6 @@
 # (C) 2015 Elke Schaper
 
+from tral import configuration
 """
     :synopsis: Alignment of tandem repeat units.
 
@@ -10,12 +11,9 @@ import logging
 import os
 import subprocess
 import tempfile
-from Bio import AlignIO
 
 log = logging.getLogger(__name__)
 
-from tral.repeat import repeat
-from tral import configuration
 
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]

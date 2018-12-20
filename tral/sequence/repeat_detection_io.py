@@ -25,7 +25,7 @@ class RepeatRegion:
 
 
 def tred_get_repeats(infile):
-    """ Read repeats from a TRED standard output (stdout) file stream successively.
+    r"""Read repeats from a TRED standard output (stdout) file stream successively.
 
     Read repeats from a TRED standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
@@ -122,7 +122,7 @@ def tred_msa_from_pairwise(repeat_units):
         ru = repeat_units[iR]
 
         # The next repeat unit
-        if ru[1] == True:
+        if ru[1]:
             result.append('-' * index + ru[0])
             # How many gaps in the beginning of this repeat unit?
             index += len(pat_gap.match(ru[0]).group())
@@ -306,7 +306,7 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length=20):
         ['1' if i_gap <= maximal_gap_length else '0' for i_gap in gaps])
 
     count_valid_pairs = [len(m.group())
-                         for m in re.finditer(re.compile('1+'), gap_valid)]
+                         for m in re.finditer(re.compile(r'1+'), gap_valid)]
     # All repeat units are further apart than maximal_gap_length? -> Discard
     # the repeat
     if len(count_valid_pairs) == 0:
@@ -326,7 +326,6 @@ def trust_fill_repeats(msa, begin, sequence, maximal_gap_length=20):
     position = position[valid_index:valid_index + max(count_valid_pairs) + 1]
 
     # Add missing sequence to the repeat units
-    repeat_unit_length = len(msa[0])
     gap_count_before = 0
     for i, i_gap in enumerate(gaps):
         gap_count_after = gap_count_before + i_gap
@@ -376,8 +375,8 @@ def trust_get_repeats(infile):
     pat_repeat_info = re.compile(r"(\d+) (\d+).*$")
     pat_repeat_header = re.compile(r">Repeat \d+")
     # FIXME find proper character set here
-    pat_repeat_sequence = re.compile("([A-Za-z-]+)")
-    pat_protein_end = re.compile("//")
+    pat_repeat_sequence = re.compile(r"([A-Za-z-]+)")
+    pat_protein_end = re.compile(r"//")
 
     # Our possible parser states:
     #
@@ -519,7 +518,7 @@ def trust_get_repeats(infile):
 
 
 def trf_get_repeats(infile):
-    """ Read repeats from a TRF txt.html file stream file stream successively.
+    r"""Read repeats from a TRF txt.html file stream file stream successively.
 
     Read repeats from a TRF txt.html file stream file stream successively.
     Postcondition: infile points to EOF.
@@ -557,16 +556,16 @@ def trf_get_repeats(infile):
     """
 
     # find the name of the sequence ## CURRENTLY NOT IMPLEMENTED
-    #pat_identifier = re.compile("Sequence: (\S+)")
+    #pat_identifier = re.compile(r"Sequence: (\S+)")
 
     # find coordinates of the repeat region in the protein
-    pat_coordinates = re.compile("Indices: (\d+)--(\d+)")
+    pat_coordinates = re.compile(r"Indices: (\d+)--(\d+)")
 
     # find a part of a repeat unit and its coordinate
-    pattern_seq = re.compile("\s+(\d+) ([ACGT\- ]+)")
+    pattern_seq = re.compile(r"\s+(\d+) ([ACGT\- ]+)")
 
     # find the final tag 'Statistics'
-    pat_statistics = re.compile("Statistics")
+    pat_statistics = re.compile(r"Statistics")
 
     # Our possible parser states:
     #
@@ -586,9 +585,10 @@ def trf_get_repeats(infile):
     #  0: save sequence to tmp_consensus -> 5
 
     state = 1
-    #identifier = ""  # Currently not implemented.
+    # identifier = ""  # Currently not implemented.
     preMSA = []
     consensus = []
+    tmp_consensus = None
     for i, line in enumerate(infile):
         LOG.debug("Line %d: %s", i, line[0:-1])
 
@@ -795,7 +795,7 @@ def getMSA(sequenceMSA, consensusMSA):
 
 
 def hhpredid_get_repeats(infile):
-    """ Read repeats from a HHREPID standard output (stdout) file stream successively.
+    r"""Read repeats from a HHREPID standard output (stdout) file stream successively.
 
     Read repeats from a HHREPID standard output (stdout) file stream successively.
     Postcondition: infile points to EOF.
@@ -820,8 +820,8 @@ def hhpredid_get_repeats(infile):
     # find a part of a repeat unit and its first coordinate
     # minus or \minus?
 
-    pattern_repeat_unit_count = re.compile("Repeats\s+(\d+)")
-    pattern_seq = re.compile("[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)")
+    pattern_repeat_unit_count = re.compile(r"Repeats\s+(\d+)")
+    pattern_seq = re.compile(r"[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)")
 
     # Our possible parser states:
 
@@ -873,7 +873,7 @@ def hhpredid_get_repeats(infile):
                                 region.msa))
 
     # Yield final repeat region.
-    if not region is None:
+    if region is not None:
         if len(region.msa) >= 2:
             yield region
         else:
@@ -898,8 +898,8 @@ def phobos_get_repeats(infile):
     .. todo:: Show PHOBOS output syntax.
     """
 
-    pattern_begin = re.compile("(\d+) :\s+\d")
-    pattern_seq = re.compile("([\-ACGT]+)")
+    pattern_begin = re.compile(r"(\d+) :\s+\d")
+    pattern_seq = re.compile(r"([\-ACGT]+)")
 
     # Our possible parser states:
     #
@@ -912,7 +912,7 @@ def phobos_get_repeats(infile):
         LOG.debug("Line %d: %s", i, line[0:-1])
         if 1 == state:  # Find TR offset
             search = pattern_begin.search(line)
-            if search and search.groups()[0] != None:
+            if search and search.groups()[0] is not None:
                 LOG.debug(" *(1->2) Found tandem repeat begin")
                 state = 2
                 region = RepeatRegion()
@@ -921,14 +921,14 @@ def phobos_get_repeats(infile):
 
         elif 2 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
-            if match and match.groups()[0] != None:
+            if match and match.groups()[0] is not None:
                 LOG.debug(" *(2->3) Found first repeat unit")
                 region.msa.append(match.groups()[0])
                 state = 3
 
         elif 3 == state:  # Find all other repeat units
             match = pattern_seq.search(line)
-            if match and match.groups()[0] != None:
+            if match and match.groups()[0] is not None:
                 LOG.debug(" *(3->3) Found a repeat unit")
                 region.msa.append(match.groups()[0])
             else:

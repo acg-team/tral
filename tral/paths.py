@@ -23,7 +23,6 @@ DATA_DIR = os.path.join(CONFIG_DIR, "data")
 
 
 def config_file(name):
-
     ''' Returns the complete path to the config file `name`.
 
         Returns the complete path to the config file `name`. Searches first in
