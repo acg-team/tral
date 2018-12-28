@@ -22,52 +22,62 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
     exit $?
 }
 
+######################
+### Download HMMER
 
-APT_CMD=$(which apt)
-YUM_CMD=$(which yum)
-DNF_CMD=$(which dnf)
-CONDA_CMD=$(which conda)
-BREW_CMD=$(which brew)
-PORT_CMD=$(which port)
+## TODO: get full name of unzipped hmmer (with version)
+
+for directory in "$TRAL_EXT_SOFTWARE/hmmer"*; do  # test if hmmer files not already in directory
+    if [ -d "$directory" ]; then
+        echo "HMMER is already downloaded and in "$directory""
+    else
+        {   
+            LINK_HMMER="http://eddylab.org/software/hmmer/hmmer.tar.gz" # HHrepID Nov 22 2007
+            wget "$LINK_HMMER" -P "$TRAL_EXT_SOFTWARE"   # download execution file
+            tar -xvzf "$TRAL_EXT_SOFTWARE/hmmer.tar.gz" -C "$TRAL_EXT_SOFTWARE"
+            rm -rf "$TRAL_EXT_SOFTWARE/hmmer.tar.gz"
+            } || {
+            echo "Couldn't download HMMER."
+            exit $?
+        }
+        
+    fi
+done
 
 ######################
-### Installation HMMER
-# installing the newest version of hmmer depending on your system
+### Compile and Install HMMER
 
+{
+    (
+        {
+            cd "$TRAL_EXT_SOFTWARE/hmmer-"*
+        } && {
+            ./configure --prefix "$INSTALLATION_PATH"
+            make clean
+            make
+            "$INSTALLATION_PATH"/bin make check        # run a test suite
+            make install
+        } && {
+            echo "Installation of HMMER done."
+            ln -s "$INSTALLATION_PATH/bin/hmmbuild" "$INSTALLATION_PATH/hmmbuild"
+            echo -e  "\nHMMER is in your path $INSTALLATION_PATH/bin.\n" \
+                    "You may have to add it to your PATH."
+        }
+    )
+    } || {
+    echo "Couldn't compile and install HMMER."
+    exit $?
+}
 
-if [[ ! -z $APT_CMD ]]; then            # Linux (Ubuntu, Debian...)
-    apt install hmmer
-elif [[ ! -z $DNF_CMD ]]; then          # Linux (Fedora)
-    dnf install hmmer
-elif [[ ! -z $YUM_CMD ]]; then          # Linux (older Fedora)
-    yum install hmmer
-elif [[ ! -z $CONDA_CMD ]]; then        # Anaconda
-    conda install -c bioconda hmmer
-elif [[ ! -z $BREW_CMD ]]; then         # OS/X, HomeBrew
-    brew install hmmer
-elif [[ ! -z $PORT_CMD ]]; then         # OS/X, MacPorts
-    port install hmmer
-else
-    echo "Error: Unfortunatelly it is not possible to install HMMER on your system."
-    exit 1;
-fi
-
-######################
+###############i#######
 ### Uninstall HMMER
 
-# if [[ ! -z $APT_CMD ]]; then            # Linux (Ubuntu, Debian...)
-#     apt remove hmmer
-# elif [[ ! -z $DNF_CMD ]]; then          # Linux (Fedora)
-#     dnf remove hmmer
-# elif [[ ! -z $YUM_CMD ]]; then          # Linux (older Fedora)
-#     yum remove hmmer
-# elif [[ ! -z $CONDA_CMD ]]; then        # Anaconda
-#     conda remove -c bioconda hmmer
-# elif [[ ! -z $BREW_CMD ]]; then         # OS/X, HomeBrew
-#     brew remove hmmer
-# elif [[ ! -z $PORT_CMD ]]; then         # OS/X, MacPorts
-#     port uninstall hmmer
-# else
-#     echo "Error: Something went wrong while trying to remove HMMER, maybe it is already uninstalled."
-#     exit 1;
-# fi
+## TODO: find other way to delete hmmer and adapt it within uninstall script!!
+
+{
+    ( cd "$TRAL_EXT_SOFTWARE/hmmer-"* && make uninstall )
+    rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"* 
+    rm -rf "$INSTALLATION_PATH/hmmbuild"
+} || {
+    echo -e "HMMER removed."
+}
