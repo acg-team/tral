@@ -29,8 +29,18 @@ rm -rf /usr/local/share/alfdarwin
 
 ### MAFFT
 
-dpkg --remove mafft
 rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
+
+     ( cd $INSTALLATION_PATH; \
+rm -f mafft linsi; rm -f mafft ginsi; rm -f mafft fftns; \
+rm -f mafft fftnsi; rm -f mafft nwns; rm -f mafft nwnsi; \
+rm -f mafft einsi; \
+rm -f mafft mafft-linsi; rm -f mafft mafft-ginsi; rm -f mafft mafft-fftns; \
+rm -f mafft mafft-fftnsi; rm -f mafft mafft-nwns; rm -f mafft mafft-nwnsi; \
+rm -f mafft mafft-einsi; rm -f mafft mafft-xinsi; rm -f mafft mafft-qinsi; \
+rm -f mafft mafft-distance; rm -f mafft mafft-profile; \
+rm -f mafft-homologs.rb; rm -f mafft-sparsecore.rb; \
+rm -rf libexec )
 
 ### PHOBOS
 

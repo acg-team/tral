@@ -27,6 +27,8 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 ######################
 ### Download and Installation PHOBOS
 
+## TODO: Does the test work if phobos not installed in a system path?
+
 if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in directory
     
     if [[ "$ACCEPT_ALL" = "yes" ]]; then
