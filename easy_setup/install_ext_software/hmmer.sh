@@ -55,7 +55,7 @@ done
             ./configure --prefix "$INSTALLATION_PATH"
             make clean
             make
-            "$INSTALLATION_PATH"/bin make check        # run a test suite
+            # "$INSTALLATION_PATH"/bin make check        # run a test suite
             make install
         } && {
             echo "Installation of HMMER done."

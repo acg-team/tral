@@ -11,15 +11,14 @@ You can adapt the default installing path within configTRAL_path.cfg. Please onl
 
 ## Prerequisites
 
-easy_setup only works for linux64 by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
-To install TRAL and its external software within usr/local/bin (default for variable $INSTALLATION_PATH) you need to execute the scripts as root.
-In case you want to install TRAL from the git repository automatically, you need to have git installed on your computer.
-
-These setup scripts require python 3, pip, unzip, and git.
+These installation scripts can be used on all Linux systems, but still require python3, pip, unzip and git.
+Per default TRAL and its external software will be installed in usr/local/bin. Then you may execute the scripts as root.
+If you wish to change this path you can adjust $INSTALLATION_PATH in configTRAL.cfg
 
 ## Installation of TRAL
 
-To install TRAL within its virtual environment you can simply run the script setupTRAL.sh with either the argument "pip" or "git".
+To install TRAL within you can simply run the script setupTRAL.sh with either the argument "pip" or "git".
+It is recommended to install TRAL within a virtual environment (e. g. virtualenv).
 
 ### Installation of TRAL with "git"
 
@@ -33,7 +32,7 @@ If you haven't git installed, you may need install git or to download the github
 
 ### Installation of external software for TRAL
 
-After setting up TRAL with setupTRAL.sh you can install external software. 
+After installing TRAL with setupTRAL.sh you can install external software. 
 The script install_ext_software.sh automatically iterates through all installation scripts for each recommended external software of TRAL and ask you for each single software if you want to install it (press y/n). Please confirm to their respective licence.
 
 Otherwise, you can run an installation script for each external software individually which can be found within the directory setup_tral/install_ext_software.
@@ -53,13 +52,10 @@ Currently, installation scripts for the following external software are availabl
 - tred
 
 On the bottom of each installation script for the external software an uninstallation procedure can be found.
-Either comment all installation part and uncomment uninstallation part or run the commands directly in the commandline.
+Either comment out all installation part and uncomment uninstallation part or run the commands directly in the commandline.
+ 
+You may need to run these scripts as root ($INSTALLATION_PATH is usr/local/bin per default).
 
-It may be that you need to be root to install external software.
-
-## Activation and Use of TRAL
-
-It is recommended to install TRAL within a virtual environment (e. g. virtualenv).
 
 ## Uninstallation of TRAL and its external software
 
