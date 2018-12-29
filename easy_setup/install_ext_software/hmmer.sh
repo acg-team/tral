@@ -74,10 +74,10 @@ done
 
 ## TODO: find other way to delete hmmer and adapt it within uninstall script!!
 
-{
-    ( cd "$TRAL_EXT_SOFTWARE/hmmer-"* && make uninstall )
-    rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"* 
-    rm -rf "$INSTALLATION_PATH/hmmbuild"
-} || {
-    echo -e "HMMER removed."
-}
+# {
+#     ( cd "$TRAL_EXT_SOFTWARE/hmmer-"* && make uninstall )
+#     rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"* 
+#     rm -rf "$INSTALLATION_PATH/hmmbuild"
+# } || {
+#     echo -e "HMMER removed."
+# }
