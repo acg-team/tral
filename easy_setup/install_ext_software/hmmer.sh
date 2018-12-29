@@ -60,7 +60,7 @@ done
         } && {
             echo "Installation of HMMER done."
             ln -s "$INSTALLATION_PATH/bin/hmmbuild" "$INSTALLATION_PATH/hmmbuild"
-            echo -e  "\nHMMER is in your path $INSTALLATION_PATH/bin.\n" \
+            echo -e  "\nHMMER is in your path $INSTALLATION_PATH/bin\n" \
                     "You may have to add it to your PATH."
         }
     )
