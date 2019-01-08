@@ -48,17 +48,17 @@ def serialize_repeat_list_tsv(tandem_repeats, config=CONFIG, *args):
         data = []
         for i_characteristic in output_characteristics:
             if "divergence" == i_characteristic:
-                if hasattr(i_repeat, "dScore") and model in i_repeat.dScore:
+                if hasattr(i_repeat, "d_divergence") and model in i_repeat.d_divergence: # why not simply "d_divergence" but "dScore"??
                     data.append(i_repeat.divergence(model))
                 else:
                     data.append(None)
             elif "pvalue" == i_characteristic:
-                if hasattr(i_repeat, "dPValue") and model in i_repeat.dPValue:
+                if hasattr(i_repeat, "d_pvalue") and model in i_repeat.d_pvalue: # why not simply "d_pvalue" but "dPValue"??
                     data.append(i_repeat.pvalue(model))
                 else:
                     data.append(None)
             elif "score" == i_characteristic:
-                if hasattr(i_repeat, "dScore") and model in i_repeat.dScore:
+                if hasattr(i_repeat, "d_score") and model in i_repeat.d_score:
                     data.append(i_repeat.score(model))
                 else:
                     data.append(None)
