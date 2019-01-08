@@ -309,8 +309,8 @@ def load_model(evolution_model='lg'):
     return (Q, eq_freq, alphabet)
 
 
-def TN93(alpha_1=CONFIG['TN93']['alpha_1'], alpha_2=CONFIG['TN93']['alpha_2'],
-         beta=CONFIG['TN93']['beta']):
+def TN93(alpha_1=float(CONFIG['TN93']['alpha_1']), alpha_2=float(CONFIG['TN93']['alpha_2']),
+         beta=float(CONFIG['TN93']['beta'])):
     '''TN93'''
     # 4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93
     Q = [[-(alpha_1 + 2 * beta), alpha_1, beta, beta],
@@ -321,7 +321,7 @@ def TN93(alpha_1=CONFIG['TN93']['alpha_1'], alpha_2=CONFIG['TN93']['alpha_2'],
     return ['T', 'C', 'A', 'G'], [0.25, 0.25, 0.25, 0.25], Q
 
 
-def K80(kappa=CONFIG['K80']['kappa']):
+def K80(kappa=float(CONFIG['K80']['kappa'])):
     ''' K80 '''
     return TN93(alpha_1=kappa, alpha_2=kappa, beta=1)
 
