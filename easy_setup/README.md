@@ -11,11 +11,10 @@ You can adapt the default installing path within configTRAL_path.cfg. Please onl
 
 ## Prerequisites
 
-easy_setup only works for linux64 by now. If you use another operating system, you can have a closer look into the scripts and adapt them for your specific OS or install TRAL within a virtual machine.
+These setup scripts require python 3, pip, unzip, and git and run on any UNIX based operation system.
+
 To install TRAL and its external software within usr/local/bin (default for variable $INSTALLATION_PATH) you need to execute the scripts as root.
 In case you want to install TRAL from the git repository automatically, you need to have git installed on your computer.
-
-These setup scripts require python 3, pip, unzip, and git.
 
 ## Installation of TRAL
 
