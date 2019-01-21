@@ -291,18 +291,22 @@ def none_overlapping(rl, overlap, l_criterion):
     """
 
     overlap_type = overlap[0]
-    overlap_args = overlap[1]
+    if len(overlap) > 1: # has to be adapted to a more convenient way
+        overlap_args = overlap[1]
 
     if not (hasattr(rl, 'd_cluster') and overlap_type in rl.d_cluster):
-        rl.cluster(overlap_type, overlap_args)
+        if len(overlap) > 1:
+            rl.cluster(overlap_type, overlap_args)
+        else:
+            rl.cluster(overlap_type)
 
     res = []
     for i_cluster in rl.d_cluster[overlap_type]:
 
         i_repeat = [rl.repeats[i] for i in i_cluster]
 
-        for iC in l_criterion:
-            criterion_type, criterion_value = iC
+        for ctype, cvalue in l_criterion.items():
+            criterion_type, criterion_value = ctype, cvalue 
             if len(i_repeat) == 1:
                 res.append(i_repeat[0])
                 break
