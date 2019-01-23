@@ -15,6 +15,8 @@ These installation scripts can be used on all Linux systems, but still require p
 Per default TRAL and its external software will be installed in usr/local/bin. Then you may execute the scripts as root.
 If you wish to change this path you can adjust $INSTALLATION_PATH in configTRAL.cfg
 
+These setup scripts require python 3, pip, unzip, and git and run on any UNIX based operation system.
+
 ## Installation of TRAL
 
 To install TRAL within you can simply run the script setupTRAL.sh with either the argument "pip" or "git".
