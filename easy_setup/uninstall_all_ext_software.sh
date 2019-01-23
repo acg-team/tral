@@ -29,8 +29,18 @@ rm -rf /usr/local/share/alfdarwin
 
 ### MAFFT
 
-dpkg --remove mafft
 rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
+
+     ( cd $INSTALLATION_PATH; \
+rm -f mafft linsi; rm -f mafft ginsi; rm -f mafft fftns; \
+rm -f mafft fftnsi; rm -f mafft nwns; rm -f mafft nwnsi; \
+rm -f mafft einsi; \
+rm -f mafft mafft-linsi; rm -f mafft mafft-ginsi; rm -f mafft mafft-fftns; \
+rm -f mafft mafft-fftnsi; rm -f mafft mafft-nwns; rm -f mafft mafft-nwnsi; \
+rm -f mafft mafft-einsi; rm -f mafft mafft-xinsi; rm -f mafft mafft-qinsi; \
+rm -f mafft mafft-distance; rm -f mafft mafft-profile; \
+rm -f mafft-homologs.rb; rm -f mafft-sparsecore.rb; \
+rm -rf libexec )
 
 ### PHOBOS
 
@@ -73,20 +83,10 @@ rm -rf "$INSTALLATION_PATH/XSTREAM"
 
 ### HMMER
 
-if [[ ! -z $APT_CMD ]]; then            # Linux (Ubuntu, Debian...)
-    apt remove hmmer
-elif [[ ! -z $DNF_CMD ]]; then          # Linux (Fedora)
-    dnf remove hmmer
-elif [[ ! -z $YUM_CMD ]]; then          # Linux (older Fedora)
-    yum remove hmmer
-elif [[ ! -z $CONDA_CMD ]]; then        # Anaconda
-    conda remove bioconda hmmer
-elif [[ ! -z $BREW_CMD ]]; then         # OS/X, HomeBrew
-    brew remove hmmer
-elif [[ ! -z $PORT_CMD ]]; then         # OS/X, MacPorts
-    port uninstall hmmer
-else
-    echo "Error: Something went wrong while trying to remove HMMER, maybe it is already uninstalled."
-    exit 1;
-fi
+for directory in "$TRAL_EXT_SOFTWARE/hmmer-"*; do
+    if [ -d "$directory" ]; then
+    ( cd "$TRAL_EXT_SOFTWARE/hmmer-"* && make uninstall )
+    rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"*
+    fi
+done
 

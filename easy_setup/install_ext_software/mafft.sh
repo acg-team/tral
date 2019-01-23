@@ -27,29 +27,45 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
     exit $?
 }
 
-######################
-### Download and Installation MAFFT
+# ######################
+# ### Download and Installation MAFFT
 
-latestVer=$(wget -qO- "https://mafft.cbrc.jp/alignment/software/linux.html" |
-    egrep amd64.deb |                  # only grep deb version
+latestVer=$(wget -qO- "https://mafft.cbrc.jp/alignment/software/source.html" |
+    egrep without-extensions-src.tgz | 
 sed -n 's/.*href="\([^"]*\).*/\1/p')
 
-dpkg -s mafft 2>/dev/null >/dev/null && echo "MAFFT is already installed " || # test if mafft already installed
-{
-    # if not installed get newest version for linux system
-    if [ ! -f "$TRAL_EXT_SOFTWARE/$latestVer" ]; then # test if latest version already downloaded
+mafftVer=${latestVer%-src.tgz}
+
+if [ ! -d "$TRAL_EXT_SOFTWARE/$mafftVer" ]; then 
+    {
         wget "https://mafft.cbrc.jp/alignment/software/$latestVer" -P "$TRAL_EXT_SOFTWARE" || {  # download
             echo "Was not able to download mafft."
             exit $?
         }
-    fi
-    dpkg -i "$TRAL_EXT_SOFTWARE/$latestVer" # install latest version
-}
+        tar -xvzf "$TRAL_EXT_SOFTWARE/$latestVer" -C "$TRAL_EXT_SOFTWARE"
+        sed -i "s#PREFIX = /usr/local#PREFIX = "$INSTALLATION_PATH"#" "$TRAL_EXT_SOFTWARE/$mafftVer/core/Makefile" # change default installation path in Makefile
+        sed -i "s#BINDIR = \$(PREFIX)/bin#BINDIR = \$(PREFIX)#" "$TRAL_EXT_SOFTWARE/$mafftVer/core/Makefile"
+
+        ( cd "$TRAL_EXT_SOFTWARE/$mafftVer/core/" && make clean && make && make install ) # Installation
+        rm -rf "$TRAL_EXT_SOFTWARE/"$latestVer""
+    }
+fi
+
 
 # mafft is now accessible with the command "mafft"
 
 ######################
-### Uninstallation of MAFFT (default paths!)
+### Uninstalltion of MAFFT
 
-# dpkg --remove mafft
-# rm -rf $"TRAL_EXT_SOFTWARE"/mafft*
+# rm -rf "$TRAL_EXT_SOFTWARE"/mafft*
+
+#      ( cd $INSTALLATION_PATH; \
+# rm -f mafft linsi; rm -f mafft ginsi; rm -f mafft fftns; \
+# rm -f mafft fftnsi; rm -f mafft nwns; rm -f mafft nwnsi; \
+# rm -f mafft einsi; \
+# rm -f mafft mafft-linsi; rm -f mafft mafft-ginsi; rm -f mafft mafft-fftns; \
+# rm -f mafft mafft-fftnsi; rm -f mafft mafft-nwns; rm -f mafft mafft-nwnsi; \
+# rm -f mafft mafft-einsi; rm -f mafft mafft-xinsi; rm -f mafft mafft-qinsi; \
+# rm -f mafft mafft-distance; rm -f mafft mafft-profile; \
+# rm -f mafft-homologs.rb; rm -f mafft-sparsecore.rb; \
+# rm -rf libexec )
