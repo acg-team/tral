@@ -2,7 +2,7 @@
 
 # By execution of this script a little filesystem will be created within the INSTALLATION_PATH (default: /usr/local/bin).
 # If you wish to change this path, do this within configTRAL_path.cfg
-# Run this script as as superuser if your INSTALLATION_PATH only can be accessed by root.
+# Run this script as superuser if your INSTALLATION_PATH only can be accessed by root.
 
 
 ######################
