@@ -50,6 +50,7 @@ if [[ $1 == "setup" ]]; then
     
     # test if TRAL repository is already downloaded
     if [ -d "$PARENT_PATH/tral" ] && [ -e "$PARENT_PATH/setup.py" ] ; then
+
         (cd "$PARENT_PATH" && python setup.py install) || {
             echo -e "\nA problem occured while trying to install TRAL with \"python setup.py install\"."
             exit 1
