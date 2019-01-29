@@ -50,7 +50,7 @@ It is recommended to install TRAL within a virtual environment (e. g. virtualenv
 Currently the version provided in "pypi" is not up-to-date, therefore it is recommended to install TRAL with python setup.py install "setup". 
 
 ```
-sudo ./setupTRAL.sh setup
+./setupTRAL.sh setup
 ```
 
 Within the next release the tral version on pypi will be updated.
@@ -59,6 +59,10 @@ Within the next release the tral version on pypi will be updated.
 
 After installing TRAL with setupTRAL.sh you can install external software. 
 The script install_ext_software.sh automatically iterates through all installation scripts for each recommended external software of TRAL and ask you for each single software if you want to install it (press y/n). Please confirm to their respective licence.
+
+```
+sudo ./install_ext_software.sh
+```
 
 Otherwise, you can run an installation script for each external software individually which can be found within the directory setup_tral/install_ext_software.
 The software will be downloaded in the directory $FILES/tral_external_software.
