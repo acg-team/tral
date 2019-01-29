@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING HHREPID #####
 # HHrepID 1.0.0 – de novo Protein Repeat Detection

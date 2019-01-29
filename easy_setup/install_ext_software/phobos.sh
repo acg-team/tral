@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING PHOBOS #####
 # Phobos - a tandem repeat search tool for complete genomes

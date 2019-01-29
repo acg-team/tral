@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING HMMER #####
 # HMMER: Sequence profile model generation using profile hidden Markov models

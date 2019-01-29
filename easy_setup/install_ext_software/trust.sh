@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING TRUST #####
 # TRUST: Tracking repeats using significance and transitivity.

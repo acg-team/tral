@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING T-REKS #####
 # T-REKS: identification of Tandem Repeats in sequences with a K-meanS based algorithm.

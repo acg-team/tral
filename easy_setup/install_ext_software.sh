@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Run this script after setting up TRAL by using setupTRAL.sh.
 # This script will automatically called within setupTRAL or can be executed afterwards.

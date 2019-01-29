@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING XSTREAM #####
 # XSTREAM: variable sequence tandem repeats extraction and architecture modeling

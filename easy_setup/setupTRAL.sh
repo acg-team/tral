@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # By execution of this script a little filesystem will be created within the INSTALLATION_PATH (default: /usr/local/bin).
 # If you wish to change this path, do this within configTRAL_path.cfg
@@ -24,7 +24,7 @@ fi
 
 
 # create needed directories to install tral
-mkdir -p "$TRAL_PATH"/{tral_env,output}
+mkdir -p "$TRAL_PATH"
 mkdir -p "$TRAL_EXT_SOFTWARE" # create directory for installation of external software
 
 # directories will be added temporarely to PATH

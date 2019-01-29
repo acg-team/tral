@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # INSTALLING MAFFT #####
 # MAFFT: Multiple alignment program for amino acid or nucleotide sequences
