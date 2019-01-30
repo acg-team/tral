@@ -9,7 +9,7 @@ Moreover, you can decide which external software should be downloaded and instal
 
 These installation scripts can be used on all Linux systems, but still require python3, pip, unzip and git.
 Please make sure you use a python version >= Python3.5.
-Per default TRAL and its external software will be installed in ``/usr/local/bin``. Then you may execute the scripts as root.
+Per default TRAL will be installed within the site-packages of python and its external software in ``/usr/local/bin``. Then you may execute the scripts as root.
 If you wish to change this path you can adjust 
 ``$INSTALLATION_PATH`` in ``configTRAL.cfg``
 
@@ -75,7 +75,6 @@ Currently, installation scripts for the following external software are availabl
 - hhrepid
 - mafft
 - phobos
-- tredparse  (virtualenv required to run in python2)
 - t-reks
 - trf
 - trust
