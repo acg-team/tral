@@ -97,7 +97,7 @@ tred.py "$@"' > "$TRAL_EXT_SOFTWARE/tred"
 
 chmod +x "$TRAL_EXT_SOFTWARE/tred"
 cp "$TRAL_EXT_SOFTWARE/tred" "$INSTALLATION_PATH" # copy wrapper file to system path
-chmod +x "$INSTALLATION_PATH/tred" && echo -e "\ntred is in your system path $INSTALLATION_PATH and can be executed with the command \"tred\""
+chmod +x "$INSTALLATION_PATH/tred" && echo -e "\ntred is in your path $INSTALLATION_PATH and can be executed with the command \"tred\""
 deactivate
 
 ######################

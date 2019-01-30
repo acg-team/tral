@@ -47,7 +47,7 @@ chmod +x "$INSTALLATION_PATH/trf409.linux64"
 if [ ! -h "$INSTALLATION_PATH/trf" ]; then    
     ln -s trf409.linux64 "$INSTALLATION_PATH/trf" # create symlink to executable file
 fi
-} && echo -e  "\nTRF is in your system path $INSTALLATION_PATH and can be executed with the command trf"
+} && echo -e  "\nTRF is in your path $INSTALLATION_PATH and can be executed with the command trf"
 
 # TRF is now executable with trf409.linux64
 

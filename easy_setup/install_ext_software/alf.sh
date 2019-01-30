@@ -41,7 +41,9 @@ fi
 
 rm -rf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz"
 (cd "$TRAL_EXT_SOFTWARE/ALF_standalone" && "$TRAL_EXT_SOFTWARE/ALF_standalone/install.sh" "$INSTALLATION_PATH") # installation of ALF
-
+ln -sf "$INSTALLATION_PATH/bin/alfsim" "$INSTALLATION_PATH"
+ln -sf "$INSTALLATION_PATH/bin/alfdarwin.linux64" "$INSTALLATION_PATH"
+ln -sf "$INSTALLATION_PATH/bin/alfdarwin" "$INSTALLATION_PATH"
 
 ######################
 ### Uninstall ALF (default paths!)
