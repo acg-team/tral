@@ -13,8 +13,8 @@ Per default TRAL will be installed within the site-packages of python and its ex
 If you wish to change this path you can adjust 
 ``$INSTALLATION_PATH`` in ``configTRAL.cfg``
 
-These setup scripts require bash, python 3, pip, unzip, and git and run on any UNIX based operation system.
-To compile some of the software (HMMER) gcc, make and musl-dev is needed.
+These setup scripts require ``bash``, ``python3``, ``pip``, ``unzip``, and ``git`` and run on any UNIX based operation system.
+To compile some of the software (HMMER) ``gcc``, ``make`` and ``musl-dev`` is needed.
 If you like to work in a virtual environment you need to install the respective software (e.g. virtenv)
 
 ## Getting Started
@@ -52,6 +52,7 @@ It is recommended to install TRAL within a virtual environment (e. g. virtualenv
 Currently the version provided in "pypi" is not up-to-date, therefore it is recommended to install TRAL with python setup.py install "setup". 
 
 ```
+cd ./tral/easy_setup
 ./setupTRAL.sh setup
 ```
 
