@@ -31,7 +31,6 @@ Some of TRAL's functions depend on external software ([Installation instructions
 
 [documented on GitHub IO]:https://acg-team.github.io/tral/
 [easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
-[Installation instructions]:https://acg-team.github.io/tral/install.html#install
 [Installation instructions for dependencies]:https://acg-team.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
