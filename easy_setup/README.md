@@ -95,10 +95,22 @@ To uninstall TRAL (and is external software if you wish) run the script deleteTR
 ```
 \.deleteTRAL.sh
 ```
-You will be asked if you want to uninstall the external software as well.
 
+You will be asked if you want to uninstall the external software as well.
+If you used sudo to install TRAL and its external software you will need to use sudo for the uninstallation too.
+
+```
+sudo \.deleteTRAL.sh
+```
 To uninstall only all installed external software run:
 
 ```
 \.uninstall_all_ext_software.sh
 ```
+
+or in case you installed it with sudo:
+
+```
+sudo \.uninstall_all_ext_software.sh
+```
+
