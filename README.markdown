@@ -29,9 +29,14 @@ GPL-2.0
 
 Some of TRAL's functions depend on external software ([Installation instructions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
+<<<<<<< HEAD
 [documented on GitHub IO]:https://acg-team.github.io/tral/
 [easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
-[Installation instructions]:https://acg-team.github.io/tral/install.html#install
+=======
+
+
+[documented on GitHub IO]:https://acg-team.github.io/tral/
+[easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
 [Installation instructions for dependencies]:https://acg-team.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/
