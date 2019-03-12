@@ -55,6 +55,8 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                 "\n".join(my_msa))
             logging.error(error_note)
             return None
+    elif aligner == "proPIP":
+        print("proPIP is not integrated yet.")
 
     else:
         raise ValueError(
