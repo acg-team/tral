@@ -18,7 +18,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 mkdir -p "$TRAL_EXT_SOFTWARE/castor"
 
 ######################
-### Compiling and installing the dependencies
+### Compiling and installing the dependencies and castor
 
 (
     cd "$TRAL_EXT_SOFTWARE/castor"
@@ -135,8 +135,19 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             echo "A problem occured while trying to install Intel TBB."
             exit $? 
         }
+    } && {
+        {
+            ## compiling Castor with dynamic linking
+            (
+            git clone https://github.com/acg-team/castor.git
+            cd castor
+            cmake --target castor -- -DCMAKE_BUILD_TYPE=Release CMakeLists.txt
+            sudo make
+            )
+        } || { 
+            echo "A problem occured while trying to compile Castor."
+            exit $? 
+        }
     }
 )
-
-
 
