@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
+
+# requirements:
 # The user should have reading/writing rights on the system folders (i.e. /usr/local, /usr/local/include).
+# cmake version >= 3.8
+# git with github account
 
 # INSTALLING Castor #####
 
@@ -112,6 +116,7 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
         {
             ## TSHLib - Tree Search Heuristics Library 
             (
+            echo ls
             git clone https://github.com/acg-team/tshlib.git # do not use the bitbucket
             # username for github required!
             cd tshlib
