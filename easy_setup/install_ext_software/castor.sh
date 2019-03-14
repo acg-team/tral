@@ -148,6 +148,7 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             cd castor
             cmake --target castor -- -DCMAKE_BUILD_TYPE=Release CMakeLists.txt
             sudo make
+            ln -sf "$TRAL_EXT_SOFTWARE/castor/castor/Castor" "$INSTALLATION_PATH" # copy executable into system path
             )
         } || { 
             echo "A problem occured while trying to compile Castor."
