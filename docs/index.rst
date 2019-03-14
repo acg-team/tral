@@ -29,7 +29,7 @@ Tutorials
 Reference Guide
 ===============
 
-- `Code base on GitHub <https://github.com/elkeschaper/tral>`_
+- `Code base on GitHub <https://github.com/acg-team/tral>`_
 - :ref:`Class documentation <code_docs>`
 - `GC3Pie <https://code.google.com/p/gc3pie/>`_
 
