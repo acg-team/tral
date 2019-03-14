@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -92,16 +92,19 @@
 </li>
 <li><a class="reference internal" href="#how-to-contribute-to-the-homepage">How to contribute to the homepage</a></li>
 <li><a class="reference internal" href="#how-to-test-a-package-on-pypitest">How to test a package on pypitest</a></li>
+<li><a class="reference internal" href="#how-to-use-pypi">How to use Pypi</a></li>
 </ul>
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/contribute.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/contribute.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -120,7 +123,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="technical-hints-for-contributors">
 <span id="contribute"></span><h1>Technical hints for contributors<a class="headerlink" href="#technical-hints-for-contributors" title="Permalink to this headline">¶</a></h1>
@@ -188,6 +191,29 @@ base: develop
 <div class="highlight-python"><div class="highlight"><pre>pip install -i https://testpypi.python.org/pypi
 </pre></div>
 </div>
+</div>
+<div class="section" id="how-to-use-pypi">
+<h2>How to use Pypi<a class="headerlink" href="#how-to-use-pypi" title="Permalink to this headline">¶</a></h2>
+<p>This documentation summarizes the steps to a new release of TRAL.</p>
+<p>Version number updates</p>
+<ul class="simple">
+<li>README.markdown and README.rst</li>
+<li>setup.py</li>
+<li>docs/conf.py</li>
+</ul>
+<p>Try testpypi</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd><p class="first">cd ~
+swap .pypirc_testpypi .pypirc</p>
+<p>cd [TRAL directory]
+python setup.py sdist upload -r pypitest</p>
+<p>cd ~
+swap .pypirc_testpypi .pypirc</p>
+<p class="last">cd [Installation test directory]
+pip install -i <a class="reference external" href="https://testpypi.python.org/pypi">https://testpypi.python.org/pypi</a> tral</p>
+</dd>
+</dl>
 </div>
 </div>
 

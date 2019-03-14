@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -88,12 +88,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/background.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/background.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -112,13 +114,13 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="background">
 <span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
 <p>When printing a tandem repeat, you will see a lot of information. Here is what it means.
-(You get this example from <a class="reference internal" href="significance_test.html#significance-test"><em>the significance test tutorials</em></a>)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+(You get this example from <a class="reference internal" href="significance_test.html#significance-test"><span>the significance test tutorials</span></a>)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s1">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="go">&gt; begin:38 l_effective:2 n:6 pvalue:0.0 divergence:0.46649169922545164 type:phylo_gap01</span>
 <span class="go">RRN</span>
 <span class="go">RR-</span>
@@ -161,18 +163,18 @@ tandem repeat units is very conserved.)</li>
 <h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this headline">¶</a></h2>
 <p>You have access to more tandem repeat characteristics. The dir() command will provide you
 with a list of all attributes and functions connected to the object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s1">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="go">[&#39;TRD&#39;, &#39;__class__&#39;, &#39;__delattr__&#39;, &#39;__dict__&#39;, &#39;__dir__&#39;, &#39;__doc__&#39;, &#39;__eq__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__gt__&#39;, &#39;__hash__&#39;, &#39;__init__&#39;, &#39;__le__&#39;, &#39;__lt__&#39;, &#39;__module__&#39;, &#39;__ne__&#39;, &#39;__new__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;, &#39;__repr__&#39;, &#39;__setattr__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__subclasshook__&#39;, &#39;__weakref__&#39;, &#39;begin&#39;, &#39;calc_index_msa&#39;, &#39;calc_calc_n_effective&#39;, &#39;calculate_pvalues&#39;, &#39;calculate_scores&#39;, &#39;create&#39;, &#39;dDivergence&#39;, &#39;dPValue&#39;, &#39;dScore&#39;, &#39;deleteInsertionColumns&#39;, &#39;deletions&#39;, &#39;divergence&#39;, &#39;gapStructure&#39;, &#39;gap_structure_HMM&#39;, &#39;gaps&#39;, &#39;insertions&#39;, &#39;l&#39;, &#39;l_effective&#39;, &#39;msa&#39;, &#39;msaD&#39;, &#39;msaT&#39;, &#39;msaTD&#39;, &#39;msaTDN&#39;, &#39;msaTD_standard_aa&#39;, &#39;msa_original&#39;, &#39;msa_standard_aa&#39;, &#39;n&#39;, &#39;calc_n_effective&#39;, &#39;nGap&#39;, &#39;pvalue&#39;, &#39;save_original_msa&#39;, &#39;score&#39;, &#39;sequence_length&#39;, &#39;sequence_type&#39;, &#39;text&#39;, &#39;textD&#39;, &#39;textD_standard_aa&#39;, &#39;totD&#39;, &#39;write&#39;]</span>
 </pre></div>
 </div>
-<p>For a more explanation, check out the <a class="reference internal" href="code_docs.html#code-docs"><em>Class documentation</em></a>, or
-<a class="reference internal" href="contributors.html#contributors"><em>contact us</em></a>.</p>
+<p>For a more explanation, check out the <a class="reference internal" href="code_docs.html#code-docs"><span>Class documentation</span></a>, or
+<a class="reference internal" href="contributors.html#contributors"><span>contact us</span></a>.</p>
 </div>
 <div class="section" id="writing-a-tandem-repeat-to-csv">
 <h2>Writing a tandem repeat to .csv<a class="headerlink" href="#writing-a-tandem-repeat-to-csv" title="Permalink to this headline">¶</a></h2>
 <p>When you write a tandem repeat to .csv with TRAL, the result may look as follows:</p>
 <div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/Users/elkeschaper/Python_projects/Tandem_repeat_code/Tral/docs/background.rst</tt>, line 70)</p>
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/home/lina/SynologyDrive/tral/docs/background.rst</tt>, line 70)</p>
 Literal block expected; none found.</div>
 <p>begin   msa_original    l_effective      n_effective      repeat_region_length divergence      pvalue
 316     GDII,GDIR       4       2.0     8       None    None

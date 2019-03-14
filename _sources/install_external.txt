@@ -7,8 +7,6 @@ Here, we explain how to install external software packages, such as *de novo* ta
 detectors. Important: Once a software is installed, the path to either the binary or the
 executable shell script needs to be indicated in the TRAL configuration file :ref:`config.ini <configure>`.
 
-
-
 Sequence profile model generation
 ---------------------------------
 
@@ -48,6 +46,18 @@ If *ginsi* is not in your system path, set the absolute path::
 
 Currently integrated detectors
 ------------------------------
+
+========    =======
+Software    License
+========    =======
+HHrepID     CC-BY-NC-2.0
+PHOBOS      Non-commercial
+TRED        Non-commercial
+T-REKS      Non-commercial?
+TRF         Unlimited use
+TRUST       ?
+XSTREAM     Non-commercial
+========    =======
 
 HHrepID
 *******

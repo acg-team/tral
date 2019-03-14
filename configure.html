@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -102,12 +102,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/configure.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/configure.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -126,7 +128,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="configuration">
 <span id="configure"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
@@ -145,18 +147,18 @@ as change default thresholds and behaviours.</p>
 by default.</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detection]]
-        AA = HHrepID,  # List of default de novo detectors on amino acid data that you wish to use.
+        AA = HHrepID, T-REKS, TRUST, XSTREAM  # List of default de novo detectors on amino acid data that you wish to use.
         DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
 </pre></div>
 </div>
 <p>If the binaries or executable scripts of any <em>de novo</em> detection algorithm are not in the
 system path, set the absolute paths in config.ini. Details for each detector (e.g. to create
-executable scripts) are detailed in <a class="reference internal" href="install_external.html#install-external"><em>Installation of external software</em></a>.</p>
+executable scripts) are detailed in <a class="reference internal" href="install_external.html#install-external"><span>Installation of external software</span></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         PHOBOS = phobos
         HHrepID = hhrepid_64
-        HHrepID_dummyhmm = /path/to/home/.tral/data/dummyHMM.hmm
+        HHrepID_dummyhmm = /path/to/home/.tral/data/hhrepid/dummyHMM.hmm
         TRUST = TRUST
         TRUST_substitutionmatrix = /path/to/TRUST/Align/BLOSUM50  #Recommended: Use matrices packages shipped with TRUST
         XSTREAM = XSTREAM
@@ -265,7 +267,7 @@ the format of the debugging message. Defaults to WARNING. The path to the file n
 defined as</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">logging.config</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="s">&quot;path/to/your/home/.tral/logging.ini&quot;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="s2">&quot;path/to/your/home/.tral/logging.ini&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
