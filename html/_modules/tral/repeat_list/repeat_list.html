@@ -1,0 +1,540 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tral.repeat_list.repeat_list &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.repeat_list.repeat_list</h1><div class="highlight"><pre>
+<span class="c1"># (C) 2015 Elke Schaper</span>
+
+<span class="kn">from</span> <span class="nn">tral.repeat_list</span> <span class="kn">import</span> <span class="n">repeat_list_io</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :synopsis: The RepeatList Class.</span>
+
+<span class="sd">    .. moduleauthor:: Elke Schaper &lt;elke.schaper@isb-sib.ch&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RepeatList"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList">[docs]</a><span class="k">class</span> <span class="nc">RepeatList</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; A `RepeatList` contains list of repeats that belong to the same</span>
+<span class="sd">    sequence, or set of sequences.</span>
+
+<span class="sd">    `RepeatList` contains methods that act on several tandem repeats.</span>
+<span class="sd">    For example, methods to</span>
+
+<span class="sd">    *   detect overlapping tandem repeats</span>
+<span class="sd">    *   identify the tandem repeat with highest statistical significance</span>
+<span class="sd">    *   filter a set of tandem repeats according to different filtering</span>
+<span class="sd">        procedures.</span>
+
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        repeats (list of Repeat): The list of tandem repats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RepeatList.__str__"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Create string for RepeatList instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeats</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span> <span class="o">=</span> <span class="n">repeats</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rl</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rl</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RepeatList</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeats</span> <span class="o">+</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rl</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rl</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RepeatList</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="RepeatList.create"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">input_format</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read ``RepeatList`` from file.</span>
+
+<span class="sd">        Read ``RepeatList`` from file (currently, only pickle is supported)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_format (str):  Currently only &quot;pickle&quot;</span>
+<span class="sd">            file (str): Path to output file</span>
+
+<span class="sd">        .. todo:: Write checks for ``input_format`` and ``file``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s1">&#39;pickle&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;input_format is unknown: {}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_format</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RepeatList.write"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">return_string</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Serialize and write ``RepeatList`` instances.</span>
+
+<span class="sd">        Serialize ``RepeatList`` instance using the stated ``output_format``.</span>
+<span class="sd">        If a ``file`` is specified, save the String. If ``str`` is specified, give back</span>
+<span class="sd">        the String (not possible for pickles).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_format (str):  The output format: Either &quot;pickle&quot; or &quot;tsv&quot;</span>
+<span class="sd">            file (str): Path to output file</span>
+
+<span class="sd">        .. todo:: Write checks for ``output_format`` and ``file``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;pickle&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+            <span class="nb">file</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;tsv&#39;</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">repeat_list_io</span><span class="o">.</span><span class="n">serialize_repeat_list_tsv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;output_format is unknown: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_format</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">file</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_string</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="RepeatList.filter"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Filter ``repeats`` according to ``func_name``.</span>
+
+<span class="sd">        Filter ``repeats`` according to ``func_name``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name (str): The name of a local filtering method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check: is func_name a str, or is it a method? if it is a method, it</span>
+        <span class="c1"># must be in dir(): ``funcname in dir`` == TRUE?</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">],</span> <span class="n">func_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RepeatList</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RepeatList.cluster"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.RepeatList.cluster">[docs]</a>    <span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Cluster ``repeats`` according to ``overlap_type``.</span>
+
+<span class="sd">        Cluster ``repeats`` according to ``overlap_type``. We assume that overlap of</span>
+<span class="sd">        repeats is transitive: If A overlaps with B, and B overlaps with C, (A,B,C) form</span>
+<span class="sd">        one cluster.</span>
+<span class="sd">        The attribute ``cluster`` is initiated to a dict:</span>
+
+<span class="sd">            self.cluster = {&quot;overlap_type1&quot;: [(0,2),(1)], &quot;overlap_type2&quot;: [(0),(1), (2)]}</span>
+
+<span class="sd">        In this toy example, the first and the third repeat in ``repeats`` cluster</span>
+<span class="sd">        according to &quot;overlap_type1&quot;, whereas no repeats cluster according to</span>
+<span class="sd">        &quot;overlap_type2&quot;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            overlap_type (str): The name of a local pairwise repeat overlapping method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;d_cluster&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d_cluster</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">l_cluster</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">l_repeat_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="p">)))</span>
+        <span class="k">while</span> <span class="n">l_repeat_indices</span><span class="p">:</span>
+            <span class="n">i_cluster</span> <span class="o">=</span> <span class="p">[</span><span class="n">l_repeat_indices</span><span class="o">.</span><span class="n">pop</span><span class="p">()]</span>
+            <span class="n">l_repeat_in_cluster_check</span> <span class="o">=</span> <span class="n">i_cluster</span><span class="p">[:]</span>
+
+            <span class="k">while</span> <span class="n">l_repeat_in_cluster_check</span><span class="p">:</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="n">l_repeat_in_cluster_check</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">remaining_indices</span> <span class="o">=</span> <span class="n">l_repeat_indices</span><span class="p">[:]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">remaining_indices</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">two_repeats_overlap</span><span class="p">(</span>
+                            <span class="n">overlap_type</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="n">check</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                        <span class="n">i_cluster</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="n">l_repeat_in_cluster_check</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="n">l_repeat_indices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="n">l_cluster</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_cluster</span><span class="p">)</span>
+
+        <span class="n">l_cluster</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l_cluster</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_cluster</span></div></div>
+
+
+<span class="c1"># FILTERING</span>
+<span class="c1"># Filter methods (func) are all defined in the same way: They return a subset</span>
+<span class="c1"># of self.repeats, also as a list.</span>
+<span class="c1">#  Return is a (list of `Repeat`).</span>
+
+<div class="viewcode-block" id="pvalue"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.pvalue">[docs]</a><span class="k">def</span> <span class="nf">pvalue</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns all repeats in ``rl`` with a p-Value below a certain threshold.</span>
+
+<span class="sd">    Returns all repeats in ``rl`` with a p-Value below a certain threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rl (RepeatList): An instance of the RepeatList class.</span>
+<span class="sd">        score (str): The type of score defines the pvalue that is used for filtering</span>
+<span class="sd">        threshold (float): All repeats with a pvalue of type `score` above this threshold</span>
+<span class="sd">            are filtered out.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">threshold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i_repeat</span><span class="o">.</span><span class="n">pvalue</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="divergence"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.divergence">[docs]</a><span class="k">def</span> <span class="nf">divergence</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns all repeats in ``rl`` with a divergence below a certain</span>
+<span class="sd">        threshold.</span>
+
+<span class="sd">    Returns all repeats in ``rl`` with a divergence below a certain threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rl (RepeatList): An instance of the RepeatList class.</span>
+<span class="sd">        score (str): The type of score defines the divergence that is used for</span>
+<span class="sd">                    filtering</span>
+<span class="sd">        threshold (float): All repeats with a divergence of type `score` above</span>
+<span class="sd">                            this threshold are filtered out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i_repeat</span><span class="o">.</span><span class="n">divergence</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="attribute"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.attribute">[docs]</a><span class="k">def</span> <span class="nf">attribute</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns all repeats in ``rl`` with a attribute below (above) a certain</span>
+<span class="sd">        threshold.</span>
+
+<span class="sd">    Returns all repeats in ``rl`` with a attribute below (above) a certain</span>
+<span class="sd">    threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rl (RepeatList): An instance of the RepeatList class.</span>
+<span class="sd">        attribute (str): The attribute of the Repeat instance</span>
+<span class="sd">        type (str): Either &quot;min&quot; or &quot;max&quot;</span>
+<span class="sd">        threshold (float): All repeats with an attribute value below (above)</span>
+<span class="sd">                          this threshold are filtered out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">threshold</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;type must either be &#39;min&#39; or &#39;max&#39;. Instead, it is {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="none_overlapping_fixed_repeats"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.none_overlapping_fixed_repeats">[docs]</a><span class="k">def</span> <span class="nf">none_overlapping_fixed_repeats</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="n">rl_fixed</span><span class="p">,</span> <span class="n">overlap_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns all repeats in ``rl`` none-overlapping with ``rl_fixed``.</span>
+
+<span class="sd">    Returns all repeats in ``rl`` none-overlapping with ``rl_fixed`` according</span>
+<span class="sd">    to ``overlap``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rl (RepeatList): An instance of the RepeatList class.</span>
+<span class="sd">        rl (rl_fixed): A second instance of the RepeatList class.</span>
+<span class="sd">        overlap (list): First list element: Name (str) of an overlap method in</span>
+<span class="sd">                        repeat_list. All remaining elements are additional</span>
+<span class="sd">                        arguments for this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">i_repeat_fixed</span> <span class="ow">in</span> <span class="n">rl_fixed</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">two_repeats_overlap</span><span class="p">(</span>
+                    <span class="n">overlap_type</span><span class="p">,</span>
+                    <span class="n">repeat1</span><span class="o">=</span><span class="n">i_repeat</span><span class="p">,</span>
+                    <span class="n">repeat2</span><span class="o">=</span><span class="n">i_repeat_fixed</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="none_overlapping"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.none_overlapping">[docs]</a><span class="k">def</span> <span class="nf">none_overlapping</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="n">overlap</span><span class="p">,</span> <span class="n">l_criterion</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns all none-overlapping repeats in ``rl``.</span>
+
+<span class="sd">    Returns all none-overlapping repeats in ``rl``. Repeats are clustered</span>
+<span class="sd">    according to ``overlap``. Of each cluster, only the best repeat is returned</span>
+<span class="sd">    according to ``dCriterion``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rl (RepeatList): An instance of the RepeatList class.</span>
+<span class="sd">        overlap (tuple): First element: Name (str) of an overlap method in</span>
+<span class="sd">            `repeat_list`. Second element: **kwargs. All remaining elements are</span>
+<span class="sd">            additional arguments for this class.</span>
+<span class="sd">        l_criterion (list): list of (criterion (str), criterion arguments)</span>
+<span class="sd">            tuples. Until only one repeat is remainining in a cluster, the</span>
+<span class="sd">            criteria are applied in order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">overlap_type</span> <span class="o">=</span> <span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># has to be adapted to a more convenient way</span>
+        <span class="n">overlap_args</span> <span class="o">=</span> <span class="n">overlap</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">rl</span><span class="p">,</span> <span class="s1">&#39;d_cluster&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">overlap_type</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rl</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="n">overlap_args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rl</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">overlap_type</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i_cluster</span> <span class="ow">in</span> <span class="n">rl</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">]:</span>
+
+        <span class="n">i_repeat</span> <span class="o">=</span> <span class="p">[</span><span class="n">rl</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i_cluster</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">cvalue</span> <span class="ow">in</span> <span class="n">l_criterion</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">criterion_type</span><span class="p">,</span> <span class="n">criterion_value</span> <span class="o">=</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">cvalue</span> 
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">criterion_type</span> <span class="o">==</span> <span class="s1">&#39;pvalue&#39;</span><span class="p">:</span>
+                <span class="n">min_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">pvalue</span><span class="p">(</span><span class="n">criterion_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i_repeat</span><span class="p">)</span>
+                <span class="n">i_repeat</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i_repeat</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">pvalue</span><span class="p">(</span><span class="n">criterion_value</span><span class="p">)</span> <span class="o">==</span> <span class="n">min_value</span><span class="p">]</span>
+
+            <span class="k">elif</span> <span class="n">criterion_type</span> <span class="o">==</span> <span class="s1">&#39;divergence&#39;</span><span class="p">:</span>
+                <span class="n">min_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">divergence</span><span class="p">(</span><span class="n">criterion_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i_repeat</span><span class="p">)</span>
+                <span class="n">i_repeat</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i_repeat</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">divergence</span><span class="p">(</span><span class="n">criterion_value</span><span class="p">)</span> <span class="o">==</span> <span class="n">min_value</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;repeat_list.none_overlapping(): &gt; 1 Repeats have the same values...&quot;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<span class="c1"># OVERLAP DETECTION METHODS</span>
+<div class="viewcode-block" id="two_repeats_overlap"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.two_repeats_overlap">[docs]</a><span class="k">def</span> <span class="nf">two_repeats_overlap</span><span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="n">repeat1</span><span class="p">,</span> <span class="n">repeat2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper method to test the overlap of ``repeat1`` and ``repeat2``.</span>
+
+<span class="sd">    Helper method to test the overlap of ``repeat1`` and ``repeat2``. The</span>
+<span class="sd">    overlap is calculated by the local method ``overlap_type``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        overlap_type (str): The name of a local pairwise repeat overlapping</span>
+<span class="sd">                            method.</span>
+<span class="sd">        repeat1 (Repeat): An instance of the Repeat class</span>
+<span class="sd">        repeat2 (Repeat): A second instance of the Repeat class</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Forwards method output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">is_overlapping</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">],</span> <span class="n">overlap_type</span><span class="p">)</span>
+    <span class="c1"># Alternative implementation:</span>
+    <span class="c1"># is_overlapping = globals()[overlap_type]</span>
+    <span class="k">return</span> <span class="n">is_overlapping</span><span class="p">(</span><span class="n">repeat1</span><span class="p">,</span> <span class="n">repeat2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="shared_char"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.shared_char">[docs]</a><span class="k">def</span> <span class="nf">shared_char</span><span class="p">(</span><span class="n">repeat1</span><span class="p">,</span> <span class="n">repeat2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Do two TRs share at least one char?</span>
+
+<span class="sd">    Return 1 if the two TRs share at least one char (amino acids or nucleotides); else 0.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repeat1 (Repeat): An instance of the Repeat class</span>
+<span class="sd">        repeat2 (Repeat): A second instance of the Repeat class</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Bool: 1 if the repeats share &gt;= 1 char, else 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">repeat1</span><span class="o">.</span><span class="n">begin</span> <span class="o">+</span> <span class="n">repeat1</span><span class="o">.</span><span class="n">repeat_region_length</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">repeat2</span><span class="o">.</span><span class="n">begin</span><span class="p">)</span> <span class="ow">or</span> \
+       <span class="p">(</span><span class="n">repeat2</span><span class="o">.</span><span class="n">begin</span> <span class="o">+</span> <span class="n">repeat2</span><span class="o">.</span><span class="n">repeat_region_length</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">repeat1</span><span class="o">.</span><span class="n">begin</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<div class="viewcode-block" id="common_ancestry"><a class="viewcode-back" href="../../../repeat_list.html#tral.repeat_list.repeat_list.common_ancestry">[docs]</a><span class="k">def</span> <span class="nf">common_ancestry</span><span class="p">(</span><span class="n">repeat1</span><span class="p">,</span> <span class="n">repeat2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Do two TRs share at least one pair of chars with common ancestry?</span>
+
+<span class="sd">    Return 1 if the two TRs share at least one pair of chars (amino acids or</span>
+<span class="sd">    nucleotides) with common ancestry; else 0.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repeat1 (Repeat): An instance of the Repeat class</span>
+<span class="sd">        repeat2 (Repeat): A second instance of the Repeat class</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Bool: 1 if the repeats share &gt;= 1 pair of chars with common ancestry, else 0.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">repeat1</span><span class="p">,</span> <span class="s1">&#39;msaIT&#39;</span><span class="p">):</span>
+        <span class="n">repeat1</span><span class="o">.</span><span class="n">calc_index_msa</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">repeat2</span><span class="p">,</span> <span class="s1">&#39;msaIT&#39;</span><span class="p">):</span>
+        <span class="n">repeat2</span><span class="o">.</span><span class="n">calc_index_msa</span><span class="p">()</span>
+
+    <span class="n">original</span> <span class="o">=</span> <span class="n">repeat2</span><span class="o">.</span><span class="n">msaIT</span>
+    <span class="n">potential</span> <span class="o">=</span> <span class="n">repeat1</span><span class="o">.</span><span class="n">msaIT</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">potential</span><span class="p">:</span>
+            <span class="n">iP</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">iP</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">original</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="n">iP</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">original</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">p</span><span class="p">[</span><span class="n">iP</span><span class="p">]:</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">iPRest</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iP</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="n">iPRest</span><span class="p">]</span> <span class="ow">in</span> <span class="n">original</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]:</span>
+                            <span class="c1">#coverage = repeat1.repeat_region_length/repeat2.repeat_region_length</span>
+                            <span class="c1">#greediness = repeat1.l_effective/repeat2.l_effective</span>
+                            <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;error in shared_char with original </span><span class="si">%s</span><span class="s1"> and potential </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">repeat1</span><span class="o">.</span><span class="n">msaIT</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">repeat2</span><span class="o">.</span><span class="n">msaIT</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;original:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repeat2</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;original:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repeat2</span><span class="o">.</span><span class="n">begin</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;potential:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repeat1</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;potential:&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repeat1</span><span class="o">.</span><span class="n">begin</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">False</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

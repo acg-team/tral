@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tandem Repeat Annotation Library &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="#" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+      .related { display: none; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="#">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="#">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Install me.</h3>
+
+<p>Current version: <b>0.3</b></p>
+<p>Get TRAL for Python3 from the <a href="http://pypi.python.org/pypi/tral">Python Package
+Index</a>, or install it with:</p>
+<pre>pip install tral</pre>
+
+
+<h3>Questions? Suggestions?</h3>
+
+<p>Join the <a href="http://groups.google.com/group/tandemrepeats">Google group</a>:</p>
+<form action="http://groups.google.com/group/tandemrepeats/boxsubscribe"
+      style="padding-left: 0.5em">
+  <input type="text" name="email" value="your@email" style="font-size: 90%; width: 120px"
+         onfocus="$(this).val('');"/>
+  <input type="submit" name="sub" value="Subscribe" style="font-size: 90%; width: 70px"/>
+</form>
+<p>You can also open an issue at the
+  <a href="https://github.com/elkeschaper/tandemrepeats/issues">tracker</a>.</p>
+
+<h3><a href="contributors.html">Contributors</a></h3>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tandem-repeat-annotation-library">
+<h1>Tandem Repeat Annotation Library<a class="headerlink" href="#tandem-repeat-annotation-library" title="Permalink to this headline">¶</a></h1>
+<p>TRAL makes annotation of tandem repeats in amino acid and nucleic data simple. TRAL includes
+modules for detecting tandem repeats with both de novo software and sequence profile HMMs;
+statistical significance analysis of putative tandem repeats, and filtering of redundant predictions.</p>
+</div>
+<div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic simple">
+<li><a class="reference internal" href="install.html#install"><span>Install TRAL</span></a></li>
+<li><a class="reference internal" href="install_external.html#install-external"><span>Install tandem repeat external software</span></a></li>
+<li><a class="reference internal" href="configure.html#configure"><span>Adapt configuration files</span></a></li>
+</ol>
+</div>
+<div class="section" id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="denovo.html#denovo"><span>Run and parse</span></a> de novo repeat detection software.</li>
+<li><a class="reference internal" href="cphmm.html#cphmm"><span>Annotate tandem repeats</span></a> from sequence domain models.</li>
+<li><a class="reference internal" href="significance_test.html#significance-test"><span>Perform statistical significance test</span></a> of tandem repeats.</li>
+<li><a class="reference internal" href="overlap_filtering.html#overlap-filtering"><span>Perform overlap filtering</span></a> of redundant tandem repeat annotations.</li>
+<li><a class="reference internal" href="workflow.html#workflow"><span>Use GC3Pie</span></a> to annotate your large sequence dataset.</li>
+</ul>
+</div>
+<div class="section" id="reference-guide">
+<h1>Reference Guide<a class="headerlink" href="#reference-guide" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/acg-team/tral">Code base on GitHub</a></li>
+<li><a class="reference internal" href="code_docs.html#code-docs"><span>Class documentation</span></a></li>
+<li><a class="reference external" href="https://code.google.com/p/gc3pie/">GC3Pie</a></li>
+</ul>
+</div>
+<div class="section" id="how-to-cite-us">
+<h1>How to cite us<a class="headerlink" href="#how-to-cite-us" title="Permalink to this headline">¶</a></h1>
+<p>E Schaper, A Korsunsky, J Pecerska, A Messina, R Murri, H Stockinger, S Zoller, I Xenarios, and M Anisimova (2015). <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/early/2015/05/17/bioinformatics.btv306.abstract">TRAL: Tandem Repeat Annotation Library</a>. <em>Bioinformatics</em>. DOI:  10.1093/bioinformatics/btv306</p>
+<p>More on <a class="reference internal" href="contributors.html#contributors"><span>contributors and the background</span></a> of this project.</p>
+</div>
+<div class="section" id="how-to-contribute">
+<h1>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="contribute.html#contribute"><span>Technical hints</span></a> for contributors to TRAL.</li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>
