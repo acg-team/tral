@@ -1,7 +1,0 @@
-.. _uml:
-
-
-.. figure::  _static/packages_Tral_notugly.svg
-   :align:   center
-
-   The Tral packages.

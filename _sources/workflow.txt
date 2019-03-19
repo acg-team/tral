@@ -111,7 +111,7 @@ to Python pickle objects:
 
 ::
 
-    mkdir $MYTRAL/hmm
+    mkdir $MYTRAL/examples/workflow/hmm
     python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/examples/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/examples/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/examples/workflow/hmm
 
 

@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -99,12 +99,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/install_external.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install_external.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -123,17 +125,17 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="installation-of-external-software">
 <span id="install-external"></span><h1>Installation of external software<a class="headerlink" href="#installation-of-external-software" title="Permalink to this headline">¶</a></h1>
 <p>Here, we explain how to install external software packages, such as <em>de novo</em> tandem repeat
 detectors. Important: Once a software is installed, the path to either the binary or the
-executable shell script needs to be indicated in the TRAL configuration file <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>.</p>
+executable shell script needs to be indicated in the TRAL configuration file <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>.</p>
 <div class="section" id="sequence-profile-model-generation">
 <h2>Sequence profile model generation<a class="headerlink" href="#sequence-profile-model-generation" title="Permalink to this headline">¶</a></h2>
 <p>At current, only support for HMMER is integrated <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/24/6/807.long">published in Bioinformatics (2008)</a> (<a class="reference external" href="http://hmmer.janelia.org/">Installation instructions</a>).
-TRAL searches for HMMER&#8217;s <em>hmmbuild</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+TRAL searches for HMMER&#8217;s <em>hmmbuild</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[hmm]
     hmmbuild = hmmbuild
 </pre></div>
@@ -147,7 +149,7 @@ TRAL searches for HMMER&#8217;s <em>hmmbuild</em> in the system path by default 
 <div class="section" id="alignment-of-tandem-repeat-units">
 <span id="mafft"></span><h2>Alignment of tandem repeat units<a class="headerlink" href="#alignment-of-tandem-repeat-units" title="Permalink to this headline">¶</a></h2>
 <p>Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (<a class="reference external" href="http://mafft.cbrc.jp/alignment/software/">Installation instructions</a>).
-TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[repeat]
     ginsi = ginsi
 </pre></div>
@@ -160,14 +162,45 @@ TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (mo
 </div>
 <div class="section" id="currently-integrated-detectors">
 <span id="install-denovo"></span><h2>Currently integrated detectors<a class="headerlink" href="#currently-integrated-detectors" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Software</th>
+<th class="head">License</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>HHrepID</td>
+<td>CC-BY-NC-2.0</td>
+</tr>
+<tr class="row-odd"><td>PHOBOS</td>
+<td>Non-commercial</td>
+</tr>
+<tr class="row-even"><td>TRED</td>
+<td>Non-commercial</td>
+</tr>
+<tr class="row-odd"><td>T-REKS</td>
+<td>Non-commercial?</td>
+</tr>
+<tr class="row-even"><td>TRF</td>
+<td>Unlimited use</td>
+</tr>
+<tr class="row-odd"><td>TRUST</td>
+<td>?</td>
+</tr>
+<tr class="row-even"><td>XSTREAM</td>
+<td>Non-commercial</td>
+</tr>
+</tbody>
+</table>
 <div class="section" id="hhrepid">
 <h3>HHrepID<a class="headerlink" href="#hhrepid" title="Permalink to this headline">¶</a></h3>
 <p>HHrepID is a profile self alignment <em>de novo</em> amino acid tandem repeat detection software
-<a class="reference external" href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002195">published e.g. in PLOS Computational Biology (2011)</a> <!-- LinaNaef 20180730
-Is currently only available as an online tool.
-(<a class="reference external" href="http://toolkit.tuebingen.mpg.de/hhrepid">Installation instructions</a>) -->
-    .
-TRAL searches for the executable binary <em>hhrepid64</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+<a class="reference external" href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002195">published e.g. in PLOS Computational Biology (2011)</a> (<a class="reference external" href="http://toolkit.tuebingen.mpg.de/hhrepid">Installation instructions</a>).
+TRAL searches for the executable binary <em>hhrepid64</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         HHrepID = hhrepid_64
@@ -190,7 +223,7 @@ Supply the path to your null hmm file of choice:</p>
 <div class="section" id="phobos">
 <h3>PHOBOS<a class="headerlink" href="#phobos" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="http://www.ruhr-uni-bochum.de/ecoevo/cm/cm_phobos.htm">PHOBOS</a>  is an unpublished <em>k</em>-mer based <em>de novo</em> DNA tandem repeat detection software.
-TRAL searches for the executable <em>phobos</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+TRAL searches for the executable <em>phobos</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         PHOBOS = phobos
@@ -207,7 +240,7 @@ TRAL searches for the executable <em>phobos</em> in the system path by default (
 <h3>TRED<a class="headerlink" href="#tred" title="Permalink to this headline">¶</a></h3>
 <p>TRED is a sequence self alignment <em>de novo</em> amino acid tandem repeat detection software
 <a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/23/2/e30.short">published in Bioinformatics (2007)</a> (The software is available on request).
-TRAL searches for the executable <em>tred</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+TRAL searches for the executable <em>tred</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         TRED = tred
@@ -223,14 +256,14 @@ TRAL searches for the executable <em>tred</em> in the system path by default (mo
 <div class="section" id="t-reks">
 <h3>T-REKS<a class="headerlink" href="#t-reks" title="Permalink to this headline">¶</a></h3>
 <p>T-REKS is a <em>k</em>-mer based <em>de novo</em> DNA/AA tandem repeat detection software
-<a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/25/20/2632.short">published in Bioinformatics (2009)</a> (<a class="reference external" href="http://bioinfo.montp.cnrs.fr/index.php?route=tools&tool=3&lang=uk">Installation instructions</a>).
+<a class="reference external" href="http://bioinformatics.oxfordjournals.org/content/25/20/2632.short">published in Bioinformatics (2009)</a> (<a class="reference external" href="http://bioinfo.montp.cnrs.fr/?r=t-reks">Installation instructions</a>).
 Create an executable text file T-REKS with the following content:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh
 java -jar /my/path/to/T-Reks.jar &quot;$@&quot;
 </pre></div>
 </div>
 <p>If you place this text file in your systems path, TRAL finds it by default
-(modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+(modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         T-REKS = T-REKS
@@ -248,7 +281,7 @@ path:</p>
 <h3>TRF<a class="headerlink" href="#trf" title="Permalink to this headline">¶</a></h3>
 <p>TRF is a <em>k</em>-mer based self alignment <em>de novo</em> DNA tandem repeat detection software
 <a class="reference external" href="http://nar.oxfordjournals.org/content/27/2/573.full">published in Nucleic Acids Research (1999)</a> (<a class="reference external" href="http://tandem.bu.edu/trf/trf.html">Installation instructions</a>).
-TRAL searches for the executable <em>trf</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+TRAL searches for the executable <em>trf</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         TRF = trf
@@ -272,7 +305,7 @@ java -Xmx30G -cp /my/path/to/TRUST/1.0.0/Align nl.vu.cs.align.SelfSimilarity &qu
 </pre></div>
 </div>
 <p>If you place this text file in your systems path, TRAL finds it by default
-(modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+(modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         TRUST = TRUST
@@ -303,7 +336,7 @@ java -jar /my/path/to/xstream.jar &quot;$@&quot;
 </pre></div>
 </div>
 <p>If you place this text file in your systems path, TRAL finds it by default
-(modify in <a class="reference internal" href="configure.html#configure"><em>config.ini</em></a>):</p>
+(modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[sequence]
     [[repeat_detector_path]]
         XSTREAM = XSTREAM
@@ -321,8 +354,8 @@ path:</p>
 <div class="section" id="not-yet-integrated-software">
 <h2>Not yet integrated software<a class="headerlink" href="#not-yet-integrated-software" title="Permalink to this headline">¶</a></h2>
 <p>There is a large number of tandem repeat detection software for which TRAL does not provide
-parsers. However, theses parsers are easily manually added to <a class="reference internal" href="sequence.html#module-tral.sequence.repeat_detection_io"><em>sequence.repeat_detection_io</em></a>.
-Please file an issue on the <a class="reference external" href="https://github.com/acg-team/tral/issues">tracker</a>.</p>
+parsers. However, theses parsers are easily manually added to <a class="reference internal" href="code_docs.html#code-docs"><span>sequence.repeat_detection_io</span></a>.
+Please file an issue on the <a class="reference external" href="https://github.com/acg-team/tandemrepeats/issues">tracker</a>.</p>
 </div>
 </div>
 

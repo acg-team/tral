@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -89,12 +89,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/overlap_filtering.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/overlap_filtering.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -113,7 +115,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="perform-overlap-filtering-of-redundant-tandem-repeat-annotations">
 <span id="overlap-filtering"></span><h1>Perform overlap filtering of redundant tandem repeat annotations.<a class="headerlink" href="#perform-overlap-filtering-of-redundant-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h1>
@@ -121,8 +123,8 @@
 types of overlap, and filter them accordingly.</p>
 <p>Requirements for this tutorial:</p>
 <ul class="simple">
-<li><a class="reference internal" href="install.html#install"><em>Install TRAL</em></a>. TRAL ships with the tandem repeat data needed for this tutorial.</li>
-<li><a class="reference internal" href="configure.html#pvaluefiles"><em>Download p-Value distribution files</em></a>.</li>
+<li><a class="reference internal" href="install.html#install"><span>Install TRAL</span></a>. TRAL ships with the tandem repeat data needed for this tutorial.</li>
+<li><a class="reference internal" href="configure.html#pvaluefiles"><span>Download p-Value distribution files</span></a>.</li>
 </ul>
 <div class="section" id="read-in-tandem-repeat-annotations">
 <h2>Read in tandem repeat annotations.<a class="headerlink" href="#read-in-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h2>
@@ -130,9 +132,9 @@ types of overlap, and filter them accordingly.</p>
 <span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
 
-<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s">&quot;examples&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="s">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
+<span class="n">fRepeat_Pickle</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span> <span class="s2">&quot;examples&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;HIV-1_388796.pickle&quot;</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fRepeat_Pickle</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -140,16 +142,16 @@ types of overlap, and filter them accordingly.</p>
 <div class="section" id="filter-overlapping-tandem-repeats">
 <h2>Filter overlapping tandem repeats.<a class="headerlink" href="#filter-overlapping-tandem-repeats" title="Permalink to this headline">¶</a></h2>
 <p>Tandem repeats can be clustered according to different types of overlap:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s">&quot;shared_char&quot;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s2">&quot;shared_char&quot;</span>
 <span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
-    <span class="n">iSequence</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">overlap_type</span><span class="p">)</span>
+    <span class="n">iSequence</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">overlap_type</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In the first sequences, no repeats share any chars, however in the second sequence, three tandem repeats
 overlap:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
 <span class="go">[{5}, {4}, {3}, {2}, {1}, {0}]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">d_cluster</span><span class="p">[</span><span class="n">overlap_type</span><span class="p">])</span>
 <span class="go">[{4, 5}, {0, 2, 3}, {1}]</span>
 </pre></div>
 </div>
@@ -157,18 +159,18 @@ overlap:</p>
 to choose to retain one of the overlapping tandem repeats. For example the following usage
 will first retain the tandem repeats of lowest p-Value according to the <em>score</em>, and in case
 there still are draws, retain the tandem repeat of lowest divergence:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s">&quot;common_ancestry&quot;</span>
-<span class="n">score</span> <span class="o">=</span> <span class="s">&quot;phylo_gap001&quot;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s2">&quot;common_ancestry&quot;</span>
+<span class="n">score</span> <span class="o">=</span> <span class="s2">&quot;phylo_gap001&quot;</span>
 <span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
-    <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">&quot;none_overlapping&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span> <span class="p">[(</span><span class="s">&quot;pvalue&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;divergence&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">)])</span>
-    <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeatlist</span><span class="p">(</span><span class="n">repeat_list_filtered</span><span class="p">,</span> <span class="s">&quot;denovo_non_overlapping&quot;</span><span class="p">)</span>
+    <span class="n">repeat_list_filtered</span> <span class="o">=</span> <span class="n">iSequence</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;none_overlapping&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">overlap_type</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span> <span class="p">[(</span><span class="s2">&quot;pvalue&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;divergence&quot;</span><span class="p">,</span> <span class="n">score</span><span class="p">)])</span>
+    <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeatlist</span><span class="p">(</span><span class="n">repeat_list_filtered</span><span class="p">,</span> <span class="s2">&quot;denovo_non_overlapping&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The resulting <em>result_list</em> now only contains tandem repeats that do not overlap according
 the <em>common ancestry</em> overlap:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
 <span class="go">28</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s">&quot;denovo_non_overlapping&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">iR</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span> <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">iS</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s2">&quot;denovo_non_overlapping&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">repeats</span><span class="p">])</span>
 <span class="go">23</span>
 </pre></div>
 </div>
@@ -178,7 +180,7 @@ the <em>common ancestry</em> overlap:</p>
 <p>There are currently two types of overlap implemented:</p>
 <ul class="simple">
 <li>&#8220;shared_char&#8221;: Do two tandem repeats contain any two chars in common?</li>
-<li>&#8220;common ancestry&#8221;: Do two tandem repeats have at least two chars in the same column of their tandem repeat unit alignments? This approach is more conservative than &#8220;shared char&#8221;. This approach has been used in the <a class="reference internal" href="contributors.html#publications"><em>MBE and New Phytologist publications, 2014</em></a>.</li>
+<li>&#8220;common ancestry&#8221;: Do two tandem repeats have at least two chars in the same column of their tandem repeat unit alignments? This approach is more conservative than &#8220;shared char&#8221;. This approach has been used in the <a class="reference internal" href="contributors.html#publications"><span>MBE and New Phytologist publications, 2014</span></a>.</li>
 </ul>
 <p>For clustering, overlap is assumed to be a transitive attribute. That is, if tandem repeats
 A &amp; B, as well as B &amp; C overlap, all tandem repeats A, B &amp; C are clustered, no matter

@@ -1,0 +1,1053 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tral.hmm.hmm_own_model &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.hmm.hmm_own_model</h1><div class="highlight"><pre>
+<span class="c1"># (C) 2012-2015 Elke Schaper</span>
+<span class="c1"># coding: utf-8</span>
+
+<span class="kn">from</span> <span class="nn">tral.hmm</span> <span class="kn">import</span> <span class="n">hmm_io</span>
+<span class="kn">from</span> <span class="nn">tral.repeat.repeat_score</span> <span class="kn">import</span> <span class="n">load_model</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span><span class="p">,</span> <span class="n">minimize_scalar</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+
+<span class="c1">################################### HMM class ############################</span>
+
+
+<div class="viewcode-block" id="HMM"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.HMM">[docs]</a><span class="k">class</span> <span class="nc">HMM</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; A cyclic HMM applicable to describe sequence Tandem Repeats &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">tandem_repeat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">prior_divergence</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">prior_indel_insertion</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">tandem_repeat</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">HMM_from_file</span><span class="p">(</span>
+                    <span class="n">tandem_repeat</span><span class="p">,</span>
+                    <span class="n">accession</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+                    <span class="n">prior_indel_insertion</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">HMM_from_TR</span><span class="p">(</span>
+                    <span class="n">tandem_repeat</span><span class="p">,</span>
+                    <span class="n">prior_divergence</span><span class="o">=</span><span class="n">prior_divergence</span><span class="p">,</span>
+                    <span class="n">prior_indel_insertion</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">,</span>
+                    <span class="n">emission_file</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">HMM_example</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">HMM_example</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># states = [&quot;N&quot;, &quot;B&quot;, &quot;M1&quot;, &quot;M2&quot;, &quot;M3&quot;, &quot;E&quot;, &quot;C&quot;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;M1&quot;</span><span class="p">,</span> <span class="s2">&quot;M2&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Initialisation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="n">iS2</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">iS2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_0</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+
+        <span class="c1"># Transition probabilities</span>
+        <span class="c1"># Feed Values to p_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;M1&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;M1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;M2&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;M2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;M1&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+        <span class="c1"># emissions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emissions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">]</span>
+
+        <span class="c1"># emission probabilities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="n">iE</span><span class="p">:</span> <span class="mf">0.25</span> <span class="k">for</span> <span class="n">iE</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emissions</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span><span class="p">[</span><span class="s1">&#39;M1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span><span class="p">[</span><span class="s1">&#39;M2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">}</span>
+
+<div class="viewcode-block" id="HMM.HMM_from_TR_One_step"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.HMM.HMM_from_TR_One_step">[docs]</a>    <span class="k">def</span> <span class="nf">HMM_from_TR_One_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tandem_repeat</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build a HMM from a TR alignment given the ML divergence t.</span>
+<span class="sd">            One step approach: Calc the posterior of the ancestral sequence and use it</span>
+<span class="sd">            as the likelihood of the homologous repeat unit sequence. &quot;&quot;&quot;</span></div>
+        <span class="c1"># not implemented yet. For implementation, Use the first half of</span>
+        <span class="c1"># self.HMM_from_TR()</span>
+
+<div class="viewcode-block" id="HMM.HMM_from_file"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.HMM.HMM_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">HMM_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hmm_file</span><span class="p">,</span> <span class="n">accession</span><span class="p">,</span> <span class="n">prior_indel_insertion</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Load a HMM from hmm_file</span>
+<span class="sd">            Store probabilities as log10arithms.</span>
+
+<span class="sd">            Parameters:</span>
+<span class="sd">            &lt;hmm_file&gt; = &#39;path//to/file.hmm&#39;</span>
+<span class="sd">            &lt;accession&gt; = &#39;PF00560&#39;</span>
+<span class="sd">            &lt;prior_indel_insertion&gt; = {&#39;mu&#39;: 0.5, &#39;sigma_squared&#39;: 0.81}</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">bInsertion_state_emission_p_from_file</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">bTerminal_state_emission_p_from_file</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="n">hmmer_probabilities</span> <span class="o">=</span> <span class="n">hmm_io</span><span class="o">.</span><span class="n">read_HMMER</span><span class="p">(</span><span class="n">hmm_file</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">accession</span><span class="p">)</span>
+        <span class="n">dTranslate_States</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">i</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span>
+                <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">hmmer_probabilities</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s1">&#39;COMPO&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;letters&#39;</span><span class="p">]}</span>
+        <span class="n">hmmer_probabilities</span> <span class="o">=</span> <span class="p">{(</span><span class="n">i</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;COMPO&#39;</span><span class="p">,</span> <span class="s1">&#39;letters&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="n">dTranslate_States</span><span class="p">[</span>
+                                <span class="n">i</span><span class="p">]):</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">hmmer_probabilities</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="c1"># WARNING: The order of keys in hmmer_probabilities might not be what</span>
+        <span class="c1"># you think. You need to adapt your code at several instances (wherever</span>
+        <span class="c1"># you assume the states to be ordered, e.g. zip(repeat_states,</span>
+        <span class="c1"># hmmer_probabilities.keys))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">hmmer_probabilities</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&lt;hmmer_probabilities&gt; were not found :(&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hmmer</span> <span class="o">=</span> <span class="n">hmmer_probabilities</span>
+
+        <span class="c1"># Warning! The following line is only appropriate, if there are only</span>
+        <span class="c1"># &quot;letters&quot;, &quot;COMPO&quot;, and the match state keys in &lt;hmmer_probabilities&gt;</span>
+        <span class="n">l_effective</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hmmer_probabilities</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="c1"># Assume: sequence_type = &#39;AA&#39;</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">null_model_emission_p</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s1">&#39;lg&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Initialise all HMM states to default value</span>
+        <span class="n">repeat_states</span><span class="p">,</span> <span class="n">insert_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialise_HMM_structure</span><span class="p">(</span><span class="n">l_effective</span><span class="p">)</span>
+
+        <span class="c1"># Store indel probabilities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_indel_probabilities</span><span class="p">(</span><span class="n">prior_indel_insertion</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="c1"># Store null model insertion probabilities for terminal and insertion</span>
+        <span class="c1"># states</span>
+        <span class="k">if</span> <span class="n">bTerminal_state_emission_p_from_file</span><span class="p">:</span>
+            <span class="n">null_model_emission_p</span> <span class="o">=</span> <span class="n">hmmer3_null_model_emission_probabilites</span><span class="p">(</span>
+                <span class="n">hmmer_probabilities</span><span class="o">=</span><span class="n">hmmer_probabilities</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hmmer_probabilities</span> <span class="o">=</span> <span class="n">hmmer_probabilities</span>
+
+        <span class="c1"># Store match state and insertion state emission probabilities</span>
+        <span class="n">match_state_emission_p</span> <span class="o">=</span> <span class="n">hmmer3_emission_probabilities</span><span class="p">(</span>
+            <span class="n">hmmer_probabilities</span><span class="o">=</span><span class="n">hmmer_probabilities</span><span class="p">,</span>
+            <span class="n">letters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span>
+                <span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="n">lMatch</span><span class="o">=</span><span class="n">repeat_states</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bInsertion_state_emission_p_from_file</span><span class="p">:</span>
+            <span class="n">insertion_state_emission_p</span> <span class="o">=</span> <span class="n">hmmer3_insertion_probabilities</span><span class="p">(</span>
+                <span class="n">hmmer_probabilities</span><span class="o">=</span><span class="n">hmmer_probabilities</span><span class="p">,</span>
+                <span class="n">letters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span>
+                    <span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                <span class="n">lMatch</span><span class="o">=</span><span class="n">insertion_states</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">insertion_state_emission_p</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_emission_probabilities</span><span class="p">(</span>
+            <span class="n">alphabet</span><span class="p">,</span>
+            <span class="n">null_model_emission_p</span><span class="p">,</span>
+            <span class="n">match_state_emission_p</span><span class="p">,</span>
+            <span class="n">repeat_states</span><span class="p">,</span>
+            <span class="n">insertion_state_emission_p</span><span class="p">,</span>
+            <span class="n">insert_states</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HMM.HMM_from_TR"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.HMM.HMM_from_TR">[docs]</a>    <span class="k">def</span> <span class="nf">HMM_from_TR</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">tandem_repeat</span><span class="p">,</span>
+            <span class="n">prior_divergence</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">prior_indel_insertion</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">emission_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build a HMM from a TR &lt;tandem_repeat&gt;.</span>
+<span class="sd">            Two step approach: First, calc the posterior of the ancestral sequence</span>
+<span class="sd">            Then, calculate the likelihood of the homologous repeat unit sequence.</span>
+
+<span class="sd">            Parameters:</span>
+<span class="sd">            &lt;prior_divergence&gt; is {&#39;type&#39;: &#39;alpha&#39;/&#39;fixed_value&#39;, &#39;value&#39;: 4}</span>
+<span class="sd">            &lt;prior_indel_insertion&gt; is {&#39;mu&#39;: 0.5, &#39;sigma_squared&#39;: 0.81}</span>
+
+<span class="sd">            Store probabilities as log10arithms.&quot;&quot;&quot;</span>
+
+        <span class="c1"># This will fail at current, as the divergence attribute is a dict.</span>
+        <span class="k">if</span> <span class="n">prior_divergence</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">divergence</span> <span class="o">=</span> <span class="n">divergence_from_FP_simulations</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">prior_divergence</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span>
+            <span class="n">divergence</span> <span class="o">=</span> <span class="n">divergence_from_FP_simulations</span><span class="p">(</span>
+                <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">prior_divergence</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+            <span class="c1"># print(divergence)</span>
+            <span class="c1"># print(prior_divergence[&#39;value&#39;])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">divergence</span> <span class="o">=</span> <span class="n">prior_divergence</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">prior_indel_insertion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">prior_indel_insertion</span><span class="p">[</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;adaptive&#39;</span><span class="p">:</span>
+            <span class="c1"># Adapt the indel probabilities towards the divergences</span>
+            <span class="n">prior_indel_insertion</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">divergence</span> <span class="o">/</span> \
+                <span class="n">prior_indel_insertion</span><span class="p">[</span><span class="s1">&#39;factor&#39;</span><span class="p">]</span>
+            <span class="n">prior_indel_insertion</span><span class="p">[</span>
+                <span class="s1">&#39;sigma_squared&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prior_indel_insertion</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">5</span>
+
+        <span class="n">sequence_type</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">sequence_type</span>
+        <span class="n">l_effective</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">n</span>  <span class="c1"># Test: Do you really need this variable?</span>
+
+        <span class="n">repeat_states</span><span class="p">,</span> <span class="n">insert_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialise_HMM_structure</span><span class="p">(</span><span class="n">l_effective</span><span class="p">)</span>
+
+        <span class="c1"># Transitions incorporating deletion or insertion states</span>
+
+        <span class="c1"># We assume that deletions are not longer than the repeat unit, which would hence not be visible anymore.</span>
+        <span class="c1"># We also assume that you cannot jump from &quot;I&quot; directly to &quot;C&quot;, as is</span>
+        <span class="c1"># would have been more likely to directly assume &quot;C&quot; from the foregoing</span>
+        <span class="c1"># state.</span>
+
+        <span class="c1"># # Apply the modulus in order to determine the true index of any state,</span>
+        <span class="c1"># as you might have crossed the current tandem repeat unit&#39;s border:</span>
+        <span class="c1"># index(i,l_effective) = i%l_effective</span>
+
+        <span class="n">insertion_lengths</span><span class="p">,</span> <span class="n">deletion_lengths</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">gap_structure_HMM</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_indel_probabilities</span><span class="p">(</span>
+            <span class="n">prior_indel_insertion</span><span class="p">,</span>
+            <span class="n">l_effective</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">insertion_lengths</span><span class="o">=</span><span class="n">insertion_lengths</span><span class="p">,</span>
+            <span class="n">deletion_lengths</span><span class="o">=</span><span class="n">deletion_lengths</span><span class="p">)</span>
+
+        <span class="c1"># Load model of sequence evolution parameters</span>
+        <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+            <span class="n">Q</span><span class="p">,</span> <span class="n">eqFreq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s1">&#39;lg&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Q</span><span class="p">,</span> <span class="n">eqFreq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s1">&#39;tn93&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Calculate ML-emission probabilities for all match states</span>
+        <span class="c1"># YOU might want to transfer Q,eqFreq,alphabet to this function???</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emission_file</span><span class="p">:</span>
+            <span class="n">likelihood_offspring</span> <span class="o">=</span> <span class="n">calculate_log10_offspring_likelihood</span><span class="p">(</span>
+                <span class="n">tandem_repeat</span><span class="p">,</span>
+                <span class="n">divergence</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hmmer_probabilities</span> <span class="o">=</span> <span class="n">hmm_io</span><span class="o">.</span><span class="n">read_HMMER</span><span class="p">(</span><span class="n">emission_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">likelihood_offspring</span> <span class="o">=</span> <span class="n">hmmer3_emission_probabilities</span><span class="p">(</span>
+                <span class="n">hmmer_probabilities</span><span class="o">=</span><span class="n">hmmer_probabilities</span><span class="p">,</span>
+                <span class="n">letters</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span>
+                    <span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                <span class="n">lMatch</span><span class="o">=</span><span class="n">repeat_states</span><span class="p">)</span>
+
+        <span class="c1"># Anpassen!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_emission_probabilities</span><span class="p">(</span>
+            <span class="n">alphabet</span><span class="o">=</span><span class="n">alphabet</span><span class="p">,</span>
+            <span class="n">null_model_emission_p</span><span class="o">=</span><span class="n">eqFreq</span><span class="p">,</span>
+            <span class="n">match_state_emission_p</span><span class="o">=</span><span class="n">likelihood_offspring</span><span class="p">,</span>
+            <span class="n">repeat_states</span><span class="o">=</span><span class="n">repeat_states</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HMM.initialise_HMM_structure"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.HMM.initialise_HMM_structure">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_HMM_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialise all states</span>
+<span class="sd">        Set transition probabilities to None/0</span>
+<span class="sd">        Set initial probability for all states equal.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Build a HMM from these likelihoods.</span>
+        <span class="n">repeat_states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l_effective</span><span class="p">)]</span>
+        <span class="n">insert_states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l_effective</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">repeat_states</span> <span class="o">+</span> <span class="n">insert_states</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;HMM states: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+
+        <span class="c1"># Initialisation</span>
+        <span class="c1"># The transition probability is initially set to None for all states.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="p">{</span><span class="n">iS2</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">iS2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+        <span class="c1"># The initial probability is equal in all states. (np.log10(1)=0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_0</span> <span class="o">=</span> <span class="p">{</span><span class="n">iS</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+
+        <span class="c1"># Transition probabilities</span>
+
+        <span class="c1"># First, mark which transitions are not penalised, e.g. bear a &#39;probability of np.log10(1)=0&#39;:</span>
+        <span class="c1"># - Transitions from &quot;N&quot; to any &quot;M_k&quot;</span>
+        <span class="c1"># - Transitions from any &quot;M_k&quot; to &quot;C&quot;</span>
+        <span class="c1"># - Transitions from &quot;M_k&quot; to &quot;M_k+1&quot; (for k&lt;n) and &quot;M_k&quot; to &quot;M_0&quot; (for k==n)</span>
+        <span class="c1"># - Transitions from &quot;N&quot; to &quot;N&quot;</span>
+        <span class="c1"># - Transitions from &quot;C&quot; to &quot;C&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l_effective</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))][</span><span class="s2">&quot;C&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))][</span>
+                <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span> <span class="o">+</span>
+                        <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">][</span><span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="s2">&quot;C&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">repeat_states</span><span class="p">,</span> <span class="n">insert_states</span></div>
+
+    <span class="k">def</span> <span class="nf">set_emission_probabilities</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">alphabet</span><span class="p">,</span>
+            <span class="n">null_model_emission_p</span><span class="p">,</span>
+            <span class="n">match_state_emission_p</span><span class="p">,</span>
+            <span class="n">repeat_states</span><span class="p">,</span>
+            <span class="n">insertion_emmission_p</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">insertion_states</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="c1"># emissions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emissions</span> <span class="o">=</span> <span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Emissions: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emissions</span><span class="p">))</span>
+
+        <span class="c1"># emission probabilities</span>
+
+        <span class="c1"># Set all emission probabilities to null model emission probabilities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">iS</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">letter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                    <span class="n">null_model_emission_p</span><span class="p">[</span><span class="n">number</span><span class="p">])</span> <span class="k">for</span> <span class="n">letter</span><span class="p">,</span>
+                <span class="n">number</span> <span class="ow">in</span> <span class="n">alphabet</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">iS</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+
+        <span class="c1"># Set match state probabilities to ML-emission probabilities</span>
+        <span class="k">for</span> <span class="n">iRS</span><span class="p">,</span> <span class="n">iEmission_p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeat_states</span><span class="p">,</span> <span class="n">match_state_emission_p</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span><span class="p">[</span><span class="n">iRS</span><span class="p">]</span> <span class="o">=</span> <span class="n">iEmission_p</span>
+
+        <span class="k">if</span> <span class="n">insertion_emmission_p</span> <span class="ow">and</span> <span class="n">insertion_states</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Setting insertion state probabilities&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iIS</span><span class="p">,</span> <span class="n">iEmission_p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">insertion_states</span><span class="p">,</span> <span class="n">insertion_emmission_p</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_e</span><span class="p">[</span><span class="n">iIS</span><span class="p">]</span> <span class="o">=</span> <span class="n">iEmission_p</span>
+
+        <span class="c1">#logger.debug(&quot;Emission probabilities: {0}&quot;.format(self.p_e[&#39;M0&#39;]))</span>
+
+    <span class="k">def</span> <span class="nf">set_indel_probabilities</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prior_indel_insertion</span><span class="p">,</span>
+            <span class="n">l_effective</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">insertion_lengths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">deletion_lengths</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">default</span><span class="p">:</span>
+            <span class="n">p_deletion_formation</span> <span class="o">=</span> <span class="n">calculate_log10_indel_probability</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">n</span><span class="p">,</span>
+                <span class="n">prior</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">)</span>
+            <span class="n">p_insertion_formation</span> <span class="o">=</span> <span class="n">calculate_log10_indel_probability</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">n</span><span class="p">,</span>
+                <span class="n">prior</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">)</span>
+            <span class="n">p_deletion_lengths</span> <span class="o">=</span> <span class="n">calculate_log10_probability_indel_lengths</span><span class="p">(</span>
+                <span class="p">[],</span>
+                <span class="n">l_effective</span> <span class="o">-</span>
+                <span class="mi">1</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;zipf&#39;</span><span class="p">)</span>
+            <span class="n">p_insertion_continued</span><span class="p">,</span> <span class="n">p_insertion_stopped</span> <span class="o">=</span> <span class="n">calculate_log10_probability_indel_lengths</span><span class="p">(</span>
+                <span class="p">[],</span> <span class="bp">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;exponential&#39;</span><span class="p">)</span>
+
+        <span class="c1"># First, calculate the transition probability of all states that only</span>
+        <span class="c1"># depends on the gap structure of one site:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l_effective</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">default</span><span class="p">:</span>
+                <span class="n">p_deletion_formation</span> <span class="o">=</span> <span class="n">calculate_log10_indel_probability</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">deletion_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">)</span>
+                <span class="n">p_insertion_formation</span> <span class="o">=</span> <span class="n">calculate_log10_indel_probability</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">insertion_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior_indel_insertion</span><span class="p">)</span>
+                <span class="n">p_deletion_lengths</span> <span class="o">=</span> <span class="n">calculate_log10_probability_indel_lengths</span><span class="p">(</span>
+                    <span class="n">deletion_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">l_effective</span> <span class="o">-</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;zipf&#39;</span><span class="p">)</span>
+                <span class="n">p_insertion_continued</span><span class="p">,</span> <span class="n">p_insertion_stopped</span> <span class="o">=</span> <span class="n">calculate_log10_probability_indel_lengths</span><span class="p">(</span>
+                    <span class="n">insertion_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;exponential&#39;</span><span class="p">)</span>
+
+            <span class="c1"># In the current setup, moving from &quot;N&quot; to either an insertion, or a deletion state</span>
+            <span class="c1"># is less likely than staying in &quot;N&quot;. Thus, these probabilities are left at zero.</span>
+            <span class="c1">#self.p_t[&quot;N&quot;][&quot;I{0}&quot;.format(str(i))] = p_insertion</span>
+
+            <span class="c1"># Mi-1 -&gt; Mi+l_effective (deletion(l_effective))</span>
+            <span class="k">for</span> <span class="n">iC</span><span class="p">,</span> <span class="n">p_deletion_length</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_deletion_lengths</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))][</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="n">p_deletion_formation</span> <span class="o">+</span> <span class="n">p_deletion_length</span>
+                <span class="c1"># Ii -&gt; Mi + l_effective (insertionL) + deletion(l_effective)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                    <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))][</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="n">p_insertion_stopped</span> <span class="o">+</span> <span class="n">p_deletion_formation</span> <span class="o">+</span> <span class="n">p_deletion_length</span>
+
+            <span class="c1"># Mi-1 -&gt; Ii (insertion)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))][</span>
+                <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="n">p_insertion_formation</span>
+
+            <span class="c1"># Ii -&gt; Ii (1-insertionL)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))][</span>
+                <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="n">p_insertion_continued</span>
+
+            <span class="c1"># Ii -&gt; Mi (insertionL)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))][</span>
+                <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">,</span>
+                        <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="n">p_insertion_stopped</span>
+
+        <span class="c1"># Second, calculate the transition probability of all states that depends on the gap structure of several sites.</span>
+        <span class="c1"># These calcs use the information already gathered in self.p_t.</span>
+        <span class="c1"># These are deletions, that are directly followed by insertions</span>
+        <span class="c1"># (Case 1: deletion from match state. Case 2: deletion from insertion state.)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l_effective</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">iC</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">):</span>
+                <span class="c1"># Mi -&gt; Ii+iC (deletion(iC-1) + insertion(i+iC))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))][</span>
+                    <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))][</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span>
+                    <span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))][</span>
+                    <span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">index</span><span class="p">(</span>
+                            <span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span>
+                            <span class="n">l_effective</span><span class="p">))]</span>
+
+                <span class="c1"># Ii -&gt; Ii+l_effective insertion_stop(i) + deletion(i;l_effective) +</span>
+                <span class="c1"># insertion_formation(i+l_effective+1)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))][</span><span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))][</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))]</span> <span class="o">+</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))][</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))]</span> <span class="o">+</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">[</span><span class="s2">&quot;M{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">iC</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))][</span><span class="s2">&quot;I{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">iC</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">))]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Transition probabilities: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_t</span><span class="p">))</span></div>
+
+
+<span class="c1">################################### Local TR class #######################</span>
+<div class="viewcode-block" id="TR"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.TR">[docs]</a><span class="k">class</span> <span class="nc">TR</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Fake interim TR class &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">divergence</span> <span class="o">=</span> <span class="mf">0.6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msaTD</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAA&quot;</span><span class="p">,</span> <span class="s2">&quot;CCC&quot;</span><span class="p">,</span> <span class="s2">&quot;GTG&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">=</span> <span class="s1">&#39;DNA&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+<span class="c1">################################### MAP parameter estimation 3############</span>
+
+
+<div class="viewcode-block" id="divergence_from_FP_simulations"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.divergence_from_FP_simulations">[docs]</a><span class="k">def</span> <span class="nf">divergence_from_FP_simulations</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Which HMM divergence sets the average FP-rate</span>
+<span class="sd">        (i.e. the number of falsely positively assigend amino acid on either flanking side to a perfect TR)</span>
+<span class="sd">        to in total alpha*l&#39;&#39;&#39;</span>
+
+    <span class="c1"># alpha: In average, the number of falsely assigned AAs on both sides of the TR with should not extend l * alpha</span>
+    <span class="c1"># Derivation:</span>
+    <span class="c1"># FP-rate (average number of AAs predicted falsely as part of a perfect</span>
+    <span class="c1"># TR) on one side of the TR as a function of the divergence.</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mf">0.50150</span><span class="p">,</span>
+        <span class="mf">0.58600</span><span class="p">,</span>
+        <span class="mf">0.70900</span><span class="p">,</span>
+        <span class="mf">0.75125</span><span class="p">,</span>
+        <span class="mf">0.89275</span><span class="p">,</span>
+        <span class="mf">1.00900</span><span class="p">,</span>
+        <span class="mf">1.25100</span><span class="p">,</span>
+        <span class="mf">1.24150</span><span class="p">,</span>
+        <span class="mf">1.56275</span><span class="p">,</span>
+        <span class="mf">1.69600</span><span class="p">,</span>
+        <span class="mf">1.88475</span><span class="p">,</span>
+        <span class="mf">2.20025</span><span class="p">,</span>
+        <span class="mf">2.33375</span><span class="p">,</span>
+        <span class="mf">2.53500</span><span class="p">,</span>
+        <span class="mf">2.99300</span><span class="p">,</span>
+        <span class="mf">3.25900</span><span class="p">,</span>
+        <span class="mf">3.77400</span><span class="p">,</span>
+        <span class="mf">4.03300</span><span class="p">,</span>
+        <span class="mf">4.26675</span><span class="p">,</span>
+        <span class="mf">4.71800</span><span class="p">,</span>
+        <span class="mf">5.30925</span><span class="p">,</span>
+        <span class="mf">5.83325</span><span class="p">,</span>
+        <span class="mf">6.31575</span><span class="p">,</span>
+        <span class="mf">6.84000</span><span class="p">,</span>
+        <span class="mf">7.93425</span><span class="p">,</span>
+        <span class="mf">9.01900</span><span class="p">,</span>
+        <span class="mf">9.72000</span><span class="p">,</span>
+        <span class="mf">10.80925</span><span class="p">,</span>
+        <span class="mf">12.26650</span><span class="p">,</span>
+        <span class="mf">13.50750</span><span class="p">,</span>
+        <span class="mf">14.29825</span><span class="p">,</span>
+        <span class="mf">15.74225</span><span class="p">,</span>
+        <span class="mf">18.66050</span><span class="p">,</span>
+        <span class="mf">20.02575</span><span class="p">,</span>
+        <span class="mf">21.54400</span><span class="p">,</span>
+        <span class="mf">23.97300</span><span class="p">,</span>
+        <span class="mf">26.93625</span><span class="p">,</span>
+        <span class="mf">30.39400</span><span class="p">,</span>
+        <span class="mf">32.78550</span><span class="p">,</span>
+        <span class="mf">35.80375</span><span class="p">,</span>
+        <span class="mf">38.98025</span><span class="p">,</span>
+        <span class="mf">45.79925</span><span class="p">,</span>
+        <span class="mf">48.48200</span><span class="p">,</span>
+        <span class="mf">51.29100</span><span class="p">,</span>
+        <span class="mf">56.74300</span><span class="p">,</span>
+        <span class="mf">60.45925</span><span class="p">,</span>
+        <span class="mf">64.44675</span><span class="p">,</span>
+        <span class="mf">69.41900</span><span class="p">,</span>
+        <span class="mf">80.02450</span><span class="p">,</span>
+        <span class="mf">82.37550</span><span class="p">,</span>
+        <span class="mf">88.47350</span><span class="p">,</span>
+        <span class="mf">95.13425</span><span class="p">,</span>
+        <span class="mf">98.00750</span><span class="p">,</span>
+        <span class="mf">105.54975</span><span class="p">,</span>
+        <span class="mf">108.85625</span><span class="p">,</span>
+        <span class="mf">117.76750</span><span class="p">,</span>
+        <span class="mf">125.69250</span><span class="p">,</span>
+        <span class="mf">125.73725</span><span class="p">,</span>
+        <span class="mf">137.40675</span><span class="p">,</span>
+        <span class="mf">143.08225</span><span class="p">,</span>
+        <span class="mf">148.28725</span><span class="p">,</span>
+        <span class="mf">154.51425</span><span class="p">,</span>
+        <span class="mf">161.23075</span><span class="p">,</span>
+        <span class="mf">160.33875</span><span class="p">,</span>
+        <span class="mf">172.00475</span><span class="p">,</span>
+        <span class="mf">175.41525</span><span class="p">,</span>
+        <span class="mf">180.44425</span><span class="p">,</span>
+        <span class="mf">179.47350</span><span class="p">,</span>
+        <span class="mf">190.14225</span><span class="p">,</span>
+        <span class="mf">190.93625</span><span class="p">,</span>
+        <span class="mf">194.03725</span><span class="p">,</span>
+        <span class="mf">194.87475</span><span class="p">,</span>
+        <span class="mf">203.35900</span><span class="p">,</span>
+        <span class="mf">209.94350</span><span class="p">,</span>
+        <span class="mf">210.63750</span><span class="p">,</span>
+        <span class="mf">210.63950</span><span class="p">,</span>
+        <span class="mf">216.69850</span><span class="p">,</span>
+        <span class="mf">223.15025</span><span class="p">,</span>
+        <span class="mf">219.22775</span><span class="p">,</span>
+        <span class="mf">227.37700</span><span class="p">,</span>
+        <span class="mf">227.09600</span><span class="p">,</span>
+        <span class="mf">238.11900</span><span class="p">,</span>
+        <span class="mf">235.79275</span><span class="p">,</span>
+        <span class="mf">238.05250</span><span class="p">,</span>
+        <span class="mf">242.59875</span><span class="p">,</span>
+        <span class="mf">244.40425</span><span class="p">]</span>
+    <span class="c1"># Sequence divergence associated with f.</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">86</span><span class="p">)]</span>
+    <span class="c1"># List &lt;da&gt; contains the linearly weighted averaged divergences of the two</span>
+    <span class="c1"># values of the FP-rate that enclose l*alpha:</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">before</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">iF</span><span class="p">,</span> <span class="n">iD</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">f_ok</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">while</span> <span class="n">iF</span> <span class="o">&gt;</span> <span class="n">f_ok</span><span class="p">:</span>
+            <span class="n">da</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">((</span><span class="n">iF</span> <span class="o">-</span> <span class="n">f_ok</span><span class="p">)</span> <span class="o">*</span> <span class="n">before</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">f_ok</span> <span class="o">-</span> <span class="n">before</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">iD</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">iF</span> <span class="o">-</span> <span class="n">before</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">f_ok</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">before</span> <span class="o">=</span> <span class="p">(</span><span class="n">iF</span><span class="p">,</span> <span class="n">iD</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">6</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">da</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">iMax</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="n">iMax</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">calculate_log10_offspring_likelihood</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="n">sequence_type</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">sequence_type</span>
+
+    <span class="c1"># Calculate posterior probabilities of ancestral states from the TR</span>
+    <span class="c1"># alignment</span>
+
+    <span class="c1"># Load model of sequence evolution parameters</span>
+    <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">eqFreq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s1">&#39;lg&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">eqFreq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="s1">&#39;tn93&#39;</span><span class="p">)</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">Q</span> <span class="o">*</span> <span class="n">divergence</span><span class="p">)</span>
+
+    <span class="c1"># Initialise the count matrix (if not already existent)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="s1">&#39;msaTDN&#39;</span><span class="p">):</span>
+        <span class="n">msaTDN_temp</span> <span class="o">=</span> <span class="p">[[</span><span class="n">alphabet</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">column</span> <span class="k">if</span> <span class="n">symbol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTD</span><span class="p">]</span>
+        <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">msaTDN_temp</span><span class="p">:</span>
+            <span class="n">my_diag</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()))}</span>
+            <span class="k">for</span> <span class="n">iN</span> <span class="ow">in</span> <span class="n">column</span><span class="p">:</span>
+                <span class="n">my_diag</span><span class="p">[</span><span class="n">iN</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_diag</span><span class="p">[</span><span class="n">iN</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">my_diag</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
+
+    <span class="c1"># Initialise results matrix</span>
+    <span class="n">posterior_ancestor</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Calculate the posterior probabilities per column</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="p">:</span>
+        <span class="n">posterior</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">i</span><span class="p">:</span> <span class="n">iJ</span> <span class="o">*</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                    <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">column</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span>
+            <span class="n">iJ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eqFreq</span><span class="p">)}</span>
+        <span class="n">normalising_factor</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">posterior</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">posterior</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">posterior</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="n">normalising_factor</span>
+        <span class="n">posterior_ancestor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">posterior</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the likelihood of evolved TR units with the given divergence</span>
+    <span class="c1"># from these ancestral states</span>
+    <span class="n">likelihood_offspring</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="n">iA</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                <span class="nb">sum</span><span class="p">(</span>
+                    <span class="n">posterior</span><span class="p">[</span><span class="n">iAncestor</span><span class="p">]</span> <span class="o">*</span>
+                    <span class="n">P</span><span class="p">[</span><span class="n">iAncestor</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">iAncestor</span> <span class="ow">in</span> <span class="n">alphabet</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">for</span> <span class="n">iA</span><span class="p">,</span>
+            <span class="n">i</span> <span class="ow">in</span> <span class="n">alphabet</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">posterior</span> <span class="ow">in</span> <span class="n">posterior_ancestor</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">likelihood_offspring</span>
+
+
+<div class="viewcode-block" id="loglikelihood_substitution"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.loglikelihood_substitution">[docs]</a><span class="k">def</span> <span class="nf">loglikelihood_substitution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">eqFreq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">tandem_repeat</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; calculate the likelihood of a repeat assuming a star tree and a sequence model</span>
+<span class="sd">        defined by Q, t, eqFreq and alphabet. &#39;&#39;&#39;</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">Q</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># msaTDN is a list of tandem_repeat.n numpy arrays.</span>
+    <span class="c1"># Each numpy array represents the elements of the alphabet. The entries</span>
+    <span class="c1"># are the count of an alphabet element in the respective tandem_repeat</span>
+    <span class="c1"># column</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="s1">&#39;msaTDN&#39;</span><span class="p">):</span>
+        <span class="n">msaTDN_temp</span> <span class="o">=</span> <span class="p">[[</span><span class="n">alphabet</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">column</span> <span class="k">if</span> <span class="n">symbol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">]]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTD</span><span class="p">]</span>
+        <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">msaTDN_temp</span><span class="p">:</span>
+            <span class="n">my_diag</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()))}</span>
+            <span class="k">for</span> <span class="n">iN</span> <span class="ow">in</span> <span class="n">column</span><span class="p">:</span>
+                <span class="n">my_diag</span><span class="p">[</span><span class="n">iN</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_diag</span><span class="p">[</span><span class="n">iN</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">my_diag</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
+
+    <span class="c1"># First sum: Over all sites</span>
+    <span class="c1"># Second sum: Over all possible ancestral characters</span>
+    <span class="c1"># Third product: Over all repeat units</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                <span class="n">iJ</span> <span class="o">*</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span>
+                        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">column</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span>
+                <span class="n">iJ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eqFreq</span><span class="p">)))</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">likelihood</span></div>
+
+
+<div class="viewcode-block" id="calculate_log10_probability_indel_lengths"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths">[docs]</a><span class="k">def</span> <span class="nf">calculate_log10_probability_indel_lengths</span><span class="p">(</span>
+        <span class="n">indel_lengths</span><span class="p">,</span>
+        <span class="n">indel_length_max</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;zipf&#39;</span><span class="p">,</span>
+        <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculate the probability of indels of different length until a maximum length &lt;indel_length_max&gt;,</span>
+<span class="sd">    assuming that either</span>
+
+<span class="sd">    type == &#39;zipf&#39;</span>
+<span class="sd">    indel lengths are distributed following a Zipfian distribution with parameter &lt;indel_zipf&gt;.</span>
+<span class="sd">    (Compare:</span>
+<span class="sd">        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.</span>
+<span class="sd">        Mol Biol Evol, 26, 1879–1888.</span>
+<span class="sd">    In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</span>
+
+<span class="sd">    or</span>
+<span class="sd">    type == &#39;exponential&#39;</span>
+<span class="sd">    indels lengths are distributed following a (1-alpha)*(alpha^(l-1)) distribution.</span>
+<span class="sd">    [Is this model already used? Probably yes. How can i cite it?]</span>
+
+<span class="sd">    A good choice for &lt;indel_length_max&gt; when building HMMs for tandem repeats is &lt;l_effective-1&gt;, as a deletion, that</span>
+<span class="sd">    includes a complete repeat unit, will not be visible in the tandem repeat unit alignment, and could therefore</span>
+<span class="sd">    be ignored.</span>
+
+<span class="sd">    Return the probabilities as a list.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;zipf&#39;</span> <span class="o">==</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="n">indel_zipf</span> <span class="o">=</span> <span class="n">calculate_MAP_Indel_length_Zipfian_factor</span><span class="p">(</span>
+            <span class="n">indel_lengths</span><span class="p">,</span>
+            <span class="n">prior</span><span class="p">)</span>
+        <span class="n">zeta_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">zeta</span><span class="p">(</span><span class="n">indel_zipf</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                <span class="p">((</span><span class="n">iL</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">indel_zipf</span><span class="p">))</span> <span class="o">+</span> <span class="n">zeta_factor</span> <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">indel_length_max</span><span class="p">)]</span>
+
+    <span class="k">elif</span> <span class="s1">&#39;exponential&#39;</span> <span class="o">==</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">calculate_MAP_Indel_length_exponential_factor</span><span class="p">(</span>
+            <span class="n">indel_lengths</span><span class="p">,</span>
+            <span class="n">prior</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;I am not aware of indel length model type: {0}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calculate_MAP_Indel_length_exponential_factor"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor">[docs]</a><span class="k">def</span> <span class="nf">calculate_MAP_Indel_length_exponential_factor</span><span class="p">(</span><span class="n">indel_lengths</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculate the MAP Exponential decay constant &lt;alpha&gt; that determines the distribution of</span>
+<span class="sd">    indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular</span>
+<span class="sd">    column.</span>
+
+<span class="sd">    The MAP is calculated numerically, as no nice analytical solution has been found so far.</span>
+<span class="sd">    A power function of grade 3 needs to be solved:</span>
+<span class="sd">        0 == prior[&#39;sigma_squared&#39;]*(sum(indel_lengths) - len(indel_lengths)) -</span>
+<span class="sd">             alpha*(prior[&#39;sigma_squared&#39;]*sum(indel_lengths) + prior[&#39;mu&#39;]) +</span>
+<span class="sd">             (alpha**2)*(1 + prior[&#39;mu&#39;]) - alpha**3</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;sigma_squared&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indel_lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># As we are only interested in the maximum, we can leave out factors</span>
+        <span class="c1"># (e.g. * 1/(math.sqrt(2*math.pi * prior[&#39;sigma_squared&#39;])) for the Gaussian)</span>
+        <span class="c1"># There is an analytic solution. Compare &quot;Gap it!&quot; or &quot;gaps.nb&quot;</span>
+        <span class="n">posterior</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">alpha</span><span class="p">:</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="p">(</span><span class="n">lIndel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                                             <span class="k">for</span> <span class="n">lIndel</span> <span class="ow">in</span> <span class="n">indel_lengths</span><span class="p">])</span> <span class="o">*</span> \
+            <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;sigma_squared&#39;</span><span class="p">])</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">minimize_scalar</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bounded&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="calculate_MAP_Indel_length_Zipfian_factor"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor">[docs]</a><span class="k">def</span> <span class="nf">calculate_MAP_Indel_length_Zipfian_factor</span><span class="p">(</span><span class="n">indel_lengths</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; calculate the MAP Zipfian constant &lt;indel_zipf&gt; that determines the distribution of</span>
+<span class="sd">    indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular</span>
+<span class="sd">    column.</span>
+<span class="sd">    The probability distribution of indel lengths is assumed to follow the Zipfian distribution</span>
+<span class="sd">    (Compare</span>
+<span class="sd">        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.</span>
+<span class="sd">        Mol Biol Evol, 26, 1879–1888.</span>
+<span class="sd">    In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</span>
+
+<span class="sd">    The MAP is calculated numerically, as there did not seem to be a nice analytical solution.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="mf">1.821</span><span class="p">,</span> <span class="s1">&#39;sigma_squared&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indel_lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># The posterior is the likelihood * prior * scaling.</span>
+        <span class="c1"># As we are only interested in the maximum, we leave out all factors in</span>
+        <span class="c1"># the following equation for the posterior:</span>
+        <span class="n">posterior</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">indel_zipf</span><span class="p">:</span> <span class="o">-</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">zeta</span><span class="p">(</span><span class="n">indel_zipf</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">indel_lengths</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">lIndel</span> <span class="o">**</span> <span class="o">-</span><span class="n">indel_zipf</span> <span class="k">for</span> <span class="n">lIndel</span> <span class="ow">in</span> <span class="n">indel_lengths</span><span class="p">])</span> <span class="o">*</span> \
+            <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">indel_zipf</span> <span class="o">-</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;sigma_squared&#39;</span><span class="p">])</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">minimize_scalar</span><span class="p">(</span><span class="n">posterior</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;brent&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="calculate_log10_indel_probability"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_log10_indel_probability">[docs]</a><span class="k">def</span> <span class="nf">calculate_log10_indel_probability</span><span class="p">(</span><span class="n">nIndels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; calculate the probabilty of an indel per site and per repeat unit</span>
+<span class="sd">    from the MAP estimate of the indel rate, given</span>
+<span class="sd">    - the &lt;divergence&gt; of the repeat units</span>
+<span class="sd">    - a &lt;prior&gt; on the indel rates (normal distributed)</span>
+<span class="sd">    - the number of indels &lt;nIndels&gt; in this column</span>
+<span class="sd">    - the total length &lt;n&gt; of this column</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">indel_rate_MAP</span> <span class="o">=</span> <span class="n">calculate_MAP_indel_rate</span><span class="p">(</span><span class="n">nIndels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">indel_rate_MAP</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calculate_MAP_indel_rate"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_MAP_indel_rate">[docs]</a><span class="k">def</span> <span class="nf">calculate_MAP_indel_rate</span><span class="p">(</span><span class="n">nIndels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; calculate the MAP indel_rate per repeat unit and site given</span>
+<span class="sd">    - an assumed prior distribution of the indel rate described by the dict &lt;prior&gt;</span>
+<span class="sd">    - the likelihood of the the observed number of indels &lt;nIndels&gt;.</span>
+
+<span class="sd">    posterior ~ likelihood * prior</span>
+<span class="sd">    Derive the posterior with respect to the indel_rate</span>
+<span class="sd">    Set the result equal to 0</span>
+<span class="sd">    Solve with respect to the MAP of the indel_rate.</span>
+
+<span class="sd">    For nIndels in {0,1} it is possible to derive the MAP indel_rate analytically.</span>
+<span class="sd">    For all other cases, the maximum of the posterior distribution needs to be found</span>
+<span class="sd">    in good approximation algorithmically.</span>
+
+<span class="sd">    ln(posterior) ~ ln(likelihood) + ln(prior)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;sigma_squared&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">nIndels</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># This max is chosen absolutely randomly. do you have any better idea?</span>
+        <span class="c1"># (Before: constant 0.001)</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;sigma_squared&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Calculate the roots numerically</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span>
+            <span class="n">derivative_log_posterior</span><span class="p">,</span>
+            <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">],</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">prior</span><span class="p">,</span>
+                <span class="n">n</span><span class="p">,</span>
+                <span class="n">nIndels</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="derivative_log_posterior"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.derivative_log_posterior">[docs]</a><span class="k">def</span> <span class="nf">derivative_log_posterior</span><span class="p">(</span><span class="n">indel_rate</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">nIndels</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; assuming that on each site on each repeat unit, an in/del event has occured, or not.</span>
+<span class="sd">    Thus, the likelihood of a certain number of in/del events follows the binomial distribution.</span>
+<span class="sd">    The prior is assumed to be a gaussian described by prior.</span>
+
+<span class="sd">    Return the derivative with respect to &lt;indel_rate&gt; of the natural logarithm of the posterior</span>
+<span class="sd">    probability of &lt;nIndels&gt;, calculated as the product of likelihood and prior. The</span>
+<span class="sd">    normalisation factor is ignored for the moment.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">indel_rate</span> <span class="o">+</span> <span class="p">(</span><span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">indel_rate</span> <span class="o">-</span> <span class="n">n</span> <span class="o">*</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;sigma_squared&#39;</span><span class="p">])</span> <span class="o">*</span> \
+        <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">indel_rate</span><span class="p">)</span> <span class="o">-</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">nIndels</span><span class="p">)</span> <span class="o">*</span> <span class="n">prior</span><span class="p">[</span><span class="s1">&#39;sigma_squared&#39;</span><span class="p">]</span></div>
+
+<span class="c1">############################### External parameters ######################</span>
+
+
+<div class="viewcode-block" id="hmmer3_emission_probabilities"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.hmmer3_emission_probabilities">[docs]</a><span class="k">def</span> <span class="nf">hmmer3_emission_probabilities</span><span class="p">(</span><span class="n">hmmer_probabilities</span><span class="p">,</span> <span class="n">letters</span><span class="p">,</span> <span class="n">lMatch</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Get emission probabilities from hmmer3 hmm file.</span>
+<span class="sd">    In hmm file, emission probabilities are -ln(p).</span>
+<span class="sd">    Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)</span>
+
+<span class="sd">    Parameters (e.g.):</span>
+<span class="sd">    letters = [&#39;A&#39;, &#39;C&#39;, &#39;E&#39;, &#39;D&#39;, &#39;G&#39;, &#39;F&#39;, &#39;I&#39;, &#39;H&#39;, &#39;K&#39;, &#39;M&#39;, &#39;L&#39;, &#39;N&#39;, &#39;Q&#39;, &#39;P&#39;, &#39;S&#39;, &#39;R&#39;, &#39;T&#39;, &#39;W&#39;, &#39;V&#39;, &#39;Y&#39;]</span>
+<span class="sd">    lMatch = [&#39;M&#39;+str(i) for i in range(24)]</span>
+
+<span class="sd">    Return format (pseudo code):</span>
+<span class="sd">    [{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in lMatch]</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Test: Is the number of match states in both models equal?</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">hmmer_probabilities</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">lMatch</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Match states HMMER: {0} Match states local: {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">hmmer_probabilities</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lMatch</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;The number of match states in HMMer model and local model does not match&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Test: Are all &lt;letters&gt; represented in the HMMER HMM?</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">iL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hmmer_probabilities</span><span class="p">[</span><span class="s1">&#39;letters&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="n">letters</span><span class="p">):</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">iL</span> <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="n">letters</span> <span class="k">if</span> <span class="n">iL</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hmmer_probabilities</span><span class="p">[</span><span class="s1">&#39;letters&#39;</span><span class="p">]]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Missing representation in Hmmer File: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Some letters in the local HMM are not represented in the HMMER HMM.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="n">iL</span><span class="p">:</span> <span class="o">-</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">iP</span><span class="p">)</span> <span class="o">*</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">iL</span><span class="p">,</span>
+            <span class="n">iP</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">hmmer_probabilities</span><span class="p">[</span><span class="s1">&#39;letters&#39;</span><span class="p">],</span>
+                <span class="n">hmmer_probabilities</span><span class="p">[</span>
+                    <span class="n">iMatch</span><span class="p">[</span>
+                        <span class="mi">1</span><span class="p">:]][</span><span class="s1">&#39;emissions&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="n">iL</span> <span class="ow">in</span> <span class="n">letters</span><span class="p">}</span> <span class="k">for</span> <span class="n">iMatch</span> <span class="ow">in</span> <span class="n">lMatch</span><span class="p">]</span></div>
+
+
+<span class="c1">##################################### Tests ##############################</span>
+
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39; To be implemented... &#39;&#39;&#39;</span>
+    <span class="c1">#tandem_repeat = ...</span>
+    <span class="n">divergence</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">calculate_log10_offspring_likelihood</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="n">divergence</span><span class="p">)</span></div>
+
+<span class="c1">##################################### Main ###############################</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">my_TR</span> <span class="o">=</span> <span class="n">repeat_info</span><span class="o">.</span><span class="n">Repeat</span><span class="p">(</span>
+        <span class="n">begin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">msa</span><span class="o">=</span><span class="p">[</span>
+            <span class="s1">&#39;A-G&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ACG&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ACG&#39;</span><span class="p">],</span>
+        <span class="n">sequence_type</span><span class="o">=</span><span class="s1">&#39;DNA&#39;</span><span class="p">)</span>
+    <span class="c1">#my_TR = TR()</span>
+    <span class="n">my_HMM</span> <span class="o">=</span> <span class="n">HMM</span><span class="p">(</span><span class="n">my_TR</span><span class="p">,</span> <span class="n">divergence</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1">#print(calculate_indel_rate(1, 6, 1.5))</span>
+
+    <span class="c1"># print(calculate_probability_indel_lengths(0.366869,6,&#39;exponential&#39;))</span>
+
+    <span class="k">return</span> <span class="n">my_HMM</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

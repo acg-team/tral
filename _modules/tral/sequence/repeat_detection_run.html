@@ -1,0 +1,1234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tral.sequence.repeat_detection_run &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.sequence.repeat_detection_run</h1><div class="highlight"><pre>
+<span class="c1"># (C) 2011, Alexander Korsunsky</span>
+<span class="c1"># (C) 2011-2015 Elke Schaper</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :synopsis: Execution of repeat detection algorithms</span>
+
+<span class="sd">    .. moduleauthor:: Elke Schaper &lt;elke.schaper@isb-sib.ch&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">distutils</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">configuration</span>
+<span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">repeat_detection_io</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">CONFIG_GENERAL</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
+<span class="n">REPEAT_DETECTOR_PATH</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">][</span><span class="s2">&quot;repeat_detector_path&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="BinaryExecutable"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.BinaryExecutable">[docs]</a><span class="k">class</span> <span class="nc">BinaryExecutable</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Contains the executable, and combines executable with parameters.</span>
+
+<span class="sd">    Contains the executable, and combines executable with parameters.</span>
+
+<span class="sd">     Attributes:</span>
+<span class="sd">        binary(str): Path to binary</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Construct a BinaryExecutable object.</span>
+
+<span class="sd">        Construct a BinaryExecutable object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            binary (str): Path to the binary</span>
+<span class="sd">            name(str): Name of the programme.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">binary</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;A binary executable must be provided.&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">binary</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">distutils</span><span class="o">.</span><span class="n">spawn</span><span class="o">.</span><span class="n">find_executable</span><span class="p">(</span><span class="n">binary</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The executable {} does not exist, although {} was selected &quot;</span>
+                <span class="s2">&quot;to be executed. Please make sure the executable is in the system path, or &quot;</span>
+                <span class="s2">&quot;the path to the executable is correctly set in config.ini&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">binary</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+<div class="viewcode-block" id="BinaryExecutable.get_execute_tokens"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">get_execute_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the tokens to invoke the program with the arguments args&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">binary</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BinaryExecutable.get_execute_line"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.BinaryExecutable.get_execute_line">[docs]</a>    <span class="k">def</span> <span class="nf">get_execute_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the command line to invoke the program with the arguments args&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="check_java_errors"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.check_java_errors">[docs]</a><span class="k">def</span> <span class="nf">check_java_errors</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="n">errfile</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">LOG</span><span class="p">,</span> <span class="n">procname</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check for java problems. Return True if there were problems, else False.</span>
+
+<span class="sd">    Check for these java errors:</span>
+
+<span class="sd">     * Stdout file is empty but stderr file is not.</span>
+<span class="sd">     * Java Exception string is indicated in the errfile</span>
+
+<span class="sd">     Return True if there were problems, else False.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        outfile (file handle):  Redirected standard output channel file.</span>
+<span class="sd">        errfile (file handle): Redirected standard error channel file</span>
+<span class="sd">            If None, no copies are saved.</span>
+<span class="sd">        log (?): Name of the log to issue log messages to. If none, no log</span>
+<span class="sd">                messages will be issued.</span>
+
+<span class="sd">    .. todo:: Complete docstring</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">has_error</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">of</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">errfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ef</span><span class="p">:</span>
+        <span class="n">outfile_size</span> <span class="o">=</span> <span class="n">of</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span>
+        <span class="n">errfile_str</span> <span class="o">=</span> <span class="n">ef</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">errfile_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">errfile_str</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">errfile_size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">outfile_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">has_error</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Process </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> has empty STDOUT but non-empty STDERR&quot;</span><span class="p">,</span>
+            <span class="n">procname</span><span class="p">)</span>
+
+    <span class="n">pat_javaexc</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="s1">r&#39;Exception in thread &quot;.+&quot; \S+:.*$(\s+at .+)+&#39;</span><span class="p">,</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">pat_javaexc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">errfile_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">has_error</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Java Exception probably occured in process </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">! Exception information:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">procname</span><span class="p">,</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">has_error</span></div>
+
+
+<span class="k">class</span> <span class="nc">TRDetector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a TRDetector object with executable als executable object&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span> <span class="o">=</span> <span class="n">executable</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Launch a detector process</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        working_dir -- Working directory to run process in</span>
+<span class="sd">        args -- Arguments to pass to the process</span>
+
+<span class="sd">        Return Value:</span>
+<span class="sd">        A tuple with:</span>
+<span class="sd">            - The return code</span>
+<span class="sd">            - The name to the file with the redirected standard output channel (stdout)</span>
+<span class="sd">            - The name to the file with the redirected standard error channel (stderror)</span>
+
+<span class="sd">        The standard output (stdout) and standard error (stderr) channels will</span>
+<span class="sd">        be redirected to working_dir/stdout.txt and working_dir/stdout.txt</span>
+<span class="sd">        respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># create working directory in top level working directory,</span>
+        <span class="c1"># if it does not yet exist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">working_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
+
+        <span class="n">stdoutfname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;stdout.txt&quot;</span><span class="p">)</span>
+        <span class="n">stderrfname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;stderr.txt&quot;</span><span class="p">)</span>
+
+        <span class="c1"># open stdout and stderr output file</span>
+        <span class="n">__stdout_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">__stderr_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">stderrfname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Launching process: </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_line</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">working_dir</span><span class="p">)</span>
+
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Launching process tokens: </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">working_dir</span><span class="p">)</span>
+        <span class="c1"># launch process</span>
+        <span class="n">__process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__executable</span><span class="o">.</span><span class="n">get_execute_tokens</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">cwd</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">__stdout_file</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">__stderr_file</span><span class="p">,</span> <span class="n">close_fds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">__process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="n">__stdout_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">__stderr_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">__process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorHHrepID</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HHrepID&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;HHrepID&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot; Execute vi</span>
+<span class="sd">    ./hhrepid_32 -i infile -v 0 -nofilt -d dummyHMM.hmm -o resultfile</span>
+<span class="sd">    ./hhrepid -i &lt;query&gt; -d &lt;path to cal.hhm&gt; -tp &lt;path to tp.dat&gt; -fp &lt;path to fp.dat&gt; &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># turn off low-complexity filter (default: filter on)</span>
+                <span class="s2">&quot;-nofilt&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="c1"># calibration by shuffling instead of database search (default:</span>
+                <span class="c1"># off)</span>
+                <span class="s2">&quot;-shuffle&quot;</span><span class="p">:</span> <span class="bp">False</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># &lt;file&gt; input query alignment  (fasta/a2m/a3m) or HMM file (.hhm)</span>
+                <span class="s2">&quot;-i&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-d&quot;</span><span class="p">:</span> <span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="s1">&#39;HHrepID_dummyhmm&#39;</span><span class="p">],</span>   <span class="c1"># &lt;path&gt; dummy hmm database file</span>
+                <span class="s2">&quot;-o&quot;</span><span class="p">:</span> <span class="s1">&#39;hhrepID.o&#39;</span><span class="p">,</span>    <span class="c1"># &lt;file&gt; write results and multiple sequence alignment to file (default=none)</span>
+                <span class="s2">&quot;-v&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>           <span class="c1"># -v: verbose mode (default: show only warnings)  ;  -v 0: suppress all screen outpu</span>
+                <span class="s2">&quot;-P&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt; max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)</span>
+                <span class="s2">&quot;-R&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt; max p-value of repeats  (def=1)</span>
+                <span class="s2">&quot;-T&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt; max total repeat p-value (def=0.001)</span>
+                <span class="s2">&quot;-alpha&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt; For calculating repeat p-values: weight of n&#39;th suboptimal alignment vs. (n+1)-st suboptimal alignmen</span>
+                <span class="s2">&quot;-k&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># [0,inf[ For calculating repeat p-values: maximal number of suboptimal alignments considered (def=1)</span>
+                <span class="s2">&quot;-cont&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt;  probability threshold for masking of inconsistent cells (def=0.001)</span>
+                <span class="s2">&quot;-mrgr&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># [0,inf[  number of merge rounds for achieving consistency (def=3)</span>
+                <span class="s2">&quot;-lcon&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># &lt;float&gt;  preserved local context in shuffling (def=2)</span>
+                <span class="s2">&quot;-lmin&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>        <span class="c1"># [0,inf[  minimal length of repeats to be identified (def=7)</span>
+
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="n">infile</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">toks</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">optstring</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">)]</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span><span class="p">:</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optstring</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorHHrepID object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorHHrepID</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorHHrepID</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">prog_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="n">infile</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> \
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="n">prog_args</span><span class="p">)</span>
+
+        <span class="c1"># CHECK WHETHER outfile exists, else give warning and return empty</span>
+        <span class="c1"># list.</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="n">resultfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-o&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">resultfile</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">resultfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infilehandle</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">hhpredid_get_repeats</span><span class="p">(</span><span class="n">infilehandle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorPhobos</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;PHOBOS&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;PHOBOS&quot;</span>
+
+    <span class="c1"># execute via phobos --printRepeatSeqMode 3 DNA.faa phobos.o</span>
+    <span class="c1"># or phobos --help to see all options</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># Phobos will choose the shorter of the two alignments instead</span>
+                <span class="c1"># of the longer. Phobos will run faster with this option.</span>
+                <span class="s2">&quot;--preferShorterRepeats&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="c1"># dontRemoveMostlyOverlapping. Default: DO remove mostly</span>
+                <span class="c1"># overlapping repeats in favour of the one with the higher</span>
+                <span class="c1"># internal score</span>
+                <span class="s2">&quot;--dontRemoveMostlyOverlapping&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">scriptopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;outputfile&quot;</span><span class="p">:</span> <span class="s1">&#39;phobos.o&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># &lt;int&gt; Display of TR. 0: asIs, 1: Alphabetical normal form, 2: Alphabetical normal form also considering the reverse complement. Default: 2</span>
+                <span class="s2">&quot;--reportUnit&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;--NPerfectionMode&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Treatment of N.  0: asMismatch, 1: asNeutral, 2: asMatch. Default: 0.</span>
+                <span class="s2">&quot;--printRepeatSeqMode&quot;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Show the repeat unit alignment</span>
+                <span class="s2">&quot;--outputFormat&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; 0 : Use the Phobos output format. Default: 0</span>
+                <span class="s2">&quot;--minPerfection&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;float&gt; Minimum perfection of a satellites. Default: 0.</span>
+                <span class="s2">&quot;--maxPerfection&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;float&gt; Maximum perfection of a satellites. Default: 100.</span>
+                <span class="s2">&quot;--maximum_score_reduction&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># The maximum amount the score can be reduced before search is aborded. Typical: 6*mismatch-penalty or infinite. Default: infinite</span>
+                <span class="s2">&quot;--recursion&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># The recursion depth used in the search. Values in the range 3 to 7 are recommended. A value of 0 implies a search for perfect repeats only. Default: Not stated</span>
+                <span class="s2">&quot;--minUnitLen&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Minimum unit length. Default: 1</span>
+                <span class="s2">&quot;--maxUnitLen&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Maximum unit length. Default: 10</span>
+                <span class="s2">&quot;--minLength_b&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;float&gt; The minimum length of a repeat is determined with: maximum( minLength, minLength_a + minLength_b*(unit-length) ). Default value of minLength_b: 0</span>
+                <span class="s2">&quot;--minLength_a&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Default value of minLength_a: 0</span>
+                <span class="s2">&quot;--minLength&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Default value of minLength: 0</span>
+                <span class="s2">&quot;--minScore_b&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;float&gt; The minimum score of a repeat is determined with: maximum( minScore, minScore_a + minScore_b*(unit-length) ). Default value of minScore_b: 1</span>
+                <span class="s2">&quot;--minScore_a&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Default value of minScore_a: 0</span>
+                <span class="s2">&quot;--minScore&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Default value of minScore: 6</span>
+                <span class="s2">&quot;--mismatchScore&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Score for mismatch - must be negative. Default: -5. Match score is fixed to one.</span>
+                <span class="s2">&quot;--indelScore&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>  <span class="c1"># &lt;int&gt; Score for indels - must be negative. Default: -5. Match score is fixed to one.</span>
+                <span class="s2">&quot;--searchMode&quot;</span><span class="p">:</span> <span class="s1">&#39;imperfect&#39;</span>  <span class="c1"># [&#39;exact&#39;,&#39;extendExact&#39;,&#39;imperfect&#39;]</span>
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">set_working_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">working_dir</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">working_dir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">optstring</span> <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span>
+                <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">optvalue</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optstring</span><span class="p">)</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+            <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorPhobos object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorPhobos</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorPhobos</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_working_dir</span><span class="p">(</span><span class="n">working_dir</span><span class="o">=</span><span class="n">wd</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">DetectorPhobos</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span>
+            <span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+        <span class="c1"># alternatively:</span>
+        <span class="c1">#prog_args = self.config.tokens(infile=infile)</span>
+        <span class="c1">#retcode, stdoutfname, stderrfname = super().run_process(wd, *prog_args)</span>
+
+        <span class="c1"># Process output file, return results If outfile does not exist return</span>
+        <span class="c1"># empty list</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">]):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">resultfilehandle</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">phobos_get_repeats</span><span class="p">(</span><span class="n">resultfilehandle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Did not find Phobos result file in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scriptopts</span><span class="p">[</span><span class="s1">&#39;outputfile&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorTRED</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;TRED&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;TRED&quot;</span>
+
+    <span class="sd">&quot;&quot;&quot; tred is a shell script executing:</span>
+<span class="sd">            tred1 myDNA.faa intermediate_output</span>
+<span class="sd">            tred2 myDNA.faa intermediate_output output1 output2</span>
+<span class="sd">        At the moment, we do not know how to add parameters to TRED    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1"># For now, use Tred with default options only</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">set_result_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_file</span> <span class="o">=</span> <span class="n">result_file</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span> <span class="o">=</span> <span class="p">[</span><span class="n">infile</span><span class="p">]</span>
+            <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_file</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorTRED object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorTRED</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorTRED</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">result_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="s1">&#39;tred.o&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_result_file</span><span class="p">(</span><span class="n">result_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_file</span><span class="p">)</span>
+        <span class="n">prog_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="n">infile</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> \
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="n">prog_args</span><span class="p">)</span>
+
+        <span class="c1"># CHECK WHETHER outfile exists, else give warning and return empty</span>
+        <span class="c1"># list.</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_file</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infilehandle</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">tred_get_repeats</span><span class="p">(</span><span class="n">infilehandle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Did not find TRED result file in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorTREKS</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;T-REKS&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;T-REKS&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-overlapfilter&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                <span class="s2">&quot;-nosplit&quot;</span><span class="p">:</span> <span class="bp">True</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-msaMode&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-clustal&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-db&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-muscle&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-outfile&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-similarity&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-kmeans&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-varIndels&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s2">&quot;-type&quot;</span><span class="p">:</span> <span class="bp">None</span>
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">bool_toks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">optstring</span> <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span>
+                <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">optvalue</span><span class="p">]</span>
+            <span class="n">value_toks</span> <span class="o">=</span> <span class="p">([</span>
+                <span class="n">optstring</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+            <span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">value_toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-infile=&quot;</span> <span class="o">+</span> <span class="n">infile</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">bool_toks</span> <span class="o">+</span> <span class="n">value_toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                 <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorTREKS object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorTREKS</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorTREKS</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">prog_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="n">infile</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> \
+            <span class="nb">super</span><span class="p">(</span><span class="n">DetectorTREKS</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="n">prog_args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">check_java_errors</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span><span class="p">,</span>
+                             <span class="n">log</span><span class="o">=</span><span class="n">LOG</span><span class="p">,</span> <span class="n">procname</span><span class="o">=</span><span class="n">DetectorTREKS</span><span class="o">.</span><span class="n">displayname</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">treks_get_repeats</span><span class="p">(</span><span class="n">outfile</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tmp</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorTRF</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;TRF&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;TRF_Benson&quot;</span>
+
+    <span class="c1"># Execute via:</span>
+    <span class="c1"># ./trf404.linux64.exe inputfile 2 7 7 80 10 50 500 -d</span>
+    <span class="c1"># Result file in this case is called inputfile.2.7.7.80.10.50.500.1.txt.html</span>
+    <span class="c1"># WARNING: This result file name is only used if there is only one sequence in the input file!</span>
+    <span class="c1">## result_file_name = &quot;.&quot;.join([inputfile] + [str(optvalue) for optstring, optvalue in self.valopts.items() if optvalue != None] + [&#39;1.txt.html&#39;])</span>
+
+    <span class="c1"># ./trf404.linux64.exe File Match Mismatch Delta PM PI Minscore MaxPeriod [options]</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># no redundancy elimination # Already without the -r flag set,</span>
+                <span class="c1"># the three best redundant solutions are displayed</span>
+                <span class="s2">&quot;-r&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="c1"># &quot;-h&quot;            : False,    # When -h is set, the output html of interest is not written :(</span>
+                <span class="c1"># &quot;-d&quot;            : False,    # produce data file, not needed at curren</span>
+                <span class="c1"># &quot;-m&quot;            : False,    # masked sequence file</span>
+                <span class="c1"># &quot;-f&quot;            : False,    # flanking sequence</span>
+            <span class="p">}</span>
+
+            <span class="c1"># The order of TRF flags matters. Hence, we use an ordered</span>
+            <span class="c1"># dictionary for valopts.</span>
+            <span class="n">valopts_tmp</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>  <span class="c1"># input file</span>
+                <span class="p">(</span><span class="s2">&quot;Match&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>     <span class="c1"># matching weigh</span>
+                <span class="p">(</span><span class="s2">&quot;Mismatch&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>     <span class="c1"># mismatching penalty</span>
+                <span class="p">(</span><span class="s2">&quot;Delta&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>     <span class="c1"># indel penalty</span>
+                <span class="p">(</span><span class="s2">&quot;PM&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>    <span class="c1"># integer match probability</span>
+                <span class="p">(</span><span class="s2">&quot;PI&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>    <span class="c1"># integer indel probability</span>
+                <span class="p">(</span><span class="s2">&quot;Minscore&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>    <span class="c1"># minimum alignment score to report</span>
+                <span class="p">(</span><span class="s2">&quot;MaxPeriod&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>    <span class="c1"># maximum period size to report</span>
+
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">valopts_tmp</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span><span class="p">:</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optstring</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorTRF object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorTRF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorTRF</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">prog_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="o">=</span><span class="n">infile</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> \
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="n">prog_args</span><span class="p">)</span>
+
+        <span class="c1"># get the infile name from the infile path</span>
+        <span class="n">infile_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">r&quot;/([_\.\w]+)$&quot;</span><span class="p">,</span> <span class="n">infile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># WARNING! TRF is a volatile programme, this result_file_name might not always be true.</span>
+        <span class="c1"># Maybe a general search on txt.html elements in the result dir might</span>
+        <span class="c1"># be more appropiate.</span>
+        <span class="n">result_file_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">infile_name</span><span class="p">]</span> <span class="o">+</span>
+            <span class="p">[</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">)</span> <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span>
+                <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span> <span class="o">+</span>
+            <span class="p">[</span><span class="s1">&#39;1.txt.html&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">result_file_name</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">trf_get_repeats</span><span class="p">(</span><span class="n">outfile</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tmp</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorTrust</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;TRUST&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;TRUST&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-noseg&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                <span class="s2">&quot;-force&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-matrix&quot;</span><span class="p">:</span> <span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="s1">&#39;TRUST_substitutionmatrix&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;-gapo&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-gapx&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-procTotal&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="p">}</span>  <span class="c1"># procTotal: When running on a cluster, specify the amount of processors used  # procNr cpu_number:  When running on a cluster, specify 0-based CPU-number and amount of processors used</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">optstring</span> <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span>
+                <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">optvalue</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optstring</span><span class="p">)</span>
+                    <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-fasta&quot;</span><span class="p">)</span>
+                <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorTrust object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorTrust</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run detector process on infile in working_dir and return all repeats found&quot;&quot;&quot;</span>
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorTrust</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">DetectorTrust</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span>
+            <span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">check_java_errors</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span><span class="p">,</span>
+                             <span class="n">log</span><span class="o">=</span><span class="n">LOG</span><span class="p">,</span> <span class="n">procname</span><span class="o">=</span><span class="n">DetectorTrust</span><span class="o">.</span><span class="n">displayname</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># shutil.copyfile(stdoutfname, YOUR FAVOURITE PATH)</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">trust_get_repeats</span><span class="p">(</span><span class="n">outfile</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">DetectorXStream</span><span class="p">(</span><span class="n">TRDetector</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;XSTREAM&#39;</span>
+    <span class="n">displayname</span> <span class="o">=</span> <span class="s2">&quot;XSTREAM&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Configuration</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># &quot;-n&quot; : False,   # sequence type: nucleotide</span>
+                <span class="s2">&quot;-l&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>   <span class="c1"># don&#39;t look for periods &gt;1000</span>
+                <span class="c1"># &quot;-p&quot; : False,   # don&#39;t print repeat alignmen</span>
+                <span class="s2">&quot;-h&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>    <span class="c1"># write to console, not HTML</span>
+                <span class="c1"># &quot;-C&quot; : False,   # don&#39;t print any repeat info</span>
+                <span class="s2">&quot;-z&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>  <span class="c1"># generate spreadsheet .xls output</span>
+                <span class="c1"># &quot;-Z&quot; : False,   # create statistics spreadshee</span>
+                <span class="c1"># &quot;-s&quot; : False,   # parse output by input sequence</span>
+                <span class="s2">&quot;-f&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>   <span class="c1"># perform divide &amp; conquer on inpu</span>
+                <span class="c1"># &quot;-G&quot; : False,   # create color-coded TR block diagram</span>
+                <span class="c1"># &quot;-G*&quot; : False,  # create single color TR block diagram</span>
+                <span class="c1"># &quot;-B&quot; : False,   # create sequence comparison map PNG</span>
+                <span class="c1"># &quot;-O&quot; : False,   # print &quot;mismatch/gaps colored&quot; HTML outpu</span>
+                <span class="s2">&quot;-N&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>   <span class="c1"># turn off nesting</span>
+                <span class="s2">&quot;-o&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>   <span class="c1"># don&#39;t remove overlapping TR domain</span>
+                <span class="c1"># &quot;-S&quot; : False,   # input strain into database</span>
+                <span class="s2">&quot;-V&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>   <span class="c1"># don&#39;t invoke D &amp; C automatically for long inpu</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-g&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [integer] set gap number</span>
+                <span class="s2">&quot;-i&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [0-1] set matching threshold for detection</span>
+                <span class="s2">&quot;-I&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [0-1] set cons error threshold for printing</span>
+                <span class="s2">&quot;-D&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [0-1] set max % indels for printing</span>
+                <span class="s2">&quot;-m&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>    <span class="c1"># [integer] set minimum period</span>
+                <span class="s2">&quot;-x&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [integer] set maximum period</span>
+                <span class="s2">&quot;-e&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [any number&gt;=2] set minimum copy number</span>
+                <span class="c1"># &quot;-a&quot; : None,    # [string] add identifier string to output file</span>
+                <span class="s2">&quot;-f&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>    <span class="c1"># [integer] set fragment length</span>
+                <span class="c1"># &quot;-d&quot; : None,    # [file path] specify output directory</span>
+                <span class="c1"># &quot;-A&quot; : None,    # [file] import substitution alphabe</span>
+                <span class="s2">&quot;-L&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>    <span class="c1"># [integer] set minimum TR domain length</span>
+                <span class="s2">&quot;-P&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>    <span class="c1"># [0-1] set minimum % sequence coverage</span>
+                <span class="c1"># &quot;-Q&quot; : None,    # [user,pass,db] send output to MySQL TR database</span>
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Generate command line tokens based on this configuration.</span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">            infile -- generate tokens to pass infile as input file to detector&quot;&quot;&quot;</span>
+            <span class="n">toks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">optstring</span> <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span>
+                <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">optvalue</span><span class="p">]</span>
+
+            <span class="n">toks</span> <span class="o">=</span> <span class="n">toks</span> <span class="o">+</span> \
+                <span class="p">[</span><span class="n">optstring</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">optvalue</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">optstring</span><span class="p">,</span> <span class="n">optvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valopts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">optvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">toks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">toks</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DetectorXStream object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">        name: The name of the tandem repeat detector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+        <span class="n">executable</span> <span class="o">=</span> <span class="n">BinaryExecutable</span><span class="p">(</span>
+            <span class="n">binary</span><span class="o">=</span><span class="n">REPEAT_DETECTOR_PATH</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DetectorXStream</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">executable</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">find_chartfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">searchdir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Look for XSTREAM output xls file and return filepath&quot;&quot;&quot;</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">searchdir</span><span class="p">)</span>
+
+        <span class="c1"># look for the first file that matches XSTREAM_something_chart.xl</span>
+        <span class="n">pat_chartfilename</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;^XSTREAM_.*_chart\.xls$&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pat_chartfilename</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">searchdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">run_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run detector process on infile in working_dir and return all repeats found.</span>
+
+<span class="sd">        Run detector process on infile in working_dir and return all repeats found.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            working_dir (str): Working directory</span>
+<span class="sd">            infile (str): Infile</span>
+
+<span class="sd">        .. ToDo:: Complete docstrings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">DetectorXStream</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># execute detector process</span>
+        <span class="n">retcode</span><span class="p">,</span> <span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">DetectorXStream</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span>
+            <span class="n">wd</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">check_java_errors</span><span class="p">(</span><span class="n">stdoutfname</span><span class="p">,</span> <span class="n">stderrfname</span><span class="p">,</span>
+                             <span class="n">log</span><span class="o">=</span><span class="n">LOG</span><span class="p">,</span> <span class="n">procname</span><span class="o">=</span><span class="n">DetectorXStream</span><span class="o">.</span><span class="n">displayname</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Find output file, cry about it if not found</span>
+
+        <span class="c1">#shutil.rmtree(os.path.join(EXECROOT, &#39;..&#39;, &#39;spielwiese&#39;))</span>
+        <span class="c1">#shutil.copytree(working_dir, os.path.join(EXECROOT, &#39;..&#39;, &#39;spielwiese&#39;))</span>
+
+        <span class="n">chartfilename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_chartfile</span><span class="p">(</span><span class="n">wd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chartfilename</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No XSTREAM output chart file found in </span><span class="si">%s</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="n">wd</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Process output file, return results</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">chartfilename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">repeat_detection_io</span><span class="o">.</span><span class="n">xstream_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Detectors"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.Detectors">[docs]</a><span class="k">def</span> <span class="nf">Detectors</span><span class="p">(</span><span class="n">lDetector</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sequence_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Define a global dictionary of all used detector functions.</span>
+
+<span class="sd">    Define a global dictionary of all used detector functions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lDetector (list of str): A list of repeat detection algorithm names.</span>
+<span class="sd">        sequence_type (str): Either &quot;AA&quot; or &quot;DNA&quot;.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: if at least one of the provided detectors in ``lDetector`` does not exist.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">DETECTORS</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sequence_type</span><span class="p">:</span>
+        <span class="n">sequence_type</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;sequence_type&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lDetector</span><span class="p">:</span>
+        <span class="n">lDetector</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">][</span><span class="s2">&quot;repeat_detection&quot;</span><span class="p">][</span><span class="n">sequence_type</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lDetector</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">lDetector</span> <span class="o">=</span> <span class="p">[</span><span class="n">lDetector</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lDetector</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot; lDetector is not of type list. Please supply a list of TR detectors</span>
+<span class="s2">            (e.g. lDetector = [&#39;HHrepID&#39;]). If you use TR detectors defined in config.ini, make</span>
+<span class="s2">            sure the TR detector list (AA or DNA) is correctly defined.&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FINDER_LIST</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lDetector</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Unknown TR detector supplied (Supplied: {}. Known TR detectors: {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">lDetector</span><span class="p">,</span>
+                    <span class="n">FINDER_LIST</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="n">DETECTORS</span> <span class="o">=</span> <span class="p">{</span><span class="n">FINDER_LIST</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">FINDER_LIST</span><span class="p">[</span><span class="n">i</span><span class="p">]()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lDetector</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="split_sequence"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.split_sequence">[docs]</a><span class="k">def</span> <span class="nf">split_sequence</span><span class="p">(</span><span class="n">seq_records</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Split a FASTA file with multiple entries to several FASTA files with one entry</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    seq_records -- List of Sequence instances.</span>
+<span class="sd">    working_dir -- Output directory for splitted file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    A list of tuples containing the Protein identifier and the file name</span>
+
+<span class="sd">    .. TODO: Do not append i to outfiles, but a sequence ID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">outfiles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">seq_records</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;sequence_{0:03}.faa&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">seq</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;fasta&quot;</span><span class="p">)</span>
+        <span class="n">outfiles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">outfiles</span></div>
+
+
+<span class="k">class</span> <span class="nc">DetectorJob</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">protein_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span> <span class="o">=</span> <span class="n">infile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_id</span> <span class="o">=</span> <span class="n">job_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_id</span> <span class="o">=</span> <span class="n">protein_id</span>
+
+
+<span class="c1">################ RUN A SET OF Tandem Repeat Detection algorithms (TRDs) ##</span>
+
+<div class="viewcode-block" id="run_detector"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.repeat_detection_run.run_detector">[docs]</a><span class="k">def</span> <span class="nf">run_detector</span><span class="p">(</span>
+        <span class="n">seq_records</span><span class="p">,</span>
+        <span class="n">detectors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">sequence_type</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">local_working_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">num_threads</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Run TRD on sequence_records and return the predicted repeats for each ``seq_records``</span>
+<span class="sd">     and for each tandem repeat detector.</span>
+
+<span class="sd">    Run TRD on sequence_records and return the predicted repeats for each ``seq_records``</span>
+<span class="sd">    and for each tandem repeat detector. Example of return type::</span>
+
+<span class="sd">        [</span>
+<span class="sd">            # record 1</span>
+<span class="sd">            {</span>
+<span class="sd">            &#39;T-REKS&#39; : [ Repeat(), Repeat(), ...],</span>
+<span class="sd">            &#39;XSTREAM&#39; : [ Repeat(), Repeat(), ...],</span>
+<span class="sd">            ...</span>
+<span class="sd">            },</span>
+<span class="sd">            # record 2</span>
+<span class="sd">            ...</span>
+<span class="sd">        ]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq_records (list of Sequence): A list of Sequence instances</span>
+<span class="sd">        detectors (list of str): A list tandem repeat detector names</span>
+<span class="sd">        sequence_type (str): Either &quot;AA&quot; or &quot;DNA&quot;</span>
+<span class="sd">        default (bool): If True, default values for the detection algorithms are used.</span>
+<span class="sd">        local_working_dir (str): Directory where data and results are stored. If provided,</span>
+<span class="sd">        temporary files are not deleted/</span>
+<span class="sd">        num_threads (int): Run ``num_threads`` detectors on parallel threads.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of dictionary: A list with a dictionary for each record in seq_records. The</span>
+<span class="sd">        dictionary contains a list of repeats for each detector that was used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create temporary working dir</span>
+    <span class="k">if</span> <span class="n">local_working_dir</span><span class="p">:</span>
+        <span class="n">working_dir</span> <span class="o">=</span> <span class="n">local_working_dir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">working_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;repeat_detection_run.run_detector: Created tempfile: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">working_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">working_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;The specified directory </span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">working_dir</span> <span class="o">+</span>
+                          <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Initialise Detectors</span>
+    <span class="n">Detectors</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">sequence_type</span><span class="p">)</span>
+
+    <span class="c1"># Adjust TRD parameters:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">default</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+            <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;HHrepID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_hhrepid_config_open</span><span class="p">()</span>
+            <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;TRUST&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_trust_config_open</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;TRF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_trf_config_open</span><span class="p">()</span>
+            <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;PHOBOS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_phobos_config_open</span><span class="p">()</span>
+        <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;T-REKS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_treks_config_open</span><span class="p">()</span>
+        <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;XSTREAM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_xstream_config_open</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;DNA&#39;</span><span class="p">:</span>
+        <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;T-REKS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">set_treks_config_DNA</span><span class="p">()</span>
+
+    <span class="n">infiles</span> <span class="o">=</span> <span class="n">split_sequence</span><span class="p">(</span><span class="n">seq_records</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">)</span>
+
+    <span class="c1"># list of dictionaries for each protein containing detectorname : results</span>
+    <span class="c1"># entries</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="n">fname</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">detector</span> <span class="ow">in</span> <span class="n">DETECTORS</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">infiles</span><span class="p">))</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create a list for our jobs</span>
+    <span class="n">joblist</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">DetectorJob</span><span class="p">(</span>
+            <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
+            <span class="n">infile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">infile</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+            <span class="n">protein_id</span><span class="o">=</span><span class="n">infile</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">fname</span><span class="p">,</span> <span class="n">detector</span> <span class="ow">in</span> <span class="n">DETECTORS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">infile</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infiles</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%d</span><span class="s2"> input files in </span><span class="si">%d</span><span class="s2"> jobs.&quot;</span><span class="p">,</span>
+             <span class="nb">len</span><span class="p">(</span><span class="n">infiles</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">joblist</span><span class="p">))</span>
+
+    <span class="c1"># put joblist into job queue, thus starting actual work</span>
+    <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">joblist</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s2">&quot;{0:03}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">job_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Launching detector </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> in directory </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                      <span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">run_process</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">infile</span><span class="p">)</span>
+
+            <span class="c1"># lock the mutex for results, append result</span>
+            <span class="c1"># with result_lock:</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">job_id</span><span class="p">][</span><span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detector </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> returned from job </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                      <span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">job_id</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="s2">&quot;Exception occured in worker while processing </span><span class="si">%s</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">infile</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All jobs returned.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># delete temporary directory</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">local_working_dir</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
+        <span class="c1"># I guess the error type is known, and you could be more precise :)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected error: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<span class="c1">######## SET OPEN CONFIGS #########</span>
+
+<span class="k">def</span> <span class="nf">set_hhrepid_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for HHrepid</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorHHrepID</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">boolopts</span><span class="p">[</span><span class="s2">&quot;-nofilt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c1"># &lt;float&gt; max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-P&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-T&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># &lt;float&gt; max total repeat p-value (def=0.001)</span>
+    <span class="c1"># [0,inf[  minimal length of repeats to be identified (def=7)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-lmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;hhrepid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;hhrepid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">set_phobos_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for Phobos</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorPhobos</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;--maxUnitLen&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;--mismatchScore&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;--indelScore&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+<span class="c1"># Incomplete</span>
+
+
+<span class="k">def</span> <span class="nf">set_treks_config_DNA</span><span class="p">():</span>
+    <span class="c1"># construct DNA configuration for T-Reks</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorTREKS</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;t-reks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;t-reks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">set_treks_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for T-Reks</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorTREKS</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-similarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;t-reks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;t-reks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">set_trf_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for TRF</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorTRF</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;Minscore&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;trf&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;trf&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">set_trust_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for Trust</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorTrust</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">boolopts</span><span class="p">[</span><span class="s1">&#39;-force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;trust&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;trust&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span> <span class="nf">set_xstream_config_open</span><span class="p">():</span>
+    <span class="c1"># construct open configuration for XStream</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">DetectorXStream</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+    <span class="c1">#config.boolopts[optname] = True</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-I&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">valopts</span><span class="p">[</span><span class="s2">&quot;-g&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> config tokens: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;xstream&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">displayname</span><span class="p">,</span>
+              <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DETECTORS</span><span class="p">[</span><span class="s1">&#39;xstream&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tokens</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="c1">######################## HARDCODED OVERVIEW DICTIONARIES #################</span>
+
+<span class="n">FINDER_LIST</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;HHrepID&quot;</span><span class="p">:</span> <span class="n">DetectorHHrepID</span><span class="p">,</span>
+               <span class="s2">&quot;Phobos&quot;</span><span class="p">:</span> <span class="n">DetectorPhobos</span><span class="p">,</span>
+               <span class="s2">&quot;TRED&quot;</span><span class="p">:</span> <span class="n">DetectorTRED</span><span class="p">,</span>
+               <span class="s2">&quot;T-REKS&quot;</span><span class="p">:</span> <span class="n">DetectorTREKS</span><span class="p">,</span>
+               <span class="s2">&quot;TRF&quot;</span><span class="p">:</span> <span class="n">DetectorTRF</span><span class="p">,</span>
+               <span class="s2">&quot;TRUST&quot;</span><span class="p">:</span> <span class="n">DetectorTrust</span><span class="p">,</span>
+               <span class="s2">&quot;XSTREAM&quot;</span><span class="p">:</span> <span class="n">DetectorXStream</span>
+               <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

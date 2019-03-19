@@ -62,7 +62,7 @@
     </script>
 
   </head>
-  <body>
+  <body role="document">
 <div class="pageheader">
     <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
     <a href="index.html">
@@ -77,7 +77,7 @@
 </div>
 
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -98,12 +98,14 @@
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/workflow.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/workflow.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -122,7 +124,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="use-gc3pie-to-annotate-your-large-sequence-dataset">
 <span id="workflow"></span><h1>Use GC3Pie to annotate your large sequence dataset.<a class="headerlink" href="#use-gc3pie-to-annotate-your-large-sequence-dataset" title="Permalink to this headline">¶</a></h1>
@@ -151,7 +153,7 @@ the path to the local copy included in TRAL with this Python code:</p>
 </div>
 <div class="section" id="configure-tral">
 <h2>Configure TRAL.<a class="headerlink" href="#configure-tral" title="Permalink to this headline">¶</a></h2>
-<p>We start by <a class="reference internal" href="configure.html#configure"><em>adapting the TRAL configuration files</em></a> to choose for
+<p>We start by <a class="reference internal" href="configure.html#configure"><span>adapting the TRAL configuration files</span></a> to choose for
 example which external tandem repeat detection algorithms you would like to run on the
 sequence data. Don&#8217;t forget to add a comma behind the last entry in this list, otherwise the
 file format is violated.</p>
@@ -202,7 +204,7 @@ for .fasta file indexing.</p>
 <h3>Test the file preprocessing.<a class="headerlink" href="#test-the-file-preprocessing" title="Permalink to this headline">¶</a></h3>
 <p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:</p>
-<div class="highlight-python"><div class="highlight"><pre>mkdir $MYTRAL/hmm
+<div class="highlight-python"><div class="highlight"><pre>mkdir $MYTRAL/examples/workflow/hmm
 python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_raw $MYTRAL/examples/workflow/uniprot_PRDM_annotation.tsv --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm_raw $MYTRAL/examples/workflow/PRDM_PFAM_models.hmm --hmm $MYTRAL/examples/workflow/hmm
 </pre></div>
 </div>

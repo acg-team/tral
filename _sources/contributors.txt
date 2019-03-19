@@ -10,15 +10,15 @@ The who's who of TRAL.
 People
 ------
 
-- `Maria Anisimova <http://www.inf.ethz.ch/personal/anmaria/>`_
+- `Maria Anisimova <https://www.zhaw.ch/en/about-us/person/anis/>`_
 - `Alexander Korsunsky <https://online.tugraz.at/tug_online/visitenkarte.show_vcard?pPersonenId=CB87061E95264479&pPersonenGruppe=3>`_
 - `Antonio Messina <http://www.gc3.uzh.ch/people/am/>`_
 - `Riccardo Murri <http://www.gc3.uzh.ch/people/rm/>`_
 - `Julia Pecerska <http://www.bsse.ethz.ch/department/people/detail-person.html?persid=192596>`_
-- `Elke Schaper <http://www.inf.ethz.ch/personal/eschaper/>`_
+- `Elke Schaper <https://github.com/elkeschaper>`_
 - `Heinz Stockinger <http://people.isb-sib.ch/Heinz.Stockinger/>`_
 - `Ioannis Xenarios <http://www.isb-sib.ch/groups/lausanne/vital-it-xenarios.html#Xenarios>`_
-- `Stefan Zoller <http://people.inf.ethz.ch/zollers/>`_
+- `Stefan Zoller <https://www.usys.ethz.ch/en/people/profile.html?persid=88844>`_
 
 
 .. _publications:
