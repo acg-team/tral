@@ -79,6 +79,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         # TODO:
         # - replace Castor with config-castor
         # - replace files in parameter file
+        # - prevent printing of output files in current directory!
 
         ###################
         # add castor to the config file
@@ -144,13 +145,12 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
 
         with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
             castor_output = f.readlines()
-   
-        print(castor_output)
 
-        msa = [iLine for iLine in castor_output if iLine[0] != '>']
+        msa = [iLine[:-1] for iLine in castor_output if iLine[0] != '>']
         log.debug('\n'.join(msa))
         try:
             return msa
+            # TODO: see if the msa has to be in a correct turn... if yes sort the msa file before creating list
         except:
             error_note = (
                 "Castor could not successfully run the realignment for: "
