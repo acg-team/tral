@@ -57,9 +57,15 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             return None
         
     elif aligner == "proPIP":
-        # print("proPIP is not integrated yet.")
-        print("Start doing something with Castor.")
+        # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
+        # TODO:
+        # - replace Castor with config-castor
+        # - replace files in parameter file
+        # - prevent printing of output files in current directory!
+        # - error handling (Castor installed properly? add to path; define in config file)
+
+        # TODO: model dependent on DNA/Protein:
         if sequence_type == "AA":
             alphabet="Protein"
         elif sequence_type == "DNA":
@@ -70,24 +76,8 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
 
-        # create file with unaligned sequences
-        unaligned_sequences = os.path.join(working_dir,"sequences.faa")                    
-        with open(msa_file, 'r') as infile, open(unaligned_sequences, 'w') as outfile:
-            temp = infile.read().replace("-", "")
-            outfile.write(temp)
-
-        # TODO:
-        # - replace Castor with config-castor
-        # - replace files in parameter file
-        # - prevent printing of output files in current directory!
-
         ###################
-        # add castor to the config file
-
-        ###################
-        # call castor to infer a tree from the previous alignment
-        
-
+        # Infer a tree from the previous alignment
         castor_tree_initialization = subprocess.Popen(["Castor",
                             "analysis_name=prova",
                             "model_description=JC69+PIP",  # add to config?
@@ -113,9 +103,14 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                             "support=none"])
         castor_tree_initialization.wait() # needed that the next analysis can be executed correctly!        
 
+        ###################
         # call castor to align TR units with inferred tree 
 
-        # TODO: model dependent on DNA/Protein
+        # create file with unaligned sequences
+        unaligned_sequences = os.path.join(working_dir,"sequences.faa")                    
+        with open(msa_file, 'r') as infile, open(unaligned_sequences, 'w') as outfile:
+            temp = infile.read().replace("-", "")
+            outfile.write(temp)
 
         castor_alignment = subprocess.Popen(["Castor",
                             "analysis_name=aligner",
@@ -140,11 +135,21 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         castor_alignment.wait()
 
         # TODO: put alignment into std output instead of file
-        # TODO: change name of alignment! this initial makes it strange....
 
-
-        with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
-            castor_output = f.readlines()
+        try:
+            # The created alignment file has "initial" included into the name because in future the tool should be able to realign
+            with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
+                castor_output = f.readlines()
+        except FileNotFoundError:
+            try:    
+                with open(msa_realigned, "r") as f:
+                    castor_output = f.readlines()
+            except FileNotFoundError:
+                error_note = (
+                    "Castor could not successfully run the realignment for:\n" +
+                    "\n".join(my_msa))
+                logging.error(error_note)
+                return
 
         msa = [iLine[:-1] for iLine in castor_output if iLine[0] != '>']
         log.debug('\n'.join(msa))
@@ -153,12 +158,10 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             # TODO: see if the msa has to be in a correct turn... if yes sort the msa file before creating list
         except:
             error_note = (
-                "Castor could not successfully run the realignment for: "
+                "Castor could not successfully run the realignment for:\n" +
                 "\n".join(my_msa))
             logging.error(error_note)
             return None
-
-
 
     else:
         raise ValueError(
