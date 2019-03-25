@@ -20,7 +20,7 @@ class TralHit(object):
     """Encapsulates a search result"""
     def __init__(self, id, prob, logodds, states):
         self.id=id
-        self.prob=prob
+        self.prob=prob  # log10 probability
         self.logodds=logodds
         self.states=states
 
@@ -197,14 +197,14 @@ class TralHit(object):
         # Compute alignment
         align = self._to_align_matrix(states, seq, ignored)
 
-        # Compute bounds. Should be 0-based inclusive
+        # Compute bounds. 0-based inclusive
         start = min(i for i, s in enumerate(self.states) if s not in ignored)
         end = max(i for i, s in enumerate(self.states) if s not in ignored)
 
         out.write("Length: {} residues - ".format(hmm_len))
         out.write("nb: {}  ".format(len(align)))
-        out.write("from  {} to {} - ".format(start, end))
-        out.write("Psim:{:.2f} ".format(self.prob))
+        out.write("from  {} to {} - ".format(start + 1, end + 1))
+        out.write("Psim:{:f} ".format(10 ** self.prob))
         out.write("region Length:{}".format(end - start + 1))
         out.write("\n")
 

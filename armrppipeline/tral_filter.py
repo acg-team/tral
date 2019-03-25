@@ -72,7 +72,7 @@ def count_repeats(states, hmm_length=0):
         float(last_match) / hmm_length
 
 
-def tralfilter(results, repeats=2, log_odds=8.0):
+def tral_filter(results, repeats=2, log_odds=8.0):
     """Get the set of hits passing the specified filter
 
     :param results: TSV file with TRAL hits
@@ -80,7 +80,7 @@ def tralfilter(results, repeats=2, log_odds=8.0):
     :param log_odds: minimum log odds score
     :return: Generator for all hits
     """
-    hits = parsehits(results)
+    hits = parse_hits(results)
     filtered = filter(lambda hit: hit.logodds >= log_odds and \
                                   hit.states and \
                                   count_repeats(hit.states) >= repeats,
@@ -89,12 +89,15 @@ def tralfilter(results, repeats=2, log_odds=8.0):
         yield hit
 
 
-def filterfasta(databasefile, outfile, hits):
+def filter_fasta(databasefile, outfile, hits, usedescription=True):
     """Filter a fasta file to IDs contained in the hits
 
     :param databasefile: Name of input fasta. May be gzipped
     :param outfile: Name of output fasta. Uncompressed.
     :param hits: Iterable of TralHits
+    :param usedescription: Include full description (header line) from the input
+        fasta database. If false, only the name (first word after the '>') will
+        be used.
     """
     ids = {hit.id for hit in hits}
     with opengzip(databasefile) as database:
@@ -102,17 +105,22 @@ def filterfasta(databasefile, outfile, hits):
             logging.info("Loading database from %s", databasefile)
             seqs = SeqIO.parse(database, 'fasta')
             filtered = filter(lambda seq: seq.name in ids, seqs)
+            if not usedescription:
+                def replacedescription(seq):
+                    seq.description = seq.name
+                    return seq
+                filtered = map(replacedescription, filtered)
             SeqIO.write(filtered, results, 'fasta')
 
 
 
-def parsehits(results):
+def parse_hits(results):
     """Generator for hits from a tral_search output TSV file
     """
     # Filename
     if not hasattr(results, 'readlines'):
         with open(results, 'r') as f:
-            for hit in parsehits(f):
+            for hit in parse_hits(f):
                 yield hit
             return
 
@@ -135,8 +143,8 @@ def parsehits(results):
         except ValueError as e:
             logging.error("{} in results file line {}".format(e, linenr))
 
-def writehits(hits, outfile):
-    """Write a collection of hits to a file
+def write_hits(hits, outfile):
+    """Write a collection of hits to a TSV file
 
     :param hits: iterable of TralHit
     :param outfile: filename
@@ -150,6 +158,34 @@ def writehits(hits, outfile):
             results.write(hit.to_line())
             results.write("\n")
 
+def write_treks(databasefile, outfile, hits, hmm=None):
+    """Write a collection of hits as a TREKS file
+
+    :param hits: iterable of TralHit
+    :param outfile: filename
+    """
+    with opengzip(databasefile) as database:
+        with open(outfile, 'w') as results:
+            logging.info("Loading database from %s", databasefile)
+            seqs = {rec.name: rec for rec in SeqIO.parse(database, 'fasta')}
+
+            for hit in hits:
+                rec = seqs[hit.id]
+                results.write(hit.to_treks(rec.seq, hmm=hmm))
+                results.write("\n")
+
+def match_seqs(hits, fastafile):
+    """Pair a series of hits with sequences
+
+    Requires loading fastafile into memory
+
+    Return: generator of (TralHit, SeqRecord) tuples
+    """
+    with opengzip(fastafile) as database:
+        seqs = {rec.name: rec for rec in SeqIO.parse(database, 'fasta')}
+        for hit in hits:
+            seq = seqs[hit.id]
+            yield (hit, seq)
 
 def main(args=None):
     parser = argparse.ArgumentParser(description='Filter hits from tral_search')
@@ -158,9 +194,13 @@ def main(args=None):
     group = parser.add_argument_group('outputs')
     group.add_argument("-f", "--filtered-fasta", help="output fasta file, filtered by hits")
     group.add_argument("-o", "--filtered-tsv", help="Filtered TSV file")
+    group.add_argument("-x", "--filtered-treks", help="Filtered T-Reks file")
     group = parser.add_argument_group('Thresholds')
     group.add_argument("-r", "--min-repeats", help="Minimum number of repeats", type=float, default=2.0)
     group.add_argument("-t", "--log-odds", help="Threshold for minimum log-odds ratio", type=float, default=8.0)
+    parser.add_argument("--preserve-header", help="Include the full header in FASTA output. "
+        "Otherwise, just the identifier is used to match TSV and TREKS.",
+        default=False, action="store_true")
     parser.add_argument("-v", "--verbose", help="Long messages",
                         default=False, action="store_true")
     args = parser.parse_args(args)
@@ -168,15 +208,22 @@ def main(args=None):
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
     # parse and filter hits
-    hits = tralfilter(args.hits, args.min_repeats, args.log_odds)
+    hits = tral_filter(args.hits, args.min_repeats, args.log_odds)
+
+    # preserve iterable if multiple output formats
+    if bool(args.filtered_tsv) + bool(args.filtered_fasta) + bool(args.filtered_treks) > 1:
+        hits = list(hits)
+
     # output filtered tsv
     if args.filtered_tsv:
-        if args.filtered_fasta:
-            hits = list(hits)  # preserve iterable
-        writehits(hits, args.filtered_tsv)
+        write_hits(hits, args.filtered_tsv)
     # output filtered fasta
     if args.filtered_fasta:
-        filterfasta(args.database, args.filtered_fasta, hits)
+        filter_fasta(args.database, args.filtered_fasta, hits,
+                     usedescription=args.preserve_header)
+    # output filtered treks
+    if args.filtered_treks:
+        write_treks(args.database, args.filtered_treks, hits, hmm=None)
 
 if __name__ == "__main__":
     main()
