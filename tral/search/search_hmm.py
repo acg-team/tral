@@ -1,5 +1,9 @@
 #!/usr/bin/python
 """
+Tool to search an HMM against a database of sequences
+
+May be run as a module, e.g. `python -m tral.search.search_hmm -h`
+
 @author Spencer Bliven <sbliven@ucsd.edu>
 """
 
@@ -11,23 +15,38 @@ import itertools
 from io import StringIO
 import re
 
-from tral.hmm import hmm, hmm_io, hmm_viterbi
-from tral.sequence import sequence
+from ..hmm import hmm, hmm_io, hmm_viterbi
+from ..sequence import sequence
 from Bio import SeqIO
 
 
 class TralHit(object):
-    """Encapsulates a search result"""
+    """Encapsulates key information about a TRAL search result.
+    
+    This is similar to some objects from the `tral.repeat` package, but collects
+    data together and provides serialization methods.
+    """
     def __init__(self, id, prob, logodds, states):
         self.id=id
         self.prob=prob  # log10 probability
         self.logodds=logodds
         self.states=states
 
+    # Header for TSV format
     header = "ID\tProb\tLO\tStates"
 
     @classmethod
     def parse_line(Cls, line):
+        """Parse a line from the TSV serialization to a TralHit
+        
+        Inverse of to_line()
+
+        Args:
+        -  line (str): TSV-separated line representing one hit
+
+        Returns:
+        A new TralHit instance
+        """
         fields = line.strip("\n").split('\t')
 
         if len(fields) != 4:
@@ -216,7 +235,17 @@ class TralHit(object):
 
 
 def opengzip(filename):
-    """Open a file, which may optionally be gzip'd"""
+    """Open a file, which may optionally be gzip'd
+    
+    Checks the magic bytes to see if the file was compressed.
+
+    Args:
+        - filename (str): Filename
+    
+    Returns:
+        An open file handle
+    
+    """
     magic = None
     with open(filename, 'br') as f:
         magic = f.read(2)
@@ -241,7 +270,7 @@ def shuffle_seq(seq):
     return mutable
 
 
-def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
+def search_hmm(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
     circular_profile = hmm.HMM.create(input_format='hmmer', file=hmmfile)
 
     with opengzip(databasefile) as database:
@@ -273,6 +302,7 @@ def tralsearch(hmmfile, databasefile, outfile, start=0, n=0, shuffle=False):
 
 
 def main(args=None):
+    "search_hmm main method"
     parser = argparse.ArgumentParser(description='Align a cpHMM against a database using TRAL')
     parser.add_argument("hmm", help="cpHMM filename")
     parser.add_argument("database", help="database to search, in fasta format (may be gzip compressed)")
@@ -289,7 +319,7 @@ def main(args=None):
 
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
-    tralsearch(args.hmm, args.database, args.results, start=args.start, n=args.dbsize, shuffle=args.shuffle)
+    search_hmm(args.hmm, args.database, args.results, start=args.start, n=args.dbsize, shuffle=args.shuffle)
 
 if __name__ == "__main__":
     main()

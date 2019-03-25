@@ -1,5 +1,12 @@
 #!/usr/bin/python
 """
+Filter search_hmm results according to various statistics
+
+May be run as a module, e.g. `python -m tral.search.filter_hmm -h`
+
+Filtering is performed by `filter_search_results`. Other methods provide
+I/O and supporting roles.
+
 @author Spencer Bliven <sbliven@ucsd.edu>
 """
 
@@ -10,10 +17,10 @@ import random
 import itertools
 import re
 
-from tral.hmm import hmm, hmm_io, hmm_viterbi
-from tral.sequence import sequence
+from ..hmm import hmm, hmm_io, hmm_viterbi
+from ..sequence import sequence
 from Bio import SeqIO
-from .tral_search import TralHit, opengzip
+from .search_hmm import TralHit, opengzip
 
 
 def count_repeats(states, hmm_length=0):
@@ -72,7 +79,7 @@ def count_repeats(states, hmm_length=0):
         float(last_match) / hmm_length
 
 
-def tral_filter(results, repeats=2, log_odds=8.0):
+def filter_search_results(results, repeats=2, log_odds=8.0):
     """Get the set of hits passing the specified filter
 
     :param results: TSV file with TRAL hits
@@ -115,7 +122,7 @@ def filter_fasta(databasefile, outfile, hits, usedescription=True):
 
 
 def parse_hits(results):
-    """Generator for hits from a tral_search output TSV file
+    """Generator for hits from a search_hmm output TSV file
     """
     # Filename
     if not hasattr(results, 'readlines'):
@@ -188,8 +195,9 @@ def match_seqs(hits, fastafile):
             yield (hit, seq)
 
 def main(args=None):
-    parser = argparse.ArgumentParser(description='Filter hits from tral_search')
-    parser.add_argument("hits", help="TSV file, as produced by tral_search, containing HMM hits")
+    "filter_hmm main method"
+    parser = argparse.ArgumentParser(description='Filter hits from search_hmm')
+    parser.add_argument("hits", help="TSV file, as produced by search_hmm, containing HMM hits")
     parser.add_argument("database", help="database to filter, in fasta format (may be gzip compressed)")
     group = parser.add_argument_group('outputs')
     group.add_argument("-f", "--filtered-fasta", help="output fasta file, filtered by hits")
@@ -208,7 +216,7 @@ def main(args=None):
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
     # parse and filter hits
-    hits = tral_filter(args.hits, args.min_repeats, args.log_odds)
+    hits = filter_search_results(args.hits, args.min_repeats, args.log_odds)
 
     # preserve iterable if multiple output formats
     if bool(args.filtered_tsv) + bool(args.filtered_fasta) + bool(args.filtered_treks) > 1:
