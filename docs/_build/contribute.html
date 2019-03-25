@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Technical hints for contributors &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Technical hints for contributors</a><ul>
+<li><a class="reference internal" href="#how-to-contribute">How to contribute</a><ul>
+<li><a class="reference internal" href="#fork-the-repository">1. Fork the repository</a></li>
+<li><a class="reference internal" href="#clone-the-repository-from-your-fork">2. Clone the repository from your fork</a></li>
+<li><a class="reference internal" href="#create-your-feature-branch">3. Create your feature branch</a></li>
+<li><a class="reference internal" href="#push-your-feature-branch-to-your-github-fork">4. Push your feature branch to your github fork</a></li>
+<li><a class="reference internal" href="#create-a-pull-request">5. Create a pull request.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-contribute-to-the-homepage">How to contribute to the homepage</a></li>
+<li><a class="reference internal" href="#how-to-test-a-package-on-pypitest">How to test a package on pypitest</a></li>
+<li><a class="reference internal" href="#how-to-use-pypi">How to use Pypi</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/contribute.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="technical-hints-for-contributors">
+<span id="contribute"></span><h1>Technical hints for contributors<a class="headerlink" href="#technical-hints-for-contributors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-contribute">
+<h2>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fork-the-repository">
+<h3>1. Fork the repository<a class="headerlink" href="#fork-the-repository" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://help.github.com/articles/fork-a-repo/">Forking</a> a repository on github means creating a clone of a repository on github. Simply
+click on &#8220;Fork&#8221; in the TRAL repos <a class="reference external" href="https://github.com/acg-team/tral/">TRAL repository</a>
+once you have a Github account.</p>
+</div>
+<div class="section" id="clone-the-repository-from-your-fork">
+<h3>2. Clone the repository from your fork<a class="headerlink" href="#clone-the-repository-from-your-fork" title="Permalink to this headline">¶</a></h3>
+<p>From the command line, create a clone of your fork:</p>
+<div class="highlight-python"><div class="highlight"><pre>git clone https://github.com/&lt;YOUR_USER_NAME&gt;/tral
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-your-feature-branch">
+<h3>3. Create your feature branch<a class="headerlink" href="#create-your-feature-branch" title="Permalink to this headline">¶</a></h3>
+<p>If you use git-flow, start a new feature:</p>
+<div class="highlight-python"><div class="highlight"><pre>git-flow start feature &lt;YOUR_FEATURE&gt;
+</pre></div>
+</div>
+<p>Otherwise, create a new branch as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>git checkout -b feature/&lt;YOUR_FEATURE&gt;
+</pre></div>
+</div>
+<p>Next, add the necessary changes and commit them:</p>
+<div class="highlight-python"><div class="highlight"><pre>git add &lt;CHANGED_FILE&gt;
+git commit -m &#39;CHANGED_FILE: DESCRIPTION OF YOUR CHANGES’
+</pre></div>
+</div>
+</div>
+<div class="section" id="push-your-feature-branch-to-your-github-fork">
+<h3>4. Push your feature branch to your github fork<a class="headerlink" href="#push-your-feature-branch-to-your-github-fork" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>git push origin feature/&lt;FEATURE_NAME&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-pull-request">
+<h3>5. Create a pull request.<a class="headerlink" href="#create-a-pull-request" title="Permalink to this headline">¶</a></h3>
+<p>Create the <a class="reference external" href="https://help.github.com/articles/using-pull-requests/">pull request</a> online on github.
+For this, go to your github page and click on &#8220;Pull Request&#8221;.</p>
+<div class="highlight-python"><div class="highlight"><pre>https://github.com/&lt;YOUR_USER_NAME&gt;/tral
+</pre></div>
+</div>
+<p>Do a pull request on the develop branch of  acg-team/tral.</p>
+<div class="highlight-python"><div class="highlight"><pre>base fork: acg-team/tral
+base: develop
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="how-to-contribute-to-the-homepage">
+<h2>How to contribute to the homepage<a class="headerlink" href="#how-to-contribute-to-the-homepage" title="Permalink to this headline">¶</a></h2>
+<p>Check out the current version of the TRAL homepage as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>git clone --single-branch -b gh-pages https://&lt;your_git_name&gt;@github.com/acg-team/tral.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-test-a-package-on-pypitest">
+<h2>How to test a package on pypitest<a class="headerlink" href="#how-to-test-a-package-on-pypitest" title="Permalink to this headline">¶</a></h2>
+<p>Install the package from pypitest as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install -i https://testpypi.python.org/pypi
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-use-pypi">
+<h2>How to use Pypi<a class="headerlink" href="#how-to-use-pypi" title="Permalink to this headline">¶</a></h2>
+<p>This documentation summarizes the steps to a new release of TRAL.</p>
+<p>Version number updates</p>
+<ul class="simple">
+<li>README.markdown and README.rst</li>
+<li>setup.py</li>
+<li>docs/conf.py</li>
+</ul>
+<p>Try testpypi</p>
+<dl class="docutils">
+<dt>::</dt>
+<dd><p class="first">cd ~
+swap .pypirc_testpypi .pypirc</p>
+<p>cd [TRAL directory]
+python setup.py sdist upload -r pypitest</p>
+<p>cd ~
+swap .pypirc_testpypi .pypirc</p>
+<p class="last">cd [Installation test directory]
+pip install -i <a class="reference external" href="https://testpypi.python.org/pypi">https://testpypi.python.org/pypi</a> tral</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>
