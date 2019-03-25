@@ -305,7 +305,7 @@ def none_overlapping(rl, overlap, l_criterion):
 
         i_repeat = [rl.repeats[i] for i in i_cluster]
 
-        for ctype, cvalue in l_criterion.items():
+        for ctype, cvalue in l_criterion:
             criterion_type, criterion_value = ctype, cvalue
             if len(i_repeat) == 1:
                 res.append(i_repeat[0])
