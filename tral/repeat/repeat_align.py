@@ -64,6 +64,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         # - replace files in parameter file
         # - prevent printing of output files in current directory!
         # - error handling (Castor installed properly? add to path; define in config file)
+        # - which parts should be adaptable by the user?
 
         # TODO: model dependent on DNA/Protein:
         if sequence_type == "AA":
