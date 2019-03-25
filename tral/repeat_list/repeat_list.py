@@ -291,7 +291,7 @@ def none_overlapping(rl, overlap, l_criterion):
     """
 
     overlap_type = overlap[0]
-    if len(overlap) > 1: # has to be adapted to a more convenient way
+    if len(overlap) > 1:  # has to be adapted to a more convenient way
         overlap_args = overlap[1]
 
     if not (hasattr(rl, 'd_cluster') and overlap_type in rl.d_cluster):
@@ -306,7 +306,7 @@ def none_overlapping(rl, overlap, l_criterion):
         i_repeat = [rl.repeats[i] for i in i_cluster]
 
         for ctype, cvalue in l_criterion.items():
-            criterion_type, criterion_value = ctype, cvalue 
+            criterion_type, criterion_value = ctype, cvalue
             if len(i_repeat) == 1:
                 res.append(i_repeat[0])
                 break
