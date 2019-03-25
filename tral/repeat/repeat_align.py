@@ -60,7 +60,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
         # TODO:
-        # - replace Castor with config-castor
+
         # - replace files in parameter file
         # - prevent printing of output files in current directory!
         # - error handling (Castor installed properly? add to path; define in config file)
@@ -79,30 +79,39 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
 
         ###################
         # Infer a tree from the previous alignment
-        castor_tree_initialization = subprocess.Popen(["Castor",
-                            "analysis_name=prova",
-                            "model_description=JC69+PIP",  # add to config?
-                            "input_folder={}".format(working_dir),
-                            "output_folder={}".format(working_dir),
-                            "alphabet={}".format(alphabet),
-                            "alignment=false",
-                            "input.sequence.file={}".format(msa_file),
-                            "input.sequence.sites_to_use=all",
-                            "init.tree=distance",
-                            "init.distance.method=bionj",
-                            "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)",  # add to config?
-                            "rate_distribution=Constant",
-                            "optimization=D-BFGS(derivatives=BFGS)",
-                            "optimization.max_number_f_eval=5000",  # add to config?
-                            "optimization.tolerance=0.001",  # add to config?
-                            "optimization.final=bfgs",
-                            "optimization.topology=true",
-                            "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
-                            "output.estimates.file={}".format(working_dir),
-                            "output.tree.file={}".format(tree),
-                            "output.estimates.format=json"
-                            "support=none"])
-        castor_tree_initialization.wait() # needed that the next analysis can be executed correctly!        
+        try:
+            castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'],
+                                "analysis_name=prova",
+                                "model_description=JC69+PIP",  # add to config?
+                                "input_folder={}".format(working_dir),
+                                "output_folder={}".format(working_dir),
+                                "alphabet={}".format(alphabet),
+                                "alignment=false",
+                                "input.sequence.file={}".format(msa_file),
+                                "input.sequence.sites_to_use=all",
+                                "init.tree=distance",
+                                "init.distance.method=bionj",
+                                "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)",  # add to config?
+                                "rate_distribution=Constant",
+                                "optimization=D-BFGS(derivatives=BFGS)",
+                                "optimization.max_number_f_eval=5000",  # add to config?
+                                "optimization.tolerance=0.001",  # add to config?
+                                "optimization.final=bfgs",
+                                "optimization.topology=true",
+                                "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
+                                "output.estimates.file={}".format(working_dir),
+                                "output.tree.file={}".format(tree),
+                                "output.estimates.format=json"
+                                "support=none"])
+            castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
+        except FileNotFoundError:
+            error_note = (
+                "ProPIP could not be reached.\n" +
+                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+            logging.error(error_note)
+            return
+
+       
 
         ###################
         # call castor to align TR units with inferred tree 
@@ -113,27 +122,34 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             temp = infile.read().replace("-", "")
             outfile.write(temp)
 
-        castor_alignment = subprocess.Popen(["Castor",
-                            "analysis_name=aligner",
-                            "model_description=GTR+PIP",  # add to config?
-                            "input_folder={}".format(working_dir),
-                            "output_folder={}".format(working_dir),
-                            "alphabet={}".format(alphabet),
-                            "alignment=true",
-                            "alignment.version=ram",
-                            "input.sequence.file={}".format(unaligned_sequences),
-                            "input.sequence.sites_to_use=all",
-                            "init.tree=user",
-                            "init.distance.method=bionj",
-                            "input.tree.file={}".format(tree),
-                            "model=PIP(model=JC69,lambda=0.2,mu=0.1)", # add to config?
-                            "rate_distribution=Constant",
-                            "optimization=None",
-                            "output.msa.file={}".format(msa_realigned),
-                            "output.estimates.file={}".format(working_dir),
-                            "output.estimates.format=json"
-                            "support=none"])
-        castor_alignment.wait()
+        try:
+            castor_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],
+                                "analysis_name=aligner",
+                                "model_description=GTR+PIP",  # add to config?
+                                "input_folder={}".format(working_dir),
+                                "output_folder={}".format(working_dir),
+                                "alphabet={}".format(alphabet),
+                                "alignment=true",
+                                "alignment.version=ram",
+                                "input.sequence.file={}".format(unaligned_sequences),
+                                "input.sequence.sites_to_use=all",
+                                "init.tree=user",
+                                "init.distance.method=bionj",
+                                "input.tree.file={}".format(tree),
+                                "model=PIP(model=JC69,lambda=0.2,mu=0.1)", # add to config?
+                                "rate_distribution=Constant",
+                                "optimization=None",
+                                "output.msa.file={}".format(msa_realigned),
+                                "output.estimates.file={}".format(working_dir),
+                                "output.estimates.format=json"
+                                "support=none"])
+            castor_alignment.wait()
+        except FileNotFoundError:
+            error_note = (
+                "ProPIP could not be reached.\n" +
+                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+            logging.error(error_note)
+            return
 
         # TODO: put alignment into std output instead of file
 
