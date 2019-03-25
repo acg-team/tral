@@ -17,6 +17,7 @@
 ### Housekeeping
 
 shopt -s nocasematch # making comparisons case-insensitive
+set -euo pipefail # exit on errors and undefined vars
 
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
@@ -31,7 +32,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in directory
     
-    if [[ "$ACCEPT_ALL" = "yes" ]]; then
+    if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
         ma=a
     else
         {
@@ -56,7 +57,7 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
         [Aa]* )
             echo -e "\nDo you confirm to the authors copyright (Copyright (c) Christoph Mayer 2006-2017)?\n This program is for academic and non-commercial usage only."
             
-            if [[ "$ACCEPT_ALL" = "yes" ]]; then
+            if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
                 yn=y
             else read -p "Would you like to download the phobos-v3.3.12-linux version? yes(y) or no (n):" yn
             fi

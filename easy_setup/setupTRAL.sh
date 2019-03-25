@@ -10,6 +10,7 @@
 ######################
 
 shopt -s nocasematch # making comparisons case-insensitive
+set -euo pipefail # exit on errors and undefined vars
 
 if [[ ! "$1" =~ ^(setup|pip)$ ]]; then
     echo -e "\nPlease provide as argument how you want to install TRAL with setup.py \"setup\" or \"pip\").\n"
@@ -61,7 +62,7 @@ if [[ $1 == "setup" ]]; then
         # if the tral directory is not already downloaded, it has to be cloned from github
         echo -e "\nPlease clone the TRAL repository from github.\n"
 
-        if [[ "$ACCEPT_ALL" = "yes" ]]; then
+        if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
         yn=y
         else read -p "Do you want to clone the TRAL repository from github in "$TRAL_PATH"? yes(y) or no (n):" yn
         fi
@@ -126,7 +127,7 @@ fi
 if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
     echo -e  "\nIn order to calculate the p-Value of tandem repeat scores, available p-Value distributions need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue."
     
-    if [[ "$ACCEPT_ALL" = "yes" ]]; then
+    if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
     yn=y
     else read -p "Would you like to do this? yes(y) or no (n):" yn
     fi
