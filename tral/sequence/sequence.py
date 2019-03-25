@@ -96,7 +96,7 @@ class Sequence:
             raise Exception("Output format {} is not implemented for",
                             "sequence.write()".format(file_format))
 
-    def detect(self, lHMM=None, denovo=None, **kwargs):
+    def detect(self, lHMM=None, denovo=None, aligner='mafft', sequence_type='AA', **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
         A list of ``Repeat`` instances is created for tandem repeat detections
@@ -137,7 +137,7 @@ class Sequence:
                     iHMM.l_effective)
                 if len(unaligned_msa) > 1:
                     # Align the msa
-                    aligned_msa = repeat_align.realign_repeat(unaligned_msa)
+                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, aligner, sequence_type)
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         if 'repeat' in kwargs:

@@ -63,10 +63,8 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
 
         # - replace files in parameter file
         # - prevent printing of output files in current directory!
-        # - error handling (Castor installed properly? add to path; define in config file)
         # - which parts should be adaptable by the user?
 
-        # TODO: model dependent on DNA/Protein:
         if sequence_type == "AA":
             alphabet="Protein"
         elif sequence_type == "DNA":
@@ -104,6 +102,8 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                 "output.estimates.format=json"
                                 "support=none"])
             castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
+            # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
+            # the given alignment cannot have a column with only gaps
         except FileNotFoundError:
             error_note = (
                 "ProPIP could not be reached.\n" +
@@ -111,16 +111,17 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             logging.error(error_note)
             return
 
-       
-
         ###################
         # call castor to align TR units with inferred tree 
 
         # create file with unaligned sequences
-        unaligned_sequences = os.path.join(working_dir,"sequences.faa")                    
-        with open(msa_file, 'r') as infile, open(unaligned_sequences, 'w') as outfile:
-            temp = infile.read().replace("-", "")
-            outfile.write(temp)
+        unaligned_sequences = os.path.join(working_dir,"sequences.faa")
+        try:                
+            with open(msa_file, 'r') as infile, open(unaligned_sequences, 'w') as outfile:
+                temp = infile.read().replace("-", "")
+                outfile.write(temp)
+        except:
+            print("A problem occurred while trying to reach previous alignment in file.") # TODO: Improve this error message!
 
         try:
             castor_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],

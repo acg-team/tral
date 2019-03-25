@@ -144,7 +144,7 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
         {
             ## compiling Castor with dynamic linking
             (
-            # git clone https://github.com/acg-team/castor_aligner.git
+            git clone https://github.com/acg-team/castor_aligner.git
             cd castor_aligner
             cmake --target castor -- -DCMAKE_BUILD_TYPE=Release CMakeLists.txt
             sudo make
