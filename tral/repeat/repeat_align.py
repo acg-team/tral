@@ -57,13 +57,16 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             return None
         
     elif aligner == "proPIP":
+
+
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
-        # TODO:
+        # TODO: replace files in parameter file
+        # TODO: which parts should be adaptable by the user?
+        # TODO: put alignment into std output instead of file
 
-        # - replace files in parameter file
-        # - prevent printing of output files in current directory!
-        # - which parts should be adaptable by the user?
+        # log messages of castor to stderr instead of logfiles
+        os.environ["GLOG_logtostderr"] = "1"
 
         if sequence_type == "AA":
             alphabet="Protein"
@@ -112,7 +115,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             return
 
         ###################
-        # call castor to align TR units with inferred tree 
+        # Call castor to align TR units with inferred tree 
 
         # create file with unaligned sequences
         unaligned_sequences = os.path.join(working_dir,"sequences.faa")
@@ -152,8 +155,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             logging.error(error_note)
             return
 
-        # TODO: put alignment into std output instead of file
-
         try:
             # The created alignment file has "initial" included into the name because in future the tool should be able to realign
             with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
@@ -178,7 +179,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         log.debug('\n'.join(msa_sorted))
         try:
             return msa_sorted
-            # TODO: see if the msa has to be in a correct turn... if yes sort the msa file before creating list
         except:
             error_note = (
                 "Castor could not successfully run the realignment for:\n" +
