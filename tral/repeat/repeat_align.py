@@ -31,7 +31,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
     msa_file = os.path.join(working_dir, 'msa_temp.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i, iMSA in enumerate(my_msa):
-            msa_filehandle.write('>t{0}\n{1}\n'.format(i, iMSA))
+            msa_filehandle.write('>{0}\n{1}\n'.format(i, iMSA))
 
     if aligner == 'mafft':
         # Run Mafft
@@ -168,11 +168,16 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                     "\n".join(my_msa))
                 logging.error(error_note)
                 return
+        print(castor_output)
 
         msa = [iLine[:-1] for iLine in castor_output if iLine[0] != '>']
-        log.debug('\n'.join(msa))
+        label = [iLine[:-1] for iLine in castor_output if iLine[0] == '>']
+        # use original order of msa
+        msa_sorted = [x for _,x in sorted(zip(label,msa))]
+
+        log.debug('\n'.join(msa_sorted))
         try:
-            return msa
+            return msa_sorted
             # TODO: see if the msa has to be in a correct turn... if yes sort the msa file before creating list
         except:
             error_note = (
