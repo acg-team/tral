@@ -169,8 +169,8 @@ class Sequence:
 
             for jTRD, jlTR in predicted_repeats.items():
                 for iTR in jlTR:
-                    if len(iTR.msa) < 3:
-                        # print("Less than three tandem repeat units will not be realigned.")
+                    if len(iTR.msa) < 3 or len(iTR.msa[0]) < 10:
+                        print("Tandem repeats with less than 3 units or unit length of less than 10 characters will not be realigned.")
                         pass
                     else:
                         # realign tandem repeats   
