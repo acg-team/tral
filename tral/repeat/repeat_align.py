@@ -61,12 +61,13 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
 
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
-        # TODO: replace files in parameter file
-        # TODO: which parts should be adaptable by the user?
+        # TODO: change substitution models
         # TODO: put alignment into std output instead of file
+        # TODO: include gamma option
+        # TODO: Use correct naming for Castor/proPIP. proPIP should not be referred to as castor!!
 
         # log messages of castor to stderr instead of logfiles
-        os.environ["GLOG_logtostderr"] = "1"
+        # os.environ["GLOG_logtostderr"] = "1"
 
         if sequence_type == "AA":
             alphabet="Protein"
@@ -78,44 +79,62 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
 
-        ###################
-        # Infer a tree from the previous alignment
-        try:
-            castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'],
-                                "analysis_name=prova",
-                                "model_description=JC69+PIP",  # add to config?
-                                "input_folder={}".format(working_dir),
-                                "output_folder={}".format(working_dir),
-                                "alphabet={}".format(alphabet),
-                                "alignment=false",
-                                "input.sequence.file={}".format(msa_file),
-                                "input.sequence.sites_to_use=all",
-                                "init.tree=distance",
-                                "init.distance.method=bionj",
-                                "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)",  # add to config?
-                                "rate_distribution=Constant",
-                                "optimization=D-BFGS(derivatives=BFGS)",
-                                "optimization.max_number_f_eval=5000",  # add to config?
-                                "optimization.tolerance=0.001",  # add to config?
-                                "optimization.final=bfgs",
-                                "optimization.topology=true",
-                                "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
-                                "output.estimates.file={}".format(working_dir),
-                                "output.tree.file={}".format(tree),
-                                "output.estimates.format=json"
-                                "support=none"])
-            castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
-            # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
-            # the given alignment cannot have a column with only gaps
-        except FileNotFoundError:
-            error_note = (
-                "ProPIP could not be reached.\n" +
-                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
-            logging.error(error_note)
-            return
+        ####################################
+        # Create an initial tree
+        ####################################
+
+        # Castor cannot create trees for less than four sequences
+
+        # Aligning two units is currently not supported
+        if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
+            raise Exception('Sorry, a tandem repeat with only two sequences cannot be realigned with proPIP.')
+
+        # For three units an arbritary initial tree is used for the alignment
+        elif len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
+                print("For three units which have to be aligned an arbritary tree will be given.")            
+                tree_string = "((0:0.1,2:0.1):0.1,1:0.1);"
+                with open(tree, 'w') as treefile:
+                    treefile.write(tree_string)
+
+        # For more than tree units an initial tree will be estimated from the previous alignment 
+        else:
+            try:
+                castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'],
+                                    "analysis_name=prova",
+                                    "model_description=JC69+PIP",  # add to config?
+                                    "input_folder={}".format(working_dir),
+                                    "output_folder={}".format(working_dir),
+                                    "alphabet={}".format(alphabet),
+                                    "alignment=false",
+                                    "input.sequence.file={}".format(msa_file),
+                                    "input.sequence.sites_to_use=all",
+                                    "init.tree=distance",
+                                    "init.distance.method=bionj",
+                                    "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)",  # add to config?
+                                    "rate_distribution=Constant",
+                                    "optimization=D-BFGS(derivatives=BFGS)",
+                                    "optimization.max_number_f_eval=5000",  # add to config?
+                                    "optimization.tolerance=0.001",  # add to config?
+                                    "optimization.final=bfgs",
+                                    "optimization.topology=true",
+                                    "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
+                                    "output.estimates.file={}".format(working_dir),
+                                    "output.tree.file={}".format(tree),
+                                    "output.estimates.format=json"
+                                    "support=none"])
+                castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
+                # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
+                # the given alignment cannot have a column with only gaps
+            except FileNotFoundError:
+                error_note = (
+                    "ProPIP could not be reached.\n" +
+                    "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+                logging.error(error_note)
+                raise Exception("Sorry, creating a tree for the alignment went wrong.")
 
         ###################
-        # Call castor to align TR units with inferred tree 
+        # Use proPIP algorithm to align TR units with inferred tree
+        ###################
 
         # create file with unaligned sequences
         unaligned_sequences = os.path.join(working_dir,"sequences.faa")
@@ -127,7 +146,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             print("A problem occurred while trying to reach previous alignment in file.") # TODO: Improve this error message!
 
         try:
-            castor_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],
+            proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],
                                 "analysis_name=aligner",
                                 "model_description=GTR+PIP",  # add to config?
                                 "input_folder={}".format(working_dir),
@@ -147,7 +166,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                 "output.estimates.file={}".format(working_dir),
                                 "output.estimates.format=json"
                                 "support=none"])
-            castor_alignment.wait()
+            proPIP_alignment.wait()
         except FileNotFoundError:
             error_note = (
                 "ProPIP could not be reached.\n" +
@@ -169,8 +188,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                     "\n".join(my_msa))
                 logging.error(error_note)
                 return
-        print(castor_output)
-
+                
         msa = [iLine[:-1] for iLine in castor_output if iLine[0] != '>']
         label = [iLine[:-1] for iLine in castor_output if iLine[0] == '>']
         # use original order of msa

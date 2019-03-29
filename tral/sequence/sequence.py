@@ -169,6 +169,14 @@ class Sequence:
 
             for jTRD, jlTR in predicted_repeats.items():
                 for iTR in jlTR:
+                    if len(iTR.msa) < 3:
+                        # print("Less than three tandem repeat units will not be realigned.")
+                        pass
+                    else:
+                        # realign tandem repeats   
+                        # print("Starting of realignment.")                     
+                        iTR.msa = repeat_align.realign_repeat(iTR.msa, aligner, sequence_type)
+
                     if 'repeat' in kwargs:
                         iTR = repeat.Repeat(iTR.msa, begin=iTR.begin,
                                             **kwargs['repeat'])
