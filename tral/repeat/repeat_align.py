@@ -58,23 +58,23 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         
     elif aligner == "proPIP":
 
-
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
-        # TODO: change substitution models
-        # TODO: put alignment into std output instead of file
         # TODO: include gamma option
-        # TODO: Use correct naming for Castor/proPIP. proPIP should not be referred to as castor!!
+        # TODO: put alignment into std output instead of writing to text file in temp director
 
         # log messages of castor to stderr instead of logfiles
-        # os.environ["GLOG_logtostderr"] = "1"
+        os.environ["GLOG_logtostderr"] = "1"
 
         if sequence_type == "AA":
             alphabet="Protein"
+            substitution_model = "LG08"
         elif sequence_type == "DNA":
             alphabet="DNA"
+            substitution_model="HKY85"
         else:
             "Sequence type is not known."
+            # "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)", 
 
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
@@ -101,7 +101,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             try:
                 castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'],
                                     "analysis_name=prova",
-                                    "model_description=JC69+PIP",  # add to config?
                                     "input_folder={}".format(working_dir),
                                     "output_folder={}".format(working_dir),
                                     "alphabet={}".format(alphabet),
@@ -110,7 +109,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                     "input.sequence.sites_to_use=all",
                                     "init.tree=distance",
                                     "init.distance.method=bionj",
-                                    "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)",  # add to config?
+                                    "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
                                     "rate_distribution=Constant",
                                     "optimization=D-BFGS(derivatives=BFGS)",
                                     "optimization.max_number_f_eval=5000",  # add to config?
@@ -148,7 +147,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
         try:
             proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],
                                 "analysis_name=aligner",
-                                "model_description=GTR+PIP",  # add to config?
+                                "model_description={}+PIP".format(substitution_model),
                                 "input_folder={}".format(working_dir),
                                 "output_folder={}".format(working_dir),
                                 "alphabet={}".format(alphabet),
@@ -159,7 +158,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                 "init.tree=user",
                                 "init.distance.method=bionj",
                                 "input.tree.file={}".format(tree),
-                                "model=PIP(model=JC69,lambda=0.2,mu=0.1)", # add to config?
+                                "model=PIP(model={},lambda=0.2,mu=0.1)".format(substitution_model), # add to config?
                                 "rate_distribution=Constant",
                                 "optimization=None",
                                 "output.msa.file={}".format(msa_realigned),
@@ -169,28 +168,28 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             proPIP_alignment.wait()
         except FileNotFoundError:
             error_note = (
-                "ProPIP could not be reached.\n" +
-                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+                "ProPIP algorithm could not be reached.\n" +
+                "Is Castor (inkl. proPIP aligner) installed properly and is the path defined in config.ini in the data directory?\n")
             logging.error(error_note)
             return
 
         try:
             # The created alignment file has "initial" included into the name because in future the tool should be able to realign
             with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
-                castor_output = f.readlines()
+                tree_output = f.readlines()
         except FileNotFoundError:
             try:    
                 with open(msa_realigned, "r") as f:
-                    castor_output = f.readlines()
+                    tree_output = f.readlines()
             except FileNotFoundError:
                 error_note = (
-                    "Castor could not successfully run the realignment for:\n" +
+                    "ProPIP could not successfully be used for the realignment of:\n" +
                     "\n".join(my_msa))
                 logging.error(error_note)
                 return
                 
-        msa = [iLine[:-1] for iLine in castor_output if iLine[0] != '>']
-        label = [iLine[:-1] for iLine in castor_output if iLine[0] == '>']
+        msa = [iLine[:-1] for iLine in tree_output if iLine[0] != '>']
+        label = [iLine[:-1] for iLine in tree_output if iLine[0] == '>']
         # use original order of msa
         msa_sorted = [x for _,x in sorted(zip(label,msa))]
 
@@ -199,7 +198,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             return msa_sorted
         except:
             error_note = (
-                "Castor could not successfully run the realignment for:\n" +
+                "ProPIP could not successfully be used for the realignment of:\n" +
                 "\n".join(my_msa))
             logging.error(error_note)
             return None
