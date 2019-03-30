@@ -74,7 +74,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
             substitution_model="HKY85"
         else:
             "Sequence type is not known."
-            # "model=PIP(model=JC69(initFreqs=observed),initFreqs=observed)", 
 
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
