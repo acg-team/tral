@@ -21,7 +21,10 @@ REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
 
-def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
+def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate_distribution='Constant'):
+
+    # TODO: should we give the possibility to set gamma distribution easily for one self?
+    # TODO: rate_distribution=gamma or rate_distribution=gamma(n=6,alpha=0.5) or gamma=TRUE/FALSE?
 
     # Create temporary working directory
     working_dir = tempfile.mkdtemp()
@@ -59,8 +62,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
     elif aligner == "proPIP":
 
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
-
-        # TODO: include gamma option
         # TODO: put alignment into std output instead of writing to text file in temp director
 
         # log messages of castor to stderr instead of logfiles
@@ -109,7 +110,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                     "init.tree=distance",
                                     "init.distance.method=bionj",
                                     "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
-                                    "rate_distribution=Constant",
+                                    "rate_distribution={}".format(rate_distribution),
                                     "optimization=D-BFGS(derivatives=BFGS)",
                                     "optimization.max_number_f_eval=5000",  # add to config?
                                     "optimization.tolerance=0.001",  # add to config?
@@ -158,7 +159,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None):
                                 "init.distance.method=bionj",
                                 "input.tree.file={}".format(tree),
                                 "model=PIP(model={},lambda=0.2,mu=0.1)".format(substitution_model), # add to config?
-                                "rate_distribution=Constant",
+                                "rate_distribution={}".format(rate_distribution),
                                 "optimization=None",
                                 "output.msa.file={}".format(msa_realigned),
                                 "output.estimates.file={}".format(working_dir),

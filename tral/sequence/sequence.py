@@ -176,6 +176,7 @@ class Sequence:
                         # realign tandem repeats   
                         # print("Starting of realignment.")                     
                         iTR.msa = repeat_align.realign_repeat(iTR.msa, aligner, sequence_type)
+                        # TODO: include option to set gamma distribution
 
                     if 'repeat' in kwargs:
                         iTR = repeat.Repeat(iTR.msa, begin=iTR.begin,
