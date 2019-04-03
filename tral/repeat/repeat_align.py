@@ -60,9 +60,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
             return None
         
     elif aligner == "proPIP":
-
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
-        # TODO: put alignment into std output instead of writing to text file in temp director
 
         # log messages of castor to stderr instead of logfiles
         os.environ["GLOG_logtostderr"] = "1"
@@ -98,7 +96,9 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                 with open(tree, 'w') as treefile:
                     treefile.write(tree_string)
         # For more than tree units an initial tree will be estimated from the previous alignment 
+
         else:
+            # create parameter file to create tree with castor
             parameters_tree =  ("analysis_name=prova",
                                 "input_folder={}".format(working_dir),
                                 "output_folder={}".format(working_dir),
@@ -120,13 +120,18 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "output.tree.file={}".format(tree),
                                 "output.estimates.format=json"
                                 "support=none")
-            with open(paramsfile_tree, 'w') as params:
-                for parameter in parameters_tree:
-                    params.write(parameter + '\n')
+            try:
+                with open(paramsfile_tree, 'w') as params:
+                    for parameter in parameters_tree:
+                        params.write(parameter + '\n')
+            except:
+                print("A problem occurred while trying to write alignment parameters to txt file")
+            
+            # run castor for tree initialization
             try:
                 castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
                                                                 "params={}".format(paramsfile_tree)])
-                castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
+                castor_tree_initialization.wait()
 
                 # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
                 # the given alignment cannot have a column with only gaps
@@ -150,6 +155,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         except:
             print("A problem occurred while trying to reach previous alignment in file.") # TODO: Improve this error message!
 
+        # create parameter file for alignment with proPIP
         parameters_alignment = ("analysis_name=aligner",
                                 "model_description={}+PIP".format(substitution_model),
                                 "input_folder={}".format(working_dir),
@@ -170,10 +176,14 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "output.estimates.file={}".format(working_dir),
                                 "output.estimates.format=json"
                                 "support=none")
-
-        with open(paramsfile_alignment, 'w') as params:
-            for parameter in parameters_alignment:
-                params.write(parameter + '\n')
+        try:
+            with open(paramsfile_alignment, 'w') as params:
+                for parameter in parameters_alignment:
+                    params.write(parameter + '\n')
+        except:
+            print("A problem occurred while trying to write alignment parameters to txt file")
+        
+        # run alignment with propip
         try:
             proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'], 
                                                 "params={}".format(paramsfile_alignment)])
@@ -185,6 +195,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
             logging.error(error_note)
             return
 
+        # read msa and return as sorted list
         try:
             # The created alignment file has "initial" included into the name because in future the tool should be able to realign
             with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
