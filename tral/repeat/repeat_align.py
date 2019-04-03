@@ -34,7 +34,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
     msa_file = os.path.join(working_dir, 'msa_temp.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i, iMSA in enumerate(my_msa):
-            msa_filehandle.write('>{0}\n{1}\n'.format(i, iMSA))
+            msa_filehandle.write('>t{0}\n{1}\n'.format(i, iMSA))
 
     if aligner == 'mafft':
         # Run Mafft
@@ -92,7 +92,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         # For three units an arbritary initial tree is used for the alignment
         elif len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
                 print("For three units which have to be aligned an arbritary tree will be given.")            
-                tree_string = "((0:0.1,2:0.1):0.1,1:0.1);"
+                tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
                 with open(tree, 'w') as treefile:
                     treefile.write(tree_string)
 
@@ -159,6 +159,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "init.distance.method=bionj",
                                 "input.tree.file={}".format(tree),
                                 "model=PIP(model={},lambda=0.2,mu=0.1)".format(substitution_model), # add to config?
+                                # "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), # add to config?
                                 "rate_distribution={}".format(rate_distribution),
                                 "optimization=None",
                                 "output.msa.file={}".format(msa_realigned),
