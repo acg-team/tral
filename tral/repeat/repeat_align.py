@@ -31,7 +31,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
     log.debug("evolvedTR: Created temp directory: %s", working_dir)
 
     # Save my_TR to temp directory:
-    msa_file = os.path.join(working_dir, 'msa_temp.faa')
+    msa_file = os.path.join(working_dir, 'initial_msa.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i, iMSA in enumerate(my_msa):
             msa_filehandle.write('>t{0}\n{1}\n'.format(i, iMSA))
@@ -78,6 +78,8 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
 
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
+        paramsfile_tree = os.path.join(working_dir, 'params_tree.txt')
+        paramsfile_alignment = os.path.join(working_dir, 'params_alignment.txt')
 
         ####################################
         # Create an initial tree
@@ -95,33 +97,37 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                 tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
                 with open(tree, 'w') as treefile:
                     treefile.write(tree_string)
-
         # For more than tree units an initial tree will be estimated from the previous alignment 
         else:
+            parameters_tree =  ("analysis_name=prova",
+                                "input_folder={}".format(working_dir),
+                                "output_folder={}".format(working_dir),
+                                "alphabet={}".format(alphabet),
+                                "alignment=false",
+                                "input.sequence.file={}".format(msa_file),
+                                "input.sequence.sites_to_use=all",
+                                "init.tree=distance",
+                                "init.distance.method=bionj",
+                                "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
+                                "rate_distribution={}".format(rate_distribution),
+                                "optimization=D-BFGS(derivatives=BFGS)",
+                                "optimization.max_number_f_eval=5000",  # add to config?
+                                "optimization.tolerance=0.001",  # add to config?
+                                "optimization.final=bfgs",
+                                "optimization.topology=true",
+                                "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
+                                "output.estimates.file={}".format(working_dir),
+                                "output.tree.file={}".format(tree),
+                                "output.estimates.format=json"
+                                "support=none")
+            with open(paramsfile_tree, 'w') as params:
+                for parameter in parameters_tree:
+                    params.write(parameter + '\n')
             try:
-                castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'],
-                                    "analysis_name=prova",
-                                    "input_folder={}".format(working_dir),
-                                    "output_folder={}".format(working_dir),
-                                    "alphabet={}".format(alphabet),
-                                    "alignment=false",
-                                    "input.sequence.file={}".format(msa_file),
-                                    "input.sequence.sites_to_use=all",
-                                    "init.tree=distance",
-                                    "init.distance.method=bionj",
-                                    "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
-                                    "rate_distribution={}".format(rate_distribution),
-                                    "optimization=D-BFGS(derivatives=BFGS)",
-                                    "optimization.max_number_f_eval=5000",  # add to config?
-                                    "optimization.tolerance=0.001",  # add to config?
-                                    "optimization.final=bfgs",
-                                    "optimization.topology=true",
-                                    "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
-                                    "output.estimates.file={}".format(working_dir),
-                                    "output.tree.file={}".format(tree),
-                                    "output.estimates.format=json"
-                                    "support=none"])
+                castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
+                                                                "params={}".format(paramsfile_tree)])
                 castor_tree_initialization.wait() # needed that the next analysis can be executed correctly! 
+
                 # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
                 # the given alignment cannot have a column with only gaps
             except FileNotFoundError:
@@ -144,9 +150,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         except:
             print("A problem occurred while trying to reach previous alignment in file.") # TODO: Improve this error message!
 
-        try:
-            proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'],
-                                "analysis_name=aligner",
+        parameters_alignment = ("analysis_name=aligner",
                                 "model_description={}+PIP".format(substitution_model),
                                 "input_folder={}".format(working_dir),
                                 "output_folder={}".format(working_dir),
@@ -165,7 +169,14 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "output.msa.file={}".format(msa_realigned),
                                 "output.estimates.file={}".format(working_dir),
                                 "output.estimates.format=json"
-                                "support=none"])
+                                "support=none")
+
+        with open(paramsfile_alignment, 'w') as params:
+            for parameter in parameters_alignment:
+                params.write(parameter + '\n')
+        try:
+            proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'], 
+                                                "params={}".format(paramsfile_alignment)])
             proPIP_alignment.wait()
         except FileNotFoundError:
             error_note = (
