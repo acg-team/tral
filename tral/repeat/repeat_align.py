@@ -161,6 +161,26 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         except:
             print("A problem occurred reading initial alignment file.")
 
+        # parse estimates file to use calculated indel parameters
+        if rate_distribution=='Constant':
+            try:
+                import json
+                with open(estimates) as estimates_file:
+                    est = json.load(estimates_file)
+                    mu_estimated = est['Model']['PIP']['mu']
+                    lambda_estimated = est['Model']['PIP']['lambda']
+                    indel_parameters = ',lambda={},mu={}'.format(lambda_estimated,mu_estimated)
+            except:
+                print('No file with parameter estimates found.')
+        else:
+            indel_parameters = ''
+                # TODO: are other steps needed?
+                # PROBLEM: No estimated parameters are produced when using the option 'gamma distribution'
+                # This probably because lambda and mu are variable across the sequence
+                # Is there a way to find lamda and mu anyway?
+                # or just take any more or less realistic indel parameters?
+                # trying to estimate them myself?
+
         # create parameter file for alignment with proPIP
         parameters_alignment = ["analysis_name=aligner",
                                 "model_description={}+PIP".format(substitution_model),
@@ -172,7 +192,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "init.tree=user",
                                 "init.distance.method=bionj",
                                 "input.tree.file={}".format(tree),
-                                "model=PIP(model={},lambda=10,mu=0.5)".format(substitution_model), # add to config?
+                                "model=PIP(model={}{})".format(substitution_model,indel_parameters),
                                 # "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model),  # add to config?
                                 "rate_distribution={}".format(rate_distribution),
                                 "optimization=None",
