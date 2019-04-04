@@ -74,74 +74,79 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         else:
             print("Sequence type is not known.")
 
+        tree_initial = os.path.join(working_dir,"tree_initial.nwk")
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
         paramsfile_tree = os.path.join(working_dir, 'params_tree.txt')
         paramsfile_alignment = os.path.join(working_dir, 'params_alignment.txt')
+        estimates = os.path.join(working_dir, 'estimates.json')
 
         ####################################
         # Create an initial tree
         ####################################
 
+        init_tree = "distance"
         # Castor cannot create trees for less than four sequences
 
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
             print("For two units which have to be aligned an arbritary tree will be given.")            
             tree_string = "(t0:0.1,t1:0.1);"
-            with open(tree, 'w') as treefile:
+            init_tree = "user"
+            with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
 
         # For three units an arbritary initial tree is used for the alignment
-        elif len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
+        if len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
             print("For three units which have to be aligned an arbritary tree will be given.")            
             tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
-            with open(tree, 'w') as treefile:
+            init_tree = "user"
+            with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
         # For more than tree units an initial tree will be estimated from the previous alignment 
 
-        else:
-            # create parameter file to create tree with castor
-            # TODO: include tree optimization for less than 4 sequences (when tree is given)
-            parameters_tree =  ["analysis_name=prova",
-                                "alphabet={}".format(alphabet),
-                                "alignment=false",
-                                "input.sequence.file={}".format(msa_file),
-                                "input.sequence.sites_to_use=all",
-                                "init.tree=distance",
-                                "init.distance.method=bionj",
-                                "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
-                                "rate_distribution={}".format(rate_distribution),
-                                "optimization=D-BFGS(derivatives=BFGS)",
-                                "optimization.max_number_f_eval=5000",  # add to config?
-                                "optimization.tolerance=0.001",  # add to config?
-                                "optimization.final=bfgs",
-                                "optimization.topology=true",
-                                "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=8),max_cycles=100,tolerance=0.001,brlen_optimisation=BFGS,threads=10)",  # add to config?
-                                "output.estimates.file={}".format(working_dir),
-                                "output.tree.file={}".format(tree),
-                                "output.estimates.format=json"
-                                "support=none"]
-            try:
-                with open(paramsfile_tree, 'w') as params:
-                    for parameter in parameters_tree:
-                        params.write(parameter + '\n')
-            except:
-                print("A problem occurred while trying to write alignment parameters to txt file")
-            
-            # run castor for tree initialization
-            try:
-                castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
-                                                                "params={}".format(paramsfile_tree)])
-                castor_tree_initialization.wait()
+        # create parameter file to create tree with castor
+        parameters_tree =  ["analysis_name=tree_optimization",
+                            "alphabet={}".format(alphabet),
+                            "alignment=false",
+                            "input.sequence.file={}".format(msa_file),
+                            "input.sequence.sites_to_use=all",
+                            "init.tree={}".format(init_tree),
+                            "input.tree.file={}".format(tree_initial),
+                            "init.distance.method=bionj",
+                            "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), 
+                            "rate_distribution={}".format(rate_distribution),
+                            "optimization=D-BFGS(derivatives=BFGS)",
+                            "optimization.max_number_f_eval=500", 
+                            "optimization.tolerance=0.001", 
+                            "optimization.final=bfgs",
+                            "optimization.topology=true",
+                            "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=4),max_cycles=50,tolerance=0.01,brlen_optimisation=BFGS,threads=10)",
+                            "output.tree.file={}".format(tree),
+                            "output.tree.format=Newick",
+                            "output.estimates.format=json",
+                            "output.estimates.file={}".format(estimates),
+                            "support=none"]
+        try:
+            with open(paramsfile_tree, 'w') as params:
+                for parameter in parameters_tree:
+                    params.write(parameter + '\n')
+        except:
+            print("A problem occurred while trying to write alignment parameters to txt file")
+        
+        # run castor for tree initialization
+        try:
+            castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
+                                                            "params={}".format(paramsfile_tree)])
+            castor_tree_initialization.wait()
 
-                # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
-                # the given alignment cannot have a column with only gaps
-            except FileNotFoundError:
-                error_note = (
-                    "ProPIP could not be reached.\n" +
-                    "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
-                logging.error(error_note)
-                raise Exception("Sorry, creating a tree for the alignment went wrong.")
+            # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
+            # the given alignment cannot have a column with only gaps
+        except FileNotFoundError:
+            error_note = (
+                "ProPIP could not be reached.\n" +
+                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+            logging.error(error_note)
+            raise Exception("Sorry, creating a tree for the alignment went wrong.")
 
         ###################
         # Use proPIP algorithm to align TR units with inferred tree
@@ -172,8 +177,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "rate_distribution={}".format(rate_distribution),
                                 "optimization=None",
                                 "output.msa.file={}".format(msa_realigned),
-                                "output.estimates.file={}".format(working_dir),
-                                "output.estimates.format=json"
                                 "support=none"]
         try:
             with open(paramsfile_alignment, 'w') as params:
