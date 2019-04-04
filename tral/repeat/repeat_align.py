@@ -72,7 +72,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
             alphabet="DNA"
             substitution_model="HKY85"
         else:
-            "Sequence type is not known."
+            print("Sequence type is not known.")
 
         tree = os.path.join(working_dir,"tree.nwk")
         msa_realigned = os.path.join(working_dir,"msa_realigned.faa")
@@ -85,23 +85,24 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
 
         # Castor cannot create trees for less than four sequences
 
-        # Aligning two units is currently not supported
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
-            raise Exception('Sorry, a tandem repeat with only two sequences cannot be realigned with proPIP.')
+            print("For two units which have to be aligned an arbritary tree will be given.")            
+            tree_string = "(t0:0.1,t1:0.1);"
+            with open(tree, 'w') as treefile:
+                treefile.write(tree_string)
 
         # For three units an arbritary initial tree is used for the alignment
         elif len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
-                print("For three units which have to be aligned an arbritary tree will be given.")            
-                tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
-                with open(tree, 'w') as treefile:
-                    treefile.write(tree_string)
+            print("For three units which have to be aligned an arbritary tree will be given.")            
+            tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
+            with open(tree, 'w') as treefile:
+                treefile.write(tree_string)
         # For more than tree units an initial tree will be estimated from the previous alignment 
 
         else:
             # create parameter file to create tree with castor
-            parameters_tree =  ("analysis_name=prova",
-                                "input_folder={}".format(working_dir),
-                                "output_folder={}".format(working_dir),
+            # TODO: include tree optimization for less than 4 sequences (when tree is given)
+            parameters_tree =  ["analysis_name=prova",
                                 "alphabet={}".format(alphabet),
                                 "alignment=false",
                                 "input.sequence.file={}".format(msa_file),
@@ -119,7 +120,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "output.estimates.file={}".format(working_dir),
                                 "output.tree.file={}".format(tree),
                                 "output.estimates.format=json"
-                                "support=none")
+                                "support=none"]
             try:
                 with open(paramsfile_tree, 'w') as params:
                     for parameter in parameters_tree:
@@ -153,13 +154,11 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                 temp = infile.read().replace("-", "")
                 outfile.write(temp)
         except:
-            print("A problem occurred while trying to reach previous alignment in file.") # TODO: Improve this error message!
+            print("A problem occurred reading initial alignment file.")
 
         # create parameter file for alignment with proPIP
-        parameters_alignment = ("analysis_name=aligner",
+        parameters_alignment = ["analysis_name=aligner",
                                 "model_description={}+PIP".format(substitution_model),
-                                "input_folder={}".format(working_dir),
-                                "output_folder={}".format(working_dir),
                                 "alphabet={}".format(alphabet),
                                 "alignment=true",
                                 "alignment.version=ram",
@@ -168,14 +167,14 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                                 "init.tree=user",
                                 "init.distance.method=bionj",
                                 "input.tree.file={}".format(tree),
-                                "model=PIP(model={},lambda=0.2,mu=0.1)".format(substitution_model), # add to config?
-                                # "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model), # add to config?
+                                "model=PIP(model={},lambda=10,mu=0.5)".format(substitution_model), # add to config?
+                                # "model=PIP(model={}(initFreqs=observed),initFreqs=observed)".format(substitution_model),  # add to config?
                                 "rate_distribution={}".format(rate_distribution),
                                 "optimization=None",
                                 "output.msa.file={}".format(msa_realigned),
                                 "output.estimates.file={}".format(working_dir),
                                 "output.estimates.format=json"
-                                "support=none")
+                                "support=none"]
         try:
             with open(paramsfile_alignment, 'w') as params:
                 for parameter in parameters_alignment:

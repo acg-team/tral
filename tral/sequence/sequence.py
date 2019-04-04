@@ -169,7 +169,7 @@ class Sequence:
 
             for jTRD, jlTR in predicted_repeats.items():
                 for iTR in jlTR:
-                    if len(iTR.msa) < 3 or len(iTR.msa[0]) < 10:
+                    if len(iTR.msa) < 2 or len(iTR.msa[0]) < 10: # TODO: change from 2 to 3
                         #print("Tandem repeats with less than 3 units or unit length of less than 10 characters will not be realigned.")
                         pass
                     else:
@@ -177,6 +177,7 @@ class Sequence:
                         # print("Starting of realignment.")                     
                         iTR.msa = repeat_align.realign_repeat(iTR.msa, aligner, sequence_type)
                         # TODO: include option to set gamma distribution
+                        # TODO: test if msa output is malformed. If yes, use original alignment or throw an error.
 
                     if 'repeat' in kwargs:
                         iTR = repeat.Repeat(iTR.msa, begin=iTR.begin,
