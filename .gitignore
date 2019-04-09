@@ -121,3 +121,5 @@ ENV/
 # Jupyter Notebook
 *.ipynb
 
+# easy install
+easy_setup/install_ext_software/phyml.sh

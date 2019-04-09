@@ -120,7 +120,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                             "optimization.tolerance=0.001", 
                             "optimization.final=bfgs",
                             "optimization.topology=true",
-                            "optimization.topology.algorithm=Mixed(coverage=best-search,starting_nodes=Hillclimbing(n=4),max_cycles=50,tolerance=0.01,brlen_optimisation=BFGS,threads=10)",
+                            "optimization.topology.algorithm=Swap(coverage=nnr-search,starting_nodes=Hillclimbing(n=4),max_cycles=50,tolerance=0.01,brlen_optimisation=Brent,threads=10)",
                             "output.tree.file={}".format(tree),
                             "output.tree.format=Newick",
                             "output.estimates.format=json",
