@@ -21,10 +21,15 @@ REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
 
-def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate_distribution='Constant'):
+def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
 
-    # TODO: should we give the possibility to set gamma distribution easily for one self?
-    # TODO: rate_distribution=gamma or rate_distribution=gamma(n=6,alpha=0.5) or gamma=TRUE/FALSE?
+    realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma', None]
+    if realignment not in realignment_types:
+        raise ValueError("Invalid realignment option. Expected one of: {}".format(realignment_types))
+    
+    if realignment == None:
+        print("No realignment was performed.")
+        return my_msa
 
     # Create temporary working directory
     working_dir = tempfile.mkdtemp()
@@ -36,7 +41,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
         for i, iMSA in enumerate(my_msa):
             msa_filehandle.write('>t{0}\n{1}\n'.format(i, iMSA))
 
-    if aligner == 'mafft':
+    if realignment == 'mafft':
         # Run Mafft
         # See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.
         # The mafft result is in stdout. Check: Do you need to capture or
@@ -59,7 +64,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
             logging.error(error_note)
             return None
         
-    elif aligner == "proPIP":
+    elif realignment == 'proPIP_constant' or realignment == 'proPIP_gamma':
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
         # log messages of castor to stderr instead of logfiles
@@ -73,6 +78,11 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
             substitution_model="HKY85"
         else:
             print("Sequence type is not known.")
+
+        if realignment == 'proPIP_constant':
+            rate_distribution = 'Constant'
+        else:
+            rate_distribution = 'Gamma(n=6,alpha=0.5)'
 
         tree_initial = os.path.join(working_dir,"tree_initial.nwk")
         tree = os.path.join(working_dir,"tree.nwk")
@@ -104,7 +114,7 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                 treefile.write(tree_string)
         # For more than tree units an initial tree will be estimated from the previous alignment 
 
-        # create parameter file to create tree with castor
+        # create parameter file to create or optimize tree with castor
         parameters_tree =  ["analysis_name=tree_optimization",
                             "alphabet={}".format(alphabet),
                             "alignment=false",
@@ -241,7 +251,6 @@ def realign_repeat(my_msa, aligner='mafft', sequence_type='AA', begin=None, rate
                 "\n".join(my_msa))
             logging.error(error_note)
             return None
-
     else:
         raise ValueError(
-            'Currently, the aligner {} is not implemented.'.format(aligner))
+            'Currently, the aligner {} is not implemented.'.format(realignment))

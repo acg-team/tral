@@ -96,7 +96,7 @@ class Sequence:
             raise Exception("Output format {} is not implemented for",
                             "sequence.write()".format(file_format))
 
-    def detect(self, lHMM=None, denovo=None, aligner='mafft', sequence_type='AA', **kwargs):
+    def detect(self, lHMM=None, denovo=None, realignment=None, sequence_type='AA', **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
         A list of ``Repeat`` instances is created for tandem repeat detections
@@ -108,13 +108,17 @@ class Sequence:
         Args:
             hmm (HMM): A list of ``HMM`` instances.
             denovo (bool): boolean
+            realignment (str): either "mafft", "proPIP_constant", "proPIP_gamma" or None
             *kwargs: Parameters fed to denovo TR prediction and/or Repeat
                 instantiation. E.g. ``repeat = {"calc_score": True}``
 
         Returns:
             A ``RepeatList`` instance
         """
-
+        realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma']
+        if realignment not in realignment_types:
+            raise ValueError("Invalid sim type. Expected one of: %s" % realignment_types)
+        
         if lHMM:
             if not isinstance(lHMM, list):
                 raise Exception('The lHMM value is not a list.')
@@ -137,7 +141,7 @@ class Sequence:
                     iHMM.l_effective)
                 if len(unaligned_msa) > 1:
                     # Align the msa
-                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, aligner, sequence_type)
+                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, realignment, sequence_type)
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         if 'repeat' in kwargs:
@@ -175,8 +179,7 @@ class Sequence:
                     else:
                         # realign tandem repeats   
                         # print("Starting of realignment.")                     
-                        iTR.msa = repeat_align.realign_repeat(iTR.msa, aligner, sequence_type)
-                        # TODO: include option to set gamma distribution
+                        iTR.msa = repeat_align.realign_repeat(iTR.msa, realignment, sequence_type)
                         # TODO: test if msa output is malformed. If yes, use original alignment or throw an error.
 
                     if 'repeat' in kwargs:
