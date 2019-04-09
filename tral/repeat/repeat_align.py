@@ -39,7 +39,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
     msa_file = os.path.join(working_dir, 'initial_msa.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i, iMSA in enumerate(my_msa):
-            msa_filehandle.write('>t{0}\n{1}\n'.format(i, iMSA))
+            msa_filehandle.write('>t{0}\n{1}\n'.format(i+1, iMSA))
 
     if realignment == 'mafft':
         # Run Mafft
@@ -100,7 +100,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
 
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
             print("For two units which have to be aligned an arbritary tree will be given.")            
-            tree_string = "(t0:0.1,t1:0.1);"
+            tree_string = "(t1:0.1,t2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
@@ -108,7 +108,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
         # For three units an arbritary initial tree is used for the alignment
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
             print("For three units which have to be aligned an arbritary tree will be given.")            
-            tree_string = "((t0:0.1,t2:0.1):0.1,t1:0.1);"
+            tree_string = "((t1:0.1,t3:0.1):0.1,t2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
@@ -150,7 +150,8 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
             castor_tree_initialization.wait()
 
             # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
-            # the given alignment cannot have a column with only gaps
+            # the given alignment cannot have a column with only gaps --> 
+
         except FileNotFoundError:
             error_note = (
                 "ProPIP could not be reached.\n" +
@@ -179,12 +180,16 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
                 mu_estimated = est['Model']['PIP']['mu']
                 lambda_estimated = est['Model']['PIP']['lambda']
                 indel_parameters = ',lambda={},mu={}'.format(lambda_estimated,mu_estimated)
-        except:
-            print('No file with parameter estimates found.')
+        except FileNotFoundError as error:
+            print('\nNo file with parameter estimates found.')
+            print('Probably it went something wrong when trying to infer or optimise the phylogenetic tree.')
+            logging.error(error)
+            raise
 
-        # TODO: proPIP cannot produce an alingment when a branchlength is zero.
+        # TODO: proPIP cannot produce an alignment when a branchlength is zero.
         #       Need to catch this before an error is thrown
         #       Maybe replace zero with a very small number?
+        #       Is this scenario even possible after tree calculation with castor?
 
         # create parameter file for alignment with proPIP
         parameters_alignment = ["analysis_name=aligner",
