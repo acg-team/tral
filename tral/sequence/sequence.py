@@ -93,8 +93,7 @@ class Sequence:
             with open(file, 'wb') as fh:
                 pickle.dump(self, fh)
         else:
-            raise Exception("Output format {} is not implemented for",
-                            "sequence.write()".format(file_format))
+            raise Exception("Output format {} is not implemented for sequence.write()".format(file_format))
 
     def detect(self, lHMM=None, denovo=None, realignment=None, sequence_type='AA', **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
@@ -115,9 +114,9 @@ class Sequence:
         Returns:
             A ``RepeatList`` instance
         """
-        realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma']
+        realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma', None]
         if realignment not in realignment_types:
-            raise ValueError("Invalid sim type. Expected one of: %s" % realignment_types)
+            raise ValueError("Invalid realignment type. Expected one of: {}".format(realignment_types))
         
         if lHMM:
             if not isinstance(lHMM, list):
@@ -173,15 +172,13 @@ class Sequence:
 
             for jTRD, jlTR in predicted_repeats.items():
                 for iTR in jlTR:
-                    if len(iTR.msa) < 2 or len(iTR.msa[0]) < 10: # TODO: change from 2 to 3
-                        #print("Tandem repeats with less than 3 units or unit length of less than 10 characters will not be realigned.")
-                        pass
-                    else:
-                        # realign tandem repeats   
-                        # print("Starting of realignment.")                     
-                        iTR.msa = repeat_align.realign_repeat(iTR.msa, realignment, sequence_type)
-                        # TODO: test if msa output is malformed. If yes, use original alignment or throw an error.
-
+                    if len(iTR.msa) > 2 or len(iTR.msa[0]) > 10: # TODO: change from 2 to 3
+                        # Realignment
+                        # only TRs with at least 3 units with a length > 10 characters will be realigned
+                        try:               
+                            iTR.msa = repeat_align.realign_repeat(iTR.msa, realignment, sequence_type)
+                        except:
+                            print("Something went wrong when trying to realign {}.".format(iTR.msa))
                     if 'repeat' in kwargs:
                         iTR = repeat.Repeat(iTR.msa, begin=iTR.begin,
                                             **kwargs['repeat'])

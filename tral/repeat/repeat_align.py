@@ -241,16 +241,13 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
         label = [iLine[:-1] for iLine in tree_output if iLine[0] == '>']
         # use original order of msa
         msa_sorted = [x for _,x in sorted(zip(label,msa))]
-
         log.debug('\n'.join(msa_sorted))
         try:
             return msa_sorted
         except:
-            error_note = (
+            raise RuntimeError(
                 "ProPIP could not successfully be used for the realignment of:\n" +
                 "\n".join(my_msa))
-            logging.error(error_note)
-            return None
     else:
         raise ValueError(
             'Currently, the aligner {} is not implemented.'.format(realignment))
