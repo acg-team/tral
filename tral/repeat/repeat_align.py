@@ -39,7 +39,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
     msa_file = os.path.join(working_dir, 'initial_msa.faa')
     with open(msa_file, 'w') as msa_filehandle:
         for i, iMSA in enumerate(my_msa):
-            msa_filehandle.write('>t{0}\n{1}\n'.format(i+1, iMSA))
+            msa_filehandle.write('>{0}\n{1}\n'.format(i+1, iMSA))
 
     if realignment == 'mafft':
         # Run Mafft
@@ -52,8 +52,19 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
                               msa_file],
                              stdout=subprocess.PIPE)
         mafft_output = [line.decode('utf8').rstrip() for line in p.stdout]
-        msa = [iLine for iLine in mafft_output if iLine[0] != '>']
-        log.debug('\n'.join(msa))
+        msa = []
+        label= []
+        for i, line in enumerate(mafft_output):
+            if line[0] == '>':
+                label.append(int(line[1:]))
+            elif mafft_output[i-1][0] == '>':
+                msa.append(line)
+            else:
+                msa[-1] += line
+        # use original order of msa
+        msa_sorted = [x for _,x in sorted(zip(label,msa))]
+
+        log.debug('\n'.join(msa_sorted))
         p.wait()
         try:
             return msa
@@ -100,7 +111,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
 
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
             print("For two units which have to be aligned an arbritary tree will be given.")            
-            tree_string = "(t1:0.1,t2:0.1);"
+            tree_string = "(1:0.1,2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
@@ -108,7 +119,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
         # For three units an arbritary initial tree is used for the alignment
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
             print("For three units which have to be aligned an arbritary tree will be given.")            
-            tree_string = "((t1:0.1,t3:0.1):0.1,t2:0.1);"
+            tree_string = "((1:0.1,3:0.1):0.1,2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:
                 treefile.write(tree_string)
@@ -230,22 +241,29 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
         try:
             # The created alignment file has "initial" included into the name because in future the tool should be able to realign
             with open(os.path.join(working_dir,"msa_realigned.initial.faa"), "r") as f:
-                tree_output = f.readlines()
+                realigned = f.readlines()
         except FileNotFoundError:
             try:    
                 with open(msa_realigned, "r") as f:
-                    tree_output = f.readlines()
+                    realigned = f.readlines()
             except FileNotFoundError:
                 error_note = (
                     "ProPIP could not successfully be used for the realignment of:\n" +
                     "\n".join(my_msa))
                 logging.error(error_note)
                 return
-                
-        msa = [iLine[:-1] for iLine in tree_output if iLine[0] != '>']
-        label = [iLine[:-1] for iLine in tree_output if iLine[0] == '>']
+        msa = []
+        label = []
+        for i, line in enumerate(realigned):
+            if line[0] == '>':
+                label.append(int(line[1:-1]))
+            elif realigned[i-1][0] == '>':
+                msa.append(line[:-1])
+            else:
+                msa[-1] += line[:-1]
         # use original order of msa
         msa_sorted = [x for _,x in sorted(zip(label,msa))]
+
         log.debug('\n'.join(msa_sorted))
         try:
             return msa_sorted
