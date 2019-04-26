@@ -302,9 +302,6 @@ def distance_index(i, j, length):
     """Helper function to calculate the distance between two indices in a
     circular HMM.
 
-    Helper function to calculate the distance between two indices in a
-    circular HMM.
-
     Args:
         i (int): first index
         j (int): second index
@@ -510,7 +507,12 @@ def hmm_path_to_non_aligned_tandem_repeat_units(sequence, path, l_effective):
 
 def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effective,
                                             translate=False):
-    """Convert a viterbi path in an hmm of length ``l_effective`` on the
+    """
+    WARNING: Currently do not rely on this function!!
+    The output seems to have missing characters and too much gaps.
+    The function needs review in order to be used.
+    
+    Convert a viterbi path in an hmm of length ``l_effective`` on the
      sequence into a corresponding tandem repeat.
 
     Extract the tandem repeat alignment from a sequence given a Viterbi path.
