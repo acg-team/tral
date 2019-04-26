@@ -511,6 +511,7 @@ def hmm_path_to_aligned_tandem_repeat_units(sequence, most_likely_path, l_effect
     WARNING: Currently do not rely on this function!!
     The output seems to have missing characters and too much gaps.
     The function needs review in order to be used.
+    todo: fix hidden bug!
     
     Convert a viterbi path in an hmm of length ``l_effective`` on the
      sequence into a corresponding tandem repeat.
