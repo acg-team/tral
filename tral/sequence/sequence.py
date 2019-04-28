@@ -95,7 +95,7 @@ class Sequence:
         else:
             raise Exception("Output format {} is not implemented for sequence.write()".format(file_format))
 
-    def detect(self, lHMM=None, denovo=None, realignment='mafft', sequence_type='AA', **kwargs):
+    def detect(self, lHMM=None, denovo=None, realignment='mafft', sequence_type='AA', user_path=None, **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
         A list of ``Repeat`` instances is created for tandem repeat detections
@@ -141,11 +141,11 @@ class Sequence:
                 if len(unaligned_msa) > 1:
                     # Align the msa
                     initial_alignment = 'mafft'
-                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, initial_alignment, sequence_type)
+                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, initial_alignment, sequence_type, user_path=user_path)
 
                     # realignment with proPIP
                     if realignment == 'proPIP_constant' or realignment == 'proPIP_gamma':
-                        aligned_msa = repeat_align.realign_repeat(aligned_msa, realignment, sequence_type)
+                        aligned_msa = repeat_align.realign_repeat(aligned_msa, realignment, sequence_type, user_path=user_path)
                     
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
@@ -182,7 +182,7 @@ class Sequence:
                         # Realignment
                         # only TRs with at least 3 units with a length > 10 characters will be realigned
                         try:               
-                            iTR.msa = repeat_align.realign_repeat(iTR.msa, realignment, sequence_type)
+                            iTR.msa = repeat_align.realign_repeat(iTR.msa, realignment, sequence_type, user_path=user_path)
                         except:
                             print("Something went wrong when trying to realign {}.".format(iTR.msa))
                     if 'repeat' in kwargs:

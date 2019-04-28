@@ -21,7 +21,7 @@ REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 ''' Some functions might overlap with repeat.gene_tree.align.'''
 
 
-def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
+def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None, user_path=None):
 
     realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma', None]
     if realignment not in realignment_types:
@@ -265,6 +265,14 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None):
         msa_sorted = [x for _,x in sorted(zip(label,msa))]
 
         log.debug('\n'.join(msa_sorted))
+
+        ## copy alignment files to user defined path
+        if user_path:
+            import shutil
+            mafft_path = user_path.split("proPIP")[0] + "mafft"
+            shutil.copy(os.path.join(working_dir,"msa_realigned.initial.faa"), user_path)
+            shutil.copy(msa_file, mafft_path)
+
         try:
             return msa_sorted
         except:
