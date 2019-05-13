@@ -5,6 +5,7 @@ from tral import configuration
     :synopsis: Alignment of tandem repeat units.
 
     .. moduleauthor:: Elke Schaper <elke.schaper@isb-sib.ch>
+    .. moduleauthor:: Paulina Näf
 """
 
 import logging
@@ -263,14 +264,18 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None, 
                 msa[-1] += line[:-1]
         # use original order of msa
         msa_sorted = [x for _,x in sorted(zip(label,msa))]
-
         log.debug('\n'.join(msa_sorted))
 
         ## copy alignment files to user defined path
         if user_path:
+            if not os.path.exists(os.path.dirname(user_path)):
+                os.mkdir(os.path.dirname(user_path))
             import shutil
             mafft_path = user_path.split("proPIP")[0] + "mafft"
-            shutil.copy(os.path.join(working_dir,"msa_realigned.initial.faa"), user_path)
+            with open(user_path, 'w') as out_msa:
+                for i in range(len(msa_sorted)):
+                    out_msa.write(">{}\n".format(i+1))
+                    out_msa.write("{}\n".format(msa_sorted[i]))
             shutil.copy(msa_file, mafft_path)
 
         try:
