@@ -10,7 +10,7 @@ import os
 
 from tral.paths import config_file, PACKAGE_DIRECTORY
 
-from tral.sequence import repeat_detection_run, sequence
+from tral.sequence import sequence
 from tral.hmm import hmm
 
 logging.config.fileConfig(config_file("logging.ini"))
@@ -88,12 +88,13 @@ def sample_MBE_2014_pipeline():
     assert len(test_denovo_list.repeats) == 10
     test_denovo_list = test_denovo_list.filter("attribute", "n_effective", "min", 2.5)
     assert len(test_denovo_list.repeats) == 5
-    test_denovo_list = test_denovo_list.filter("attribute", "l", "min", 10)
+    test_denovo_list = test_denovo_list.filter("attribute", "l_effective", "min", 10)
     assert len(test_denovo_list.repeats) == 2
 
     # De novo TRs were remastered with HMM
     test_denovo_hmm = [
         hmm.HMM.create(
+            input_format = 'repeat',
             repeat=iTR) for iTR in test_denovo_list.repeats]
     test_denovo_list_remastered = test_seq.detect(lHMM=test_denovo_hmm)
     assert len(test_denovo_list_remastered.repeats) == 2

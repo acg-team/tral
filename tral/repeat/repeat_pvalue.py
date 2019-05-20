@@ -250,7 +250,7 @@ def calc_pvalues(repeats, result_file_path, file_name,
                     i_score_type)
             test_statistic = \
                 [pvalue_from_empirical_list(i_repeat, i_score_type,
-                                            empirical=empirical_list_local) \
+                                            empirical=empirical_list_local)
                  if i_repeat.l_effective != 0 else 1 for i_repeat in repeats]
         score_path = os.path.join(result_file_path, i_score_type)
         if not os.path.isdir(score_path):
@@ -327,8 +327,8 @@ def d_average_multiple_max_multinom(tandemrepeat, precision=10000.):
 
     p = d_average_multinom(l_repeat_structure[0], n_repeat_structure[0],
                            tandemrepeat.sequence_type, score_type='psim')
-    val = np.array((np.r_[l_repeat_structure[0]:(l_repeat_structure[0] * n_repeat_structure[0] + 1.)] * \
-          (precision / n_repeat_structure[0])).round(), dtype='uint32')
+    val = np.array((np.r_[l_repeat_structure[0]:(l_repeat_structure[0] * n_repeat_structure[0] + 1.)] *
+                    (precision / n_repeat_structure[0])).round(), dtype='uint32')
     if len(l_repeat_structure) == 1:
         # return best values first. for pSim, best = 1, worst = 0
         return p[::-1], val[::-1] / (precision * sum(l_repeat_structure))
@@ -340,8 +340,8 @@ def d_average_multiple_max_multinom(tandemrepeat, precision=10000.):
                                                score_type='psim')).ravel()
             val = (val[:, np.newaxis] +
                    np.array(
-                (np.r_[l_repeat_structure[i]:(l_repeat_structure[i] * n_repeat_structure[i] + 1.)]
-                 * (precision / n_repeat_structure[i])
+                (np.r_[l_repeat_structure[i]:(l_repeat_structure[i] * n_repeat_structure[i] + 1.)] *
+                 (precision / n_repeat_structure[i])
                  ).round(),
                 dtype='uint32')
             ).ravel()
@@ -427,8 +427,8 @@ def d_average_multiple_pars_multinom(tandemrepeat, precision=10000.):
         tandemrepeat.sequence_type, score_type='parsimony'
     )
     val = np.array(
-        (np.r_[(l_repeat_structure[0] * (n_repeat_structure[0] - 1)):-1:-1.]
-         * (precision / (n_repeat_structure[0] - 1.))
+        (np.r_[(l_repeat_structure[0] * (n_repeat_structure[0] - 1)):-1:-1.] *
+         (precision / (n_repeat_structure[0] - 1.))
          ).round(),
         dtype='uint32'
     )
@@ -446,8 +446,8 @@ def d_average_multiple_pars_multinom(tandemrepeat, precision=10000.):
                              ).ravel()
 
                 val = (val[:, np.newaxis] + np.array(
-                    (np.r_[(l_repeat_structure[i] * (n_repeat_structure[i] - 1)):-1:-1.]
-                     * (precision / (n_repeat_structure[i] - 1.))
+                    (np.r_[(l_repeat_structure[i] * (n_repeat_structure[i] - 1)):-1:-1.] *
+                     (precision / (n_repeat_structure[i] - 1.))
                      ).round(),
                     dtype='uint32')
                 ).ravel()

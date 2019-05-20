@@ -25,9 +25,8 @@ LOG = logging.getLogger(__name__)
 CONFIG_GENERAL = configuration.Configuration.instance().config
 CONFIG = CONFIG_GENERAL["hmm"]
 
+
 ################################### HMM class ############################
-
-
 class HMM:
 
     """ Sequence profile hidden Markov models (HMMs) are used to model genomic
@@ -113,21 +112,99 @@ class HMM:
                 self.id,
                 self.l_effective)
             hmm += "Most likely motif: {}".format(tmp)
-        except:
+        except (AttributeError, TypeError):
             hmm = "<HMM instance>"
             LOG.warning("Could not create string of HMM instance.")
 
         return hmm
 
     # Use functions defined in other methods as class functions.
-    # Static function (declare as @static ?):
-    read = hmm_io.read
+    # Static function
+    @staticmethod
+    def read(hmm_filename, id=None):
+        """Read HMM file in HMMER3 format.
+
+        HMMER3 file format is described in detail in
+        ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf,
+        section 8.
+
+        The general file format is::
+
+            HMMER3/b [3.0b2 | June 2009]
+            NAME fn3
+            ACC PF00041.12
+            DESC Fibronectin type III domain
+            LENG 86
+            ALPH amino
+            (...)
+
+            HMM          A       C       D       E       F       G       H       I    (...)    Y
+                        m->m    m->i    m->d    i->m    i->i    d->m    d->d
+              COMPO   2.70271 4.89246 3.02314 2.64362 3.59817 2.82566 3.74147 3.08574 (...) 3.22607
+                      2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+                      0.00338 6.08833 6.81068 0.61958 0.77255 0.00000       *
+              1       3.16986 5.21447 4.52134 3.29953 4.34285 4.18764 4.30886 3.35801 (...) 3.93889 1 - -
+                      2.68629 4.42236 2.77530 2.73088 3.46365 2.40512 3.72505 3.29365 (...) 3.61514
+                      0.09796 2.38361 6.81068 0.10064 2.34607 0.48576 0.95510
+              2       2.70230 5.97353 2.24744 2.62947 5.31433 2.60356 4.43584 4.79731 (...) 4.25623 3 - -
+                      2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+                      0.00338 6.08833 6.81068 0.61958 0.77255 0.48576 0.95510
+              (...)
+              86      3.03720 5.94099 3.75455 2.96917 5.26587 2.91682 3.66571 4.11840 (...) 4.99111 121 - E
+                      2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+                      0.00227 6.08723       * 0.61958 0.77255 0.00000       *
+            //
+
+        .. important:: The probabilities in this format are stored as negative
+            natural log probabilities, e.g. -ln(0.25) = 1.38629. The special case
+            of 0 probability is stored as ``*`` which in fact means -∞ (minus
+            infinity).
+
+        Args:
+            hmm_filename (str): Path to the file with model data in the HMMER3
+                file format.
+            id (str, optional): The identifier for the model to be returned.
+                E.g. for Pfam the ``id`` can look like this: 'PF00560'.
+                If defined, the function returns only the HMM with an identifier
+                that matches the provided id. If a model in the file does not have
+                an identifier to check against, it is skipped.
+
+        Returns:
+            dict: A dictionary of parameters required to initialise the HMM
+            including the id, alphabet, emission probabilities and transition
+            probabilities.
+
+            Output format::
+
+                {
+                    'id': 'PF08261.7',
+                    'letters': ['A', 'C', 'D', ..., 'Y'],
+                    'COMPO':
+                        {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                          'emissions': [2.28205, 5.14899, ..., 1.92022],
+                          'transitions': [0.01467, 4.62483, ..., -inf]},
+                    '1':
+                        {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                         'emissions': [1.00089, 4.54999, ..., 5.23581],
+                         'transitions': [0.01467, 4.62483, ..., 0.95510]},
+                    ...
+                    '8':
+                        {'insertion_emissions': [2.68618, 4.42225, ..., 3.61503],
+                         'emissions': [4.12723, 5.39816, ..., 4.58094],
+                         'transitions': [0.00990, 4.62006, ..., -inf]}
+                }
+
+        See Also:
+            hmm_io.read()
+
+        """
+        return hmm_io.read(hmm_filename, id)
 
     # Function that take the HMM instance as argument:
     def viterbi(self, *args):
         return hmm_viterbi.viterbi(self, *args)
 
-    def __init__(self, hmmer_probabilities, sequence_type = "AA"):
+    def __init__(self, hmmer_probabilities, sequence_type="AA"):
         """ HMM class __init_ module.
 
         __init__ takes HMM parameters (including the alphabet, emission
@@ -142,8 +219,8 @@ class HMM:
         self.alphabet = self.hmmer['letters']
         self.sequence_type = sequence_type
 
-        self.l_effective = max([int(key) for key \
-                               in hmmer_probabilities.keys() if key.isdigit()])
+        self.l_effective = max([int(key) for key
+                                in hmmer_probabilities.keys() if key.isdigit()])
 
         # Initialise all HMM states to default value (e.g. transition to or
         # from terminal state all have the same cost 0).
@@ -168,8 +245,7 @@ class HMM:
                 i_emission_probabilities)
         for i_state in (self.insertion_states + self.terminal_states):
             i_emission_probabilities = \
-                self.hmmer[d_translate_states[i_state]] \
-                ['insertion_emissions'][:len(self.alphabet)]
+                self.hmmer[d_translate_states[i_state]]['insertion_emissions'][:len(self.alphabet)]
             self.set_emission_probability_hmmer3(
                 i_state,
                 i_emission_probabilities)
@@ -217,13 +293,14 @@ class HMM:
         self.states = [self.terminal_states[
             0]] + self.match_states + self.insertion_states + [self.terminal_states[1]]
         self.p_t = {i_state: {i: j for i, j in self.p_t[
-            i_state].items() if not i in self.deletion_states} for i_state in self.states}
+            i_state].items() if i not in self.deletion_states} for i_state in self.states}
         self.p_0 = {
             i: j for i,
             j in self.p_0.items() if i not in self.deletion_states}
 
         del self.deletion_states
 
+    @staticmethod
     def create(input_format, file=None, repeat=None, **kwargs):
         """ Creates a HMM instance from 2 possible input formats.
 
@@ -280,6 +357,7 @@ class HMM:
         LOG.debug(hmmer_probabilities)
         return HMM(hmmer_probabilities, sequence_type)
 
+    @staticmethod
     def create_from_repeat(tandem_repeat, hmm_copy_path=None,
                            hmm_copy_id=None):
         """ Get HMM parameters (including the alphabet, emission probabilities
@@ -376,7 +454,7 @@ class HMM:
     def hmm_example(self):
         """ .. todo:: Is this method needed?
         """
-        #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
+        # states = ["N", "B", "M1", "M2", "M3", "E", "C"]
         self.states = ["N", "M1", "M2", "C"]
 
         # Initialisation
@@ -441,8 +519,7 @@ class HMM:
         for i in range(l_effective):
             self.p_t["N"]["M{0}".format(i % l_effective + 1)] = 0
             self.p_t["M{0}".format(i % l_effective + 1)]["C"] = 0
-            self.p_t["M{0}".format(i % l_effective + 1)] \
-                    ["M{0}".format((i + 1) % l_effective + 1)] = 0
+            self.p_t["M{0}".format(i % l_effective + 1)]["M{0}".format((i + 1) % l_effective + 1)] = 0
         self.p_t["N"]["N"] = 0
         self.p_t["C"]["C"] = 0
 
@@ -478,8 +555,8 @@ class HMM:
         l_emission_probabilities = \
             [-(i) * np.log10(np.exp(1)) for i in l_emission_probabilities]
         self.p_e[state] = \
-            {iL: iEP for iL, iEP in \
-            zip(self.alphabet, l_emission_probabilities)}
+            {iL: iEP for iL, iEP in
+             zip(self.alphabet, l_emission_probabilities)}
 
     def set_circle_transition_probability_hmmer3(
             self,
@@ -586,7 +663,7 @@ class HMM:
                 '0.77255', '0.48576', '0.95510']
         """
 
-        l_transition_probabilities = [-(i) * np.log10(np.exp(1)) for i \
+        l_transition_probabilities = [-(i) * np.log10(np.exp(1)) for i
                                       in l_transition_probabilities]
 
         # Match state state_index -> Match state state_index + 1

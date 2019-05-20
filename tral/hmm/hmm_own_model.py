@@ -1,9 +1,10 @@
 # (C) 2012-2015 Elke Schaper
 # coding: utf-8
 
+from tral.hmm import hmm_io
+from tral.repeat.repeat_score import load_model
 import math
 import numpy as np
-import scipy as sp
 import scipy.stats
 import scipy.special
 import scipy.linalg
@@ -12,9 +13,6 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.ERROR)
 
-from tral.repeat import repeat
-from tral.repeat.repeat_score import load_model
-from tral.hmm import hmm_io
 
 ################################### HMM class ############################
 
@@ -46,7 +44,7 @@ class HMM:
             self.HMM_example()
 
     def HMM_example(self):
-        #states = ["N", "B", "M1", "M2", "M3", "E", "C"]
+        # states = ["N", "B", "M1", "M2", "M3", "E", "C"]
         self.states = ["N", "M1", "M2", "C"]
 
         # Initialisation
@@ -191,7 +189,6 @@ class HMM:
                 'sigma_squared'] = prior_indel_insertion['mu'] / 5
 
         sequence_type = tandem_repeat.sequence_type
-        msaTD = tandem_repeat.msaTD
         l_effective = tandem_repeat.l_effective
         n = tandem_repeat.n  # Test: Do you really need this variable?
 
@@ -461,15 +458,10 @@ class HMM:
 
                 # Ii -> Ii+l_effective insertion_stop(i) + deletion(i;l_effective) +
                 # insertion_formation(i+l_effective+1)
-                self.p_t["I{0}".format(index(i,
-                                             l_effective))]["I{0}".format(index(i + iC,
-                                                                       l_effective))] = self.p_t["I{0}".format(index(i,
-                                                                                                            l_effective))]["M{0}".format(index(i,
-                                                                                                                                      l_effective))] + self.p_t["M{0}".format(index(i - 1,
-                                                                                                                                                                           l_effective))]["M{0}".format(index(i + iC,
-                                                                                                                                                                                                     l_effective))] + self.p_t["M{0}".format(index(i + iC - 1,
-                                                                                                                                                                                                                                          l_effective))]["I{0}".format(index(i + iC,
-                                                                                                                                                                                                                                                                    l_effective))]
+                self.p_t["I{0}".format(index(i, l_effective))]["I{0}".format(index(i + iC, l_effective))] = \
+                    self.p_t["I{0}".format(index(i, l_effective))]["M{0}".format(index(i, l_effective))] + \
+                    self.p_t["M{0}".format(index(i - 1, l_effective))]["M{0}".format(index(i + iC, l_effective))] + \
+                    self.p_t["M{0}".format(index(i + iC - 1, l_effective))]["I{0}".format(index(i + iC, l_effective))]
 
         logger.debug("Transition probabilities: {0}".format(self.p_t))
 
@@ -613,9 +605,6 @@ def index(i, iMax):
 def calculate_log10_offspring_likelihood(tandem_repeat, divergence=None):
 
     sequence_type = tandem_repeat.sequence_type
-    msaTD = tandem_repeat.msaTD
-    l_effective = tandem_repeat.l_effective
-    n = tandem_repeat.n
 
     # Calculate posterior probabilities of ancestral states from the TR
     # alignment
@@ -626,12 +615,9 @@ def calculate_log10_offspring_likelihood(tandem_repeat, divergence=None):
     else:
         Q, eqFreq, alphabet = load_model('tn93')
     P = scipy.linalg.expm(Q * divergence)
-    alphabet_reverse = {i: j for j, i in alphabet.items()}
 
     # Initialise the count matrix (if not already existent)
-    try:
-        tandem_repeat.msaTDN
-    except:
+    if not hasattr(tandem_repeat, 'msaTDN'):
         msaTDN_temp = [[alphabet[symbol] for symbol in column if symbol not in [
             '-', 'X', '*', 'U']] for column in tandem_repeat.msaTD]
         tandem_repeat.msaTDN = []
@@ -680,9 +666,7 @@ def loglikelihood_substitution(t, Q, eqFreq, alphabet, tandem_repeat):
     # Each numpy array represents the elements of the alphabet. The entries
     # are the count of an alphabet element in the respective tandem_repeat
     # column
-    try:
-        tandem_repeat.msaTDN
-    except:
+    if not hasattr(tandem_repeat, 'msaTDN'):
         msaTDN_temp = [[alphabet[symbol] for symbol in column if symbol not in [
             '-', 'X', '*', 'U']] for column in tandem_repeat.msaTD]
         tandem_repeat.msaTDN = []
@@ -713,12 +697,14 @@ def calculate_log10_probability_indel_lengths(
         indel_length_max,
         type='zipf',
         prior=None):
-    ''' calculate the probability of indels of different length until a maximum length <indel_length_max>,
+    '''Calculate the probability of indels of different length until a maximum length <indel_length_max>,
     assuming that either
 
     type == 'zipf'
     indel lengths are distributed following a Zipfian distribution with parameter <indel_zipf>.
-    (Compare Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution. Mol Biol Evol, 26, 1879–1888.
+    (Compare:
+        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
+        Mol Biol Evol, 26, 1879–1888.
     In their publication, <indel_zipf> is denoted as <a>, the gap lengths as <u>.)
 
     or
@@ -754,12 +740,15 @@ def calculate_log10_probability_indel_lengths(
 
 
 def calculate_MAP_Indel_length_exponential_factor(indel_lengths, prior=None):
-    ''' calculate the MAP Exponential decay constant <alpha> that determines the distribution of
+    '''Calculate the MAP Exponential decay constant <alpha> that determines the distribution of
     indel lengths. Assume a Gaussian prior. Input is a list of <indel_lengths> for a particular
     column.
 
-    The MAP is calculated numerically, as no nice analytical solution has been found so far [power function of grade 3 needs to be solved:
-    0 == prior['sigma_squared']*(sum(indel_lengths) - len(indel_lengths)) - alpha*(prior['sigma_squared']*sum(indel_lengths) + prior['mu']) + (alpha**2)*(1+prior['mu']) - alpha**3
+    The MAP is calculated numerically, as no nice analytical solution has been found so far.
+    A power function of grade 3 needs to be solved:
+        0 == prior['sigma_squared']*(sum(indel_lengths) - len(indel_lengths)) -
+             alpha*(prior['sigma_squared']*sum(indel_lengths) + prior['mu']) +
+             (alpha**2)*(1 + prior['mu']) - alpha**3
     '''
 
     if prior is None:
@@ -769,10 +758,12 @@ def calculate_MAP_Indel_length_exponential_factor(indel_lengths, prior=None):
         return prior['mu']
 
     else:
-        # As we are only interested in the maximum, we can leave out factors (e.g. * 1/(math.sqrt(2*math.pi * prior['sigma_squared'])) for the Gaussian)
+        # As we are only interested in the maximum, we can leave out factors
+        # (e.g. * 1/(math.sqrt(2*math.pi * prior['sigma_squared'])) for the Gaussian)
         # There is an analytic solution. Compare "Gap it!" or "gaps.nb"
         posterior = lambda alpha: - np.prod([(1 - alpha) * (alpha ** (lIndel - 1))
-                                             for lIndel in indel_lengths]) * math.exp(-0.5 * ((alpha - prior['mu']) ** 2) / prior['sigma_squared'])
+                                             for lIndel in indel_lengths]) * \
+            math.exp(-0.5 * ((alpha - prior['mu']) ** 2) / prior['sigma_squared'])
         res = minimize_scalar(posterior, bounds=(0, 1), method='bounded')
         return res.x
 
@@ -782,7 +773,9 @@ def calculate_MAP_Indel_length_Zipfian_factor(indel_lengths, prior=None):
     indel lengths. Assume a Gaussian prior. Input is a list of <indel_lengths> for a particular
     column.
     The probability distribution of indel lengths is assumed to follow the Zipfian distribution
-    (Compare Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution. Mol Biol Evol, 26, 1879–1888.
+    (Compare
+        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
+        Mol Biol Evol, 26, 1879–1888.
     In their publication, <indel_zipf> is denoted as <a>, the gap lengths as <u>.)
 
     The MAP is calculated numerically, as there did not seem to be a nice analytical solution.
@@ -799,7 +792,8 @@ def calculate_MAP_Indel_length_Zipfian_factor(indel_lengths, prior=None):
         # As we are only interested in the maximum, we leave out all factors in
         # the following equation for the posterior:
         posterior = lambda indel_zipf: - (scipy.special.zeta(indel_zipf, 1) ** - len(indel_lengths)) * np.prod(
-            [lIndel ** -indel_zipf for lIndel in indel_lengths]) * math.exp(-0.5 * ((indel_zipf - prior['mu']) ** 2) / prior['sigma_squared'])
+            [lIndel ** -indel_zipf for lIndel in indel_lengths]) * \
+            math.exp(-0.5 * ((indel_zipf - prior['mu']) ** 2) / prior['sigma_squared'])
         res = minimize_scalar(posterior, method='brent')
         return res.x
 
@@ -828,7 +822,8 @@ def calculate_MAP_indel_rate(nIndels, n, prior=None):
     Solve with respect to the MAP of the indel_rate.
 
     For nIndels in {0,1} it is possible to derive the MAP indel_rate analytically.
-    For all other cases, the maximum of the posterior distribution needs to be found in good approximation algorithmically.
+    For all other cases, the maximum of the posterior distribution needs to be found
+    in good approximation algorithmically.
 
     ln(posterior) ~ ln(likelihood) + ln(prior)
     '''
@@ -935,6 +930,9 @@ def main():
     #print(calculate_indel_rate(1, 6, 1.5))
 
     # print(calculate_probability_indel_lengths(0.366869,6,'exponential'))
+
+    return my_HMM
+
 
 if __name__ == "__main__":
     main()

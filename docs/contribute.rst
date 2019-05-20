@@ -12,7 +12,7 @@ How to contribute
 ^^^^^^^^^^^^^^^^^^^^^^
 
 `Forking <https://help.github.com/articles/fork-a-repo/>`_ a repository on github means creating a clone of a repository on github. Simply
-click on "Fork" in the TRAL repos `TRAL repository <https://github.com/elkeschaper/tral/>`_
+click on "Fork" in the TRAL repos `TRAL repository <https://github.com/acg-team/tral/>`_
 once you have a Github account.
 
 
@@ -65,11 +65,11 @@ For this, go to your github page and click on "Pull Request".
     https://github.com/<YOUR_USER_NAME>/tral
 
 
-Do a pull request on the develop branch of  elkeschaper/tral.
+Do a pull request on the develop branch of  acg-team/tral.
 
 ::
 
-    base fork: elkeschaper/tral
+    base fork: acg-team/tral
     base: develop
 
 
@@ -83,7 +83,7 @@ Check out the current version of the TRAL homepage as follows:
 
 ::
 
-    git clone --single-branch -b gh-pages https://<your_git_name>@github.com/elkeschaper/tral.git
+    git clone --single-branch -b gh-pages https://<your_git_name>@github.com/acg-team/tral.git
 
 
 How to test a package on pypitest

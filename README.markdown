@@ -17,18 +17,12 @@ The source code is [documented on GitHub IO].
 
 ### Installation
 
-TRAL is available on [Pypi] and can be installed with [pip] for Python>=3.2:
-
-```sh
-$ pip install tral
-```
-
-See also more extensive [Installation instructions].
+It is recommended to install TRAL with the [easy_setup] system.
 
 
 ### License
 
-GPL
+GPL-2.0
 
 
 ### Dependencies
@@ -36,9 +30,8 @@ GPL
 Some of TRAL's functions depend on external software ([Installation instructions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
 
-
-[documented on GitHub IO]:http://elkeschaper.github.io/tral/
-[Installation instructions]:http://elkeschaper.github.io/tral/install.html#install
-[Installation instructions for dependencies]:http://elkeschaper.github.io/tral/install_external.html#install-external
+[documented on GitHub IO]:https://acg-team.github.io/tral/
+[easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
+[Installation instructions for dependencies]:https://acg-team.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi
 [pip]:https://pip.pypa.io/en/latest/

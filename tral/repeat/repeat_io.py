@@ -16,6 +16,7 @@ import shutil
 import tempfile
 import subprocess
 import numpy as np
+from tral.repeat import repeat
 
 from tral.paths import DATA_DIR, EXEC_DIR
 
@@ -309,8 +310,8 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
         based on a special flavour of  Felstein stein MSA files """
 
     # find a repeat uni
-    pattern_start = re.compile("\d+ \d+")
-    pattern_seq = re.compile("\S+[ ]+([A-Z\-]+)")
+    pattern_start = re.compile(r"\d+ \d+")
+    pattern_seq = re.compile(r"\S+[ ]+([A-Z\-]+)")
 
     # Our possible parser states:
     #
@@ -395,7 +396,7 @@ def random_sequence(n_samples, sequence_type='AA', return_type='repeat',
             a = f.readline()[:-1]
         b = [i.split(' ') for i in a.split('  ')]
         frequencies = {i[0]: int(i[1]) for i in b}
-        alphabet = np.unique(i[0] for i in frequencies.keys())
+        alphabet = np.unique([i[0] for i in frequencies.keys()])
 
         for _ in range(n_samples):
             seed_int = random.randint(1, sum(frequencies.values()))

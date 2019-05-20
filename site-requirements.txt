@@ -1,8 +1,0 @@
-biopython==1.66
-configobj==5.0.6
-ete3==3.0.0b12
-numpy==1.10.1
-pyfaidx==0.4.7.1
-scipy==0.16.1
-six==1.10.0
-wheel==0.26.0

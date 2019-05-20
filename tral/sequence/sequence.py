@@ -186,7 +186,7 @@ class Sequence:
                         # Sanity check repeat and set begin coordinate for
                         # all repeats
                         if not self.repeat_in_sequence(iTR):
-                            LOG.debug("The tandem repeat is not part of" \
+                            LOG.debug("The tandem repeat is not part of"
                                       "the sequence. Detector: %s", iTR.TRD)
                             continue
 
@@ -215,7 +215,6 @@ class Sequence:
             return self.d_repeatlist[tag]
         except ValueError:
             logging.error("RepeatList %s not in Sequence", tag)
-
 
     def set_repeatlist(self, repeatlist, tag):
         """ Add `repeatlist` as attribute to this `sequence` instance.
