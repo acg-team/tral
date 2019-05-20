@@ -67,9 +67,9 @@ Writing a tandem repeat to .csv
 
 When you write a tandem repeat to .csv with TRAL, the result may look as follows::
 
-begin   msa_original    l_effective      n_effective      repeat_region_length divergence      pvalue
-316     GDII,GDIR       4       2.0     8       None    None
-507     FLG,FLG 3       2.0     6       None    None
+	begin   msa_original    l_effective      n_effective      repeat_region_length divergence      pvalue
+	316     GDII,GDIR       4       2.0     8       None    None
+	507     FLG,FLG 3       2.0     6       None    None
 
 
 Additional to the tandem repeat characteristics explained above, here you can find:
