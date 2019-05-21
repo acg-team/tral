@@ -13,8 +13,8 @@ Getting started
 
 #. :ref:`Install TRAL <install>`
 #. :ref:`Install tandem repeat external software <install_external>`
-#. :ref:`Adapt configuration files and download p-value distribtution files <configure>`
-
+#. :ref:`Adapt configuration files and download <configure>`
+#. :ref:`Download p-value distribution files <pvaluefiles>`
 
 Tutorials
 =========
