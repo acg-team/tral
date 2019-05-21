@@ -3,7 +3,7 @@
 Installation of external software
 =================================
 
-TRAL is dependend on different external software which need to be installed before TRAL can be used properly.
+TRAL is dependend on different external software which need to be installed before TRAL can be used.
 
 Here, we explain how to install external software packages, such as *de novo* tandem repeat
 detectors. Important: Once a software is installed, the path to either the binary or the
@@ -229,6 +229,24 @@ path::
     [sequence]
         [[repeat_detector_path]]
             XSTREAM = path/to/XSTREAM
+
+
+Simulation of evolution in tandem repeats
+-----------------------------------------
+
+For simulating evolved sequences ALF can be used which simulates a root genome into a number of related genomes.
+It was `published in Molecular Biology and Evolution (2012) <https://academic.oup.com/mbe/article/29/4/1115/1188345>`_ and can be downloaded on `alfsim.org <http://alfsim.org>`_.
+TRAL searches for ALFs executable *alfsim* in the system path by default (modify in :ref:`config.ini <configure>`)::
+
+    [repeat]
+        alfsim = alfsim
+
+
+If *alfsim* is not in your system path, set the absolute path::
+
+    [repeat]
+        alfsim = path/to/alfsim
+
 
 
 Not yet integrated software
