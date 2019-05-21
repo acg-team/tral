@@ -13,17 +13,18 @@ Getting started
 
 #. :ref:`Install TRAL <install>`
 #. :ref:`Install tandem repeat external software <install_external>`
-#. :ref:`Adapt configuration files <configure>`
+#. :ref:`Adapt configuration files and download p-value distribtution files <configure>`
 
 
 Tutorials
 =========
 
 - :ref:`Run and parse <denovo>` de novo repeat detection software.
+- Background about :ref:`tandem repeat characteristics in TRAL <background>`
 - :ref:`Annotate tandem repeats<cphmm>` from sequence domain models.
 - :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
 - :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
-- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset.
+- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset (toy example)
 
 
 Reference Guide
