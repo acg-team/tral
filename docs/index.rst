@@ -11,10 +11,20 @@ statistical significance analysis of putative tandem repeats, and filtering of r
 Getting started
 ===============
 
-#. :ref:`Install TRAL <install>`
-#. :ref:`Install tandem repeat external software <install_external>`
-#. :ref:`Adapt configuration files and download <configure>`
-#. :ref:`Download p-value distribution files <pvaluefiles>`
+To get started with TRAL you need to follow several steps.
+
+1. Installation of all relevant software and files:
+
+	* 1(a-c) Simplified setup with the :ref:`easy setup system for TRAL <easy_setup>`.
+
+   Otherwise download and install everything manually:
+
+	* 1(a) :ref:`Install TRAL <install>`
+	* 1(b) :ref:`Install external software needed for TRAL <install_external>`
+	* 1(c) :ref:`Download p-value distribution files <pvaluefiles>`
+
+2. :ref:`Adapt configuration files <configure>`
+
 
 Tutorials
 =========
@@ -57,4 +67,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
