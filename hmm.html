@@ -916,15 +916,9 @@ indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt;
 column.
 The probability distribution of indel lengths is assumed to follow the Zipfian distribution
 (Compare</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/lina/SynologyDrive/tral/tral/hmm/hmm_own_model.py:docstring of tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor</tt>, line 6)</p>
-Unexpected indentation.</div>
 <blockquote>
 <div>Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
 Mol Biol Evol, 26, 1879–1888.</div></blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/home/lina/SynologyDrive/tral/tral/hmm/hmm_own_model.py:docstring of tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor</tt>, line 8)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
 <p>In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
 <p>The MAP is calculated numerically, as there did not seem to be a nice analytical solution.</p>
 </dd></dl>
@@ -937,9 +931,6 @@ indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt;
 column.</p>
 <p>The MAP is calculated numerically, as no nice analytical solution has been found so far.
 A power function of grade 3 needs to be solved:</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/lina/SynologyDrive/tral/tral/hmm/hmm_own_model.py:docstring of tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor</tt>, line 7)</p>
-Unexpected indentation.</div>
 <blockquote>
 <div><dl class="docutils">
 <dt>0 == prior[&#8216;sigma_squared&#8217;]*(sum(indel_lengths) - len(indel_lengths)) -</dt>
@@ -969,11 +960,13 @@ in good approximation algorithmically.</p>
 <dt id="tral.hmm.hmm_own_model.calculate_log10_indel_probability">
 <code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_log10_indel_probability</code><span class="sig-paren">(</span><em>nIndels</em>, <em>n</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_log10_indel_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_log10_indel_probability" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculate the probabilty of an indel per site and per repeat unit
-from the MAP estimate of the indel rate, given
-- the &lt;divergence&gt; of the repeat units
-- a &lt;prior&gt; on the indel rates (normal distributed)
-- the number of indels &lt;nIndels&gt; in this column
-- the total length &lt;n&gt; of this column</p>
+from the MAP estimate of the indel rate, given</p>
+<ul class="simple">
+<li>the &lt;divergence&gt; of the repeat units</li>
+<li>a &lt;prior&gt; on the indel rates (normal distributed)</li>
+<li>the number of indels &lt;nIndels&gt; in this column</li>
+<li>the total length &lt;n&gt; of this column</li>
+</ul>
 </dd></dl>
 
 <dl class="function">
@@ -984,15 +977,9 @@ assuming that either</p>
 <p>type == &#8216;zipf&#8217;
 indel lengths are distributed following a Zipfian distribution with parameter &lt;indel_zipf&gt;.
 (Compare:</p>
-<div class="system-message">
-<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">/home/lina/SynologyDrive/tral/tral/hmm/hmm_own_model.py:docstring of tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths</tt>, line 7)</p>
-Unexpected indentation.</div>
 <blockquote>
 <div>Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
 Mol Biol Evol, 26, 1879–1888.</div></blockquote>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">/home/lina/SynologyDrive/tral/tral/hmm/hmm_own_model.py:docstring of tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths</tt>, line 9)</p>
-Block quote ends without a blank line; unexpected unindent.</div>
 <p>In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
 <p>or
 type == &#8216;exponential&#8217;
