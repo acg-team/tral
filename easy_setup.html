@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>easy_setup for TRAL &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">easy_setup for TRAL</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#installation-of-tral">Installation of TRAL</a><ul>
+<li><a class="reference internal" href="#installation-of-tral-with-setup">Installation of TRAL with &#8220;setup&#8221;</a></li>
+<li><a class="reference internal" href="#installation-of-external-software-for-tral">Installation of external software for TRAL</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#uninstallation-of-tral-and-its-external-software">Uninstallation of TRAL and its external software</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/easy_setup.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="easy-setup-for-tral">
+<span id="easy-setup"></span><h1>easy_setup for TRAL<a class="headerlink" href="#easy-setup-for-tral" title="Permalink to this headline">¶</a></h1>
+<p>These scripts will help you to easily install TRAL and its dependencies without going too deep into detail of the different installation procedures.
+It automatically sets up a little filesystem for TRAL.
+Moreover, you can decide which external software should be downloaded and installed without the need to read through their (sometimes complicated) installation procedures.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>These installation scripts can be used on all Linux systems, but still require python3, pip, unzip and git.
+Please make sure you use a python version &gt;= Python3.5.
+Per default TRAL will be installed within the site-packages of python and its external software in <code class="docutils literal"><span class="pre">/usr/local/bin</span></code>. Then you may execute the scripts as root.
+If you wish to change this path you can adjust
+<code class="docutils literal"><span class="pre">$INSTALLATION_PATH</span></code> in <code class="docutils literal"><span class="pre">configTRAL.cfg</span></code></p>
+<p>These setup scripts require <code class="docutils literal"><span class="pre">bash</span></code>, <code class="docutils literal"><span class="pre">python3</span></code>, <code class="docutils literal"><span class="pre">pip</span></code>, <code class="docutils literal"><span class="pre">unzip</span></code>, and <code class="docutils literal"><span class="pre">git</span></code> and run on any UNIX based operation system.
+To compile some of the software (HMMER) <code class="docutils literal"><span class="pre">gcc</span></code>, <code class="docutils literal"><span class="pre">make</span></code> and <code class="docutils literal"><span class="pre">musl-dev</span></code> is needed.
+If you like to work in a virtual environment you need to install the respective software (e.g. virtenv).</p>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>It is recommended to use TRAL within its own virtual environment for python3, e.g. with virtenv.</p>
+<p>To install virtenv just use pip install:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip3 install virtenv
+</pre></div>
+</div>
+<p>Setup a virtenv and activate it:</p>
+<div class="highlight-python"><div class="highlight"><pre>virtualenv -p python3 env_tral
+source env_tral/bin/activate
+</pre></div>
+</div>
+<p>To get started with TRAL, simply clone the github directory <a class="reference external" href="https://github.com/acg-team/tral.git">https://github.com/acg-team/tral.git</a> or download the directory easy_setup and then execute the bash scripts as described below. For example, create a folder called tral_repository in <code class="docutils literal"><span class="pre">\home\user</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre>mkdir tral_repository
+cd tral_repository
+git clone https://github.com/acg-team/tral.git
+</pre></div>
+</div>
+<p>If you haven&#8217;t git installed, you may need install git or to download the github repository manually (<a class="reference external" href="https://github.com/acg-team/tral.git">https://github.com/acg-team/tral.git</a>).</p>
+</div>
+<div class="section" id="installation-of-tral">
+<h2>Installation of TRAL<a class="headerlink" href="#installation-of-tral" title="Permalink to this headline">¶</a></h2>
+<p>You can adapt the default installing path within configTRAL_path.cfg. Please only change the variables FILES and <code class="docutils literal"><span class="pre">$INSTALLATION_PATH</span></code>.</p>
+<p>To install TRAL within you can simply run the script setupTRAL.sh with either the argument &#8220;pip&#8221; or &#8220;setup&#8221;.
+It is recommended to install TRAL within a virtual environment (e. g. virtualenv) which has to be activated before.</p>
+<div class="section" id="installation-of-tral-with-setup">
+<h3>Installation of TRAL with &#8220;setup&#8221;<a class="headerlink" href="#installation-of-tral-with-setup" title="Permalink to this headline">¶</a></h3>
+<p>Currently the version provided in &#8220;pypi&#8221; is not up-to-date, therefore it is recommended to install TRAL with python setup.py install &#8220;setup&#8221;.</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ./tral/easy_setup
+./setupTRAL.sh setup
+</pre></div>
+</div>
+<p>Within the next release the tral version on pypi will be updated.</p>
+</div>
+<div class="section" id="installation-of-external-software-for-tral">
+<h3>Installation of external software for TRAL<a class="headerlink" href="#installation-of-external-software-for-tral" title="Permalink to this headline">¶</a></h3>
+<p>After installing TRAL with setupTRAL.sh you can install external software.
+The script install_ext_software.sh automatically iterates through all installation scripts for each recommended external software of TRAL and ask you for each single software if you want to install it (press y/n). Please confirm to their respective licence.</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo ./install_ext_software.sh
+</pre></div>
+</div>
+<p>Otherwise, you can run an installation script for each external software individually which can be found within the directory <code class="docutils literal"><span class="pre">setup_tral/install_ext_software</span></code>.
+The software will be downloaded in the directory <code class="docutils literal"><span class="pre">$FILES/tral_external_software</span></code>.
+Currently, installation scripts for the following external software are available:</p>
+<ul class="simple">
+<li>alf</li>
+<li>hmmer</li>
+<li>hhrepid</li>
+<li>mafft</li>
+<li>phobos</li>
+<li>t-reks</li>
+<li>trf</li>
+<li>trust</li>
+<li>xstream</li>
+</ul>
+<p>On the bottom of each installation script for the external software an uninstallation procedure can be found.
+Either comment out all installation part and uncomment uninstallation part or run the commands directly in the commandline.</p>
+<p>You may need to run these scripts as root (<code class="docutils literal"><span class="pre">$INSTALLATION_PATH</span></code> is <code class="docutils literal"><span class="pre">/usr/local/bin</span></code> per default).</p>
+<p>If you install these external software not in a user path like the default usr/local/bin, you have to adapt your config.ini file in .tral for each external software. The .tral directory will be copied to your <code class="docutils literal"><span class="pre">$HOME</span></code> directory automatically. TRAL only can find its configuration files if .tral is in your HOME directory. Otherwise provide a symlink (e.g. when installing on a cluster).</p>
+</div>
+</div>
+<div class="section" id="uninstallation-of-tral-and-its-external-software">
+<h2>Uninstallation of TRAL and its external software<a class="headerlink" href="#uninstallation-of-tral-and-its-external-software" title="Permalink to this headline">¶</a></h2>
+<p>To uninstall TRAL (and is external software if you wish) run the script deleteTRAL.sh.</p>
+<div class="highlight-python"><div class="highlight"><pre>\.deleteTRAL.sh
+</pre></div>
+</div>
+<p>You will be asked if you want to uninstall the external software as well.
+If you used sudo to install TRAL and its external software you will need to use sudo for the uninstallation too.</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo \.deleteTRAL.sh
+</pre></div>
+</div>
+<p>To uninstall only all installed external software run:</p>
+<div class="highlight-python"><div class="highlight"><pre>\.uninstall_all_ext_software.sh
+</pre></div>
+</div>
+<p>or in case you installed it with sudo:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo \.uninstall_all_ext_software.sh
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

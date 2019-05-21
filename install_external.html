@@ -94,6 +94,7 @@
 <li><a class="reference internal" href="#xstream">XSTREAM</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#simulation-of-evolution-in-tandem-repeats">Simulation of evolution in tandem repeats</a></li>
 <li><a class="reference internal" href="#not-yet-integrated-software">Not yet integrated software</a></li>
 </ul>
 </li>
@@ -129,6 +130,7 @@
             
   <div class="section" id="installation-of-external-software">
 <span id="install-external"></span><h1>Installation of external software<a class="headerlink" href="#installation-of-external-software" title="Permalink to this headline">¶</a></h1>
+<p>TRAL is dependend on different external software which need to be installed before TRAL can be used.</p>
 <p>Here, we explain how to install external software packages, such as <em>de novo</em> tandem repeat
 detectors. Important: Once a software is installed, the path to either the binary or the
 executable shell script needs to be indicated in the TRAL configuration file <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>.</p>
@@ -329,7 +331,7 @@ Supply the path of your favourite substitution matrix:</p>
 <div class="section" id="xstream">
 <span id="id2"></span><h3>XSTREAM<a class="headerlink" href="#xstream" title="Permalink to this headline">¶</a></h3>
 <p>XSTREAM is a <em>k</em>-mer based <em>de novo</em> DNA/AA tandem repeat detection software
-<a class="reference external" href="http://www.biomedcentral.com/1471-2105/8/382/">published in BMC Bioinformatics (2007)</a> (<a class="reference external" href="http://jimcooperlab.mcdb.ucsb.edu/xstream/">Installation instructions</a>).</p>
+<a class="reference external" href="http://www.biomedcentral.com/1471-2105/8/382/">published in BMC Bioinformatics (2007)</a> (<a class="reference external" href="http://jimcooperlab.mcdb.ucsb.edu/xstream/download.jsp">Installation instructions</a>).</p>
 <p>Create an executable text file XSTREAM with the following content:</p>
 <div class="highlight-python"><div class="highlight"><pre>#!/bin/sh
 java -jar /my/path/to/xstream.jar &quot;$@&quot;
@@ -349,6 +351,21 @@ path:</p>
         XSTREAM = path/to/XSTREAM
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="simulation-of-evolution-in-tandem-repeats">
+<h2>Simulation of evolution in tandem repeats<a class="headerlink" href="#simulation-of-evolution-in-tandem-repeats" title="Permalink to this headline">¶</a></h2>
+<p>For simulating evolved sequences ALF can be used which simulates a root genome into a number of related genomes.
+It was <a class="reference external" href="https://academic.oup.com/mbe/article/29/4/1115/1188345">published in Molecular Biology and Evolution (2012)</a> and can be downloaded on <a class="reference external" href="http://alfsim.org">alfsim.org</a>.
+TRAL searches for ALFs executable <em>alfsim</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    alfsim = alfsim
+</pre></div>
+</div>
+<p>If <em>alfsim</em> is not in your system path, set the absolute path:</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    alfsim = path/to/alfsim
+</pre></div>
 </div>
 </div>
 <div class="section" id="not-yet-integrated-software">
