@@ -21,7 +21,7 @@ CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
 
-def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None, user_path=None):
+def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=None):
 
     """ Realignment of a repeat MSA using mafft or proPIP
 
@@ -39,7 +39,6 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None, 
         my_msa (list of strings): List of sequences (str)
         realignment (str): Either "mafft" or "proPIP_constant" or "proPIP_gamma"
         sequence_type (str): Either "AA" or "DNA"
-        begin (int): start of repeat in sequence
         user_path (str): copy alignment files to user defined path
     
     Returns:
