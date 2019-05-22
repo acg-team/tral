@@ -17,7 +17,7 @@ To get started with TRAL you need to follow several steps.
 
 	* 1(a-c) Simplified setup with the :ref:`easy setup system for TRAL <easy_setup>`.
 
-   Otherwise download and install everything manually:
+   Otherwise download and install manually:
 
 	* 1(a) :ref:`Install TRAL <install>`
 	* 1(b) :ref:`Install external software needed for TRAL <install_external>`
