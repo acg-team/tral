@@ -8,6 +8,11 @@ repeat
 .. automodule:: tral.repeat.repeat
     :members:
 
+repeat_align
+=============================
+.. automodule:: tral.repeat.repeat_align
+    :members:
+
 repeat_exon
 =============================
 .. automodule:: tral.repeat.repeat_exon
@@ -27,3 +32,5 @@ repeat_score
 =============================
 .. automodule:: tral.repeat.repeat_score
     :members:
+
+

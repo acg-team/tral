@@ -1,6 +1,6 @@
 # (C) 2015 Elke Schaper
 
-from tral import configuration
+
 """
     :synopsis: Alignment of tandem repeat units.
 
@@ -8,6 +8,7 @@ from tral import configuration
     .. moduleauthor:: Paulina Näf
 """
 
+from tral import configuration
 import logging
 import os
 import subprocess
@@ -19,15 +20,43 @@ log = logging.getLogger(__name__)
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
-''' Some functions might overlap with repeat.gene_tree.align.'''
-
 
 def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', begin=None, user_path=None):
+
+    """ Realignment of a repeat MSA using mafft or proPIP
+
+    A good multiple sequence alignment (MSA) is an important description of a
+    tandem repeat (TR) and can be crucial to distinguish a true positive from
+    a false positive TR. 
+    This can be realised using a proper MSA estimation algorithm. Currently,
+    Mafft and proPIP can be used to realign a TR.
+
+    For proPIP two options are provided:
+        - "proPIP_constant": no gamma distribution is used for the proPIP algorithm
+        - "proPIP_gamma": gamma distribution (n=6, alpha=0.5)
+
+    Args: 
+        my_msa (list of strings): List of sequences (str)
+        realignment (str): Either "mafft" or "proPIP_constant" or "proPIP_gamma"
+        sequence_type (str): Either "AA" or "DNA"
+        begin (int): start of repeat in sequence
+        user_path (str): copy alignment files to user defined path
+    
+    Returns:
+        my_msa realigned (list of strings)
+
+    .. todo:: 
+        - test if input alignment has column with only gaps
+        - decide what happens if branch length of tree is getting zero
+    """
 
     realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma', None]
     if realignment not in realignment_types:
         raise ValueError("Invalid realignment option. Expected one of: {}".format(realignment_types))
     
+    if not all(isinstance(s, str) for s in my_msa):
+        raise ValueError("Invalid MSA input.")
+
     if realignment == None:
         print("No realignment was performed.")
         return my_msa

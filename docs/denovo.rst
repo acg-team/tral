@@ -47,7 +47,7 @@ As an example, the first detected putative tandem repeat looks as follows :ref:`
 
 
 Detect tandem repeats on all sequences with all *de novo* tandem repeat detection algorithms
-defined in the :ref:`configuration file <configure>`::
+defined in the :ref:`configuration file <configure>`. Here "denovo" is used as a tag, you can choose your own tag.::
 
     for iSequence in sequences_HIV:
         iTandem_repeats = iSequence.detect(denovo = True)
