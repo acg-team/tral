@@ -84,7 +84,10 @@
 <li><a class="reference internal" href="#">Annotate tandem repeats from sequence domain models.</a><ul>
 <li><a class="reference internal" href="#read-in-your-sequence-profile-model">Read in your sequence profile model.</a></li>
 <li><a class="reference internal" href="#read-in-your-sequences">Read in your sequences.</a></li>
-<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm">Annotate tandem repeats with the circular profile HMM.</a></li>
+<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm">Annotate tandem repeats with the circular profile HMM.</a><ul>
+<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip">Annotate tandem repeats with the circular profile HMM and realign with proPIP.</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#output-the-detected-tandem-repeats">Output the detected tandem repeats.</a></li>
 </ul>
 </li>
@@ -128,7 +131,12 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <ul class="simple">
 <li><a class="reference internal" href="install.html#install"><span>Install TRAL</span></a>. TRAL ships with the data needed for this tutorial.</li>
 <li><a class="reference internal" href="install_external.html#mafft"><span>Install Mafft/ginsi</span></a> for tandem repeat unit alignment.</li>
+<li><span class="xref std std-ref">Install Castor</span>. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.</li>
 </ul>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">write section to install castor with aligner proPIP</p>
+</div>
 <div class="section" id="read-in-your-sequence-profile-model">
 <h2>Read in your sequence profile model.<a class="headerlink" href="#read-in-your-sequence-profile-model" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
@@ -170,6 +178,23 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <span class="go">---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-</span>
 <span class="go">R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------</span>
 </pre></div>
+</div>
+<div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip">
+<h3>Annotate tandem repeats with the circular profile HMM and realign with proPIP.<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip" title="Permalink to this headline">¶</a></h3>
+<p>You can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat_align</span>
+<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">],</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP_constant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&gt; begin:31 l_effective:48 n:5 pvalue:1.0</span>
+<span class="go">-RP-R-----------HGHRA-V---A--------I-----K--------ELIVVF----G-G----------GN-----E-G---I--V--D--ELH-V-YN-T-A-T--N--Q--W---F---IPAV---R-GD---I-P-</span>
+<span class="go">--PGC-----A---A-YGF---V---C--D-G---T-----R---------LL-VF----G-G-------M---V-----EYG--KY--S--N--DL----YELQ-A-S-----R--WE--W-KRLKA----K----------</span>
+<span class="go">T-P-KNGPPPCPR-LGHSF-SLVGNKCYL-FGGLANDSEDPKNNIPRYLNDLY-ILELRPGSGVVAWDIPITYGVLPPPRE-SHTAVVYTEKDNKKSKLVIYG-GMSGCRLG-D-L-W-T-LD--IDTLTWNKP-SLSGVAPL</span>
+<span class="go">--P-R-----S---L-HS--A-T---T-I--G---N-----K---------MY-VF----G-G---W-VPL---VM----D-D-VKVA-T-HE-KEWK-C-TN-TLA-C-LNLDTMAWETIL---MDTL---E--D-N-I-P-</span>
+<span class="go">----R-----A--RA--GH-------C--------A------------------V-------A-----------I-----------------N---------------T-----R--L---Y---I-----------------</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="output-the-detected-tandem-repeats">

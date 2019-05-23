@@ -83,6 +83,7 @@
   <ul>
 <li><a class="reference internal" href="#">Repeat code documentation</a><ul>
 <li><a class="reference internal" href="#module-tral.repeat.repeat">repeat</a></li>
+<li><a class="reference internal" href="#module-tral.repeat.repeat_align">repeat_align</a></li>
 <li><a class="reference internal" href="#module-tral.repeat.repeat_exon">repeat_exon</a></li>
 <li><a class="reference internal" href="#module-tral.repeat.repeat_io">repeat_io</a></li>
 <li><a class="reference internal" href="#module-tral.repeat.repeat_pvalue">repeat_pvalue</a></li>
@@ -451,6 +452,84 @@ returns</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-tral.repeat.repeat_align">
+<span id="repeat-align"></span><h2>repeat_align<a class="headerlink" href="#module-tral.repeat.repeat_align" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Alignment of tandem repeat units.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="tral.repeat.repeat_align.realign_repeat">
+<code class="descclassname">tral.repeat.repeat_align.</code><code class="descname">realign_repeat</code><span class="sig-paren">(</span><em>my_msa</em>, <em>realignment='mafft'</em>, <em>sequence_type='AA'</em>, <em>user_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat_align.html#realign_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_align.realign_repeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Realignment of a repeat MSA using mafft or proPIP</p>
+<p>A good multiple sequence alignment (MSA) is an important description of a
+tandem repeat (TR) and can be crucial to distinguish a true positive from
+a false positive TR.
+This can be realised using a proper MSA estimation algorithm. Currently,
+Mafft and proPIP can be used to realign a TR.</p>
+<dl class="docutils">
+<dt>For proPIP two options are provided:</dt>
+<dd><ul class="first last simple">
+<li>&#8220;proPIP_constant&#8221;: no gamma distribution is used for the proPIP algorithm</li>
+<li>&#8220;proPIP_gamma&#8221;: gamma distribution (n=6, alpha=0.5)</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>my_msa</strong> (<em>list of strings</em>) &#8211; List of sequences (str)</li>
+<li><strong>realignment</strong> (<em>str</em>) &#8211; Either &#8220;mafft&#8221; or &#8220;proPIP_constant&#8221; or &#8220;proPIP_gamma&#8221;</li>
+<li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
+<li><strong>user_path</strong> (<em>str</em>) &#8211; copy alignment files to user defined path</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">my_msa realigned (list of strings)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-4">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>test if input alignment has column with only gaps</li>
+<li>decide what happens if branch length of tree is getting zero</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat.repeat_align.remove_char">
+<code class="descclassname">tral.repeat.repeat_align.</code><code class="descname">remove_char</code><span class="sig-paren">(</span><em>str</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat_align.html#remove_char"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_align.remove_char" title="Permalink to this definition">¶</a></dt>
+<dd><p>helper function to remove a character in a sequence</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat.repeat_align.remove_gaps">
+<code class="descclassname">tral.repeat.repeat_align.</code><code class="descname">remove_gaps</code><span class="sig-paren">(</span><em>msa</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat_align.html#remove_gaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_align.remove_gaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove columns in a MSA which contain only gaps.
+Do not use MSA longer than 3000 characters.</p>
+<p>Returns the MSA as a list without only-gap-containing columns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msa</strong> (<em>list of strings</em>) &#8211; List of sequences (str)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">msa (list of strings) with removed colums in case they only contain gaps</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-tral.repeat.repeat_exon">
 <span id="repeat-exon"></span><h2>repeat_exon<a class="headerlink" href="#module-tral.repeat.repeat_exon" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -707,7 +786,7 @@ n_repeat_structure (int)</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-4">
+<div class="admonition-todo admonition" id="index-5">
 <p class="first admonition-title">Todo</p>
 <p class="last">Include exact definition of returned values.</p>
 </div>
@@ -752,11 +831,11 @@ a given <code class="docutils literal"><span class="pre">n</span></code> the clo
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-5">
+<div class="admonition-todo admonition" id="index-6">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check return type.</p>
 </div>
-<div class="admonition-todo admonition" id="index-6">
+<div class="admonition-todo admonition" id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check how this method concurs with the <code class="docutils literal"><span class="pre">empirical_list</span></code> method.</p>
 </div>
@@ -795,7 +874,7 @@ Nucleic Acids Research (2012).</p>
 <p class="last">if precision higher than max(uint32) use uint64 instead.
 CHECK: <a class="reference external" href="http://docs.scipy.org/doc/numpy/user/basics.types.html">http://docs.scipy.org/doc/numpy/user/basics.types.html</a></p>
 </div>
-<div class="admonition-todo admonition" id="index-7">
+<div class="admonition-todo admonition" id="index-8">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe return value.</p>
 </div>
@@ -919,11 +998,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-8">
+<div class="admonition-todo admonition" id="index-9">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define &#8220;phylo&#8221; model.</p>
 </div>
-<div class="admonition-todo admonition" id="index-9">
+<div class="admonition-todo admonition" id="index-10">
 <p class="first admonition-title">Todo</p>
 <p class="last">Perhaps add distributions beyond l_max, n_max.</p>
 </div>
@@ -948,11 +1027,11 @@ all values are available.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-10">
+<div class="admonition-todo admonition" id="index-11">
 <p class="first admonition-title">Todo</p>
 <p class="last">Define <code class="docutils literal"><span class="pre">mu</span></code> more precisely.</p>
 </div>
-<div class="admonition-todo admonition" id="index-11">
+<div class="admonition-todo admonition" id="index-12">
 <p class="first admonition-title">Todo</p>
 <p class="last">Is this function called from anywhere? In case, consider refactoring.</p>
 </div>
@@ -1005,12 +1084,12 @@ density function, and the parsimony score of <code class="docutils literal"><spa
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-12">
+<div class="admonition-todo admonition" id="index-13">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <code class="docutils literal"><span class="pre">tandemrepeat</span></code> s parsimony
 score has not been calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-13">
+<div class="admonition-todo admonition" id="index-14">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
@@ -1033,16 +1112,16 @@ pSim score of <code class="docutils literal"><span class="pre">tandemrepeat</spa
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-14">
+<div class="admonition-todo admonition" id="index-15">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check the method&#8217;s behaviour if <code class="docutils literal"><span class="pre">tandemrepeat</span></code> s parsimony score has not been
 calculated before.</p>
 </div>
-<div class="admonition-todo admonition" id="index-15">
+<div class="admonition-todo admonition" id="index-16">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check exception: if pdf == False: return 1.</p>
 </div>
-<div class="admonition-todo admonition" id="index-16">
+<div class="admonition-todo admonition" id="index-17">
 <p class="first admonition-title">Todo</p>
 <p class="last">Describe <code class="docutils literal"><span class="pre">precision</span></code>.</p>
 </div>
@@ -1164,7 +1243,7 @@ repeat.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-17">
+<div class="admonition-todo admonition" id="index-18">
 <p class="first admonition-title">Todo</p>
 <p class="last">USE LOG EARLIER, NOT JUST IN RETURN STATEMENT</p>
 </div>
@@ -1265,15 +1344,15 @@ n_iteration (int): Number of iterations until optimisation results are returned.
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">float,
 Corresponding function parameter: float)</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple (Maximum of function<span class="target" id="index-18"></span><div class="admonition-todo admonition">
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple (Maximum of function<span class="target" id="index-19"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <code class="docutils literal"><span class="pre">region_bounded</span></code> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-19"></span><div class="admonition-todo admonition">
+<span class="target" id="index-20"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Check why <code class="docutils literal"><span class="pre">stepsize</span></code> is hardcoded at current.</p>
 </div>
-<span class="target" id="index-20"></span><div class="admonition-todo admonition">
+<span class="target" id="index-21"></span><div class="admonition-todo admonition">
 <p class="first admonition-title">Todo</p>
 <p class="last">Generalise hard-coded optimisation parameter boundaries.</p>
 </div>
@@ -1336,7 +1415,7 @@ Nucleic Acids Research (2012).</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition-todo admonition" id="index-21">
+<div class="admonition-todo admonition" id="index-22">
 <p class="first admonition-title">Todo</p>
 <p class="last">At which step shall we assert that the length of <code class="docutils literal"><span class="pre">column</span></code> &gt; 1?</p>
 </div>

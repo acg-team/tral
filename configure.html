@@ -97,7 +97,6 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#logging-ini-optional">logging.ini - OPTIONAL</a></li>
-<li><a class="reference internal" href="#p-value-distribution-files">p-Value distribution files</a></li>
 </ul>
 </li>
 </ul>
@@ -270,18 +269,6 @@ defined as</p>
 <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="s2">&quot;path/to/your/home/.tral/logging.ini&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="p-value-distribution-files">
-<span id="pvaluefiles"></span><h2>p-Value distribution files<a class="headerlink" href="#p-value-distribution-files" title="Permalink to this headline">¶</a></h2>
-<p>In order to calculate the p-Value of tandem repeat scores, available p-Value distributions
-need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd ~/.tral/data
-wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue.tar.gz
-tar -xzf pvalue.tar.gz
-</pre></div>
-</div>
-<p>Instead of downloading all p-Value distributions, it is possible to download only the
-<a class="reference external" href="ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/">distributions for particular models of sequence evolution</a>.</p>
 </div>
 </div>
 

@@ -178,7 +178,7 @@
 
 <dl class="method">
 <dt id="tral.sequence.sequence.Sequence.detect">
-<code class="descname">detect</code><span class="sig-paren">(</span><em>lHMM=None</em>, <em>denovo=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.detect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">detect</code><span class="sig-paren">(</span><em>lHMM=None</em>, <em>denovo=None</em>, <em>realignment='mafft'</em>, <em>sequence_type='AA'</em>, <em>user_path=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/sequence/sequence.html#Sequence.detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.sequence.sequence.Sequence.detect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Detects tandem repeats on <code class="docutils literal"><span class="pre">self.seq</span></code> from 2 possible sources.</p>
 <p>A list of <code class="docutils literal"><span class="pre">Repeat</span></code> instances is created for tandem repeat detections
 on the sequence from two possible sources:</p>
@@ -191,8 +191,9 @@ on the sequence from two possible sources:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hmm</strong> (<a class="reference internal" href="hmm.html#tral.hmm.hmm.HMM" title="tral.hmm.hmm.HMM"><em>HMM</em></a>) &#8211; A list of <code class="docutils literal"><span class="pre">HMM</span></code> instances.</li>
+<li><strong>hmm</strong> (<a class="reference internal" href="hmm.html#tral.hmm.hmm_own_model.HMM" title="tral.hmm.hmm_own_model.HMM"><em>HMM</em></a>) &#8211; A list of <code class="docutils literal"><span class="pre">HMM</span></code> instances.</li>
 <li><strong>denovo</strong> (<em>bool</em>) &#8211; boolean</li>
+<li><strong>realignment</strong> (<em>str</em>) &#8211; either &#8220;mafft&#8221;, &#8220;proPIP_constant&#8221;, &#8220;proPIP_gamma&#8221; or None</li>
 <li><strong>*kwargs</strong> &#8211; Parameters fed to denovo TR prediction and/or Repeat
 instantiation. E.g. <code class="docutils literal"><span class="pre">repeat</span> <span class="pre">=</span> <span class="pre">{&quot;calc_score&quot;:</span> <span class="pre">True}</span></code></li>
 </ul>

@@ -845,7 +845,7 @@ for the file format specification.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>hmm</strong> (<a class="reference internal" href="#tral.hmm.hmm.HMM" title="tral.hmm.hmm.HMM"><em>HMM</em></a>) &#8211; HMM object to write</li>
+<li><strong>hmm</strong> (<a class="reference internal" href="#tral.hmm.hmm_own_model.HMM" title="tral.hmm.hmm_own_model.HMM"><em>HMM</em></a>) &#8211; HMM object to write</li>
 <li><strong>hmm_file</strong> (<em>str or file</em>) &#8211; filename or file-like object to write to</li>
 </ul>
 </td>
@@ -1052,8 +1052,6 @@ defined by Q, t, eqFreq and alphabet.</p>
 <code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">distance_index</code><span class="sig-paren">(</span><em>i</em>, <em>j</em>, <em>length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#distance_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.distance_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to calculate the distance between two indices in a
 circular HMM.</p>
-<p>Helper function to calculate the distance between two indices in a
-circular HMM.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1085,7 +1083,11 @@ once in the code at current.</p>
 <dl class="function">
 <dt id="tral.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units">
 <code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">hmm_path_to_aligned_tandem_repeat_units</code><span class="sig-paren">(</span><em>sequence</em>, <em>most_likely_path</em>, <em>l_effective</em>, <em>translate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#hmm_path_to_aligned_tandem_repeat_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
+<dd><p>WARNING: Currently do not rely on this function!!
+The output seems to have missing characters and too much gaps.
+The function needs review in order to be used.
+todo: fix hidden bug!</p>
+<dl class="docutils">
 <dt>Convert a viterbi path in an hmm of length <code class="docutils literal"><span class="pre">l_effective</span></code> on the</dt>
 <dd>sequence into a corresponding tandem repeat.</dd>
 </dl>
