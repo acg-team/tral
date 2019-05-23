@@ -10,9 +10,9 @@ Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
 - :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
-- :ref:`Install Castor`. If you wish to realign you need to have Castor installed beforehand.
+- :ref:`Install Castor`. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
 
-.. todo:: write section to install castor and aligner proPIP
+.. todo:: write section to install castor with aligner proPIP
 
 
 Read in your sequences.
@@ -95,6 +95,7 @@ This is how the previous multiple sequence alignment (MSA) looks::
 	
 Realignment of this MSA::
 
+	from tral.repeat import repeat_align
 	realigned_msa_constant = repeat_align.realign_repeat(msa, realignment = "proPIP_constant")
 	realigned_msa_gamma = repeat_align.realign_repeat(msa, realignment = "proPIP_gamma")
 
