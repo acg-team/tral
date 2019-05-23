@@ -80,10 +80,12 @@ The software will be downloaded in the directory ``$FILES/tral_external_software
 Currently, installation scripts for the following external software are available:
 
 - alf
+- castor
 - hmmer
 - hhrepid
 - mafft
 - phobos
+- phyml
 - t-reks
 - trf
 - trust
