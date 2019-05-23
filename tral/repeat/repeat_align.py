@@ -56,8 +56,18 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
     if not all(isinstance(s, str) for s in my_msa):
         raise ValueError("Invalid MSA input.")
 
+    if realignment == "proPIP_constant" or realignment == "proPIP_gamma":
+        # remove columns that only contains gaps to avoid errors
+        my_msa = remove_gaps(my_msa)
+
+        # do try to realign if no gap is present in MSA
+        if not any(['-' in s for s in my_msa]):
+            print("\nproPIP needs at least one gap in the MSA to realign.\n" +
+                "No realignment will be performed.\n")
+            return my_msa
+
     if realignment == None:
-        print("No realignment was performed.")
+        print("\nNo realignment was performed.")
         return my_msa
 
     # Create temporary working directory
@@ -109,6 +119,10 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
 
         # log messages of castor to stderr instead of logfiles
         os.environ["GLOG_logtostderr"] = "1"
+
+        # proPIP cannot handle MSAs without any gaps
+        # TODO: catch this gaps, print warning, return original MSA
+        # TODO: replace this part as soon as proPIP can handle this
 
         if sequence_type == "AA":
             alphabet="Protein"
@@ -315,3 +329,49 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
     else:
         raise ValueError(
             'Currently, the aligner {} is not implemented.'.format(realignment))
+
+def remove_char(str, n):
+    """ helper function to remove a character in a sequence
+    """
+    first_part = str[:n] 
+    last_part = str[n+1:]
+    return first_part + last_part 
+
+def remove_gaps(msa):
+    """ Remove columns in a MSA which contain only gaps.
+    Do not use MSA longer than 3000 characters.
+
+    Returns the MSA as a list without only-gap-containing columns.
+
+    Args: 
+        msa (list of strings): List of sequences (str)
+    
+    Returns:
+        msa (list of strings) with removed colums in case they only contain gaps
+    """
+
+    if not all(isinstance(s, str) for s in msa):
+        raise ValueError("Invalid MSA input.")
+
+    i = 3000 # The MSA should have at maximum 3000 characters
+
+    if not all(len(s) < i for s in msa):
+        raise ValueError("Length of sequences in MSA need to be below {}.".format(i))
+
+    while i >= len(msa[0]):
+        i -=1
+
+    while i <= len(msa[0])-1 and not i < 0:
+        column = [] 
+        for seq in msa:
+            column.append(seq[i])
+        # print(column)
+        if all([char == '-' for char in column]):
+            col = 0
+            for seq in msa:
+                seq = remove_char(seq,i)
+                msa[col] = seq
+                col += 1
+        i -= 1
+ 
+    return msa

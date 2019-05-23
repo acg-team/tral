@@ -10,6 +10,9 @@ Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
 - :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+- :ref:`Install Castor`. If you wish to realign you need to have Castor installed beforehand.
+
+.. todo:: write section to install castor and aligner proPIP
 
 
 Read in your sequences.
@@ -73,6 +76,46 @@ As an example, T-REKS detects the following repeat in the second HIV sequence :r
     > begin:449 l_effective:10 n:2
     RPEPTAPP-ESL
     RPEPTAPPPES-
+
+Realign a repeat with proPIP.
+-----------------------------
+Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation::
+
+	test_sequence = sequences_HIV[3]
+	tandem_repeats = test_sequence.detect(denovo = True)
+	msa = tandem_repeats.repeats[6].msa
+
+This is how the previous multiple sequence alignment (MSA) looks::
+
+	>>> for unit in msa:
+	...     print(unit)
+	----DKWTVQPIQLPE
+	---KDSWTVNDIQ--K
+	LVGKLNWASQIY--PG
+	
+Realignment of this MSA::
+
+	realigned_msa_constant = repeat_align.realign_repeat(msa, realignment = "proPIP_constant")
+	realigned_msa_gamma = repeat_align.realign_repeat(msa, realignment = "proPIP_gamma")
+
+::
+
+	>>> for unit in realigned_msa_constant:
+	...     print(unit) 
+	---DK--WTVQPIQLPE
+	-K-DS--WTVNDIQ--K
+	L-VGKLNWASQ-I-YPG
+
+::
+
+	>>> for unit in realigned_msa_gamma:
+	...     print(unit)  
+	--DK--WTVQPIQLPE
+	-KDS--WTVNDIQ--K
+	LVGKLNWASQ-I-YPG
+
+
+
 
 Output the detected tandem repeats.
 -----------------------------------
