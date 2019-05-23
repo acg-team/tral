@@ -16,10 +16,8 @@ import tempfile
 
 log = logging.getLogger(__name__)
 
-
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
-
 
 def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=None):
 
@@ -120,10 +118,6 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
         # log messages of castor to stderr instead of logfiles
         os.environ["GLOG_logtostderr"] = "1"
 
-        # proPIP cannot handle MSAs without any gaps
-        # TODO: catch this gaps, print warning, return original MSA
-        # TODO: replace this part as soon as proPIP can handle this
-
         if sequence_type == "AA":
             alphabet="Protein"
             substitution_model = "LG08"
@@ -202,9 +196,6 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
             castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
                                                             "params={}".format(paramsfile_tree)])
             castor_tree_initialization.wait()
-
-            # TODO: Catch this error: Column #33 of the alignment contains only gaps. Please remove it and try again!
-            # the given alignment cannot have a column with only gaps --> 
 
         except FileNotFoundError:
             error_note = (
