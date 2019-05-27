@@ -31,7 +31,7 @@ If *hmmbuild* is not in your system path, set the absolute path::
 
 Alignment of tandem repeat units
 ---------------------------------
-Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
+Currently, MAFFT is the default tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
 TRAL searches for MAFFT's *ginsi* in the system path by default (modify in :ref:`config.ini <configure>`)::
 
     [repeat]
@@ -42,6 +42,20 @@ If *ginsi* is not in your system path, set the absolute path::
 
     [repeat]
         ginsi = path/to/ginsi
+
+Realignment of tandem repeat units with indel aware proPIP algorithm
+--------------------------------------------------------------------
+The alignment module of (`Castor <https://github.com/acg-team/castor_aligner>`__) can be used to realign tandem repeat units with the indel aware algorithm proPIP (`Installation instructions <https://bitbucket.org/lorenzogatti89/castor/wiki/Compiling/Index>`__).
+TRAL searches for *Castor* in the system path by default (modify in :ref:`config.ini <configure>`)::
+
+    [repeat]
+        Castor = Castor
+
+
+If *Castor* is not in your system path, set the absolute path::
+
+    [repeat]
+        Castor = path/to/Castor
 
 
 .. _install_denovo:
