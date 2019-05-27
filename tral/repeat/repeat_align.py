@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
-def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=None):
+def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distribution=REPEAT_CONFIG['castor_parameter']['rate_distribution'], user_path=None):
 
     """ Realignment of a repeat MSA using mafft or proPIP
 
@@ -29,13 +29,13 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
     This can be realised using a proper MSA estimation algorithm. Currently,
     Mafft and proPIP can be used to realign a TR.
 
-    For proPIP two options are provided:
-        - "proPIP_constant": no gamma distribution is used for the proPIP algorithm
-        - "proPIP_gamma": gamma distribution (n=6, alpha=0.5)
+    For proPIP the rate distribution for indels can be either constant or gamma distributed
+        - REPEAT_CONFIG['castor_parameter']['rate_distribution'] == 'constant': no gamma distribution is used for the proPIP algorithm
+        - REPEAT_CONFIG['castor_parameter']['rate_distribution'] == 'gamma': gamma distribution (n=6, alpha=0.5)
 
     Args: 
         my_msa (list of strings): List of sequences (str)
-        realignment (str): Either "mafft" or "proPIP_constant" or "proPIP_gamma"
+        realignment (str): Either "mafft" or "proPIP"
         sequence_type (str): Either "AA" or "DNA"
         user_path (str): copy alignment files to user defined path
     
@@ -47,14 +47,14 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
         - decide what happens if branch length of tree is getting zero
     """
 
-    realignment_types = ['mafft', 'proPIP_constant', 'proPIP_gamma', None]
+    realignment_types = ['mafft', 'proPIP', None]
     if realignment not in realignment_types:
         raise ValueError("Invalid realignment option. Expected one of: {}".format(realignment_types))
     
     if not all(isinstance(s, str) for s in my_msa):
         raise ValueError("Invalid MSA input.")
 
-    if realignment == "proPIP_constant" or realignment == "proPIP_gamma":
+    if realignment == "proPIP":
         # remove columns that only contains gaps to avoid errors
         my_msa = remove_gaps(my_msa)
 
@@ -112,7 +112,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
             logging.error(error_note)
             return None
         
-    elif realignment == 'proPIP_constant' or realignment == 'proPIP_gamma':
+    elif realignment == 'proPIP':
         # Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)
 
         # log messages of castor to stderr instead of logfiles
@@ -125,12 +125,14 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
             alphabet="DNA"
             substitution_model="HKY85"
         else:
-            print("Sequence type is not known.")
+            raise ValueError("Sequence type is not known.")
 
-        if realignment == 'proPIP_constant':
+        if rate_distribution == 'constant':
             rate_distribution = 'Constant'
-        else:
+        elif rate_distribution == 'gamma':
             rate_distribution = 'Gamma(n=6,alpha=0.5)'
+        else:
+            raise ValueError("Rate distribution parameter not known.")
 
         tree_initial = os.path.join(working_dir,"tree_initial.nwk")
         tree = os.path.join(working_dir,"tree.nwk")
@@ -200,7 +202,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', user_path=No
         except FileNotFoundError:
             error_note = (
                 "ProPIP could not be reached.\n" +
-                "Is Castor installed properly and is the path defined in config.ini in the data directory?\n")
+                "Is Castor installed properly and is the path defined correctly in config.ini in the data directory?\n")
             logging.error(error_note)
             raise Exception("Sorry, creating a tree for the alignment went wrong.")
 
