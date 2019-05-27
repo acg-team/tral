@@ -84,6 +84,7 @@
 <li><a class="reference internal" href="#">Installation of external software</a><ul>
 <li><a class="reference internal" href="#sequence-profile-model-generation">Sequence profile model generation</a></li>
 <li><a class="reference internal" href="#alignment-of-tandem-repeat-units">Alignment of tandem repeat units</a></li>
+<li><a class="reference internal" href="#realignment-of-tandem-repeat-units-with-indel-aware-propip-algorithm">Realignment of tandem repeat units with indel aware proPIP algorithm</a></li>
 <li><a class="reference internal" href="#currently-integrated-detectors">Currently integrated detectors</a><ul>
 <li><a class="reference internal" href="#hhrepid">HHrepID</a></li>
 <li><a class="reference internal" href="#phobos">PHOBOS</a></li>
@@ -150,7 +151,7 @@ TRAL searches for HMMER&#8217;s <em>hmmbuild</em> in the system path by default 
 </div>
 <div class="section" id="alignment-of-tandem-repeat-units">
 <span id="mafft"></span><h2>Alignment of tandem repeat units<a class="headerlink" href="#alignment-of-tandem-repeat-units" title="Permalink to this headline">¶</a></h2>
-<p>Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (<a class="reference external" href="http://mafft.cbrc.jp/alignment/software/">Installation instructions</a>).
+<p>Currently, MAFFT is the default tool for (re-)alignment of the tandem repeat units to each other (<a class="reference external" href="http://mafft.cbrc.jp/alignment/software/">Installation instructions</a>).
 TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre>[repeat]
     ginsi = ginsi
@@ -159,6 +160,20 @@ TRAL searches for MAFFT&#8217;s <em>ginsi</em> in the system path by default (mo
 <p>If <em>ginsi</em> is not in your system path, set the absolute path:</p>
 <div class="highlight-python"><div class="highlight"><pre>[repeat]
     ginsi = path/to/ginsi
+</pre></div>
+</div>
+</div>
+<div class="section" id="realignment-of-tandem-repeat-units-with-indel-aware-propip-algorithm">
+<h2>Realignment of tandem repeat units with indel aware proPIP algorithm<a class="headerlink" href="#realignment-of-tandem-repeat-units-with-indel-aware-propip-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>The alignment module of (<a class="reference external" href="https://github.com/acg-team/castor_aligner">Castor</a>) can be used to realign tandem repeat units with the indel aware algorithm proPIP (<a class="reference external" href="https://bitbucket.org/lorenzogatti89/castor/wiki/Compiling/Index">Installation instructions</a>).
+TRAL searches for <em>Castor</em> in the system path by default (modify in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>):</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    Castor = Castor
+</pre></div>
+</div>
+<p>If <em>Castor</em> is not in your system path, set the absolute path:</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    Castor = path/to/Castor
 </pre></div>
 </div>
 </div>
