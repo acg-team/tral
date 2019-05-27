@@ -303,6 +303,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
             break
     else:
         LOG.error('ALFSIM was not able to produce simulated sequence.')
+        LOG.error('Do you have ALFSIM installed and used the correct path in the configuration file?')
         return
 
     # shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
