@@ -676,7 +676,8 @@ class Repeat:
             self.msa_original.append(unit_original)
     
     def realign_TR(self, realignment='proPIP', rate_distribution=CONFIG['castor_parameter']['rate_distribution']):
-        """ Realign multiple sequence alignment of tandem repeat
+        """ Realign multiple sequence alignment of tandem repeats.
+            Update of tandem repeat MSA.
 
         Args:
             self (Repeat instance)

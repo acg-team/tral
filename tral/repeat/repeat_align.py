@@ -196,7 +196,10 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
         # run castor for tree initialization
         try:
             castor_tree_initialization = subprocess.Popen([REPEAT_CONFIG['Castor'], 
-                                                            "params={}".format(paramsfile_tree)])
+                                                            "params={}".format(paramsfile_tree)],
+                                                            stdout=subprocess.PIPE,
+                                                            stderr=subprocess.PIPE)
+            print("Tree initialization with Castor ....")
             castor_tree_initialization.wait()
 
         except FileNotFoundError:
@@ -264,7 +267,10 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
         # run alignment with propip
         try:
             proPIP_alignment = subprocess.Popen([REPEAT_CONFIG['Castor'], 
-                                                "params={}".format(paramsfile_alignment)])
+                                                "params={}".format(paramsfile_alignment)],
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE)
+            print("Realignment of MSA with proPIP .... ")
             proPIP_alignment.wait()
         except FileNotFoundError:
             error_note = (
