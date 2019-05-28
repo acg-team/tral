@@ -149,7 +149,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
         # Castor cannot create trees for less than four sequences
 
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 2:
-            print("For two units which have to be aligned an arbritary tree will be given.")            
+            print("For two units which have to be aligned an arbritary starting tree will be given.")            
             tree_string = "(1:0.1,2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:
@@ -157,7 +157,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
 
         # For three units an arbritary initial tree is used for the alignment
         if len([1 for line in open(msa_file) if line.startswith(">")]) == 3:
-            print("For three units which have to be aligned an arbritary tree will be given.")            
+            print("For three units which have to be aligned an arbritary starting tree will be given.")            
             tree_string = "((1:0.1,3:0.1):0.1,2:0.1);"
             init_tree = "user"
             with open(tree_initial, 'w') as treefile:

@@ -143,6 +143,15 @@ class Sequence:
                     initial_alignment = 'mafft'
                     aligned_msa = repeat_align.realign_repeat(unaligned_msa, initial_alignment, sequence_type, user_path=user_path)
 
+                    if realignment == 'proPIP':
+                        if len(aligned_msa) > 2 or len(aligned_msa[0]) > 10: # TODO: change from 2 to 3
+                        # only TRs with at least 3 units with a length > 10 characters will be realigned              
+                            aligned_msa = repeat_align.realign_repeat(aligned_msa,
+                                                                    realignment,
+                                                                    sequence_type,
+                                                                    rate_distribution=rate_distribution,
+                                                                    user_path=user_path)
+
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         if 'repeat' in kwargs:
