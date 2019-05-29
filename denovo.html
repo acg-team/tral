@@ -187,40 +187,33 @@ absolute number of detections in the HIV proteome for a couple of algorithms:</p
 </div>
 <div class="section" id="realign-a-repeat-with-propip">
 <h2>Realign a repeat with proPIP.<a class="headerlink" href="#realign-a-repeat-with-propip" title="Permalink to this headline">¶</a></h2>
-<p>Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation:</p>
+<p>Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">test_sequence</span> <span class="o">=</span> <span class="n">sequences_HIV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">test_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-<span class="n">msa</span> <span class="o">=</span> <span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">msa</span>
 </pre></div>
 </div>
-<p>This is how the previous multiple sequence alignment (MSA) looks:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+<p>Print one of the previous multiple sequence alignments (MSA):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+<span class="go">&gt; begin:828 l_effective:13 n:3</span>
 <span class="go">----DKWTVQPIQLPE</span>
 <span class="go">---KDSWTVNDIQ--K</span>
 <span class="go">LVGKLNWASQIY--PG</span>
 </pre></div>
 </div>
-<p>Realignment of this MSA:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat_align</span>
-<span class="n">realigned_msa_constant</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">msa</span><span class="p">,</span> <span class="n">realignment</span> <span class="o">=</span> <span class="s2">&quot;proPIP_constant&quot;</span><span class="p">)</span>
-<span class="n">realigned_msa_gamma</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">msa</span><span class="p">,</span> <span class="n">realignment</span> <span class="o">=</span> <span class="s2">&quot;proPIP_gamma&quot;</span><span class="p">)</span>
+<p>Realignment with proPIP (default realignment=&#8217;proPIP&#8217;) of the tandem repeat MSAs with a constant rate distribution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">TR</span> <span class="ow">in</span> <span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">:</span>
+        <span class="n">TR</span><span class="o">.</span><span class="n">realign_TR</span><span class="p">(</span><span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP&#39;</span><span class="p">,</span> <span class="n">rate_distribution</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">realigned_msa_constant</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+<span class="go">&gt; begin:828 l_effective:13 n:3</span>
 <span class="go">---DK--WTVQPIQLPE</span>
-<span class="go">-K-DS--WTVNDIQ--K</span>
-<span class="go">L-VGKLNWASQ-I-YPG</span>
+<span class="go">--KDS--WTVNDIQ--K</span>
+<span class="go">LV-GKLNWASQ-I-YPG</span>
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">realigned_msa_gamma</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-<span class="go">--DK--WTVQPIQLPE</span>
-<span class="go">-KDS--WTVNDIQ--K</span>
-<span class="go">LVGKLNWASQ-I-YPG</span>
-</pre></div>
-</div>
+<p>Set rate_distribution = &#8216;gamma&#8217; for a gamma distributed indel placement or modify it in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>.
+Set realignment = &#8216;mafft&#8217; to realign with mafft instead of proPIP.</p>
 </div>
 <div class="section" id="output-the-detected-tandem-repeats">
 <h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this headline">¶</a></h2>

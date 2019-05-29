@@ -181,13 +181,12 @@ is searched for tandem repeats using the circular profile HMM.</p>
 </div>
 <div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip">
 <h3>Annotate tandem repeats with the circular profile HMM and realign with proPIP.<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip" title="Permalink to this headline">¶</a></h3>
-<p>You can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat_align</span>
-<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">],</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP_constant&#39;</span><span class="p">)</span>
+<p>Alternatively, you can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">],</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="go">&gt; begin:31 l_effective:48 n:5 pvalue:1.0</span>
+<span class="go">&gt; begin:31 l_effective:48 n:5</span>
 <span class="go">-RP-R-----------HGHRA-V---A--------I-----K--------ELIVVF----G-G----------GN-----E-G---I--V--D--ELH-V-YN-T-A-T--N--Q--W---F---IPAV---R-GD---I-P-</span>
 <span class="go">--PGC-----A---A-YGF---V---C--D-G---T-----R---------LL-VF----G-G-------M---V-----EYG--KY--S--N--DL----YELQ-A-S-----R--WE--W-KRLKA----K----------</span>
 <span class="go">T-P-KNGPPPCPR-LGHSF-SLVGNKCYL-FGGLANDSEDPKNNIPRYLNDLY-ILELRPGSGVVAWDIPITYGVLPPPRE-SHTAVVYTEKDNKKSKLVIYG-GMSGCRLG-D-L-W-T-LD--IDTLTWNKP-SLSGVAPL</span>
@@ -195,6 +194,7 @@ is searched for tandem repeats using the circular profile HMM.</p>
 <span class="go">----R-----A--RA--GH-------C--------A------------------V-------A-----------I-----------------N---------------T-----R--L---Y---I-----------------</span>
 </pre></div>
 </div>
+<p>If you wish to use a gamma distribution for indels, choose the option rate_distribution = &#8216;gamma&#8217; or modify the rate distribution in <a class="reference internal" href="configure.html#configure"><span>config.ini</span></a>.</p>
 </div>
 </div>
 <div class="section" id="output-the-detected-tandem-repeats">

@@ -10,6 +10,9 @@ Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
 - :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
+- :ref:`Install Castor`. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
+
+.. todo:: write section to install castor with aligner proPIP
 
 
 Read in your sequences.
@@ -47,7 +50,7 @@ As an example, the first detected putative tandem repeat looks as follows :ref:`
 
 
 Detect tandem repeats on all sequences with all *de novo* tandem repeat detection algorithms
-defined in the :ref:`configuration file <configure>`::
+defined in the :ref:`configuration file <configure>`. Here "denovo" is used as a tag, you can choose your own tag.::
 
     for iSequence in sequences_HIV:
         iTandem_repeats = iSequence.detect(denovo = True)
@@ -73,6 +76,37 @@ As an example, T-REKS detects the following repeat in the second HIV sequence :r
     > begin:449 l_effective:10 n:2
     RPEPTAPP-ESL
     RPEPTAPPPES-
+
+Realign a repeat with proPIP.
+-----------------------------
+Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation. ::
+
+	test_sequence = sequences_HIV[3]
+	tandem_repeats = test_sequence.detect(denovo = True)
+
+Print one of the previous multiple sequence alignments (MSA)::
+
+	>>> print(tandem_repeats.repeats[6])
+	> begin:828 l_effective:13 n:3
+	----DKWTVQPIQLPE
+	---KDSWTVNDIQ--K
+	LVGKLNWASQIY--PG
+	
+Realignment with proPIP (default realignment='proPIP') of the tandem repeat MSAs with a constant rate distribution::
+
+	for TR in tandem_repeats.repeats:
+		TR.realign_TR(realignment='proPIP', rate_distribution='constant')
+
+::
+
+	>>> print(tandem_repeats.repeats[6])
+	> begin:828 l_effective:13 n:3
+	---DK--WTVQPIQLPE
+	--KDS--WTVNDIQ--K
+	LV-GKLNWASQ-I-YPG
+
+Set rate_distribution = 'gamma' for a gamma distributed indel placement or modify it in :ref:`config.ini <configure>`.
+Set realignment = 'mafft' to realign with mafft instead of proPIP.
 
 Output the detected tandem repeats.
 -----------------------------------

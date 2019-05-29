@@ -1,0 +1,491 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tral.repeat.repeat_align &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.repeat.repeat_align</h1><div class="highlight"><pre>
+<span class="c1"># (C) 2015 Elke Schaper</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :synopsis: Alignment of tandem repeat units.</span>
+
+<span class="sd">    .. moduleauthor:: Elke Schaper &lt;elke.schaper@isb-sib.ch&gt;</span>
+<span class="sd">    .. moduleauthor:: Paulina Näf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">configuration</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">CONFIG_GENERAL</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
+<span class="n">REPEAT_CONFIG</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="realign_repeat"><a class="viewcode-back" href="../../../repeat.html#tral.repeat.repeat_align.realign_repeat">[docs]</a><span class="k">def</span> <span class="nf">realign_repeat</span><span class="p">(</span><span class="n">my_msa</span><span class="p">,</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;mafft&#39;</span><span class="p">,</span> <span class="n">sequence_type</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="n">rate_distribution</span><span class="o">=</span><span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;castor_parameter&#39;</span><span class="p">][</span><span class="s1">&#39;rate_distribution&#39;</span><span class="p">],</span> <span class="n">user_path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Realignment of a repeat MSA using mafft or proPIP</span>
+
+<span class="sd">    A good multiple sequence alignment (MSA) is an important description of a</span>
+<span class="sd">    tandem repeat (TR) and can be crucial to distinguish a true positive from</span>
+<span class="sd">    a false positive TR. </span>
+<span class="sd">    This can be realised using a proper MSA estimation algorithm. Currently,</span>
+<span class="sd">    Mafft and proPIP can be used to realign a TR.</span>
+
+<span class="sd">    For proPIP the rate distribution for indels can be either constant or gamma distributed</span>
+<span class="sd">        - REPEAT_CONFIG[&#39;castor_parameter&#39;][&#39;rate_distribution&#39;] == &#39;constant&#39;: no gamma distribution is used for the proPIP algorithm</span>
+<span class="sd">        - REPEAT_CONFIG[&#39;castor_parameter&#39;][&#39;rate_distribution&#39;] == &#39;gamma&#39;: gamma distribution (n=6, alpha=0.5)</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        my_msa (list of strings): List of sequences (str)</span>
+<span class="sd">        realignment (str): Either &quot;mafft&quot; or &quot;proPIP&quot;</span>
+<span class="sd">        sequence_type (str): Either &quot;AA&quot; or &quot;DNA&quot;</span>
+<span class="sd">        user_path (str): copy alignment files to user defined path</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        my_msa realigned (list of strings)</span>
+
+<span class="sd">    .. todo:: </span>
+<span class="sd">        - test if input alignment has column with only gaps</span>
+<span class="sd">        - decide what happens if branch length of tree is getting zero</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">realignment_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mafft&#39;</span><span class="p">,</span> <span class="s1">&#39;proPIP&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">realignment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">realignment_types</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid realignment option. Expected one of: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">realignment_types</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">my_msa</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid MSA input.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">realignment</span> <span class="o">==</span> <span class="s2">&quot;proPIP&quot;</span><span class="p">:</span>
+        <span class="c1"># remove columns that only contains gaps to avoid errors</span>
+        <span class="n">my_msa</span> <span class="o">=</span> <span class="n">remove_gaps</span><span class="p">(</span><span class="n">my_msa</span><span class="p">)</span>
+
+        <span class="c1"># do try to realign if no gap is present in MSA</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">my_msa</span><span class="p">]):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">proPIP needs at least one gap in the MSA to realign.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;No realignment will be performed.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">my_msa</span>
+
+    <span class="k">if</span> <span class="n">realignment</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">No realignment was performed.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_msa</span>
+
+    <span class="c1"># Create temporary working directory</span>
+    <span class="n">working_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;evolvedTR: Created temp directory: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">)</span>
+
+    <span class="c1"># Save my_TR to temp directory:</span>
+    <span class="n">msa_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;initial_msa.faa&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">msa_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">msa_filehandle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iMSA</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">my_msa</span><span class="p">):</span>
+            <span class="n">msa_filehandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&gt;{0}</span><span class="se">\n</span><span class="s1">{1}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">iMSA</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">realignment</span> <span class="o">==</span> <span class="s1">&#39;mafft&#39;</span><span class="p">:</span>
+        <span class="c1"># Run Mafft</span>
+        <span class="c1"># See http://mafft.cbrc.jp/alignment/software/manual/manual.html for choice of options.</span>
+        <span class="c1"># The mafft result is in stdout. Check: Do you need to capture or</span>
+        <span class="c1"># redirect the stderr?</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;ginsi&#39;</span><span class="p">],</span>
+                              <span class="s2">&quot;--anysymbol&quot;</span><span class="p">,</span>
+                              <span class="s2">&quot;--quiet&quot;</span><span class="p">,</span>
+                              <span class="n">msa_file</span><span class="p">],</span>
+                             <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">mafft_output</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">stdout</span><span class="p">]</span>
+        <span class="n">msa</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">label</span><span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mafft_output</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+                <span class="n">label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+            <span class="k">elif</span> <span class="n">mafft_output</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+                <span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">line</span>
+        <span class="c1"># use original order of msa</span>
+        <span class="n">msa_sorted</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="n">msa</span><span class="p">))]</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msa_sorted</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">msa</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">error_note</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Mafft could not successfully run the realignment for: &quot;</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_msa</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_note</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        
+    <span class="k">elif</span> <span class="n">realignment</span> <span class="o">==</span> <span class="s1">&#39;proPIP&#39;</span><span class="p">:</span>
+        <span class="c1"># Run Castor (with integrated aligner) (https://github.com/acg-team/castor_aligner)</span>
+
+        <span class="c1"># log messages of castor to stderr instead of logfiles</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GLOG_logtostderr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+
+        <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s2">&quot;AA&quot;</span><span class="p">:</span>
+            <span class="n">alphabet</span><span class="o">=</span><span class="s2">&quot;Protein&quot;</span>
+            <span class="n">substitution_model</span> <span class="o">=</span> <span class="s2">&quot;LG08&quot;</span>
+        <span class="k">elif</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s2">&quot;DNA&quot;</span><span class="p">:</span>
+            <span class="n">alphabet</span><span class="o">=</span><span class="s2">&quot;DNA&quot;</span>
+            <span class="n">substitution_model</span><span class="o">=</span><span class="s2">&quot;HKY85&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sequence type is not known.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rate_distribution</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
+            <span class="n">rate_distribution</span> <span class="o">=</span> <span class="s1">&#39;Constant&#39;</span>
+        <span class="k">elif</span> <span class="n">rate_distribution</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span>
+            <span class="n">rate_distribution</span> <span class="o">=</span> <span class="s1">&#39;Gamma(n=6,alpha=0.5)&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Rate distribution parameter not known.&quot;</span><span class="p">)</span>
+
+        <span class="n">tree_initial</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;tree_initial.nwk&quot;</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;tree.nwk&quot;</span><span class="p">)</span>
+        <span class="n">msa_realigned</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;msa_realigned.faa&quot;</span><span class="p">)</span>
+        <span class="n">paramsfile_tree</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;params_tree.txt&#39;</span><span class="p">)</span>
+        <span class="n">paramsfile_alignment</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;params_alignment.txt&#39;</span><span class="p">)</span>
+        <span class="n">estimates</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;estimates.json&#39;</span><span class="p">)</span>
+
+        <span class="c1">####################################</span>
+        <span class="c1"># Create an initial tree</span>
+        <span class="c1">####################################</span>
+
+        <span class="n">init_tree</span> <span class="o">=</span> <span class="s2">&quot;distance&quot;</span>
+        <span class="c1"># Castor cannot create trees for less than four sequences</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">msa_file</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;For two units which have to be aligned an arbritary starting tree will be given.&quot;</span><span class="p">)</span>            
+            <span class="n">tree_string</span> <span class="o">=</span> <span class="s2">&quot;(1:0.1,2:0.1);&quot;</span>
+            <span class="n">init_tree</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tree_initial</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">treefile</span><span class="p">:</span>
+                <span class="n">treefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tree_string</span><span class="p">)</span>
+
+        <span class="c1"># For three units an arbritary initial tree is used for the alignment</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">msa_file</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;For three units which have to be aligned an arbritary starting tree will be given.&quot;</span><span class="p">)</span>            
+            <span class="n">tree_string</span> <span class="o">=</span> <span class="s2">&quot;((1:0.1,3:0.1):0.1,2:0.1);&quot;</span>
+            <span class="n">init_tree</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tree_initial</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">treefile</span><span class="p">:</span>
+                <span class="n">treefile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tree_string</span><span class="p">)</span>
+        <span class="c1"># For more than tree units an initial tree will be estimated from the previous alignment </span>
+
+        <span class="c1"># create parameter file to create or optimize tree with castor</span>
+        <span class="n">parameters_tree</span> <span class="o">=</span>  <span class="p">[</span><span class="s2">&quot;analysis_name=tree_optimization&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;alphabet={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alphabet</span><span class="p">),</span>
+                            <span class="s2">&quot;alignment=false&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;input.sequence.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msa_file</span><span class="p">),</span>
+                            <span class="s2">&quot;input.sequence.sites_to_use=all&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;init.tree={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">init_tree</span><span class="p">),</span>
+                            <span class="s2">&quot;input.tree.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tree_initial</span><span class="p">),</span>
+                            <span class="s2">&quot;init.distance.method=bionj&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;model=PIP(model={}(initFreqs=observed),initFreqs=observed)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">substitution_model</span><span class="p">),</span> 
+                            <span class="s2">&quot;rate_distribution=Constant&quot;</span><span class="p">,</span> <span class="c1"># creating tree alwas with constant rates to estimate lamda and mu from data</span>
+                            <span class="s2">&quot;optimization=D-BFGS(derivatives=BFGS)&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;optimization.max_number_f_eval=500&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;optimization.tolerance=0.001&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;optimization.final=bfgs&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;optimization.topology=true&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;optimization.topology.algorithm=Swap(coverage=nnr-search,starting_nodes=Hillclimbing(n=4),max_cycles=50,tolerance=0.01,brlen_optimisation=Brent,threads=10)&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;output.tree.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span>
+                            <span class="s2">&quot;output.tree.format=Newick&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;output.estimates.format=json&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;output.estimates.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">estimates</span><span class="p">),</span>
+                            <span class="s2">&quot;support=none&quot;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">paramsfile_tree</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">params</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">parameters_tree</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parameter</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;A problem occurred while trying to write alignment parameters to txt file&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># run castor for tree initialization</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">castor_tree_initialization</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;Castor&#39;</span><span class="p">],</span> 
+                                                            <span class="s2">&quot;params={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">paramsfile_tree</span><span class="p">)],</span>
+                                                            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                                            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Tree initialization with Castor ....&quot;</span><span class="p">)</span>
+            <span class="n">castor_tree_initialization</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">error_note</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;ProPIP could not be reached.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;Is Castor installed properly and is the path defined correctly in config.ini in the data directory?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_note</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Sorry, creating a tree for the alignment went wrong.&quot;</span><span class="p">)</span>
+
+        <span class="c1">###################</span>
+        <span class="c1"># Use proPIP algorithm to align TR units with inferred tree</span>
+        <span class="c1">###################</span>
+
+        <span class="c1"># create file with unaligned sequences</span>
+        <span class="n">unaligned_sequences</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;sequences.faa&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>                
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">msa_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">unaligned_sequences</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;A problem occurred reading initial alignment file.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># parse estimates file to use calculated indel parameters</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">estimates</span><span class="p">)</span> <span class="k">as</span> <span class="n">estimates_file</span><span class="p">:</span>
+                <span class="n">est</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">estimates_file</span><span class="p">)</span>
+                <span class="n">mu_estimated</span> <span class="o">=</span> <span class="n">est</span><span class="p">[</span><span class="s1">&#39;Model&#39;</span><span class="p">][</span><span class="s1">&#39;PIP&#39;</span><span class="p">][</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+                <span class="n">lambda_estimated</span> <span class="o">=</span> <span class="n">est</span><span class="p">[</span><span class="s1">&#39;Model&#39;</span><span class="p">][</span><span class="s1">&#39;PIP&#39;</span><span class="p">][</span><span class="s1">&#39;lambda&#39;</span><span class="p">]</span>
+                <span class="n">indel_parameters</span> <span class="o">=</span> <span class="s1">&#39;,lambda={},mu={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lambda_estimated</span><span class="p">,</span><span class="n">mu_estimated</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">FileNotFoundError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">No file with parameter estimates found.&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Probably it went something wrong when trying to infer or optimise the phylogenetic tree.&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="c1"># TODO: proPIP cannot produce an alignment when a branchlength is zero.</span>
+        <span class="c1">#       Need to catch this before an error is thrown</span>
+        <span class="c1">#       Maybe replace zero with a very small number?</span>
+        <span class="c1">#       Is this scenario even possible after tree calculation with castor?</span>
+
+        <span class="c1"># create parameter file for alignment with proPIP</span>
+        <span class="n">parameters_alignment</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;analysis_name=aligner&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;model_description={}+PIP&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">substitution_model</span><span class="p">),</span>
+                                <span class="s2">&quot;alphabet={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alphabet</span><span class="p">),</span>
+                                <span class="s2">&quot;alignment=true&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;alignment.version=ram&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;input.sequence.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unaligned_sequences</span><span class="p">),</span>
+                                <span class="s2">&quot;input.sequence.sites_to_use=all&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;init.tree=user&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;init.distance.method=bionj&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;input.tree.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span>
+                                <span class="s2">&quot;model=PIP(model={}{})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">substitution_model</span><span class="p">,</span><span class="n">indel_parameters</span><span class="p">),</span>
+                                <span class="s2">&quot;rate_distribution={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rate_distribution</span><span class="p">),</span>
+                                <span class="s2">&quot;optimization=None&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;output.msa.file={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msa_realigned</span><span class="p">),</span>
+                                <span class="s2">&quot;support=none&quot;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">paramsfile_alignment</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">params</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">parameters_alignment</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parameter</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;A problem occurred while trying to write alignment parameters to txt file&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># run alignment with propip</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">proPIP_alignment</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;Castor&#39;</span><span class="p">],</span> 
+                                                <span class="s2">&quot;params={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">paramsfile_alignment</span><span class="p">)],</span>
+                                                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Realignment of MSA with proPIP .... &quot;</span><span class="p">)</span>
+            <span class="n">proPIP_alignment</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">error_note</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;ProPIP algorithm could not be reached.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;Is Castor (inkl. proPIP aligner) installed properly and is the path defined in config.ini in the data directory?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_note</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># read msa and return as sorted list</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># The created alignment file has &quot;initial&quot; included into the name because in future the tool should be able to realign</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;msa_realigned.initial.faa&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">realigned</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>    
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">msa_realigned</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">realigned</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">error_note</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;ProPIP could not successfully be used for the realignment of:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_msa</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_note</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="n">msa</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">realigned</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+                <span class="n">label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">realigned</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
+                <span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># use original order of msa</span>
+        <span class="n">msa_sorted</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="n">msa</span><span class="p">))]</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msa_sorted</span><span class="p">))</span>
+
+        <span class="c1">## copy alignment files to user defined path</span>
+        <span class="k">if</span> <span class="n">user_path</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">user_path</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">user_path</span><span class="p">))</span>
+            <span class="kn">import</span> <span class="nn">shutil</span>
+            <span class="n">mafft_path</span> <span class="o">=</span> <span class="n">user_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;proPIP&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;mafft&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">user_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_msa</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msa_sorted</span><span class="p">)):</span>
+                    <span class="n">out_msa</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&gt;{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">out_msa</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msa_sorted</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">msa_file</span><span class="p">,</span> <span class="n">mafft_path</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">msa_sorted</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;ProPIP could not successfully be used for the realignment of:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_msa</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Currently, the aligner {} is not implemented.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">realignment</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="remove_char"><a class="viewcode-back" href="../../../repeat.html#tral.repeat.repeat_align.remove_char">[docs]</a><span class="k">def</span> <span class="nf">remove_char</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; helper function to remove a character in a sequence</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first_part</span> <span class="o">=</span> <span class="nb">str</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> 
+    <span class="n">last_part</span> <span class="o">=</span> <span class="nb">str</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">first_part</span> <span class="o">+</span> <span class="n">last_part</span> </div>
+
+<div class="viewcode-block" id="remove_gaps"><a class="viewcode-back" href="../../../repeat.html#tral.repeat.repeat_align.remove_gaps">[docs]</a><span class="k">def</span> <span class="nf">remove_gaps</span><span class="p">(</span><span class="n">msa</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Remove columns in a MSA which contain only gaps.</span>
+<span class="sd">    Do not use MSA longer than 3000 characters.</span>
+
+<span class="sd">    Returns the MSA as a list without only-gap-containing columns.</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        msa (list of strings): List of sequences (str)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        msa (list of strings) with removed colums in case they only contain gaps</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid MSA input.&quot;</span><span class="p">)</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">3000</span> <span class="c1"># The MSA should have at maximum 3000 characters</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of sequences in MSA need to be below {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">i</span> <span class="o">-=</span><span class="mi">1</span>
+
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">msa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="p">[]</span> 
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">:</span>
+            <span class="n">column</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="c1"># print(column)</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">column</span><span class="p">]):</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">:</span>
+                <span class="n">seq</span> <span class="o">=</span> <span class="n">remove_char</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">msa</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span>
+                <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+ 
+    <span class="k">return</span> <span class="n">msa</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

@@ -807,8 +807,10 @@
 <span class="sd">    type == &#39;zipf&#39;</span>
 <span class="sd">    indel lengths are distributed following a Zipfian distribution with parameter &lt;indel_zipf&gt;.</span>
 <span class="sd">    (Compare:</span>
+
 <span class="sd">        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.</span>
 <span class="sd">        Mol Biol Evol, 26, 1879–1888.</span>
+<span class="sd">    </span>
 <span class="sd">    In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</span>
 
 <span class="sd">    or</span>
@@ -850,6 +852,7 @@
 
 <span class="sd">    The MAP is calculated numerically, as no nice analytical solution has been found so far.</span>
 <span class="sd">    A power function of grade 3 needs to be solved:</span>
+
 <span class="sd">        0 == prior[&#39;sigma_squared&#39;]*(sum(indel_lengths) - len(indel_lengths)) -</span>
 <span class="sd">             alpha*(prior[&#39;sigma_squared&#39;]*sum(indel_lengths) + prior[&#39;mu&#39;]) +</span>
 <span class="sd">             (alpha**2)*(1 + prior[&#39;mu&#39;]) - alpha**3</span>
@@ -878,8 +881,10 @@
 <span class="sd">    column.</span>
 <span class="sd">    The probability distribution of indel lengths is assumed to follow the Zipfian distribution</span>
 <span class="sd">    (Compare</span>
+
 <span class="sd">        Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.</span>
 <span class="sd">        Mol Biol Evol, 26, 1879–1888.</span>
+
 <span class="sd">    In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</span>
 
 <span class="sd">    The MAP is calculated numerically, as there did not seem to be a nice analytical solution.</span>
@@ -905,6 +910,7 @@
 <div class="viewcode-block" id="calculate_log10_indel_probability"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_own_model.calculate_log10_indel_probability">[docs]</a><span class="k">def</span> <span class="nf">calculate_log10_indel_probability</span><span class="p">(</span><span class="n">nIndels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; calculate the probabilty of an indel per site and per repeat unit</span>
 <span class="sd">    from the MAP estimate of the indel rate, given</span>
+
 <span class="sd">    - the &lt;divergence&gt; of the repeat units</span>
 <span class="sd">    - a &lt;prior&gt; on the indel rates (normal distributed)</span>
 <span class="sd">    - the number of indels &lt;nIndels&gt; in this column</span>

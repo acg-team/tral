@@ -391,6 +391,28 @@ columns before this column?:
 </dd></dl>
 
 <dl class="method">
+<dt id="tral.repeat.repeat.Repeat.realign_TR">
+<code class="descname">realign_TR</code><span class="sig-paren">(</span><em>realignment='proPIP'</em>, <em>rate_distribution='constant'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat.html#Repeat.realign_TR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat.Repeat.realign_TR" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Realign multiple sequence alignment of tandem repeats.</dt>
+<dd>Update of tandem repeat MSA.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>self</strong> (<em>Repeat instance</em>) &#8211; </li>
+<li><strong>realignment</strong> (<em>str</em>) &#8211; either &#8220;proPIP&#8221; or &#8220;mafft&#8221;</li>
+<li><strong>rate_distribution</strong> (<em>str</em>) &#8211; either &#8220;constant&#8221; or &#8220;gamma&#8221; (per default value from REPEAT_CONFIG[&#8216;castor_parameter&#8217;][&#8216;rate_distribution&#8217;])</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="tral.repeat.repeat.Repeat.save_original_msa">
 <code class="descname">save_original_msa</code><span class="sig-paren">(</span><em>sequence</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat.html#Repeat.save_original_msa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat.Repeat.save_original_msa" title="Permalink to this definition">¶</a></dt>
 <dd><p>recalculate the original msa, assuming that begin is defined
@@ -464,7 +486,7 @@ returns</p>
 </table>
 <dl class="function">
 <dt id="tral.repeat.repeat_align.realign_repeat">
-<code class="descclassname">tral.repeat.repeat_align.</code><code class="descname">realign_repeat</code><span class="sig-paren">(</span><em>my_msa</em>, <em>realignment='mafft'</em>, <em>sequence_type='AA'</em>, <em>user_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat_align.html#realign_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_align.realign_repeat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">tral.repeat.repeat_align.</code><code class="descname">realign_repeat</code><span class="sig-paren">(</span><em>my_msa</em>, <em>realignment='mafft'</em>, <em>sequence_type='AA'</em>, <em>rate_distribution='constant'</em>, <em>user_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat/repeat_align.html#realign_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat.repeat_align.realign_repeat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Realignment of a repeat MSA using mafft or proPIP</p>
 <p>A good multiple sequence alignment (MSA) is an important description of a
 tandem repeat (TR) and can be crucial to distinguish a true positive from
@@ -472,10 +494,10 @@ a false positive TR.
 This can be realised using a proper MSA estimation algorithm. Currently,
 Mafft and proPIP can be used to realign a TR.</p>
 <dl class="docutils">
-<dt>For proPIP two options are provided:</dt>
+<dt>For proPIP the rate distribution for indels can be either constant or gamma distributed</dt>
 <dd><ul class="first last simple">
-<li>&#8220;proPIP_constant&#8221;: no gamma distribution is used for the proPIP algorithm</li>
-<li>&#8220;proPIP_gamma&#8221;: gamma distribution (n=6, alpha=0.5)</li>
+<li>REPEAT_CONFIG[&#8216;castor_parameter&#8217;][&#8216;rate_distribution&#8217;] == &#8216;constant&#8217;: no gamma distribution is used for the proPIP algorithm</li>
+<li>REPEAT_CONFIG[&#8216;castor_parameter&#8217;][&#8216;rate_distribution&#8217;] == &#8216;gamma&#8217;: gamma distribution (n=6, alpha=0.5)</li>
 </ul>
 </dd>
 </dl>
@@ -485,7 +507,7 @@ Mafft and proPIP can be used to realign a TR.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>my_msa</strong> (<em>list of strings</em>) &#8211; List of sequences (str)</li>
-<li><strong>realignment</strong> (<em>str</em>) &#8211; Either &#8220;mafft&#8221; or &#8220;proPIP_constant&#8221; or &#8220;proPIP_gamma&#8221;</li>
+<li><strong>realignment</strong> (<em>str</em>) &#8211; Either &#8220;mafft&#8221; or &#8220;proPIP&#8221;</li>
 <li><strong>sequence_type</strong> (<em>str</em>) &#8211; Either &#8220;AA&#8221; or &#8220;DNA&#8221;</li>
 <li><strong>user_path</strong> (<em>str</em>) &#8211; copy alignment files to user defined path</li>
 </ul>

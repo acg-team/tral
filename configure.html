@@ -86,6 +86,7 @@
 <li><a class="reference internal" href="#de-novo-repeat-detection"><em>De novo</em> repeat detection</a></li>
 <li><a class="reference internal" href="#build-hmmer-models">Build Hmmer models</a></li>
 <li><a class="reference internal" href="#realign-tandem-repeat-units">Realign tandem repeat units</a></li>
+<li><a class="reference internal" href="#simulation-of-evolution-in-tandem-repeats">Simulation of evolution in tandem repeats</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#configs-ini-optional-change-tral-s-default-behaviour">configs.ini - OPTIONAL: Change TRAL&#8217;s default behaviour</a><ul>
@@ -182,6 +183,22 @@ not in your system path, define the absolute path:</p>
     ginsi = /path/to/ginsi
 </pre></div>
 </div>
+<p>Additionally, all detected tandem repeats (either from profile models or <em>denovo</em> can be realigned with the indel-aware proPIP alignment algorithm.
+To use proPIP you need to have Castor (incl. aligner) which ships with proPIP. If <em>Castor</em> is not in your system path, define the absolute path:</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+    Castor = /path/to/Castor
+    [[castor_parameter]]
+        rate_distribution = constant # either constant or gamma
+</pre></div>
+</div>
+</div>
+<div class="section" id="simulation-of-evolution-in-tandem-repeats">
+<h3>Simulation of evolution in tandem repeats<a class="headerlink" href="#simulation-of-evolution-in-tandem-repeats" title="Permalink to this headline">¶</a></h3>
+<p>If <em>alfsim</em> is not in your system path, set the absolute path:</p>
+<div class="highlight-python"><div class="highlight"><pre>[repeat]
+        alfsim = path/to/alfsim
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="configs-ini-optional-change-tral-s-default-behaviour">
@@ -211,7 +228,11 @@ not in your system path, define the absolute path:</p>
     calc_score = False  # Is the score calculated?
     calc_pvalue = False # Is the pvalue calculated?
     precision = 10
-    GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+    ginsi = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+    Castor = Castor
+    [[castor_parameter]]
+        rate_distribution = constant # either constant or gamma
+    alfsim = alfsim
 </pre></div>
 </div>
 </div>

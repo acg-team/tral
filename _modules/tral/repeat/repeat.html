@@ -118,7 +118,7 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
-<span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat_score</span><span class="p">,</span> <span class="n">repeat_pvalue</span><span class="p">,</span> <span class="n">repeat_io</span>
+<span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat_score</span><span class="p">,</span> <span class="n">repeat_pvalue</span><span class="p">,</span> <span class="n">repeat_io</span><span class="p">,</span> <span class="n">repeat_align</span>
 <span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">configuration</span>
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
@@ -777,7 +777,21 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">unit_original</span> <span class="o">+=</span> <span class="n">repeat_sequence</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
                     <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">msa_original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unit_original</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msa_original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unit_original</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Repeat.realign_TR"><a class="viewcode-back" href="../../../repeat.html#tral.repeat.repeat.Repeat.realign_TR">[docs]</a>    <span class="k">def</span> <span class="nf">realign_TR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP&#39;</span><span class="p">,</span> <span class="n">rate_distribution</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;castor_parameter&#39;</span><span class="p">][</span><span class="s1">&#39;rate_distribution&#39;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot; Realign multiple sequence alignment of tandem repeats.</span>
+<span class="sd">            Update of tandem repeat MSA.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            self (Repeat instance)</span>
+<span class="sd">            realignment (str): either &quot;proPIP&quot; or &quot;mafft&quot;</span>
+<span class="sd">            rate_distribution (str): either &quot;constant&quot; or &quot;gamma&quot; (per default value from REPEAT_CONFIG[&#39;castor_parameter&#39;][&#39;rate_distribution&#39;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msa</span><span class="p">,</span> 
+                                            <span class="n">realignment</span><span class="p">,</span> 
+                                            <span class="n">sequence_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_type</span><span class="p">,</span> 
+                                            <span class="n">rate_distribution</span> <span class="o">=</span> <span class="n">rate_distribution</span><span class="p">)</span></div></div>
 
 <span class="c1"># Standardize MSA #############################################################</span>
 

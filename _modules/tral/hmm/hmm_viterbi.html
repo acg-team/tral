@@ -406,9 +406,6 @@
     <span class="sd">&quot;&quot;&quot;Helper function to calculate the distance between two indices in a</span>
 <span class="sd">    circular HMM.</span>
 
-<span class="sd">    Helper function to calculate the distance between two indices in a</span>
-<span class="sd">    circular HMM.</span>
-
 <span class="sd">    Args:</span>
 <span class="sd">        i (int): first index</span>
 <span class="sd">        j (int): second index</span>
@@ -614,7 +611,13 @@
 
 <div class="viewcode-block" id="hmm_path_to_aligned_tandem_repeat_units"><a class="viewcode-back" href="../../../hmm.html#tral.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units">[docs]</a><span class="k">def</span> <span class="nf">hmm_path_to_aligned_tandem_repeat_units</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">most_likely_path</span><span class="p">,</span> <span class="n">l_effective</span><span class="p">,</span>
                                             <span class="n">translate</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert a viterbi path in an hmm of length ``l_effective`` on the</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    WARNING: Currently do not rely on this function!!</span>
+<span class="sd">    The output seems to have missing characters and too much gaps.</span>
+<span class="sd">    The function needs review in order to be used.</span>
+<span class="sd">    todo: fix hidden bug!</span>
+<span class="sd">    </span>
+<span class="sd">    Convert a viterbi path in an hmm of length ``l_effective`` on the</span>
 <span class="sd">     sequence into a corresponding tandem repeat.</span>
 
 <span class="sd">    Extract the tandem repeat alignment from a sequence given a Viterbi path.</span>

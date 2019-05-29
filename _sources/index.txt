@@ -11,19 +11,30 @@ statistical significance analysis of putative tandem repeats, and filtering of r
 Getting started
 ===============
 
-#. :ref:`Install TRAL <install>`
-#. :ref:`Install tandem repeat external software <install_external>`
-#. :ref:`Adapt configuration files <configure>`
+To get started with TRAL you need to follow several steps.
+
+1. Installation of all relevant software and files:
+
+	* 1(a-c) Simplified setup with the :ref:`easy setup system for TRAL <easy_setup>`.
+
+   Otherwise download and install manually:
+
+	* 1(a) :ref:`Install TRAL <install>`
+	* 1(b) :ref:`Install external software needed for TRAL <install_external>`
+	* 1(c) :ref:`Download p-value distribution files <pvaluefiles>`
+
+2. :ref:`Adapt configuration files <configure>`
 
 
 Tutorials
 =========
 
 - :ref:`Run and parse <denovo>` de novo repeat detection software.
+- Background about :ref:`tandem repeat characteristics in TRAL <background>`
 - :ref:`Annotate tandem repeats<cphmm>` from sequence domain models.
 - :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
 - :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
-- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset.
+- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset (toy example)
 
 
 Reference Guide
@@ -56,4 +67,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

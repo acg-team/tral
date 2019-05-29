@@ -121,8 +121,11 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">tral.repeat</span> <span class="kn">import</span> <span class="n">repeat</span>
+<span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">configuration</span>
 
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">EXEC_DIR</span>
+<span class="n">CONFIG_GENERAL</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
+<span class="n">REPEAT_CONFIG</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]</span>
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
@@ -301,7 +304,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">runfile_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s2">&quot;ALF&quot;</span><span class="p">,</span> <span class="s2">&quot;template.drw&quot;</span><span class="p">)</span>
-    <span class="n">alf_exec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">EXEC_DIR</span><span class="p">,</span> <span class="s2">&quot;alfsim&quot;</span><span class="p">)</span>
+    <span class="n">alf_exec</span> <span class="o">=</span> <span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;alfsim&#39;</span><span class="p">]</span>
     <span class="c1"># create temporary directory</span>
     <span class="n">working_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;evolvedTR: Created tempfile: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">)</span>
@@ -404,16 +407,18 @@
             <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;ALFSIM was not able to produce simulated sequence.&#39;</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Do you have ALFSIM installed and used the correct path in the configuration file?&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
 
     <span class="c1"># shutil.rmtree(&#39;/cluster/home/infk/eschaper/spielwiese/&#39;)</span>
     <span class="c1">#shutil.copytree(working_dir, &#39;/cluster/home/infk/eschaper/spielwiese/&#39;)</span>
 
     <span class="sd">&quot;&quot;&quot; Read in MSA data from ALF</span>
 <span class="sd">        The following is a short parser for ALFsim output files</span>
-<span class="sd">        yielding MSAs as lists of strings,</span>
+<span class="sd">        yielding MSAs as lists of strings, </span>
 <span class="sd">        based on a special flavour of  Felstein stein MSA files &quot;&quot;&quot;</span>
 
-    <span class="c1"># find a repeat uni</span>
+    <span class="c1"># find a repeat unit</span>
     <span class="n">pattern_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\d+ \d+&quot;</span><span class="p">)</span>
     <span class="n">pattern_seq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\S+[ ]+([A-Z\-]+)&quot;</span><span class="p">)</span>
 

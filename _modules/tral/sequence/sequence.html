@@ -121,8 +121,8 @@
 <span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">repeat_detection_run</span><span class="p">,</span> <span class="n">sequence_io</span>
 
 <span class="n">CONFIG</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
+<span class="n">REPEAT_CONFIG</span> <span class="o">=</span> <span class="n">CONFIG</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]</span>
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-
 
 <div class="viewcode-block" id="Sequence"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.sequence.Sequence">[docs]</a><span class="k">class</span> <span class="nc">Sequence</span><span class="p">:</span>
 
@@ -197,10 +197,9 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
                 <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Output format {} is not implemented for&quot;</span><span class="p">,</span>
-                            <span class="s2">&quot;sequence.write()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_format</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Output format {} is not implemented for sequence.write()&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_format</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Sequence.detect"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.sequence.Sequence.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lHMM</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">denovo</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Sequence.detect"><a class="viewcode-back" href="../../../sequence.html#tral.sequence.sequence.Sequence.detect">[docs]</a>    <span class="k">def</span> <span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lHMM</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">denovo</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;mafft&#39;</span><span class="p">,</span> <span class="n">sequence_type</span><span class="o">=</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="n">rate_distribution</span><span class="o">=</span><span class="n">REPEAT_CONFIG</span><span class="p">[</span><span class="s1">&#39;castor_parameter&#39;</span><span class="p">][</span><span class="s1">&#39;rate_distribution&#39;</span><span class="p">],</span> <span class="n">user_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Detects tandem repeats on ``self.seq`` from 2 possible sources.</span>
 
 <span class="sd">        A list of ``Repeat`` instances is created for tandem repeat detections</span>
@@ -212,13 +211,17 @@
 <span class="sd">        Args:</span>
 <span class="sd">            hmm (HMM): A list of ``HMM`` instances.</span>
 <span class="sd">            denovo (bool): boolean</span>
+<span class="sd">            realignment (str): either &quot;mafft&quot;, &quot;proPIP&quot; or None</span>
 <span class="sd">            *kwargs: Parameters fed to denovo TR prediction and/or Repeat</span>
 <span class="sd">                instantiation. E.g. ``repeat = {&quot;calc_score&quot;: True}``</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A ``RepeatList`` instance</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="n">realignment_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mafft&#39;</span><span class="p">,</span> <span class="s1">&#39;proPIP&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">realignment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">realignment_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid realignment type. Expected one of: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">realignment_types</span><span class="p">))</span>
+        
         <span class="k">if</span> <span class="n">lHMM</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lHMM</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The lHMM value is not a list.&#39;</span><span class="p">)</span>
@@ -241,7 +244,18 @@
                     <span class="n">iHMM</span><span class="o">.</span><span class="n">l_effective</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unaligned_msa</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="c1"># Align the msa</span>
-                    <span class="n">aligned_msa</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">unaligned_msa</span><span class="p">)</span>
+                    <span class="n">initial_alignment</span> <span class="o">=</span> <span class="s1">&#39;mafft&#39;</span>
+                    <span class="n">aligned_msa</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">unaligned_msa</span><span class="p">,</span> <span class="n">initial_alignment</span><span class="p">,</span> <span class="n">sequence_type</span><span class="p">,</span> <span class="n">user_path</span><span class="o">=</span><span class="n">user_path</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">realignment</span> <span class="o">==</span> <span class="s1">&#39;proPIP&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligned_msa</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligned_msa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span> <span class="c1"># TODO: change from 2 to 3</span>
+                        <span class="c1"># only TRs with at least 3 units with a length &gt; 10 characters will be realigned              </span>
+                            <span class="n">aligned_msa</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">aligned_msa</span><span class="p">,</span>
+                                                                    <span class="n">realignment</span><span class="p">,</span>
+                                                                    <span class="n">sequence_type</span><span class="p">,</span>
+                                                                    <span class="n">rate_distribution</span><span class="o">=</span><span class="n">rate_distribution</span><span class="p">,</span>
+                                                                    <span class="n">user_path</span><span class="o">=</span><span class="n">user_path</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aligned_msa</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="c1"># Create a Repeat() class with the new msa</span>
                         <span class="k">if</span> <span class="s1">&#39;repeat&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -295,7 +309,16 @@
                             <span class="k">continue</span>
 
                         <span class="n">repeats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iTR</span><span class="p">)</span>
-
+                        
+            <span class="c1"># Realignment          </span>
+            <span class="k">for</span> <span class="n">iTR</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">iTR</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">iTR</span><span class="o">.</span><span class="n">msa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span> <span class="c1"># TODO: change from 2 to 3</span>
+                    <span class="c1"># only TRs with at least 3 units with a length &gt; 10 characters will be realigned              </span>
+                    <span class="n">iTR</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">repeat_align</span><span class="o">.</span><span class="n">realign_repeat</span><span class="p">(</span><span class="n">iTR</span><span class="o">.</span><span class="n">msa</span><span class="p">,</span>
+                                                            <span class="n">realignment</span><span class="p">,</span>
+                                                            <span class="n">sequence_type</span><span class="p">,</span>
+                                                            <span class="n">rate_distribution</span><span class="o">=</span><span class="n">rate_distribution</span><span class="p">,</span>
+                                                            <span class="n">user_path</span><span class="o">=</span><span class="n">user_path</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">RepeatList</span><span class="p">(</span><span class="n">repeats</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
