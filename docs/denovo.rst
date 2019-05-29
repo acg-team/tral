@@ -105,7 +105,7 @@ Realignment with proPIP (default realignment='proPIP') of the tandem repeat MSAs
 	--KDS--WTVNDIQ--K
 	LV-GKLNWASQ-I-YPG
 
-Set rate_distribution = 'gamma' for a gamma distributed indel placement.
+Set rate_distribution = 'gamma' for a gamma distributed indel placement or modify it in :ref:`config.ini <configure>`.
 Set realignment = 'mafft' to realign with mafft instead of proPIP.
 
 Output the detected tandem repeats.

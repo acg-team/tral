@@ -86,7 +86,7 @@ Alternatively, you can directly include tandem repeat MSA realignment with the i
 	----R-----A--RA--GH-------C--------A------------------V-------A-----------I-----------------N---------------T-----R--L---Y---I-----------------
 
 
-If you wish to use a gamma distribution for indels, choose the option rate_distribution = 'gamma'.
+If you wish to use a gamma distribution for indels, choose the option rate_distribution = 'gamma' or modify the rate distribution in :ref:`config.ini <configure>`.
 
 Output the detected tandem repeats.
 -----------------------------------

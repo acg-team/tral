@@ -63,6 +63,22 @@ not in your system path, define the absolute path::
     [repeat]
         ginsi = /path/to/ginsi
 
+Additionally, all detected tandem repeats (either from profile models or *denovo* can be realigned with the indel-aware proPIP alignment algorithm.
+To use proPIP you need to have Castor (incl. aligner) which ships with proPIP. If *Castor* is not in your system path, define the absolute path::
+
+    [repeat]
+        Castor = /path/to/Castor
+        [[castor_parameter]]
+            rate_distribution = constant # either constant or gamma
+
+
+Simulation of evolution in tandem repeats
+*****************************************
+
+If *alfsim* is not in your system path, set the absolute path::
+
+	[repeat]
+		alfsim = path/to/alfsim
 
 
 configs.ini - OPTIONAL: Change TRAL's default behaviour
@@ -99,7 +115,11 @@ Creation of new Repeat instances
         calc_score = False  # Is the score calculated?
         calc_pvalue = False # Is the pvalue calculated?
         precision = 10
-        GINSI = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+        ginsi = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+        Castor = Castor
+        [[castor_parameter]]
+            rate_distribution = constant # either constant or gamma
+        alfsim = alfsim
 
 
 Statistical significance calculation and models of repeat evolution
