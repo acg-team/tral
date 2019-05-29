@@ -43,7 +43,6 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
         my_msa realigned (list of strings)
 
     .. todo:: 
-        - test if input alignment has column with only gaps
         - decide what happens if branch length of tree is getting zero
     """
 
