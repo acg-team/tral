@@ -6,8 +6,10 @@ Installation of external software
 TRAL is dependend on different external software which need to be installed before TRAL can be used.
 
 Here, we explain how to install external software packages, such as *de novo* tandem repeat
-detectors. Important: Once a software is installed, the path to either the binary or the
+detectors. _Important_: Once a software is installed, the path to either the binary or the
 executable shell script needs to be indicated in the TRAL configuration file :ref:`config.ini <configure>`.
+
+For each of the software an installation script can be found for :ref: `easy setup <easy_setup>`.
 
 Sequence profile model generation
 ---------------------------------

@@ -79,44 +79,34 @@ As an example, T-REKS detects the following repeat in the second HIV sequence :r
 
 Realign a repeat with proPIP.
 -----------------------------
-Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation::
+Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation. ::
 
 	test_sequence = sequences_HIV[3]
 	tandem_repeats = test_sequence.detect(denovo = True)
-	msa = tandem_repeats.repeats[6].msa
 
-This is how the previous multiple sequence alignment (MSA) looks::
+Print one of the previous multiple sequence alignments (MSA)::
 
-	>>> for unit in msa:
-	...     print(unit)
+	>>> print(tandem_repeats.repeats[6])
+	> begin:828 l_effective:13 n:3
 	----DKWTVQPIQLPE
 	---KDSWTVNDIQ--K
 	LVGKLNWASQIY--PG
 	
-Realignment of this MSA::
+Realignment with proPIP (default realignment='proPIP') of the tandem repeat MSAs with a constant rate distribution::
 
-	from tral.repeat import repeat_align
-	realigned_msa_constant = repeat_align.realign_repeat(msa, realignment = "proPIP_constant")
-	realigned_msa_gamma = repeat_align.realign_repeat(msa, realignment = "proPIP_gamma")
+	for TR in tandem_repeats.repeats:
+		TR.realign_TR(realignment='proPIP', rate_distribution='constant')
 
 ::
 
-	>>> for unit in realigned_msa_constant:
-	...     print(unit) 
+	>>> print(tandem_repeats.repeats[6])
+	> begin:828 l_effective:13 n:3
 	---DK--WTVQPIQLPE
-	-K-DS--WTVNDIQ--K
-	L-VGKLNWASQ-I-YPG
+	--KDS--WTVNDIQ--K
+	LV-GKLNWASQ-I-YPG
 
-::
-
-	>>> for unit in realigned_msa_gamma:
-	...     print(unit)  
-	--DK--WTVQPIQLPE
-	-KDS--WTVNDIQ--K
-	LVGKLNWASQ-I-YPG
-
-
-
+Set rate_distribution = 'gamma' for a gamma distributed indel placement.
+Set realignment = 'mafft' to realign with mafft instead of proPIP.
 
 Output the detected tandem repeats.
 -----------------------------------
