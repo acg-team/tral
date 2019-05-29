@@ -71,21 +71,22 @@ The result is a tandem repeat :ref:`(interpretation) <background>`::
 
 Annotate tandem repeats with the circular profile HMM and realign with proPIP.
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-You can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm::
+Alternatively, you can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm::
 
-	from tral.repeat import repeat_align
-	tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_Kelch_1], realignment='proPIP_constant')
+	tandem_repeats = human_HCFC1_sequence.detect(lHMM = [circular_profile_HMM_Kelch_1], realignment='proPIP')
 
 ::
 
 	>>> print(tandem_repeats.repeats[0])
-	> begin:31 l_effective:48 n:5 pvalue:1.0
+	> begin:31 l_effective:48 n:5
 	-RP-R-----------HGHRA-V---A--------I-----K--------ELIVVF----G-G----------GN-----E-G---I--V--D--ELH-V-YN-T-A-T--N--Q--W---F---IPAV---R-GD---I-P-
 	--PGC-----A---A-YGF---V---C--D-G---T-----R---------LL-VF----G-G-------M---V-----EYG--KY--S--N--DL----YELQ-A-S-----R--WE--W-KRLKA----K----------
 	T-P-KNGPPPCPR-LGHSF-SLVGNKCYL-FGGLANDSEDPKNNIPRYLNDLY-ILELRPGSGVVAWDIPITYGVLPPPRE-SHTAVVYTEKDNKKSKLVIYG-GMSGCRLG-D-L-W-T-LD--IDTLTWNKP-SLSGVAPL
 	--P-R-----S---L-HS--A-T---T-I--G---N-----K---------MY-VF----G-G---W-VPL---VM----D-D-VKVA-T-HE-KEWK-C-TN-TLA-C-LNLDTMAWETIL---MDTL---E--D-N-I-P-
 	----R-----A--RA--GH-------C--------A------------------V-------A-----------I-----------------N---------------T-----R--L---Y---I-----------------
 
+
+If you wish to use a gamma distribution for indels, choose the option rate_distribution = 'gamma'.
 
 Output the detected tandem repeats.
 -----------------------------------
