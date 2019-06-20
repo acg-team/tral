@@ -309,7 +309,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
         ## copy alignment files to user defined path
         if user_path:
             if not os.path.exists(os.path.dirname(user_path)):
-                os.mkdir(os.path.dirname(user_path))
+                os.makedirs(os.path.dirname(user_path))
             import shutil
             mafft_path = user_path.split("proPIP")[0] + "mafft"
             with open(user_path, 'w') as out_msa:
