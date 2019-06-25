@@ -49,8 +49,13 @@ class TralMixin(object):
             shutil.copytree("tral/tral_configuration", datadir)
             print("The TRAL configuration files and data files are now located in {}".format(datadir))
 
-        #self.do_egg_install()
-        super().run()
+        try:
+            # install's run() command ignores install_requires when called this way.
+            # Instead, use do_egg_install if possible. https://stackoverflow.com/q/21915469/81658
+            super().do_egg_install()
+        except AttributeError:
+            # fallback for develop
+            super().run()
 
 
 class InstallCommand(TralMixin, install):
