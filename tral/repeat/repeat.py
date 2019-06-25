@@ -674,7 +674,7 @@ class Repeat:
                     unit_original += repeat_sequence[count]
                     count += 1
             self.msa_original.append(unit_original)
-    
+
     def realign_TR(self, realignment='proPIP', rate_distribution=CONFIG['castor_parameter']['rate_distribution']):
         """ Realign multiple sequence alignment of tandem repeats.
             Update of tandem repeat MSA.
@@ -684,10 +684,10 @@ class Repeat:
             realignment (str): either "proPIP" or "mafft"
             rate_distribution (str): either "constant" or "gamma" (per default value from REPEAT_CONFIG['castor_parameter']['rate_distribution'])
         """
-        self.msa = repeat_align.realign_repeat(self.msa, 
-                                            realignment, 
-                                            sequence_type = self.sequence_type, 
-                                            rate_distribution = rate_distribution)
+        self.msa = repeat_align.realign_repeat(self.msa,
+                                               realignment,
+                                               sequence_type=self.sequence_type,
+                                               rate_distribution=rate_distribution)
 
 # Standardize MSA #############################################################
 

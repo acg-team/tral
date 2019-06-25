@@ -19,7 +19,7 @@ import numpy as np
 from tral.repeat import repeat
 from tral import configuration
 
-from tral.paths import DATA_DIR, EXEC_DIR
+from tral.paths import DATA_DIR
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
@@ -311,7 +311,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
 
     """ Read in MSA data from ALF
         The following is a short parser for ALFsim output files
-        yielding MSAs as lists of strings, 
+        yielding MSAs as lists of strings,
         based on a special flavour of  Felstein stein MSA files """
 
     # find a repeat unit

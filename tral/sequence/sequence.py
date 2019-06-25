@@ -20,6 +20,7 @@ CONFIG = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG["repeat"]
 LOG = logging.getLogger(__name__)
 
+
 class Sequence:
 
     """ A ``Sequence`` describes either a protein or a DNA sequence.
@@ -117,7 +118,7 @@ class Sequence:
         realignment_types = ['mafft', 'proPIP', None]
         if realignment not in realignment_types:
             raise ValueError("Invalid realignment type. Expected one of: {}".format(realignment_types))
-        
+
         if lHMM:
             if not isinstance(lHMM, list):
                 raise Exception('The lHMM value is not a list.')
@@ -144,13 +145,13 @@ class Sequence:
                     aligned_msa = repeat_align.realign_repeat(unaligned_msa, initial_alignment, sequence_type, user_path=user_path)
 
                     if realignment == 'proPIP':
-                        if len(aligned_msa) > 2 or len(aligned_msa[0]) > 10: # TODO: change from 2 to 3
-                        # only TRs with at least 3 units with a length > 10 characters will be realigned              
+                        if len(aligned_msa) > 2 or len(aligned_msa[0]) > 10:  # TODO: change from 2 to 3
+                            # only TRs with at least 3 units with a length > 10 characters will be realigned
                             aligned_msa = repeat_align.realign_repeat(aligned_msa,
-                                                                    realignment,
-                                                                    sequence_type,
-                                                                    rate_distribution=rate_distribution,
-                                                                    user_path=user_path)
+                                                                      realignment,
+                                                                      sequence_type,
+                                                                      rate_distribution=rate_distribution,
+                                                                      user_path=user_path)
 
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
@@ -205,16 +206,16 @@ class Sequence:
                             continue
 
                         repeats.append(iTR)
-                        
-            # Realignment          
+
+            # Realignment
             for iTR in repeats:
-                if len(iTR.msa) > 2 or len(iTR.msa[0]) > 10: # TODO: change from 2 to 3
-                    # only TRs with at least 3 units with a length > 10 characters will be realigned              
+                if len(iTR.msa) > 2 or len(iTR.msa[0]) > 10:  # TODO: change from 2 to 3
+                    # only TRs with at least 3 units with a length > 10 characters will be realigned
                     iTR.msa = repeat_align.realign_repeat(iTR.msa,
-                                                            realignment,
-                                                            sequence_type,
-                                                            rate_distribution=rate_distribution,
-                                                            user_path=user_path)
+                                                          realignment,
+                                                          sequence_type,
+                                                          rate_distribution=rate_distribution,
+                                                          user_path=user_path)
             return repeat_list.RepeatList(repeats)
 
         else:
