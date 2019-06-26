@@ -58,3 +58,12 @@ you should
 :ref:`install external software <install_external>`,
 :ref:`download p-value distribution files <pvaluefiles>`,
 and :ref:`adapt the configuration files <configure>`.
+
+.. toctree::
+   :hidden:
+
+   easy_setup
+   install_external
+   pvaluefiles
+   configure
+   install_containerized

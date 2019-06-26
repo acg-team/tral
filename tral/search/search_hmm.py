@@ -153,7 +153,7 @@ class TralHit(object):
 
         Args:
             sequence (str or Bio.SeqRecord or Bio.Seq): sequence for this hit
-            hmm (HMM): (optional) the HMM used to generate this hit. If specified,
+            hmm (hmm.HMM): (optional) the HMM used to generate this hit. If specified,
                 results in more accurate set of states
         Return: (str)
 

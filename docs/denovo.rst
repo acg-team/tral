@@ -10,7 +10,7 @@ Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
 - :ref:`Install XSTREAM <XSTREAM>`. You can also install one or more other :ref:`tandem repeat detectors<install_denovo>` instead.
-- :ref:`Install Castor`. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
+- `Install Castor <https://bitbucket.org/lorenzogatti89/castor/wiki/Home>`_. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
 
 .. todo:: write section to install castor with aligner proPIP
 
@@ -91,7 +91,7 @@ Print one of the previous multiple sequence alignments (MSA)::
 	----DKWTVQPIQLPE
 	---KDSWTVNDIQ--K
 	LVGKLNWASQIY--PG
-	
+
 Realignment with proPIP (default realignment='proPIP') of the tandem repeat MSAs with a constant rate distribution::
 
 	for TR in tandem_repeats.repeats:

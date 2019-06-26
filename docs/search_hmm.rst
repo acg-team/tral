@@ -180,4 +180,4 @@ Full usage
 Python API
 ==========
 
-See also the :ref:`Search code documentation <tral/search>`
+See also the :doc:`Search code documentation <tral/hmm>`

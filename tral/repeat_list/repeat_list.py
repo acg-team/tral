@@ -283,7 +283,7 @@ def none_overlapping(rl, overlap, l_criterion):
     Args:
         rl (RepeatList): An instance of the RepeatList class.
         overlap (tuple): First element: Name (str) of an overlap method in
-            `repeat_list`. Second element: **kwargs. All remaining elements are
+            `repeat_list`. Second element: ``**kwargs``. All remaining elements are
             additional arguments for this class.
         l_criterion (list): list of (criterion (str), criterion arguments)
             tuples. Until only one repeat is remainining in a cluster, the
