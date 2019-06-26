@@ -1,5 +1,8 @@
 .. _search_hmm:
 
+Searching for particular repeats
+********************************
+
 Overview
 ========
 
@@ -177,12 +180,4 @@ Full usage
 Python API
 ==========
 
-search_hmm
-----------
-.. automodule:: tral.search.search_hmm
-    :members:
-
-filter_hmm
-----------
-.. automodule:: tral.search.filter_hmm
-    :members:
+See also the :ref:`Search code documentation <tral/search>`

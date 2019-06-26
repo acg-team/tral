@@ -1,7 +1,7 @@
 Repeat_list code documentation
 ********************************
 
-Initial version of the repeat_list submodule documentation.
+The ``repeat_list`` submodule documentation.
 
 repeat_list
 =============================
