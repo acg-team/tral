@@ -94,7 +94,7 @@ def sample_MBE_2014_pipeline():
     # De novo TRs were remastered with HMM
     test_denovo_hmm = [
         hmm.HMM.create(
-            input_format = 'repeat',
+            input_format='repeat',
             repeat=iTR) for iTR in test_denovo_list.repeats]
     test_denovo_list_remastered = test_seq.detect(lHMM=test_denovo_hmm)
     assert len(test_denovo_list_remastered.repeats) == 2

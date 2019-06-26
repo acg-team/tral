@@ -11,6 +11,7 @@
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg
 shopt -s nocasematch # making comparisons case-insensitive
+set -euo pipefail # exit on errors and undefined vars
 
 ######################
 ### Delete TRAL

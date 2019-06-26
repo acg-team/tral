@@ -706,7 +706,7 @@ def calculate_log10_probability_indel_lengths(
 
         Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
         Mol Biol Evol, 26, 1879–1888.
-    
+
     In their publication, <indel_zipf> is denoted as <a>, the gap lengths as <u>.)
 
     or

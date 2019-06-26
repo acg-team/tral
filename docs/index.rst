@@ -1,4 +1,4 @@
-.. tral
+.. _tral:
 
 Tandem Repeat Annotation Library
 ================================
@@ -11,20 +11,29 @@ statistical significance analysis of putative tandem repeats, and filtering of r
 Getting started
 ===============
 
-To get started with TRAL you need to follow several steps.
+A working TRAL installation consists of several parts:
 
-1. Installation of all relevant software and files:
+1. The TRAL python package
+2. External tools and repeat detectors.
+3. TRAL configuration files and supporting data.
 
-	* 1(a-c) Simplified setup with the :ref:`easy setup system for TRAL <easy_setup>`.
+TRAL itself requires Python3 and should run on all platforms. However, many
+external tools require linux. The full TRAL pipeline has been tested on ubuntu.
 
-   Otherwise download and install manually:
+The easiest way to get started on ubuntu is to use the
+:ref:`easy setup system <easy_setup>`. This automatically installs TRAL and all
+external tools.
 
-	* 1(a) :ref:`Install TRAL <install>`
-	* 1(b) :ref:`Install external software needed for TRAL <install_external>`
-	* 1(c) :ref:`Download p-value distribution files <pvaluefiles>`
+Alternately, follow these steps to install each part:
 
-2. :ref:`Adapt configuration files <configure>`
+1. :ref:`Install TRAL <install>`
+2. :ref:`Install external software needed for TRAL <install_external>`
+3. :ref:`Download p-value distribution files <pvaluefiles>`
 
+Finally, :ref:`adapt the configuration files <configure>`.
+
+If you have trouble installing TRAL on your system, consider using the
+:ref:`containerized install <install_containerized>` .
 
 Tutorials
 =========
@@ -35,6 +44,7 @@ Tutorials
 - :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
 - :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
 - :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset (toy example)
+- :ref:`Find instances of a particular repeat<search_hmm>` in a sequence database.
 
 
 Reference Guide
@@ -66,4 +76,4 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
+* `search </search.html>`_
