@@ -18,7 +18,7 @@ IO <http://acg-team.github.io/tral/>`__.
 Version
 ~~~~~~~
 
-0.3.5
+1.0.0
 
 Installation
 ~~~~~~~~~~~~
