@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Modules &mdash; TRAL 0.3.5 documentation</title>
+    <title>Using TRAL in a container or VM &mdash; TRAL 0.3.5 documentation</title>
     
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -72,17 +72,25 @@
     <div class="headlinks">
         <a href="index.html">Home</a>
         <a href="install.html">Install</a>
-        <a href="#">Code docs</a>
+        <a href="code_docs.html">Code docs</a>
     </div>
 </div>
 
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using TRAL in a container or VM</a><ul>
+<li><a class="reference internal" href="#vagrant">Vagrant</a></li>
+</ul>
+</li>
+</ul>
+
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/code_docs.txt"
+      <li><a href="_sources/install_containerized.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -107,45 +115,33 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="modules">
-<span id="code-docs"></span><h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
-<p>Python APIs:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tral/hmm.html">HMM code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tral/hmm.html#module-tral.hmm.hmm">hmm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/hmm.html#module-tral.hmm.hmm_io">hmm_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/hmm.html#module-tral.hmm.hmm_own_model">hmm_own_model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/hmm.html#module-tral.hmm.hmm_viterbi">hmm_viterbi</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tral/repeat.html">Repeat code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat">repeat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat_align">repeat_align</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat_exon">repeat_exon</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat_io">repeat_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat_pvalue">repeat_pvalue</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat.html#module-tral.repeat.repeat_score">repeat_score</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tral/repeat_list.html">Repeat_list code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat_list.html#module-tral.repeat_list.repeat_list">repeat_list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/repeat_list.html#module-tral.repeat_list.repeat_list_io">repeat_list_io</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tral/search.html">Search code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tral/search.html#search-hmm">search_hmm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/search.html#filter-hmm">filter_hmm</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tral/sequence.html">Sequence code documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tral/sequence.html#module-tral.sequence.sequence">sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/sequence.html#module-tral.sequence.sequence_io">sequence_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/sequence.html#module-tral.sequence.repeat_detection_io">repeat_detection_io</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tral/sequence.html#module-tral.sequence.repeat_detection_run">repeat_detection_run</a></li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="using-tral-in-a-container-or-vm">
+<span id="install-containerized"></span><h1>Using TRAL in a container or VM<a class="headerlink" href="#using-tral-in-a-container-or-vm" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="vagrant">
+<h2>Vagrant<a class="headerlink" href="#vagrant" title="Permalink to this headline">¶</a></h2>
+<p><cite>Vagrant &lt;https://www.vagrantup.com/&gt;</cite> is tool for building virtual development
+environments. TRAL requires a complex ecosystem to use all of its features,
+so vagrant provides a reproducable environment to test installation.</p>
+<p>Installing TRAL within a vagrant box is simple. We assume you have
+<cite>installed vagrant &lt;https://www.vagrantup.com/intro/getting-started/index.html&gt;</cite>
+and a provider (e.g. VirtualBox). Next, check out the TRAL source code
+and run</p>
+<div class="highlight-python"><div class="highlight"><pre>vagrant up
+</pre></div>
+</div>
+<p>This will download all dependencies and install all external software using
+the <a class="reference internal" href="easy_setup.html#easy-setup"><span>easy setup</span></a> scripts.</p>
+<p>You can then ssh into the box and work with TRAL.</p>
+<div class="highlight-python"><div class="highlight"><pre>vagrant ssh
+$ sudo su
+# python3 -c &#39;import tral; print(tral.__version__)&#39;
+</pre></div>
+</div>
+<p>Note that the tral data files are downloaded to <code class="docutils literal"><span class="pre">/root/.tral</span></code> within the box,
+so running (within vagrant) as root is recommended. The working directory
+on the host is mounted as <code class="docutils literal"><span class="pre">/vagrant</span></code> within the box for easy data transfer.</p>
+<p>Note that external software is licensed independently of TRAL. You should check
+the licenses for all software. Several tools are restricted to academic use.</p>
 </div>
 </div>
 

@@ -86,6 +86,7 @@
 <li><a class="reference internal" href="#development">Development</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#next-steps">Next Steps</a></li>
 </ul>
 
   <div role="note" aria-label="source link">
@@ -118,6 +119,7 @@
             
   <div class="section" id="installation">
 <span id="install"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>This describes how to install the TRAL python package.</p>
 <p>With pip (or pip3) configured for Python3, try:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ pip install tral
 </pre></div>
@@ -129,11 +131,11 @@
 <div class="section" id="install-with-sudo">
 <h2>Install with sudo<a class="headerlink" href="#install-with-sudo" title="Permalink to this headline">¶</a></h2>
 <p>In case you install TRAL with sudo, the installation home might differ for the sudo account.
-You can either supply the path to your home directory during installation ...:</p>
+You can either supply the path to your home directory during installation:</p>
 <div class="highlight-python"><div class="highlight"><pre>$ python setup.py install --tral-home /path/to/your/home
 </pre></div>
 </div>
-<p>or mv the TRAL configuration directory from your root dir to your home, e.g.:</p>
+<p>or mv the TRAL configuration directory from your root dir to your home, e.g.</p>
 <div class="highlight-python"><div class="highlight"><pre>$ cd ~
 $ sudo mv /root/.tral ./
 $ sudo chown -R $(whoami) .tral
@@ -143,15 +145,25 @@ $ sudo chown -R $(whoami) .tral
 <div class="section" id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>To compile locally, run</p>
-<blockquote>
-<div>$ pip install -r requirements_dev.py
-$ python setup.py install</div></blockquote>
-<p>TRAL uses tox and pytest for testing. The following commands relate to testing and code style:</p>
-<blockquote>
-<div>$ flake8 tral  # check code style
-$ python setup.py test  # Run tests
-$ tox  # Run comprehensive test suite on multiple python versions</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre>$ pip install -r requirements_dev.py
+$ python setup.py install
+</pre></div>
 </div>
+<p>TRAL uses tox and pytest for testing. The following commands relate to testing and code style:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ flake8 tral  # check code style
+$ python setup.py test  # Run tests
+$ tox  # Run comprehensive test suite on multiple python versions
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="next-steps">
+<h1>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h1>
+<p>Working with TRAL requires more than just the python package. After this,
+you should
+<a class="reference internal" href="install_external.html#install-external"><span>install external software</span></a>,
+<a class="reference internal" href="pvaluefiles.html#pvaluefiles"><span>download p-value distribution files</span></a>,
+and <a class="reference internal" href="configure.html#configure"><span>adapt the configuration files</span></a>.</p>
 </div>
 
 
