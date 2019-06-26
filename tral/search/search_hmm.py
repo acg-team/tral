@@ -4,7 +4,6 @@ Tool to search an HMM against a database of sequences
 
 May be run as a module, e.g. `python -m tral.search.search_hmm -h`
 
-@author Spencer Bliven <sbliven@ucsd.edu>
 """
 
 import argparse

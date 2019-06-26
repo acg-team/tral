@@ -35,6 +35,7 @@ Tutorials
 - :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
 - :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
 - :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset (toy example)
+- :ref:`Find instances of a particular repeat<search_hmm>` in a sequence database.
 
 
 Reference Guide

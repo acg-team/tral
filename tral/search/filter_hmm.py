@@ -7,7 +7,6 @@ May be run as a module, e.g. `python -m tral.search.filter_hmm -h`
 Filtering is performed by `filter_search_results`. Other methods provide
 I/O and supporting roles.
 
-@author Spencer Bliven <sbliven@ucsd.edu>
 """
 
 import argparse
