@@ -12,7 +12,7 @@ Requirements for this tutorial:
 
 - :ref:`Install TRAL <install>`. TRAL ships with the data needed for this tutorial.
 - :ref:`Install Mafft/ginsi <MAFFT>` for tandem repeat unit alignment.
-- :ref:`Install Castor`. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
+- `Install Castor <https://bitbucket.org/lorenzogatti89/castor/wiki/Home>`_. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.
 
 .. todo:: write section to install castor with aligner proPIP
 

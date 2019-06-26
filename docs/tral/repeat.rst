@@ -1,7 +1,7 @@
 Repeat code documentation
 **************************
 
-Initial version of the repeat submodule documentation.
+The ``repeat`` submodule documentation.
 
 repeat
 =============================

@@ -10,6 +10,7 @@
 #provide paths from config file (has to be in the same directory than setupTRAL.sh)
 . configTRAL_path.cfg
 shopt -s nocasematch # making comparisons case-insensitive
+set -euo pipefail # exit on errors and undefined vars
 
 ######################
 ### Installing external software
@@ -17,7 +18,7 @@ shopt -s nocasematch # making comparisons case-insensitive
 
 install_ext_software () {
     
-    if [[ "$ACCEPT_ALL" = "yes" ]]; then
+    if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
         y=y
     else read -p "Would you like to install "$(basename "${software%%.sh}")"? Type \"y\" if YES:" y
     fi
@@ -36,7 +37,7 @@ install_ext_software () {
     
 }
 
-if [[ "$ACCEPT_ALL" = "yes" ]]; then
+if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
     yn=y
 else read -p "Would you like to install any external software? yes(y) or no (n):" yn
 fi

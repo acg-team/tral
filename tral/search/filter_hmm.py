@@ -7,18 +7,12 @@ May be run as a module, e.g. `python -m tral.search.filter_hmm -h`
 Filtering is performed by `filter_search_results`. Other methods provide
 I/O and supporting roles.
 
-@author Spencer Bliven <sbliven@ucsd.edu>
 """
 
 import argparse
 import logging
-import gzip
-import random
-import itertools
 import re
 
-from ..hmm import hmm, hmm_io, hmm_viterbi
-from ..sequence import sequence
 from Bio import SeqIO
 from .search_hmm import TralHit, opengzip
 
@@ -88,9 +82,9 @@ def filter_search_results(results, repeats=2, log_odds=8.0):
     :return: Generator for all hits
     """
     hits = parse_hits(results)
-    filtered = filter(lambda hit: hit.logodds >= log_odds and \
-                                  hit.states and \
-                                  count_repeats(hit.states) >= repeats,
+    filtered = filter(lambda hit: hit.logodds >= log_odds and
+                      hit.states and
+                      count_repeats(hit.states) >= repeats,
                       hits)
     for hit in filtered:
         yield hit
@@ -118,7 +112,6 @@ def filter_fasta(databasefile, outfile, hits, usedescription=True):
                     return seq
                 filtered = map(replacedescription, filtered)
             SeqIO.write(filtered, results, 'fasta')
-
 
 
 def parse_hits(results):
@@ -150,6 +143,7 @@ def parse_hits(results):
         except ValueError as e:
             logging.error("{} in results file line {}".format(e, linenr))
 
+
 def write_hits(hits, outfile):
     """Write a collection of hits to a TSV file
 
@@ -164,6 +158,7 @@ def write_hits(hits, outfile):
         for hit in hits:
             results.write(hit.to_line())
             results.write("\n")
+
 
 def write_treks(databasefile, outfile, hits, hmm=None):
     """Write a collection of hits as a TREKS file
@@ -181,6 +176,7 @@ def write_treks(databasefile, outfile, hits, hmm=None):
                 results.write(hit.to_treks(rec.seq, hmm=hmm))
                 results.write("\n")
 
+
 def match_seqs(hits, fastafile):
     """Pair a series of hits with sequences
 
@@ -194,6 +190,7 @@ def match_seqs(hits, fastafile):
             seq = seqs[hit.id]
             yield (hit, seq)
 
+
 def main(args=None):
     "filter_hmm main method"
     parser = argparse.ArgumentParser(description='Filter hits from search_hmm')
@@ -206,9 +203,10 @@ def main(args=None):
     group = parser.add_argument_group('Thresholds')
     group.add_argument("-r", "--min-repeats", help="Minimum number of repeats", type=float, default=2.0)
     group.add_argument("-t", "--log-odds", help="Threshold for minimum log-odds ratio", type=float, default=8.0)
-    parser.add_argument("--preserve-header", help="Include the full header in FASTA output. "
-        "Otherwise, just the identifier is used to match TSV and TREKS.",
-        default=False, action="store_true")
+    parser.add_argument("--preserve-header",
+                        help="Include the full header in FASTA output. Otherwise, "
+                        "just the identifier is used to match TSV and TREKS.",
+                        default=False, action="store_true")
     parser.add_argument("-v", "--verbose", help="Long messages",
                         default=False, action="store_true")
     args = parser.parse_args(args)
@@ -232,6 +230,7 @@ def main(args=None):
     # output filtered treks
     if args.filtered_treks:
         write_treks(args.database, args.filtered_treks, hits, hmm=None)
+
 
 if __name__ == "__main__":
     main()

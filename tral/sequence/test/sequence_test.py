@@ -45,7 +45,8 @@ def test_initialise_sequence():
     assert test_seq.seq == TEST_SEQUENCE
 
 
-@pytest.mark.no_external_software_required
+#@pytest.mark.no_external_software_required
+# Requires MAFFT for detect() method
 def test_detect_repeats_with_hmm(path):
     test_hmm = HMM.create(input_format='hmmer', file=os.path.join(path, "..", "..", "hmm", "test", TEST_FILE_WITH_ID))
     test_seq = sequence.Sequence(TEST_SEQUENCE_CARC)
@@ -101,9 +102,9 @@ def test_detect_repeats_denovo():
     assert len(test_optimized_repeat.repeats) == 3
 
 
-@pytest.mark.no_external_software_required
+#@pytest.mark.no_external_software_required
+# Requires MAFFT for detect() method
 def test_sequence_pickle(tmpdir):
-
     test_seq = sequence.Sequence(TEST_SEQUENCE)
 
     test_pickle = tmpdir.join("test.pickle")
