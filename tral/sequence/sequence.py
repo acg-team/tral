@@ -106,7 +106,7 @@ class Sequence:
         * de novo detection algorithms.
 
         Args:
-            hmm (HMM): A list of ``HMM`` instances.
+            hmm (hmm.HMM): A list of ``HMM`` instances.
             denovo (bool): boolean
             realignment (str): either "mafft", "proPIP" or None
             *kwargs: Parameters fed to denovo TR prediction and/or Repeat

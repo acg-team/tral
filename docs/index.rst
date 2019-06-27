@@ -77,3 +77,19 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * `search </search.html>`_
+
+.. toctree::
+   :hidden:
+
+   install
+   code_docs
+   contribute
+   contributors
+   denovo
+   background
+   cphmm
+   significance_test
+   overlap_filtering
+   workflow
+   search_hmm
+
