@@ -57,7 +57,7 @@ def test_hmm_pickle(tmpdir):
     test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE)
     test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
 
-    test_pickle = tmpdir.join("test.pickle")
+    test_pickle = os.path.join(tmpdir,"test.pickle")
     test_hmm.write(test_pickle, 'pickle')
     test_hmm_new = HMM.create(input_format='pickle', file=test_pickle)
 

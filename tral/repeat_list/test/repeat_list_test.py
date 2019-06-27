@@ -37,7 +37,7 @@ def test_repeat_list_pickle(tmpdir):
     test_repeat_list = rl.RepeatList(repeats=test_repeats)
 
     #test_pickle = os.path.join(path, "test.pickle")
-    test_pickle = tmpdir.join("test.pickle")
+    test_pickle = os.path.join(tmpdir,"test.pickle")
     test_repeat_list.write('pickle', test_pickle)
     test_repeat_list_new = repeat.Repeat.create(test_pickle, 'pickle')
 
