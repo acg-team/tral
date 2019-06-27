@@ -34,8 +34,9 @@ def test_create_HMM_from_Repeat():
 
 
 def test_create_HMM_from_DNA_Repeat():
+    # no calculation of pvalue possible since there are no pvalue distribution files available
 
-    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE, sequence_type="DNA")
+    test_repeat = repeat.Repeat(msa=TEST_REPEAT_MSA_DOUBLE, sequence_type="DNA",calc_pvalue=False)
     #test_parameters = {"hmmbuild":{"hmm_copy_path":"/Users/elkeschaper/Downloads", "hmm_copy_id":"maulwurf"}}
     #test_hmm = HMM.create(input_format = 'repeat', repeat = test_repeat, **test_parameters)
     test_hmm = HMM.create(input_format='repeat', repeat=test_repeat)
