@@ -6,12 +6,12 @@ Using TRAL in a container or VM
 Vagrant
 -------
 
-`Vagrant <https://www.vagrantup.com/>` is tool for building virtual development
+(`Vagrant <https://www.vagrantup.com/>`__) is tool for building virtual development
 environments. TRAL requires a complex ecosystem to use all of its features,
 so vagrant provides a reproducable environment to test installation.
 
 Installing TRAL within a vagrant box is simple. We assume you have
-`installed vagrant <https://www.vagrantup.com/intro/getting-started/index.html>`
+(`installed vagrant <https://www.vagrantup.com/intro/getting-started/index.html>`__)
 and a provider (e.g. VirtualBox). Next, check out the TRAL source code
 and run
 ::
