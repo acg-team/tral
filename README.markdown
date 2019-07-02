@@ -12,7 +12,7 @@ TRAL is a highly modularized, flexible sequence tandem repeats annotation Python
 The source code is [documented on GitHub IO].
 
 ### Version
-1.0.0
+1.0.1
 
 
 ### Installation
