@@ -24,6 +24,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="TRAL 0.3.5 documentation" href="index.html" />
+    <link rel="up" title="Installation" href="install.html" />
+    <link rel="next" title="Installation of external software" href="install_external.html" />
+    <link rel="prev" title="Installation" href="install.html" />
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
           rel='stylesheet' type='text/css' />
  
@@ -85,7 +88,6 @@
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 <li><a class="reference internal" href="#installation-of-tral">Installation of TRAL</a><ul>
-<li><a class="reference internal" href="#installation-of-tral-with-setup">Installation of TRAL with &#8220;setup&#8221;</a></li>
 <li><a class="reference internal" href="#installation-of-external-software-for-tral">Installation of external software for TRAL</a></li>
 </ul>
 </li>
@@ -94,6 +96,12 @@
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="install_external.html"
+                        title="next chapter">Installation of external software</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -156,21 +164,22 @@ cd tral_repository
 git clone https://github.com/acg-team/tral.git
 </pre></div>
 </div>
-<p>If you haven&#8217;t git installed, you may need install git or to download the github repository manually (<a class="reference external" href="https://github.com/acg-team/tral.git">https://github.com/acg-team/tral.git</a>).</p>
+<p>If you haven&#8217;t git installed, you may need install git or to download the <a class="reference external" href="https://github.com/acg-team/tral/">TRAL repository</a> manually.</p>
 </div>
 <div class="section" id="installation-of-tral">
 <h2>Installation of TRAL<a class="headerlink" href="#installation-of-tral" title="Permalink to this headline">¶</a></h2>
-<p>You can adapt the default installing path within configTRAL_path.cfg. Please only change the variables FILES and <code class="docutils literal"><span class="pre">$INSTALLATION_PATH</span></code>.</p>
-<p>To install TRAL within you can simply run the script setupTRAL.sh with either the argument &#8220;pip&#8221; or &#8220;setup&#8221;.
+<p>You can adapt the default installing path within configTRAL_path.cfg. Please only change the variables FILES and <code class="docutils literal"><span class="pre">$INSTALLATION_PATH</span></code>.
 It is recommended to install TRAL within a virtual environment (e. g. virtualenv) which has to be activated before.</p>
-<div class="section" id="installation-of-tral-with-setup">
-<h3>Installation of TRAL with &#8220;setup&#8221;<a class="headerlink" href="#installation-of-tral-with-setup" title="Permalink to this headline">¶</a></h3>
-<p>Currently the version provided in &#8220;pypi&#8221; is not up-to-date, therefore it is recommended to install TRAL with python setup.py install &#8220;setup&#8221;.</p>
+<p>To install TRAL within you can simply run the script setupTRAL.sh with either the argument &#8220;pip&#8221; or &#8220;setup&#8221;.</p>
+<p>&#8220;setup&#8221; uses the github version:</p>
 <div class="highlight-python"><div class="highlight"><pre>cd ./tral/easy_setup
 ./setupTRAL.sh setup
 </pre></div>
 </div>
-<p>Within the next release the tral version on pypi will be updated.</p>
+<p>&#8220;pip&#8221; uses the current TRAL version on <a class="reference external" href="https://pypi.org/project/tral/">pypi</a> manually:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ./tral/easy_setup
+./setupTRAL.sh setup
+</pre></div>
 </div>
 <div class="section" id="installation-of-external-software-for-tral">
 <h3>Installation of external software for TRAL<a class="headerlink" href="#installation-of-external-software-for-tral" title="Permalink to this headline">¶</a></h3>
@@ -179,9 +188,7 @@ The script install_ext_software.sh automatically iterates through all installati
 <div class="highlight-python"><div class="highlight"><pre>sudo ./install_ext_software.sh
 </pre></div>
 </div>
-<p>Otherwise, you can run an installation script for each external software individually which can be found within the directory <code class="docutils literal"><span class="pre">setup_tral/install_ext_software</span></code>.
-The software will be downloaded in the directory <code class="docutils literal"><span class="pre">$FILES/tral_external_software</span></code>.
-Currently, installation scripts for the following external software are available:</p>
+<p>Currently, installation scripts for the following external software are available:</p>
 <ul class="simple">
 <li>alf</li>
 <li>castor</li>
