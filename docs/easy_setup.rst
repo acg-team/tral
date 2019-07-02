@@ -43,27 +43,26 @@ To get started with TRAL, simply clone the github directory https://github.com/a
     git clone https://github.com/acg-team/tral.git
 
 
-If you haven't git installed, you may need install git or to download the github repository manually (https://github.com/acg-team/tral.git).
+If you haven't git installed, you may need install git or to download the `TRAL repository <https://github.com/acg-team/tral/>`_ manually. 
 
 Installation of TRAL
 --------------------
 
 You can adapt the default installing path within configTRAL_path.cfg. Please only change the variables FILES and ``$INSTALLATION_PATH``.
+It is recommended to install TRAL within a virtual environment (e. g. virtualenv) which has to be activated before. 
 
 To install TRAL within you can simply run the script setupTRAL.sh with either the argument "pip" or "setup".
-It is recommended to install TRAL within a virtual environment (e. g. virtualenv) which has to be activated before.
 
-Installation of TRAL with "setup"
-+++++++++++++++++++++++++++++++++
-
-Currently the version provided in "pypi" is not up-to-date, therefore it is recommended to install TRAL with python setup.py install "setup". ::
-
+"setup" uses the github version::
 
     cd ./tral/easy_setup
     ./setupTRAL.sh setup
 
+"pip" uses the current TRAL version on `pypi <https://pypi.org/project/tral/>`_ manually::
 
-Within the next release the tral version on pypi will be updated.
+    cd ./tral/easy_setup
+    ./setupTRAL.sh setup
+
 
 Installation of external software for TRAL
 ++++++++++++++++++++++++++++++++++++++++++
@@ -75,8 +74,6 @@ The script install_ext_software.sh automatically iterates through all installati
     sudo ./install_ext_software.sh
 
 
-Otherwise, you can run an installation script for each external software individually which can be found within the directory ``setup_tral/install_ext_software``.
-The software will be downloaded in the directory ``$FILES/tral_external_software``.
 Currently, installation scripts for the following external software are available:
 
 - alf
