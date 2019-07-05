@@ -34,6 +34,7 @@
 ### Housekeeping
 
 shopt -s nocasematch # making comparisons case-insensitive
+set -euo pipefail # exit on errors and undefined vars
 
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
@@ -45,7 +46,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 while [ ! -x $(which virtualenv 2>/dev/null) ]; do
     echo "Installing virtualenv required by: "${PIP:-pip}" install virtualenv."
 
-    if [[ "$ACCEPT_ALL" = "yes" ]]; then
+    if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
     yn=y
     else read -p "Do you wish to install this program? yes(y) or no (n):" yn
     fi

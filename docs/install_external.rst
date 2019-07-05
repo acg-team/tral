@@ -3,9 +3,13 @@
 Installation of external software
 =================================
 
+TRAL is dependend on different external software which need to be installed before TRAL can be used.
+
 Here, we explain how to install external software packages, such as *de novo* tandem repeat
-detectors. Important: Once a software is installed, the path to either the binary or the
+detectors. _Important_: Once a software is installed, the path to either the binary or the
 executable shell script needs to be indicated in the TRAL configuration file :ref:`config.ini <configure>`.
+
+For each of the software an installation script can be found for :ref: `easy setup <easy_setup>`.
 
 Sequence profile model generation
 ---------------------------------
@@ -29,7 +33,7 @@ If *hmmbuild* is not in your system path, set the absolute path::
 
 Alignment of tandem repeat units
 ---------------------------------
-Currently, MAFFT is the advised tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
+Currently, MAFFT is the default tool for (re-)alignment of the tandem repeat units to each other (`Installation instructions <http://mafft.cbrc.jp/alignment/software/>`__).
 TRAL searches for MAFFT's *ginsi* in the system path by default (modify in :ref:`config.ini <configure>`)::
 
     [repeat]
@@ -40,6 +44,20 @@ If *ginsi* is not in your system path, set the absolute path::
 
     [repeat]
         ginsi = path/to/ginsi
+
+Realignment of tandem repeat units with indel aware proPIP algorithm
+--------------------------------------------------------------------
+The alignment module of (`Castor <https://github.com/acg-team/castor_aligner>`__) can be used to realign tandem repeat units with the indel aware algorithm proPIP (`Installation instructions <https://bitbucket.org/lorenzogatti89/castor/wiki/Compiling/Index>`__).
+TRAL searches for *Castor* in the system path by default (modify in :ref:`config.ini <configure>`)::
+
+    [repeat]
+        Castor = Castor
+
+
+If *Castor* is not in your system path, set the absolute path::
+
+    [repeat]
+        Castor = path/to/Castor
 
 
 .. _install_denovo:
@@ -227,6 +245,24 @@ path::
     [sequence]
         [[repeat_detector_path]]
             XSTREAM = path/to/XSTREAM
+
+
+Simulation of evolution in tandem repeats
+-----------------------------------------
+
+For simulating evolved sequences ALF can be used which simulates a root genome into a number of related genomes.
+It was `published in Molecular Biology and Evolution (2012) <https://academic.oup.com/mbe/article/29/4/1115/1188345>`_ and can be downloaded on `alfsim.org <http://alfsim.org>`_.
+TRAL searches for ALFs executable *alfsim* in the system path by default (modify in :ref:`config.ini <configure>`)::
+
+    [repeat]
+        alfsim = alfsim
+
+
+If *alfsim* is not in your system path, set the absolute path::
+
+    [repeat]
+        alfsim = path/to/alfsim
+
 
 
 Not yet integrated software

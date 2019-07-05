@@ -17,6 +17,7 @@ from tral.hmm import hmm, hmm_viterbi
 from tral.sequence import repeat_detection_run, sequence_io
 
 CONFIG = configuration.Configuration.instance().config
+REPEAT_CONFIG = CONFIG["repeat"]
 LOG = logging.getLogger(__name__)
 
 
@@ -93,10 +94,9 @@ class Sequence:
             with open(file, 'wb') as fh:
                 pickle.dump(self, fh)
         else:
-            raise Exception("Output format {} is not implemented for",
-                            "sequence.write()".format(file_format))
+            raise Exception("Output format {} is not implemented for sequence.write()".format(file_format))
 
-    def detect(self, lHMM=None, denovo=None, **kwargs):
+    def detect(self, lHMM=None, denovo=None, realignment='mafft', sequence_type='AA', rate_distribution=REPEAT_CONFIG['castor_parameter']['rate_distribution'], user_path=None, **kwargs):
         """ Detects tandem repeats on ``self.seq`` from 2 possible sources.
 
         A list of ``Repeat`` instances is created for tandem repeat detections
@@ -106,14 +106,18 @@ class Sequence:
         * de novo detection algorithms.
 
         Args:
-            hmm (HMM): A list of ``HMM`` instances.
+            hmm (hmm.HMM): A list of ``HMM`` instances.
             denovo (bool): boolean
+            realignment (str): either "mafft", "proPIP" or None
             *kwargs: Parameters fed to denovo TR prediction and/or Repeat
                 instantiation. E.g. ``repeat = {"calc_score": True}``
 
         Returns:
             A ``RepeatList`` instance
         """
+        realignment_types = ['mafft', 'proPIP', None]
+        if realignment not in realignment_types:
+            raise ValueError("Invalid realignment type. Expected one of: {}".format(realignment_types))
 
         if lHMM:
             if not isinstance(lHMM, list):
@@ -137,7 +141,18 @@ class Sequence:
                     iHMM.l_effective)
                 if len(unaligned_msa) > 1:
                     # Align the msa
-                    aligned_msa = repeat_align.realign_repeat(unaligned_msa)
+                    initial_alignment = 'mafft'
+                    aligned_msa = repeat_align.realign_repeat(unaligned_msa, initial_alignment, sequence_type, user_path=user_path)
+
+                    if realignment == 'proPIP':
+                        if len(aligned_msa) > 2 or len(aligned_msa[0]) > 10:  # TODO: change from 2 to 3
+                            # only TRs with at least 3 units with a length > 10 characters will be realigned
+                            aligned_msa = repeat_align.realign_repeat(aligned_msa,
+                                                                      realignment,
+                                                                      sequence_type,
+                                                                      rate_distribution=rate_distribution,
+                                                                      user_path=user_path)
+
                     if len(aligned_msa) > 1:
                         # Create a Repeat() class with the new msa
                         if 'repeat' in kwargs:
@@ -192,6 +207,15 @@ class Sequence:
 
                         repeats.append(iTR)
 
+            # Realignment
+            for iTR in repeats:
+                if len(iTR.msa) > 2 or len(iTR.msa[0]) > 10:  # TODO: change from 2 to 3
+                    # only TRs with at least 3 units with a length > 10 characters will be realigned
+                    iTR.msa = repeat_align.realign_repeat(iTR.msa,
+                                                          realignment,
+                                                          sequence_type,
+                                                          rate_distribution=rate_distribution,
+                                                          user_path=user_path)
             return repeat_list.RepeatList(repeats)
 
         else:

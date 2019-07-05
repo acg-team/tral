@@ -17,8 +17,11 @@ import tempfile
 import subprocess
 import numpy as np
 from tral.repeat import repeat
+from tral import configuration
 
-from tral.paths import DATA_DIR, EXEC_DIR
+from tral.paths import DATA_DIR
+CONFIG_GENERAL = configuration.Configuration.instance().config
+REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
 LOG = logging.getLogger(__name__)
 
@@ -197,7 +200,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
     """
 
     runfile_template = os.path.join(DATA_DIR, "ALF", "template.drw")
-    alf_exec = os.path.join(EXEC_DIR, "alfsim")
+    alf_exec = REPEAT_CONFIG['alfsim']
     # create temporary directory
     working_dir = tempfile.mkdtemp()
     LOG.debug("evolvedTR: Created tempfile: %s", working_dir)
@@ -300,6 +303,8 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
             break
     else:
         LOG.error('ALFSIM was not able to produce simulated sequence.')
+        LOG.error('Do you have ALFSIM installed and used the correct path in the configuration file?')
+        return
 
     # shutil.rmtree('/cluster/home/infk/eschaper/spielwiese/')
     #shutil.copytree(working_dir, '/cluster/home/infk/eschaper/spielwiese/')
@@ -309,7 +314,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
         yielding MSAs as lists of strings,
         based on a special flavour of  Felstein stein MSA files """
 
-    # find a repeat uni
+    # find a repeat unit
     pattern_start = re.compile(r"\d+ \d+")
     pattern_seq = re.compile(r"\S+[ ]+([A-Z\-]+)")
 

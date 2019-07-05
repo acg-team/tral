@@ -1,7 +1,7 @@
 Sequence code documentation
 *****************************
 
-Initial version of the sequence submodule documentation.
+The ``sequence`` submodule documentation.
 
 sequence
 =============================

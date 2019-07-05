@@ -4,7 +4,6 @@ Tool to search an HMM against a database of sequences
 
 May be run as a module, e.g. `python -m tral.search.search_hmm -h`
 
-@author Spencer Bliven <sbliven@ucsd.edu>
 """
 
 import argparse
@@ -15,22 +14,22 @@ import itertools
 from io import StringIO
 import re
 
-from ..hmm import hmm, hmm_io, hmm_viterbi
-from ..sequence import sequence
+from ..hmm import hmm, hmm_viterbi
 from Bio import SeqIO
 
 
 class TralHit(object):
     """Encapsulates key information about a TRAL search result.
-    
+
     This is similar to some objects from the `tral.repeat` package, but collects
     data together and provides serialization methods.
+
     """
     def __init__(self, id, prob, logodds, states):
-        self.id=id
-        self.prob=prob  # log10 probability
-        self.logodds=logodds
-        self.states=states
+        self.id = id
+        self.prob = prob  # log10 probability
+        self.logodds = logodds
+        self.states = states
 
     # Header for TSV format
     header = "ID\tProb\tLO\tStates"
@@ -38,7 +37,7 @@ class TralHit(object):
     @classmethod
     def parse_line(Cls, line):
         """Parse a line from the TSV serialization to a TralHit
-        
+
         Inverse of to_line()
 
         Args:
@@ -68,13 +67,13 @@ class TralHit(object):
         Return: (str)
         """
         return "\t".join([
-                self.id,
-                str(self.prob),
-                str(self.logodds),
-                " ".join(self.states) if self.states else ""])
+            self.id,
+            str(self.prob),
+            str(self.logodds),
+            " ".join(self.states) if self.states else ""])
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.id!r},{self.prob!r}, {self.logodds!r}, {len(self.states)} states)"
+        return "{self.__class__.__name__}({self.id!r},{self.prob!r}, {self.logodds!r}, {len(self.states)} states)"
 
     def _to_align_matrix(self, statelist, seq, ignoredstates=["N", "C"]):
         """Constructs a 2D matrix of the repeat alignment from the states of this hit.
@@ -138,8 +137,8 @@ class TralHit(object):
             for row in range(maxlen):
                 for col in range(len(statelist)):
                     w = widths[col]
-                    char = statelist[col][row:(row+1)]
-                    alignstr.write((char if char else " ")*w)
+                    char = statelist[col][row:(row + 1)]
+                    alignstr.write((char if char else " ") * w)
                 alignstr.write("\n")
         for row in range(len(align)):
             for col in range(len(statelist)):
@@ -154,7 +153,7 @@ class TralHit(object):
 
         Args:
             sequence (str or Bio.SeqRecord or Bio.Seq): sequence for this hit
-            hmm (HMM): (optional) the HMM used to generate this hit. If specified,
+            hmm (hmm.HMM): (optional) the HMM used to generate this hit. If specified,
                 results in more accurate set of states
         Return: (str)
 
@@ -170,12 +169,11 @@ class TralHit(object):
         # G-P-PL
         # **********************
 
-
         # Handle case without any repeats
         if not self.states:
             return "repeat not found in sequence {}".format(self.id)
 
-        if hasattr(sequence,"seq"):
+        if hasattr(sequence, "seq"):
             seq = sequence.seq
         else:
             seq = sequence
@@ -185,7 +183,7 @@ class TralHit(object):
         out = StringIO()
 
         # identifier
-        desc = sequence.description if hasattr(sequence,"description") and sequence.description else self.id
+        desc = sequence.description if hasattr(sequence, "description") and sequence.description else self.id
         out.write(">")
         out.write(desc)
         out.write("\n")
@@ -208,7 +206,7 @@ class TralHit(object):
 
             # Guess based on state names
             hmm_len = max(int(a[1:]) for a in self.states if len(a) > 1)
-            states = [state for i in range(1, hmm_len+1)
+            states = [state for i in range(1, hmm_len + 1)
                       for state in ("M%d" % i, "I%d" % i)
                       if state in usedstates]
             ignored = ["N", "C"]
@@ -236,15 +234,15 @@ class TralHit(object):
 
 def opengzip(filename):
     """Open a file, which may optionally be gzip'd
-    
+
     Checks the magic bytes to see if the file was compressed.
 
     Args:
         - filename (str): Filename
-    
+
     Returns:
         An open file handle
-    
+
     """
     magic = None
     with open(filename, 'br') as f:
@@ -320,6 +318,7 @@ def main(args=None):
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO if args.verbose else logging.WARN)
 
     search_hmm(args.hmm, args.database, args.results, start=args.start, n=args.dbsize, shuffle=args.shuffle)
+
 
 if __name__ == "__main__":
     main()

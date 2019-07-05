@@ -1,7 +1,7 @@
 HMM code documentation
 **************************
 
-Initial version of the hmm submodule documentation.
+The ``hmm`` submodule documentation.
 
 hmm
 =============================
