@@ -1,3 +1,5 @@
+:orphan:
+
 Add a class inheritance diagram within .rst files:
 
 ::

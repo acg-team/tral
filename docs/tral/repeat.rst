@@ -1,11 +1,16 @@
 Repeat code documentation
 **************************
 
-Initial version of the repeat submodule documentation.
+The ``repeat`` submodule documentation.
 
 repeat
 =============================
 .. automodule:: tral.repeat.repeat
+    :members:
+
+repeat_align
+=============================
+.. automodule:: tral.repeat.repeat_align
     :members:
 
 repeat_exon
@@ -27,3 +32,5 @@ repeat_score
 =============================
 .. automodule:: tral.repeat.repeat_score
     :members:
+
+

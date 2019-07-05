@@ -283,7 +283,7 @@ def none_overlapping(rl, overlap, l_criterion):
     Args:
         rl (RepeatList): An instance of the RepeatList class.
         overlap (tuple): First element: Name (str) of an overlap method in
-            `repeat_list`. Second element: **kwargs. All remaining elements are
+            `repeat_list`. Second element: ``**kwargs``. All remaining elements are
             additional arguments for this class.
         l_criterion (list): list of (criterion (str), criterion arguments)
             tuples. Until only one repeat is remainining in a cluster, the
@@ -291,7 +291,7 @@ def none_overlapping(rl, overlap, l_criterion):
     """
 
     overlap_type = overlap[0]
-    if len(overlap) > 1: # has to be adapted to a more convenient way
+    if len(overlap) > 1:  # has to be adapted to a more convenient way
         overlap_args = overlap[1]
 
     if not (hasattr(rl, 'd_cluster') and overlap_type in rl.d_cluster):
@@ -305,8 +305,8 @@ def none_overlapping(rl, overlap, l_criterion):
 
         i_repeat = [rl.repeats[i] for i in i_cluster]
 
-        for ctype, cvalue in l_criterion.items():
-            criterion_type, criterion_value = ctype, cvalue 
+        for ctype, cvalue in l_criterion:
+            criterion_type, criterion_value = ctype, cvalue
             if len(i_repeat) == 1:
                 res.append(i_repeat[0])
                 break

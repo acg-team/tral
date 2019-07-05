@@ -1,4 +1,4 @@
-.. tral
+.. _tral:
 
 Tandem Repeat Annotation Library
 ================================
@@ -11,19 +11,40 @@ statistical significance analysis of putative tandem repeats, and filtering of r
 Getting started
 ===============
 
-#. :ref:`Install TRAL <install>`
-#. :ref:`Install tandem repeat external software <install_external>`
-#. :ref:`Adapt configuration files <configure>`
+A working TRAL installation consists of several parts:
 
+1. The TRAL python package
+2. External tools and repeat detectors.
+3. TRAL configuration files and supporting data.
+
+TRAL itself requires Python3 and should run on all platforms. However, many
+external tools require linux. The full TRAL pipeline has been tested on ubuntu.
+
+The easiest way to get started on ubuntu is to use the
+:ref:`easy setup system <easy_setup>`. This automatically installs TRAL and all
+external tools.
+
+Alternately, follow these steps to install each part:
+
+1. :ref:`Install TRAL <install>`
+2. :ref:`Install external software needed for TRAL <install_external>`
+3. :ref:`Download p-value distribution files <pvaluefiles>`
+
+Finally, :ref:`adapt the configuration files <configure>`.
+
+If you have trouble installing TRAL on your system, consider using the
+:ref:`containerized install <install_containerized>` .
 
 Tutorials
 =========
 
 - :ref:`Run and parse <denovo>` de novo repeat detection software.
+- Background about :ref:`tandem repeat characteristics in TRAL <background>`
 - :ref:`Annotate tandem repeats<cphmm>` from sequence domain models.
 - :ref:`Perform statistical significance test <significance_test>` of tandem repeats.
 - :ref:`Perform overlap filtering <overlap_filtering>` of redundant tandem repeat annotations.
-- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset.
+- :ref:`Use GC3Pie <workflow>` to annotate your large sequence dataset (toy example)
+- :ref:`Find instances of a particular repeat<search_hmm>` in a sequence database.
 
 
 Reference Guide
@@ -55,5 +76,20 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
+* `search </search.html>`_
+
+.. toctree::
+   :hidden:
+
+   install
+   code_docs
+   contribute
+   contributors
+   denovo
+   background
+   cphmm
+   significance_test
+   overlap_filtering
+   workflow
+   search_hmm
 

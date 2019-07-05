@@ -82,7 +82,10 @@ def empirical_list(l, n, sequence_type='AA', score_type='phylo'):
     file = join(SCORE_DIR, sequence_type, score_type,
                 str(l) + '_' + str(n) + '.npz')
     if not os.path.isfile(file):
-        raise ValueError("complete pdf file %s does not exist!" % file)
+        print("\nExpected a pvalue distribution file which cannot be found.")
+        print("Did you already download the pvalue distributions files and put in the data configuration folder?")
+        print("Information can be found http://acg-team.github.io/tral/pvaluefiles.html#pvaluefiles.")
+        raise ValueError("Complete pdf file %s to calculate the pvalue does not exist!" % file)
 
     empirical_list_all = np.load(file)
     # It is necessary to close the numpy filehandle.

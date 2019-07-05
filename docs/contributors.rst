@@ -19,7 +19,9 @@ People
 - `Heinz Stockinger <http://people.isb-sib.ch/Heinz.Stockinger/>`_
 - `Ioannis Xenarios <http://www.isb-sib.ch/groups/lausanne/vital-it-xenarios.html#Xenarios>`_
 - `Stefan Zoller <https://www.usys.ethz.ch/en/people/profile.html?persid=88844>`_
-
+- `Spencer Bliven <https://github.com/sbliven>`_
+- Paulina Näf
+- Matteo Delucchi
 
 .. _publications:
 

@@ -55,9 +55,9 @@ class BinaryExecutable:
             self.binary = distutils.spawn.find_executable(binary)
         if not self.binary:
             raise ValueError(
-                "The executable {} does not exist, although {} was selected "
-                "to be executed. Please make sure the executable is in the system path, or "
-                "the path to the executable is correctly set in config.ini".format(
+                "The executable {} does not exist, although {} was selected \n"
+                "to be executed. Please make sure the executable is in the system path, or \n"
+                "the path to the executable is set correctly in config.ini".format(
                     binary, name))
 
     def get_execute_tokens(self, *args):
@@ -101,8 +101,11 @@ def check_java_errors(outfile, errfile, log=LOG, procname=None):
     if errfile_size != 0 and outfile_size == 0:
         has_error = True
         LOG.warning(
-            "Process \"%s\" has empty STDOUT but non-empty STDERR",
-            procname)
+            "Process {} has empty STDOUT but non-empty STDERR.\n"
+            "This error often happens when {} is not installed or\n"
+            "no correct path is given in configfile .tral/config.ini.\n"
+            "Please check.".format(
+                procname, procname))
 
     pat_javaexc = re.compile(
         r'Exception in thread ".+" \S+:.*$(\s+at .+)+',

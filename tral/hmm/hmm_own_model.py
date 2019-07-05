@@ -703,8 +703,10 @@ def calculate_log10_probability_indel_lengths(
     type == 'zipf'
     indel lengths are distributed following a Zipfian distribution with parameter <indel_zipf>.
     (Compare:
+
         Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
         Mol Biol Evol, 26, 1879–1888.
+
     In their publication, <indel_zipf> is denoted as <a>, the gap lengths as <u>.)
 
     or
@@ -746,6 +748,7 @@ def calculate_MAP_Indel_length_exponential_factor(indel_lengths, prior=None):
 
     The MAP is calculated numerically, as no nice analytical solution has been found so far.
     A power function of grade 3 needs to be solved:
+
         0 == prior['sigma_squared']*(sum(indel_lengths) - len(indel_lengths)) -
              alpha*(prior['sigma_squared']*sum(indel_lengths) + prior['mu']) +
              (alpha**2)*(1 + prior['mu']) - alpha**3
@@ -774,8 +777,10 @@ def calculate_MAP_Indel_length_Zipfian_factor(indel_lengths, prior=None):
     column.
     The probability distribution of indel lengths is assumed to follow the Zipfian distribution
     (Compare
+
         Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
         Mol Biol Evol, 26, 1879–1888.
+
     In their publication, <indel_zipf> is denoted as <a>, the gap lengths as <u>.)
 
     The MAP is calculated numerically, as there did not seem to be a nice analytical solution.
@@ -801,6 +806,7 @@ def calculate_MAP_Indel_length_Zipfian_factor(indel_lengths, prior=None):
 def calculate_log10_indel_probability(nIndels, n, prior=None):
     ''' calculate the probabilty of an indel per site and per repeat unit
     from the MAP estimate of the indel rate, given
+
     - the <divergence> of the repeat units
     - a <prior> on the indel rates (normal distributed)
     - the number of indels <nIndels> in this column

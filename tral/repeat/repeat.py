@@ -14,7 +14,7 @@ import numpy as np
 import pickle
 import re
 
-from tral.repeat import repeat_score, repeat_pvalue, repeat_io
+from tral.repeat import repeat_score, repeat_pvalue, repeat_io, repeat_align
 from tral import configuration
 
 LOG = logging.getLogger(__name__)
@@ -355,9 +355,9 @@ class Repeat:
             Repeat instance `self`
         """
         if type(scoreslist) != list:
-            raise ValueError("Please make sure that scoreslist is a list. " \
-                            "You can make this sure by a comma at the end of your Config-File.")
-        
+            raise ValueError("Please make sure that scoreslist is a list. "
+                             "You can make this sure by a comma at the end of your Config-File.")
+
         if not hasattr(self, 'd_pvalue'):
             self.d_pvalue = defaultdict(int)
 
@@ -674,6 +674,20 @@ class Repeat:
                     unit_original += repeat_sequence[count]
                     count += 1
             self.msa_original.append(unit_original)
+
+    def realign_TR(self, realignment='proPIP', rate_distribution=CONFIG['castor_parameter']['rate_distribution']):
+        """ Realign multiple sequence alignment of tandem repeats.
+            Update of tandem repeat MSA.
+
+        Args:
+            self (Repeat instance)
+            realignment (str): either "proPIP" or "mafft"
+            rate_distribution (str): either "constant" or "gamma" (per default value from REPEAT_CONFIG['castor_parameter']['rate_distribution'])
+        """
+        self.msa = repeat_align.realign_repeat(self.msa,
+                                               realignment,
+                                               sequence_type=self.sequence_type,
+                                               rate_distribution=rate_distribution)
 
 # Standardize MSA #############################################################
 

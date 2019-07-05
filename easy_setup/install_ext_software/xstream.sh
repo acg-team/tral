@@ -14,8 +14,11 @@
 ######################
 ### Housekeeping
 
+LINK_XSTREAM="https://amnewmanlab.stanford.edu/xstream/XSTREAMprog/xstream.zip"
+
 shopt -s nocasematch # making comparisons case-insensitive
- 
+set -euo pipefail # exit on errors and undefined vars
+
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
@@ -28,7 +31,6 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 mkdir -p "$TRAL_EXT_SOFTWARE/XSTREAM"
 if [ ! -f "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar" ]; then # test if not already in directory
-    LINK_XSTREAM="http://jimcooperlab.mcdb.ucsb.edu/xstream/XSTREAMprog/xstream.zip"
     wget "$LINK_XSTREAM" -P "$TRAL_EXT_SOFTWARE/XSTREAM"
     unzip "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" -d "$TRAL_EXT_SOFTWARE/XSTREAM"
     rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" || {

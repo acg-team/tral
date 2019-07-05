@@ -6,6 +6,9 @@ import logging
 from setuptools import setup
 from setuptools.command.install import install
 from setuptools.command.develop import develop
+from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
+
+import subprocess
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
@@ -48,8 +51,15 @@ class TralMixin(object):
             shutil.copytree("tral/tral_configuration", datadir)
             print("The TRAL configuration files and data files are now located in {}".format(datadir))
 
-        #self.do_egg_install()
-        super().run()
+        try:
+            # install's run() command ignores install_requires when called this way.
+            # Instead, use do_egg_install if possible. https://stackoverflow.com/q/21915469/81658
+            # super().do_egg_install()
+            subprocess.call(["pip install -r requirements.txt --no-clean"], shell=True)
+            _bdist_egg.run(self)
+        except AttributeError:
+            # fallback for develop
+            super().run()
 
 
 class InstallCommand(TralMixin, install):
@@ -134,5 +144,6 @@ setup(
     cmdclass={
         'install': InstallCommand,
         'develop': DevelopCommand,
+        'bdist_egg': _bdist_egg,
     }
 )

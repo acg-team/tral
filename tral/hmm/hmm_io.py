@@ -359,7 +359,7 @@ def write_HMMER(hmm, hmm_file):
     for the file format specification.
 
     Args:
-        hmm (HMM): HMM object to write
+        hmm (hmm.HMM): HMM object to write
         hmm_file (str or file): filename or file-like object to write to
     """
     close = False
