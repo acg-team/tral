@@ -143,14 +143,7 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
                     echo "SKIPPING DOWNLOAD"
                 fi
                 tar -xzf "$TRAL_CONF/data/pvalue.tar.gz" -C "$TRAL_CONF/data"
-                
-                wget "ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue/AA/phylo_gap01.zip"
-                unzip "$TRAL_CONF/data/phylo_gap01.zip" -d "$TRAL_CONF/data"
-
-                wget "ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue/AA/phylo_gap001.zip"
-                unzip "$TRAL_CONF/data/phylo_gap001.zip" -d "$TRAL_CONF/data"
-                
-                rm -rf "$TRAL_CONF/data/pvalue.tar.gz" "$TRAL_CONF/data/phylo_gap01.zip" "$TRAL_CONF/data/phylo_gap001.zip"
+                rm -rf "$TRAL_CONF/data/pvalue.tar.gz"
                 } || {
                 exit 1
             }
