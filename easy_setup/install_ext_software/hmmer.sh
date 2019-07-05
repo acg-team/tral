@@ -64,7 +64,7 @@ done
         }
     )
     } || {
-    echo "Couldn't compile and install HMMER."
+    echo "Couldn't compile and install HMMER. Try to manually install the development version of HMMER by running hmmer-devel.sh which provides little endian support."
     exit $?
 }
 
