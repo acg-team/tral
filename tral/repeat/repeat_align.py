@@ -43,7 +43,7 @@ def realign_repeat(my_msa, realignment='mafft', sequence_type='AA', rate_distrib
     Returns:
         my_msa realigned (list of strings)
 
-    .. todo:: 
+    .. todo::
         - decide what happens if branch length of tree is getting zero
     """
 
