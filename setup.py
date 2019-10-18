@@ -7,8 +7,10 @@ from setuptools import setup
 from setuptools.command.install import install
 from setuptools.command.develop import develop
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
+from setuptools import setup, find_packages
 
 import subprocess
+
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
@@ -75,8 +77,6 @@ class DevelopCommand(TralMixin, develop):
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
 SCRIPTS2 = [os.path.join("tral", "examples", "workflow", i) for i in ["tandem_repeat_annotation_scripts.py",
                                                                       "tandem_repeat_annotation_workflow.py"]]
-packages = ["tral", "tral.test", "tral.hmm", "tral.hmm.test", "tral.repeat", "tral.repeat.test",
-            "tral.repeat_list", "tral.repeat_list.test", "tral.sequence", "tral.sequence.test"]
 
 # Load the version number from tral/__init__.py
 __version__ = "Undefined"
@@ -89,7 +89,7 @@ setup(
     version=__version__,
     author="Elke Schaper",
     author_email="elke.schaper@isb-sib.ch",
-    packages=packages,
+    packages=find_packages(),
     scripts=SCRIPTS1 + SCRIPTS2,
     url="http://pypi.python.org/pypi/tral/",
     license="LICENSE.txt",
