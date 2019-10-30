@@ -14,6 +14,16 @@
 ######################
 ### Housekeeping
 
+# Check if Java is installed
+if java -version 2>&1 >/dev/null | grep "java version\|openjdk version" ; then   
+	echo "Java is already installed."; 
+else   
+	echo "Java NOT installed!"
+	exit $?;
+fi
+
+
+
 LINK_XSTREAM="https://amnewmanlab.stanford.edu/xstream/XSTREAMprog/xstream.zip"
 
 shopt -s nocasematch # making comparisons case-insensitive
