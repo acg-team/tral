@@ -138,7 +138,7 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
             {
                 if [[ ! -f "$TRAL_CONF/data/pvalue.tar.gz" ]]; then
                     echo "DOWNLOADING"
-                    wget "ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue.tar.gz" -P "$TRAL_CONF/data"
+                    wget "https://acg-team.ulozezoz.myhostpoint.ch/pvalue.tar.gz" -P "$TRAL_CONF/data"
                 else
                     echo "SKIPPING DOWNLOAD"
                 fi
