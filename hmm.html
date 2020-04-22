@@ -1,0 +1,1363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>HMM code documentation &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HMM code documentation</a><ul>
+<li><a class="reference internal" href="#module-tral.hmm.hmm">hmm</a></li>
+<li><a class="reference internal" href="#module-tral.hmm.hmm_io">hmm_io</a></li>
+<li><a class="reference internal" href="#module-tral.hmm.hmm_own_model">hmm_own_model</a></li>
+<li><a class="reference internal" href="#module-tral.hmm.hmm_viterbi">hmm_viterbi</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/hmm.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hmm-code-documentation">
+<h1>HMM code documentation<a class="headerlink" href="#hmm-code-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Initial version of the hmm submodule documentation.</p>
+<div class="section" id="module-tral.hmm.hmm">
+<span id="hmm"></span><h2>hmm<a class="headerlink" href="#module-tral.hmm.hmm" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">A cyclic hidden Markov model that describes sequence tandem repeats.</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="tral.hmm.hmm.HMM">
+<em class="property">class </em><code class="descclassname">tral.hmm.hmm.</code><code class="descname">HMM</code><span class="sig-paren">(</span><em>hmmer_probabilities</em>, <em>sequence_type='AA'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence profile hidden Markov models (HMMs) are used to model genomic
+sequence containing a tandem repeat.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The HMM implemented here is described in detail in</p>
+<p>Schaper, E., Gascuel, O. &amp; Anisimova, M. Deep conservation of human
+protein tandem repeats within the eukaryotes.
+Molecular Biology and Evolution (2014).</p>
+<p>All notations used here are based on the notations introduced in</p>
+<p class="last">Eddy, S. R. Profile hidden Markov models.
+Bioinformatics 14, 755–763 (1998).</p>
+</div>
+<p>The HMM contains flanking states (&#8220;N&#8221;, &#8220;C&#8221;), match states (&#8220;M1&#8221;, &#8220;M2&#8221;, ...)
+and insertion states (&#8220;I1&#8221;, &#8220;I2&#8221;, ..). As deletion states are non-emitting,
+they are merged with the other states.</p>
+<p>The HMM state &#8220;N&#8221; emits the sequence before the tandem repeat.
+The HMM state &#8220;C&#8221; emits the residual sequence after the tandem repeat.
+The HMM states &#8220;M1&#8221;, &#8220;M2&#8221;, ... can emit sequence within the tandem repeat.
+&#8220;M1&#8221; describes the first amino acid/nucleotide in the repeat unit,
+&#8220;M2&#8221; the second, and so on]. The HMM states &#8220;I1&#8221;, &#8220;I2&#8221;, can emit sequence
+representing insertions within the tandem repeat.</p>
+<p>The transition probabilities between states are stored in <code class="docutils literal"><span class="pre">p_t</span></code>.
+The emission probabilities of every state are stored in <code class="docutils literal"><span class="pre">p_e</span></code>.
+The probabilities for any state to be the null state are stored in <code class="docutils literal"><span class="pre">p_0</span></code>.</p>
+<p>The structure and probabilities defining standard sequence profile HMMs can
+be</p>
+<ul class="simple">
+<li>taken from HMM databases such as PFAM,</li>
+<li>calculated from sequence alignments (here: an alignment of TR units) using for example the HMMER suite,</li>
+<li>defined in house.</li>
+</ul>
+<p>All three ways are implemented here.</p>
+<p>The HMM is used to detect the maximum likelihood occurrence of a TR modeled
+by the HMM on a sequence. The Viterbi algorithm is implemented to do this
+detection.</p>
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.id">
+<code class="descname">id</code><a class="headerlink" href="#tral.hmm.hmm.HMM.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em></p>
+<p>The id describes the origin of the HMM.
+E.g., PFAMID &#8220;PF00069&#8221;.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.states">
+<code class="descname">states</code><a class="headerlink" href="#tral.hmm.hmm.HMM.states" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The names of all states that the HMM contains.
+E.g. [&#8220;N&#8221;, &#8220;M1&#8221;, &#8220;I1&#8221;, &#8220;M2&#8221;, &#8220;I2&#8221;, &#8220;C&#8221;]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.insertion_states">
+<code class="descname">insertion_states</code><a class="headerlink" href="#tral.hmm.hmm.HMM.insertion_states" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The names of all insertion states that
+the HMM contains. E.g. [&#8220;I1&#8221;, &#8220;I2&#8221;]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.match_states">
+<code class="descname">match_states</code><a class="headerlink" href="#tral.hmm.hmm.HMM.match_states" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The names of all match states that the HMM
+contains. E.g. [&#8220;M1&#8221;, &#8220;M2&#8221;]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.l_effective">
+<code class="descname">l_effective</code><a class="headerlink" href="#tral.hmm.hmm.HMM.l_effective" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>The number of states in the HMM.
+E.g. l_effective = 4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.alphabet">
+<code class="descname">alphabet</code><a class="headerlink" href="#tral.hmm.hmm.HMM.alphabet" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em></p>
+<p>The letters that the HMM states can emit.
+E.g. all amino acids in the LG matrix:
+[&#8220;A&#8221;, &#8220;C&#8221;, ...]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.p_t">
+<code class="descname">p_t</code><a class="headerlink" href="#tral.hmm.hmm.HMM.p_t" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict of dict of float</em></p>
+<p>A dictionary
+{state0: {state1: transition probability, ...}, ...}
+between all <cite>states</cite> as log10.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.p_0">
+<code class="descname">p_0</code><a class="headerlink" href="#tral.hmm.hmm.HMM.p_0" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict of dict of float</em></p>
+<p>A dictionary of the null probabilities to
+be in any of the <cite>states</cite>:
+{<cite>states[0]</cite>: 0.1, <cite>states[1]</cite>: 0.2, ...}</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.p_e">
+<code class="descname">p_e</code><a class="headerlink" href="#tral.hmm.hmm.HMM.p_e" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict of dict of float</em></p>
+<p>A dictionary of emission probabilities for
+every state and every letter in <cite>alphabet</cite>:
+{<cite>states[0]</cite>: {<cite>alphabet[0]</cite>: emission probability, ...}, ...}</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tral.hmm.hmm.HMM.hmmer">
+<code class="descname">hmmer</code><a class="headerlink" href="#tral.hmm.hmm.HMM.hmmer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict of dict of float</em></p>
+<p>A dictionary of all information
+extracted from a Hmmer model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create string for HMM instance.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tral.hmm.hmm.HMM.create">
+<em class="property">static </em><code class="descname">create</code><span class="sig-paren">(</span><em>input_format</em>, <em>file=None</em>, <em>repeat=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a HMM instance from 2 possible input formats.</p>
+<p>A <cite>HMM</cite> instance is created from one of the two possible inputs:</p>
+<ul class="simple">
+<li>HMMER3 model</li>
+<li><code class="docutils literal"><span class="pre">Repeat</span></code> instance</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_format</strong> (<em>str</em>) &#8211; The file format of the input file</li>
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to the file containing the HMM parameters
+encoded in the HMMER3 format.</li>
+<li><strong>repeat</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; A Repeat object with an MSA that can be
+transformed into an HMM.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An initialized instance of the <cite>HMM</cite> class.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><cite>HMM</cite></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211;
+if the HMMER3 file provided does not exist.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211;
+if the repeat value provided is not an instance of the
+Repeat class.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211;
+if no parameters are provided to create the HMM from.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Will initialize all HMM&#8217;s in a file but will only return
+the first one.</p>
+</div>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Fix the previous warning (agree on the way how it should be
+done first)</p>
+</div>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tral.hmm.hmm.HMM.create_from_repeat">
+<em class="property">static </em><code class="descname">create_from_repeat</code><span class="sig-paren">(</span><em>tandem_repeat</em>, <em>hmm_copy_path=None</em>, <em>hmm_copy_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.create_from_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.create_from_repeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get HMM parameters (including the alphabet, emission probabilities
+and transition probabilities) from a tandem repeat.</p>
+<p>An HMM is created from <code class="docutils literal"><span class="pre">tandem_repeat</span></code> using <strong class="command">hmmbuild</strong>
+and is saven in the HMMER3 file format.
+Next, HMM parameters are retrieved from the HMMER3 file and returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tandem_repeat</strong> (<a class="reference internal" href="#tral.hmm.hmm_own_model.TR" title="tral.hmm.hmm_own_model.TR"><em>TR</em></a>) &#8211; A Repeat class instance of the TR to be
+transformed into an HMM.</li>
+<li><strong>hmm_copy_path</strong> (<em>str</em>) &#8211; Path to where a copy of the created HMM
+will be stored.
+If None, no copies are saved.</li>
+<li><strong>hmm_copy_id</strong> (<em>str</em>) &#8211; HMM id which will serve as the filename in case
+a copy should be saved.
+If None and <code class="docutils literal"><span class="pre">hmm_copy_path</span></code> is specified the name is
+generated from current date and time combination.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>HMM parameters</strong> &#8211;
+For a sample structure please refer to
+:py:hmm_io.read:.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make sure the id is correctly read in.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.get_direct_transition_probabilities_for_deletions">
+<code class="descname">get_direct_transition_probabilities_for_deletions</code><span class="sig-paren">(</span><em>state_index</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.get_direct_transition_probabilities_for_deletions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.get_direct_transition_probabilities_for_deletions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate updated transition probabilities for HMMs without</dt>
+<dd>deletion states.</dd>
+</dl>
+<p>Calculate updated transition probabilities for HMMs without deletion
+states. Deletion states are non-emitting states. Therefore, they can be
+merged into the remaining emitting states. E.g. M -&gt; D -&gt; I would be
+equivalent to M -&gt; I. The total transition probability from M to I
+would then be the product of the transition probabilities from M to D
+and from D to I (equivalent to the sum of the log10 probabilities.).</p>
+<p>This method translates all deletions following <cite>state</cite> with
+<cite>state_index</cite> into direct match state to match state transitions, and
+returns the new transition probabilities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>state_index</strong> (<em>int</em>) &#8211; The first parameter.</li>
+<li><strong>state</strong> (<em>str</em>) &#8211; The second parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float}: The transition probability from <cite>state</cite> with
+<cite>state_index</cite> to <cite>state1</cite> is calculated for all (?) possible
+<cite>state1</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">{state1</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.hmm_example">
+<code class="descname">hmm_example</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.hmm_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.hmm_example" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Is this method needed?</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.initialise_HMM_structure">
+<code class="descname">initialise_HMM_structure</code><span class="sig-paren">(</span><em>l_effective</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.initialise_HMM_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.initialise_HMM_structure" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Initialise the HMM with all states and standard values for</dt>
+<dd>transition and emission probabilities.</dd>
+</dl>
+<p>Initialise all states
+Set transition probabilities to None/0
+Set initial probability for all states equal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>l_effective</strong> (<em>int</em>) &#8211; The number of match states in the HMM.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tral.hmm.hmm.HMM.read">
+<em class="property">static </em><code class="descname">read</code><span class="sig-paren">(</span><em>hmm_filename</em>, <em>id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read HMM file in HMMER3 format.</p>
+<p>HMMER3 file format is described in detail in
+<a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>,
+section 8.</p>
+<p>The general file format is:</p>
+<div class="highlight-python"><div class="highlight"><pre>HMMER3/b [3.0b2 | June 2009]
+NAME fn3
+ACC PF00041.12
+DESC Fibronectin type III domain
+LENG 86
+ALPH amino
+(...)
+
+HMM          A       C       D       E       F       G       H       I    (...)    Y
+            m-&gt;m    m-&gt;i    m-&gt;d    i-&gt;m    i-&gt;i    d-&gt;m    d-&gt;d
+  COMPO   2.70271 4.89246 3.02314 2.64362 3.59817 2.82566 3.74147 3.08574 (...) 3.22607
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.00000       *
+  1       3.16986 5.21447 4.52134 3.29953 4.34285 4.18764 4.30886 3.35801 (...) 3.93889 1 - -
+          2.68629 4.42236 2.77530 2.73088 3.46365 2.40512 3.72505 3.29365 (...) 3.61514
+          0.09796 2.38361 6.81068 0.10064 2.34607 0.48576 0.95510
+  2       2.70230 5.97353 2.24744 2.62947 5.31433 2.60356 4.43584 4.79731 (...) 4.25623 3 - -
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.48576 0.95510
+  (...)
+  86      3.03720 5.94099 3.75455 2.96917 5.26587 2.91682 3.66571 4.11840 (...) 4.99111 121 - E
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00227 6.08723       * 0.61958 0.77255 0.00000       *
+//
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The probabilities in this format are stored as negative
+natural log probabilities, e.g. -ln(0.25) = 1.38629. The special case
+of 0 probability is stored as <code class="docutils literal"><span class="pre">*</span></code> which in fact means -∞ (minus
+infinity).</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to the file with model data in the HMMER3
+file format.</li>
+<li><strong>id</strong> (<em>str, optional</em>) &#8211; The identifier for the model to be returned.
+E.g. for Pfam the <code class="docutils literal"><span class="pre">id</span></code> can look like this: &#8216;PF00560&#8217;.
+If defined, the function returns only the HMM with an identifier
+that matches the provided id. If a model in the file does not have
+an identifier to check against, it is skipped.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A dictionary of parameters required to initialise the HMM
+including the id, alphabet, emission probabilities and transition
+probabilities.</p>
+<p>Output format:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &#39;id&#39;: &#39;PF08261.7&#39;,
+    &#39;letters&#39;: [&#39;A&#39;, &#39;C&#39;, &#39;D&#39;, ..., &#39;Y&#39;],
+    &#39;COMPO&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+          &#39;emissions&#39;: [2.28205, 5.14899, ..., 1.92022],
+          &#39;transitions&#39;: [0.01467, 4.62483, ..., -inf]},
+    &#39;1&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [1.00089, 4.54999, ..., 5.23581],
+         &#39;transitions&#39;: [0.01467, 4.62483, ..., 0.95510]},
+    ...
+    &#39;8&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [4.12723, 5.39816, ..., 4.58094],
+         &#39;transitions&#39;: [0.00990, 4.62006, ..., -inf]}
+}
+</pre></div>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">hmm_io.read()</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.set_circle_transition_probability_hmmer3">
+<code class="descname">set_circle_transition_probability_hmmer3</code><span class="sig-paren">(</span><em>l_transition_probabilities</em>, <em>final_state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.set_circle_transition_probability_hmmer3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.set_circle_transition_probability_hmmer3" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Calculate transition probabilites between states that exist due to</dt>
+<dd>the circularity of the tandem repeat HMM.</dd>
+</dl>
+<p>In HMMER3 models, no transition in circle from the last match state to
+the first match state are included.</p>
+<p>Values need to be found for the following transitions:
+m-&gt;m    m-&gt;i    m-&gt;d    i-&gt;m    i-&gt;i    d-&gt;m    d-&gt;d</p>
+<p>Compare <a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>
+pp.84-85.</p>
+<p>Input: -ln(p) Output: Also -ln(p&#8217;)</p>
+<p>When the HMM only has a single match state, i.e. l_effective == 1, the
+final match state equals the only match state, and no transition
+probabilities can be calculated via averaging over all other states.
+Therefore, the its transition probabilities remain unchanged.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>l_transition_probabilities</strong> (<em>list of float</em>) &#8211; The first parameter.</li>
+<li><strong>final_state</strong> (<em>str</em>) &#8211; The second parameter.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">transition probabilities</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.set_emission_probability_hmmer3">
+<code class="descname">set_emission_probability_hmmer3</code><span class="sig-paren">(</span><em>state</em>, <em>l_emission_probabilities</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.set_emission_probability_hmmer3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.set_emission_probability_hmmer3" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Convert and set emission probabilities from HMMER3 file to class</dt>
+<dd>attribute.</dd>
+</dl>
+<p>Set p_e of states to <cite>l_emission_probabilities</cite> for <cite>state</cite> given
+<cite>self.alphabet</cite>.
+In HMMER3 data, emission probabilities are -ln(p).</p>
+<p>It is e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre>self.alphabet =
+[&#39;A&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;, &#39;H&#39;, &#39;I&#39;, &#39;K&#39;, &#39;L&#39;, &#39;M&#39;, &#39;N&#39;, &#39;P&#39;, &#39;Q&#39;,
+ &#39;R&#39;, &#39;S&#39;, &#39;T&#39;, &#39;V&#39;, &#39;W&#39;, &#39;Y&#39;]
+</pre></div>
+</div>
+<p>Return log10(p), that is convert between the two. Conversion:
+p_Local = - p_HMM * log10(e)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state</strong> (<em>str</em>) &#8211; The state of the HMM. E.g. the fourth match state &#8216;M4&#8217;.</li>
+<li><strong>l_emission_probabilities</strong> (<em>list of float</em>) &#8211; E.g.
+[&#8216;3.27687&#8217;, &#8216;2.31397&#8217;, &#8216;3.32252&#8217;, &#8216;3.12746&#8217;, &#8216;2.89175&#8217;,
+&#8216;3.34719&#8217;, &#8216;2.28730&#8217;, &#8216;3.54139&#8217;, &#8216;2.53154&#8217;, &#8216;2.64774&#8217;,
+&#8216;3.75733&#8217;, &#8216;3.23860&#8217;, &#8216;3.57894&#8217;, &#8216;3.26290&#8217;, &#8216;2.66343&#8217;,
+&#8216;2.61544&#8217;, &#8216;2.91770&#8217;, &#8216;3.26739&#8217;, &#8216;5.09378&#8217;, &#8216;3.16816&#8217;]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.set_transition_probability_hmmer3">
+<code class="descname">set_transition_probability_hmmer3</code><span class="sig-paren">(</span><em>state_index</em>, <em>l_transition_probabilities</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.set_transition_probability_hmmer3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.set_transition_probability_hmmer3" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Convert and assign transition probabilities from a HMMER3 file to</dt>
+<dd>HMM attribute <cite>p_t</cite>.</dd>
+</dl>
+<p>Convert and assign transition probabilities from a HMMER3 file to
+HMM attribute <cite>p_t</cite>.
+Set <code class="docutils literal"><span class="pre">p_t</span></code> of states to <code class="docutils literal"><span class="pre">l_transition_probabilities</span></code> for the
+<code class="docutils literal"><span class="pre">state_index</span></code> th state.</p>
+<p>In HMMER3 data, transition probabilities are -ln(p).
+Return log10(p), i.d. convert between the two.
+Conversion: p_Local = - p_HMM * log10(e)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state_index</strong> (<em>int</em>) &#8211; E.g. 4</li>
+<li><strong>l_transition_probabilities</strong> (<em>list of float</em>) &#8211; A list of transition
+probabilities as found in a single row for a certain state in
+HMMER3 files. E.g. [&#8216;0.00021&#8217;, &#8216;8.85487&#8217;, &#8216;9.57722&#8217;, &#8216;0.61958&#8217;,
+&#8216;0.77255&#8217;, &#8216;0.48576&#8217;, &#8216;0.95510&#8217;]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm.HMM.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>file</em>, <em>output_format</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#HMM.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.HMM.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write <code class="docutils literal"><span class="pre">HMM</span></code> to file.</p>
+<p>Write <code class="docutils literal"><span class="pre">HMM</span></code> to file. Currently, only pickle is implemented.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to input file</li>
+<li><strong>output_format</strong> (<em>str</em>) &#8211; Either &#8220;fasta&#8221;, &#8220;pickle&#8221; or &#8220;stockholm&#8221;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write checks for <code class="docutils literal"><span class="pre">format</span></code> and <code class="docutils literal"><span class="pre">file</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm.hmmer3_emission_probabilities">
+<code class="descclassname">tral.hmm.hmm.</code><code class="descname">hmmer3_emission_probabilities</code><span class="sig-paren">(</span><em>hmmer_probabilities</em>, <em>letters</em>, <em>l_match</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm.html#hmmer3_emission_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm.hmmer3_emission_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emission probabilities from hmmer3 hmm file.
+In hmm file, emission probabilities are -ln(p).
+Return log10(p), i.d. convert between the two.
+Conversion: p_Local = - p_HMM * log10(e)</p>
+<p>Parameters (e.g.):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">letters</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">]</span>
+<span class="n">l_match</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Return format (pseudo code):
+[{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in l_match]</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tral.hmm.hmm_io">
+<span id="hmm-io"></span><h2>hmm_io<a class="headerlink" href="#module-tral.hmm.hmm_io" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Input/output for hmms.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="tral.hmm.hmm_io.read">
+<code class="descclassname">tral.hmm.hmm_io.</code><code class="descname">read</code><span class="sig-paren">(</span><em>hmm_filename</em>, <em>id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_io.html#read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_io.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read HMM file in HMMER3 format.</p>
+<p>HMMER3 file format is described in detail in
+<a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>,
+section 8.</p>
+<p>The general file format is:</p>
+<div class="highlight-python"><div class="highlight"><pre>HMMER3/b [3.0b2 | June 2009]
+NAME fn3
+ACC PF00041.12
+DESC Fibronectin type III domain
+LENG 86
+ALPH amino
+(...)
+
+HMM          A       C       D       E       F       G       H       I    (...)    Y
+            m-&gt;m    m-&gt;i    m-&gt;d    i-&gt;m    i-&gt;i    d-&gt;m    d-&gt;d
+  COMPO   2.70271 4.89246 3.02314 2.64362 3.59817 2.82566 3.74147 3.08574 (...) 3.22607
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.00000       *
+  1       3.16986 5.21447 4.52134 3.29953 4.34285 4.18764 4.30886 3.35801 (...) 3.93889 1 - -
+          2.68629 4.42236 2.77530 2.73088 3.46365 2.40512 3.72505 3.29365 (...) 3.61514
+          0.09796 2.38361 6.81068 0.10064 2.34607 0.48576 0.95510
+  2       2.70230 5.97353 2.24744 2.62947 5.31433 2.60356 4.43584 4.79731 (...) 4.25623 3 - -
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00338 6.08833 6.81068 0.61958 0.77255 0.48576 0.95510
+  (...)
+  86      3.03720 5.94099 3.75455 2.96917 5.26587 2.91682 3.66571 4.11840 (...) 4.99111 121 - E
+          2.68618 4.42225 2.77519 2.73123 3.46354 2.40513 3.72494 3.29354 (...) 3.61503
+          0.00227 6.08723       * 0.61958 0.77255 0.00000       *
+//
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The probabilities in this format are stored as negative
+natural log probabilities, e.g. -ln(0.25) = 1.38629. The special case
+of 0 probability is stored as <code class="docutils literal"><span class="pre">*</span></code> which in fact means -∞ (minus
+infinity).</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to the file with model data in the HMMER3
+file format.</li>
+<li><strong>id</strong> (<em>str, optional</em>) &#8211; The identifier for the model to be returned.
+E.g. for Pfam the <code class="docutils literal"><span class="pre">id</span></code> can look like this: &#8216;PF00560&#8217;.
+If defined, the function returns only the HMM with an identifier
+that matches the provided id. If a model in the file does not have
+an identifier to check against, it is skipped.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A dictionary of parameters required to initialise the HMM
+including the id, alphabet, emission probabilities and transition
+probabilities.</p>
+<p>Output format:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &#39;id&#39;: &#39;PF08261.7&#39;,
+    &#39;letters&#39;: [&#39;A&#39;, &#39;C&#39;, &#39;D&#39;, ..., &#39;Y&#39;],
+    &#39;COMPO&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+          &#39;emissions&#39;: [2.28205, 5.14899, ..., 1.92022],
+          &#39;transitions&#39;: [0.01467, 4.62483, ..., -inf]},
+    &#39;1&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [1.00089, 4.54999, ..., 5.23581],
+         &#39;transitions&#39;: [0.01467, 4.62483, ..., 0.95510]},
+    ...
+    &#39;8&#39;:
+        {&#39;insertion_emissions&#39;: [2.68618, 4.42225, ..., 3.61503],
+         &#39;emissions&#39;: [4.12723, 5.39816, ..., 4.58094],
+         &#39;transitions&#39;: [0.00990, 4.62006, ..., -inf]}
+}
+</pre></div>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_io.read_HMMER_acc_lengths">
+<code class="descclassname">tral.hmm.hmm_io.</code><code class="descname">read_HMMER_acc_lengths</code><span class="sig-paren">(</span><em>hmm_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_io.html#read_HMMER_acc_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_io.read_HMMER_acc_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of
+each model.</p>
+<p>Read HMM file in HMMER3 format. Return the PFAM ID and the lengths of
+each model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to HMMER3 file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">int): The number of match states for all HMM models in
+<code class="docutils literal"><span class="pre">hmm_filename</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(dict of str<span class="target" id="index-4"></span><div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Decide whether this function is needed.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_io.split_HMMER3_file">
+<code class="descclassname">tral.hmm.hmm_io.</code><code class="descname">split_HMMER3_file</code><span class="sig-paren">(</span><em>hmm_filename</em>, <em>resultdir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_io.html#split_HMMER3_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_io.split_HMMER3_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split HMMER3 models from a single file <code class="docutils literal"><span class="pre">hmm_filename</span></code> into many files
+in <code class="docutils literal"><span class="pre">resultdir</span></code>.</p>
+<p>Helper function: split HMMER3 models from a single file <code class="docutils literal"><span class="pre">hmm_filename</span></code>
+into many files in <code class="docutils literal"><span class="pre">resultdir</span></code>. The models are named after the HMM
+accession.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hmm_filename</strong> (<em>str</em>) &#8211; Path to HMMER3 file.</li>
+<li><strong>resultdir</strong> (<em>str</em>) &#8211; Path to directory where result files are stored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_io.to_fixed_width">
+<code class="descclassname">tral.hmm.hmm_io.</code><code class="descname">to_fixed_width</code><span class="sig-paren">(</span><em>n</em>, <em>max_width</em>, <em>allow_overflow=True</em>, <em>do_round=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_io.html#to_fixed_width"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_io.to_fixed_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a float to a fixed-width string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> (<em>-</em>) &#8211; number to format</li>
+<li><strong>max_width</strong> (<em>-</em>) &#8211; width of output string</li>
+<li><strong>allow_overflow</strong> (<em>-</em>) &#8211; allow the result to be larger than max_width for
+large n? Raises OverflowError if False</li>
+<li><strong>do_round</strong> (<em>-</em>) &#8211; Round final digit?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(str)   string representation of n, either padded or rounded to have
+max_width characters</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_io.write_HMMER">
+<code class="descclassname">tral.hmm.hmm_io.</code><code class="descname">write_HMMER</code><span class="sig-paren">(</span><em>hmm</em>, <em>hmm_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_io.html#write_HMMER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_io.write_HMMER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write &lt;hmm&gt; too &lt;hmm_filename&gt; in HMMER3 format.</p>
+<p>See Section 8 (File Formats) of
+<a class="reference external" href="ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf">ftp://selab.janelia.org/pub/software/hmmer3/3.0/Userguide.pdf</a>
+for the file format specification.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hmm</strong> (<a class="reference internal" href="#tral.hmm.hmm.HMM" title="tral.hmm.hmm.HMM"><em>HMM</em></a>) &#8211; HMM object to write</li>
+<li><strong>hmm_file</strong> (<em>str or file</em>) &#8211; filename or file-like object to write to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tral.hmm.hmm_own_model">
+<span id="hmm-own-model"></span><h2>hmm_own_model<a class="headerlink" href="#module-tral.hmm.hmm_own_model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tral.hmm.hmm_own_model.HMM">
+<em class="property">class </em><code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">HMM</code><span class="sig-paren">(</span><em>tandem_repeat=None</em>, <em>prior_divergence=None</em>, <em>prior_indel_insertion=None</em>, <em>parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cyclic HMM applicable to describe sequence Tandem Repeats</p>
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_TR">
+<code class="descname">HMM_from_TR</code><span class="sig-paren">(</span><em>tandem_repeat</em>, <em>prior_divergence=None</em>, <em>prior_indel_insertion=None</em>, <em>emission_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_TR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_TR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a HMM from a TR &lt;tandem_repeat&gt;.
+Two step approach: First, calc the posterior of the ancestral sequence
+Then, calculate the likelihood of the homologous repeat unit sequence.</p>
+<p>Parameters:
+&lt;prior_divergence&gt; is {&#8216;type&#8217;: &#8216;alpha&#8217;/&#8217;fixed_value&#8217;, &#8216;value&#8217;: 4}
+&lt;prior_indel_insertion&gt; is {&#8216;mu&#8217;: 0.5, &#8216;sigma_squared&#8217;: 0.81}</p>
+<p>Store probabilities as log10arithms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_TR_One_step">
+<code class="descname">HMM_from_TR_One_step</code><span class="sig-paren">(</span><em>tandem_repeat</em>, <em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_TR_One_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_TR_One_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a HMM from a TR alignment given the ML divergence t.
+One step approach: Calc the posterior of the ancestral sequence and use it
+as the likelihood of the homologous repeat unit sequence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.HMM_from_file">
+<code class="descname">HMM_from_file</code><span class="sig-paren">(</span><em>hmm_file</em>, <em>accession</em>, <em>prior_indel_insertion</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.HMM_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.HMM_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a HMM from hmm_file
+Store probabilities as log10arithms.</p>
+<p>Parameters:
+&lt;hmm_file&gt; = &#8216;path//to/file.hmm&#8217;
+&lt;accession&gt; = &#8216;PF00560&#8217;
+&lt;prior_indel_insertion&gt; = {&#8216;mu&#8217;: 0.5, &#8216;sigma_squared&#8217;: 0.81}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.hmm.hmm_own_model.HMM.initialise_HMM_structure">
+<code class="descname">initialise_HMM_structure</code><span class="sig-paren">(</span><em>l_effective</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#HMM.initialise_HMM_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.HMM.initialise_HMM_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialise all states
+Set transition probabilities to None/0
+Set initial probability for all states equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tral.hmm.hmm_own_model.TR">
+<em class="property">class </em><code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">TR</code><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#TR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.TR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fake interim TR class</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_MAP_Indel_length_Zipfian_factor</code><span class="sig-paren">(</span><em>indel_lengths</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_Indel_length_Zipfian_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_Zipfian_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the MAP Zipfian constant &lt;indel_zipf&gt; that determines the distribution of
+indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular
+column.
+The probability distribution of indel lengths is assumed to follow the Zipfian distribution
+(Compare</p>
+<blockquote>
+<div>Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
+Mol Biol Evol, 26, 1879–1888.</div></blockquote>
+<p>In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
+<p>The MAP is calculated numerically, as there did not seem to be a nice analytical solution.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_MAP_Indel_length_exponential_factor</code><span class="sig-paren">(</span><em>indel_lengths</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_Indel_length_exponential_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_Indel_length_exponential_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the MAP Exponential decay constant &lt;alpha&gt; that determines the distribution of
+indel lengths. Assume a Gaussian prior. Input is a list of &lt;indel_lengths&gt; for a particular
+column.</p>
+<p>The MAP is calculated numerically, as no nice analytical solution has been found so far.
+A power function of grade 3 needs to be solved:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>0 == prior[&#8216;sigma_squared&#8217;]*(sum(indel_lengths) - len(indel_lengths)) -</dt>
+<dd>alpha*(prior[&#8216;sigma_squared&#8217;]*sum(indel_lengths) + prior[&#8216;mu&#8217;]) +
+(alpha**2)*(1 + prior[&#8216;mu&#8217;]) - alpha**3</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_MAP_indel_rate">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_MAP_indel_rate</code><span class="sig-paren">(</span><em>nIndels</em>, <em>n</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_MAP_indel_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_MAP_indel_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the MAP indel_rate per repeat unit and site given
+- an assumed prior distribution of the indel rate described by the dict &lt;prior&gt;
+- the likelihood of the the observed number of indels &lt;nIndels&gt;.</p>
+<p>posterior ~ likelihood * prior
+Derive the posterior with respect to the indel_rate
+Set the result equal to 0
+Solve with respect to the MAP of the indel_rate.</p>
+<p>For nIndels in {0,1} it is possible to derive the MAP indel_rate analytically.
+For all other cases, the maximum of the posterior distribution needs to be found
+in good approximation algorithmically.</p>
+<p>ln(posterior) ~ ln(likelihood) + ln(prior)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_log10_indel_probability">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_log10_indel_probability</code><span class="sig-paren">(</span><em>nIndels</em>, <em>n</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_log10_indel_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_log10_indel_probability" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the probabilty of an indel per site and per repeat unit
+from the MAP estimate of the indel rate, given</p>
+<ul class="simple">
+<li>the &lt;divergence&gt; of the repeat units</li>
+<li>a &lt;prior&gt; on the indel rates (normal distributed)</li>
+<li>the number of indels &lt;nIndels&gt; in this column</li>
+<li>the total length &lt;n&gt; of this column</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">calculate_log10_probability_indel_lengths</code><span class="sig-paren">(</span><em>indel_lengths</em>, <em>indel_length_max</em>, <em>type='zipf'</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#calculate_log10_probability_indel_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.calculate_log10_probability_indel_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the probability of indels of different length until a maximum length &lt;indel_length_max&gt;,
+assuming that either</p>
+<p>type == &#8216;zipf&#8217;
+indel lengths are distributed following a Zipfian distribution with parameter &lt;indel_zipf&gt;.
+(Compare:</p>
+<blockquote>
+<div>Fletcher,W. and Yang,Z. (2009) INDELible: a flexible simulator of biological sequence evolution.
+Mol Biol Evol, 26, 1879–1888.</div></blockquote>
+<p>In their publication, &lt;indel_zipf&gt; is denoted as &lt;a&gt;, the gap lengths as &lt;u&gt;.)</p>
+<p>or
+type == &#8216;exponential&#8217;
+indels lengths are distributed following a (1-alpha)*(alpha^(l-1)) distribution.
+[Is this model already used? Probably yes. How can i cite it?]</p>
+<p>A good choice for &lt;indel_length_max&gt; when building HMMs for tandem repeats is &lt;l_effective-1&gt;, as a deletion, that
+includes a complete repeat unit, will not be visible in the tandem repeat unit alignment, and could therefore
+be ignored.</p>
+<p>Return the probabilities as a list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.derivative_log_posterior">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">derivative_log_posterior</code><span class="sig-paren">(</span><em>indel_rate</em>, <em>prior</em>, <em>n</em>, <em>nIndels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#derivative_log_posterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.derivative_log_posterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>assuming that on each site on each repeat unit, an in/del event has occured, or not.
+Thus, the likelihood of a certain number of in/del events follows the binomial distribution.
+The prior is assumed to be a gaussian described by prior.</p>
+<p>Return the derivative with respect to &lt;indel_rate&gt; of the natural logarithm of the posterior
+probability of &lt;nIndels&gt;, calculated as the product of likelihood and prior. The
+normalisation factor is ignored for the moment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.divergence_from_FP_simulations">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">divergence_from_FP_simulations</code><span class="sig-paren">(</span><em>l</em>, <em>alpha=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#divergence_from_FP_simulations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.divergence_from_FP_simulations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which HMM divergence sets the average FP-rate
+(i.e. the number of falsely positively assigend amino acid on either flanking side to a perfect TR)
+to in total alpha*l</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.hmmer3_emission_probabilities">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">hmmer3_emission_probabilities</code><span class="sig-paren">(</span><em>hmmer_probabilities</em>, <em>letters</em>, <em>lMatch</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#hmmer3_emission_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.hmmer3_emission_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get emission probabilities from hmmer3 hmm file.
+In hmm file, emission probabilities are -ln(p).
+Return log10(p), i.d. convert between the two. Conversion: p_Local = - p_HMM * log10(e)</p>
+<p>Parameters (e.g.):
+letters = [&#8216;A&#8217;, &#8216;C&#8217;, &#8216;E&#8217;, &#8216;D&#8217;, &#8216;G&#8217;, &#8216;F&#8217;, &#8216;I&#8217;, &#8216;H&#8217;, &#8216;K&#8217;, &#8216;M&#8217;, &#8216;L&#8217;, &#8216;N&#8217;, &#8216;Q&#8217;, &#8216;P&#8217;, &#8216;S&#8217;, &#8216;R&#8217;, &#8216;T&#8217;, &#8216;W&#8217;, &#8216;V&#8217;, &#8216;Y&#8217;]
+lMatch = [&#8216;M&#8217;+str(i) for i in range(24)]</p>
+<p>Return format (pseudo code):
+[{iA: np.log10(p(iA,iM)) for iA in alphabet.keys()} for iM in lMatch]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.loglikelihood_substitution">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">loglikelihood_substitution</code><span class="sig-paren">(</span><em>t</em>, <em>Q</em>, <em>eqFreq</em>, <em>alphabet</em>, <em>tandem_repeat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#loglikelihood_substitution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.loglikelihood_substitution" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the likelihood of a repeat assuming a star tree and a sequence model
+defined by Q, t, eqFreq and alphabet.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_own_model.test">
+<code class="descclassname">tral.hmm.hmm_own_model.</code><code class="descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_own_model.html#test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_own_model.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>To be implemented...</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tral.hmm.hmm_viterbi">
+<span id="hmm-viterbi"></span><h2>hmm_viterbi<a class="headerlink" href="#module-tral.hmm.hmm_viterbi" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Viterbi algorithm for circular hidden Markov models.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.distance_index">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">distance_index</code><span class="sig-paren">(</span><em>i</em>, <em>j</em>, <em>length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#distance_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.distance_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to calculate the distance between two indices in a
+circular HMM.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>i</strong> (<em>int</em>) &#8211; first index</li>
+<li><strong>j</strong> (<em>int</em>) &#8211; second index</li>
+<li><strong>length</strong> (<em>int</em>) &#8211; length of the HMM</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance between the indices <code class="docutils literal"><span class="pre">i</span></code> and <code class="docutils literal"><span class="pre">j</span></code>: As the HMM
+is circular <code class="docutils literal"><span class="pre">j</span></code> may have a smaller value than <code class="docutils literal"><span class="pre">i</span></code>, even though
+<code class="docutils literal"><span class="pre">j</span></code> is ahead of <code class="docutils literal"><span class="pre">i</span></code>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">May be replaced by a simple mod, as distance_index is used only
+once in the code at current.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">hmm_path_to_aligned_tandem_repeat_units</code><span class="sig-paren">(</span><em>sequence</em>, <em>most_likely_path</em>, <em>l_effective</em>, <em>translate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#hmm_path_to_aligned_tandem_repeat_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.hmm_path_to_aligned_tandem_repeat_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>WARNING: Currently do not rely on this function!!
+The output seems to have missing characters and too much gaps.
+The function needs review in order to be used.
+todo: fix hidden bug!</p>
+<dl class="docutils">
+<dt>Convert a viterbi path in an hmm of length <code class="docutils literal"><span class="pre">l_effective</span></code> on the</dt>
+<dd>sequence into a corresponding tandem repeat.</dd>
+</dl>
+<p>Extract the tandem repeat alignment from a sequence given a Viterbi path.
+Use alignment information in the Viterbi path. For example, all emissions
+labelled with M1 (match state 1) align according to the HMM. Insert gaps
+for insertions and deletions accordingly.
+Thus, for example the first characters in the repeat units do necessarily
+align, albeit some of them may be gaps. Also, all repeat units are
+necessarily of same length.</p>
+<p>Assume that all states are counted starting on 0, unless the <code class="docutils literal"><span class="pre">translate</span></code>
+flag is set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequence</strong> (<em>str</em>) &#8211; A sequence as a string.</li>
+<li><strong>most_likely_path</strong> (<em>list of str</em>) &#8211; a Viterbi path.</li>
+<li><strong>l_effective</strong> (<em>int</em>) &#8211; length of the HMM used to create the Viterbi paths.</li>
+<li><strong>translate</strong> (<em>bool</em>) &#8211; This function assumes that HMM states are enumerated
+starting on 0.
+If the HMM states are enumerated starting on 1, set this flag for
+transformation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>The function returns a tuple consisting of 3 values.
+The tuple contains:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">msa</span></code>: A repeat instance.</li>
+<li><code class="docutils literal"><span class="pre">begin</span></code>: The start index of the repeat on the sequence.</li>
+<li><code class="docutils literal"><span class="pre">shift</span></code>: The index of the HMM where the cut between repeat units is set.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">[None].</p>
+</div>
+<div class="admonition-todo admonition" id="index-6">
+<p class="first admonition-title">Todo</p>
+<p class="last">Use sequence instance instead of just a string?</p>
+</div>
+<div class="admonition-todo admonition" id="index-7">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check: How is the returned <cite>begin</cite> defined? Starting counting on 0 or 1?
+Is it the index of the last flanking character, or the first repeat character?</p>
+</div>
+<div class="admonition-todo admonition" id="index-8">
+<p class="first admonition-title">Todo</p>
+<p class="last">Can we update this function, e.g. to not assume that HMM states start on 0?</p>
+</div>
+<div class="admonition-todo admonition" id="index-9">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check the docstring, reformat returns.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.hmm_path_to_maximal_complete_tandem_repeat_units">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">hmm_path_to_maximal_complete_tandem_repeat_units</code><span class="sig-paren">(</span><em>sequences</em>, <em>paths</em>, <em>l_effective</em>, <em>alpha=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#hmm_path_to_maximal_complete_tandem_repeat_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.hmm_path_to_maximal_complete_tandem_repeat_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert several viterbi paths of a hmm on several sequences into the
+corresponding hmm units.</p>
+<p>Be ungreedy: Start from the last index in the cluster of all start state
+and end state indices.</p>
+<p>Only integrate repeat units that are at least alpha complete (be it before
+of after)
+If you prefer absolute number of characters to filter which repeat units
+are used, and which not, change this in two occurrences of alpha.</p>
+<p>Assume that all states are counted starting on 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequences</strong> (<em>list of str</em>) &#8211; A list of sequences.</li>
+<li><strong>paths</strong> (<em>list of list of str</em>) &#8211; A list of Viterbi paths</li>
+<li><strong>l_effective</strong> (<em>int</em>) &#8211; length of the HMM used to create the Viterbi paths.</li>
+<li><strong>alpha</strong> (<em>Float</em>) &#8211; alpha element [0,1].</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of multiple sequence alignments (MSAs) in the form of a list of
+list of str, e.g. <code class="docutils literal"><span class="pre">[['ATAILC',</span> <span class="pre">'ATAILC',</span> <span class="pre">'ACALKG'],</span> <span class="pre">...]</span></code>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211;
+If alpha is not in [0,1].</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-10">
+<p class="first admonition-title">Todo</p>
+<p class="last">Use sequence instances instead of just strings for <cite>sequences</cite>?</p>
+</div>
+<div class="admonition-todo admonition" id="index-11">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check example for returns.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">hmm_path_to_non_aligned_tandem_repeat_units</code><span class="sig-paren">(</span><em>sequence</em>, <em>path</em>, <em>l_effective</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#hmm_path_to_non_aligned_tandem_repeat_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.hmm_path_to_non_aligned_tandem_repeat_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a viterbi &lt;path&gt; of a hmm of length &lt;l_effective&gt; on &lt;sequence&gt;
+into the corresponding tandem repeat</p>
+<p>Extract the tandem repeat alignment from a sequence given a Viterbi path.
+Ignore the alignment information in the Viterbi path. For example, all
+emissions labelled with M1 (match state 1) align according to the HMM.
+However, this method does not use this information. Therefore, for example
+the first characters in the repeat units do not necessarily align, and the
+repeat units are not necessarily of same length.</p>
+<p>Assume that all states are counted starting on 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequence</strong> (<em>str</em>) &#8211; A sequence as a string.</li>
+<li><strong>paths</strong> (<em>list of list of str</em>) &#8211; A list of Viterbi paths</li>
+<li><strong>l_effective</strong> (<em>int</em>) &#8211; length of the HMM used to create the Viterbi paths.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A multiple sequence alignment (MSA) created from the most likely path
+along the hmm in the form of a list of str.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-12">
+<p class="first admonition-title">Todo</p>
+<p class="last">Use sequence instance instead of string for input?</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.logodds">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">logodds</code><span class="sig-paren">(</span><em>hmm</em>, <em>emission</em>, <em>logprob</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#logodds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.logodds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the log-odds score of the given emission</p>
+<p>Log odds is defined as:</p>
+<blockquote>
+<div>LO = log10 Pr[viterbi probability]/Pr[null]</div></blockquote>
+<p>where the null model is given by a constant background frequency f(x) for each amino acid:</p>
+<blockquote>
+<div>Pr[null] = sum(f(x) for x in emission)</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm</strong> (<em>-</em>) &#8211; hmm used to calculate logprob</li>
+<li><strong>emission</strong> (<em>-</em>) &#8211; emitted residues</li>
+<li><strong>logprob</strong> (<em>-</em>) &#8211; log10 of the match probability, as returned by viterby_with_prob</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float) LO</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.probability_of_the_former_state">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">probability_of_the_former_state</code><span class="sig-paren">(</span><em>i_former</em>, <em>iS</em>, <em>iE</em>, <em>p_e</em>, <em>p_t</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#probability_of_the_former_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.probability_of_the_former_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the probability of i_former, given iS and iE together with
+the dicts of emission and transition probabilities.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.viterbi">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">viterbi</code><span class="sig-paren">(</span><em>hmm</em>, <em>emission</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#viterbi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.viterbi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the most probable sequence of states given a sequence of
+emissions and a HMM using the Viterbi algorithm</p>
+<p>Get local copies of all variables.
+All probabilities must be given as logarithms
+Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with
+Lysine (K) [Reason: Seldom AAs that are not part of standard amino acid
+substitution models.]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm</strong> (<a class="reference internal" href="#module-tral.hmm.hmm" title="tral.hmm.hmm"><em>hmm</em></a>) &#8211; An instance of the HMM class.</li>
+<li><strong>emission</strong> (<a class="reference internal" href="sequence.html#module-tral.sequence.sequence" title="tral.sequence.sequence"><em>sequence</em></a>) &#8211; An instance of the Sequence class.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The most likely sequence of hmm states to emit the sequence in the
+form of a list of str, or None if it does not meet the configured thresholds</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Configuration:</dt>
+<dd>filter.basic.dict.n_effective.threshold: minimum (sequence length/hmm l_effective)
+hmm.l_effective_max: Max HMM size
+[AA|DNA].ambiguous_chars: Combine probabilities of ambiguous residues</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.hmm.hmm_viterbi.viterbi_with_prob">
+<code class="descclassname">tral.hmm.hmm_viterbi.</code><code class="descname">viterbi_with_prob</code><span class="sig-paren">(</span><em>hmm</em>, <em>emission</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/hmm/hmm_viterbi.html#viterbi_with_prob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.hmm.hmm_viterbi.viterbi_with_prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the most probable sequence of states given a sequence of
+emissions and a HMM using the Viterbi algorithm, as well as the probability    of that path</p>
+<p>Get local copies of all variables.
+All probabilities must be given as logarithms
+Replace Selenocysteine (U) with Cysteine (C), replace Pyrrolysine (O) with
+Lysine (K) [Reason: Seldom AAs that are not part of standard amino acid
+substitution models.]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hmm</strong> (<a class="reference internal" href="#module-tral.hmm.hmm" title="tral.hmm.hmm"><em>hmm</em></a>) &#8211; An instance of the HMM class.</li>
+<li><strong>emission</strong> (<a class="reference internal" href="sequence.html#module-tral.sequence.sequence" title="tral.sequence.sequence"><em>sequence</em></a>) &#8211; An instance of the Sequence class.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Tuple (path, probability)
+- The most likely sequence of hmm states to emit the sequence in the
+form of a list of str, or None if it does not meet the configured thresholds
+- The log10 probability of that path (-inf if path is None)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Configuration:</dt>
+<dd>filter.basic.dict.n_effective.threshold: minimum (sequence length/hmm l_effective)
+hmm.l_effective_max: Max HMM size
+[AA|DNA].ambiguous_chars: Combine probabilities of ambiguous residues</dd>
+</dl>
+<div class="admonition-todo admonition" id="index-13">
+<p class="first admonition-title">Todo</p>
+<p class="last">Adapt docstrings to refactored Viterbi -&gt; Viterbi_path classes.</p>
+</div>
+<div class="admonition-todo admonition" id="index-14">
+<p class="first admonition-title">Todo</p>
+<p class="last">Check: Do you need local copies of all variables?</p>
+</div>
+<div class="admonition-todo admonition" id="index-15">
+<p class="first admonition-title">Todo</p>
+<p class="last">Do the functions related to viterbi need to be summarized (e.g.
+in one class?) How do they relate to the Sequence class, or the
+HMM class?</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>
