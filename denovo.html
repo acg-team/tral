@@ -173,7 +173,7 @@ defined in the <a class="reference internal" href="configure.html#configure"><sp
     <span class="n">iSequence</span><span class="o">.</span><span class="n">set_repeatlist</span><span class="p">(</span><span class="n">iTandem_repeats</span><span class="p">,</span> <span class="s2">&quot;denovo&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Different different algorithms usually detect different tandem repeats. This the the
+<p>Different algorithms usually detect different tandem repeats. This the the
 absolute number of detections in the HIV proteome for a couple of algorithms:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">sequences_HIV</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">get_repeatlist</span><span class="p">(</span><span class="s1">&#39;denovo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">repeats</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">TRD</span> <span class="o">==</span> <span class="s2">&quot;HHrepID&quot;</span><span class="p">])</span>
 <span class="go">9</span>

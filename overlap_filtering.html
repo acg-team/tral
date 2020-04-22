@@ -164,9 +164,9 @@ overlap:</p>
 </pre></div>
 </div>
 <p>Tandem repeats can also directly be filtered of overlapping tandem repeats. Here, we need
-to choose to retain one of the overlapping tandem repeats. For example the following usage
-will first retain the tandem repeats of lowest p-Value according to the <em>score</em>, and in case
-there still are draws, retain the tandem repeat of lowest divergence:</p>
+to choose to retain one of the overlapping tandem repeats. For example the following code snippet
+will first retain the tandem repeats with the lowest p-value according to the <em>score</em>, and in case
+there are still draws, retain the tandem repeat of lowest divergence:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">overlap_type</span> <span class="o">=</span> <span class="s2">&quot;common_ancestry&quot;</span>
 <span class="n">score</span> <span class="o">=</span> <span class="s2">&quot;phylo_gap001&quot;</span>
 <span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>

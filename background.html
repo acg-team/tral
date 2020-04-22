@@ -138,8 +138,8 @@
 <span class="go">RQI</span>
 </pre></div>
 </div>
-<p>The tandem repeat is displayed as an alignment of tandem repeat units, similar to
-<a class="reference external" href="http://en.wikipedia.org/wiki/Multiple_sequence_alignment">multiple sequence alignments</a>:</p>
+<p>The tandem repeat is displayed as an alignment of tandem repeat units, similar to a
+<a class="reference external" href="http://en.wikipedia.org/wiki/Multiple_sequence_alignment">multiple sequence alignment</a>:</p>
 <div class="highlight-python"><div class="highlight"><pre>RRN
 RR-
 RRW
@@ -148,24 +148,22 @@ RQ-
 RQI
 </pre></div>
 </div>
-<p>Within the sequence, this tandem repeat would like as follows:</p>
+<p>Within the sequence, this tandem repeat would like the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">RRNRRRRWRARQRQI</span>
 </pre></div>
 </div>
-<p>These are the other characteristics of the tandem repeat, that might be shown (if available):</p>
+<p>These are the other characteristics of the tandem repeat, that can be shown (if available):</p>
 <ul class="simple">
-<li><strong>begin</strong>: This is the index where the tandem repeat starts in the sequence</li>
-<li><strong>l_effective</strong>: This is the length of the consensus tandem repeat unit, not including insertions.</li>
-<li><strong>n</strong>: This is the number of tandem repeat units.</li>
-<li><strong>pvalue</strong>: What is the probability that this repeat has occurred by random chance? (This value
-is a good estimate. So even if pvalue=0.0, of course it is possible that the sequence shows similarity
-by random chance, and not because the repeat units have evolved by duplications.)</li>
-<li><strong>divergence</strong>: this is a model-based measure of the similarity of the repeat units.
+<li><strong>begin</strong>: Index where the tandem repeat starts in the sequence</li>
+<li><strong>l_effective</strong>: Length of the consensus tandem repeat unit, not including insertions.</li>
+<li><strong>n</strong>: Number of tandem repeat units.</li>
+<li><strong>pvalue</strong>: What is the probability that this repeat has occurred by random chance? (This value is only a good estimate. So even if pvalue=0.0, of course it is possible that the sequence shows similarity by random chance, and not because the repeat units have evolved by duplications).</li>
+<li><strong>divergence</strong>:  Model-based measure of the similarity of the repeat units.
 (mathematically, it is the maximum likelihood estimate of the branch length on the phylogeny
 connecting all tandem repeat units. In the above example, every site has mutated 0.47 times
 on average. A value of 0 would mean no mutations have occurred, and the sequence of the
-tandem repeat units is very conserved.)</li>
-<li><strong>type</strong>: Which model was used to calculate the pvalue and the divergence?</li>
+tandem repeat units is very conserved).</li>
+<li><strong>type</strong>: The model which was used to calculate the pvalue and the divergence.</li>
 </ul>
 <div class="section" id="more-tandem-repeat-characteristics">
 <h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this headline">¶</a></h2>
