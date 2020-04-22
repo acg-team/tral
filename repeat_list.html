@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Repeat_list code documentation &mdash; TRAL 0.3.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TRAL 0.3.5 documentation" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head>
+  <body role="document">
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Repeat_list code documentation</a><ul>
+<li><a class="reference internal" href="#module-tral.repeat_list.repeat_list">repeat_list</a></li>
+<li><a class="reference internal" href="#module-tral.repeat_list.repeat_list_io">repeat_list_io</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/repeat_list.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="repeat-list-code-documentation">
+<h1>Repeat_list code documentation<a class="headerlink" href="#repeat-list-code-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Initial version of the repeat_list submodule documentation.</p>
+<div class="section" id="module-tral.repeat_list.repeat_list">
+<span id="repeat-list"></span><h2>repeat_list<a class="headerlink" href="#module-tral.repeat_list.repeat_list" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tral.repeat_list.repeat_list.RepeatList">
+<em class="property">class </em><code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">RepeatList</code><span class="sig-paren">(</span><em>repeats</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>RepeatList</cite> contains list of repeats that belong to the same
+sequence, or set of sequences.</p>
+<p><cite>RepeatList</cite> contains methods that act on several tandem repeats.
+For example, methods to</p>
+<ul class="simple">
+<li>detect overlapping tandem repeats</li>
+<li>identify the tandem repeat with highest statistical significance</li>
+<li>filter a set of tandem repeats according to different filtering
+procedures.</li>
+</ul>
+<dl class="attribute">
+<dt id="tral.repeat_list.repeat_list.RepeatList.repeats">
+<code class="descname">repeats</code><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.repeats" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of Repeat</em></p>
+<p>The list of tandem repats.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.repeat_list.repeat_list.RepeatList.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create string for RepeatList instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.repeat_list.repeat_list.RepeatList.cluster">
+<code class="descname">cluster</code><span class="sig-paren">(</span><em>overlap_type</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster <code class="docutils literal"><span class="pre">repeats</span></code> according to <code class="docutils literal"><span class="pre">overlap_type</span></code>.</p>
+<p>Cluster <code class="docutils literal"><span class="pre">repeats</span></code> according to <code class="docutils literal"><span class="pre">overlap_type</span></code>. We assume that overlap of
+repeats is transitive: If A overlaps with B, and B overlaps with C, (A,B,C) form
+one cluster.
+The attribute <code class="docutils literal"><span class="pre">cluster</span></code> is initiated to a dict:</p>
+<blockquote>
+<div>self.cluster = {&#8220;overlap_type1&#8221;: [(0,2),(1)], &#8220;overlap_type2&#8221;: [(0),(1), (2)]}</div></blockquote>
+<p>In this toy example, the first and the third repeat in <code class="docutils literal"><span class="pre">repeats</span></code> cluster
+according to &#8220;overlap_type1&#8221;, whereas no repeats cluster according to
+&#8220;overlap_type2&#8221;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>overlap_type</strong> (<em>str</em>) &#8211; The name of a local pairwise repeat overlapping method.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.repeat_list.repeat_list.RepeatList.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>file</em>, <em>input_format</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read <code class="docutils literal"><span class="pre">RepeatList</span></code> from file.</p>
+<p>Read <code class="docutils literal"><span class="pre">RepeatList</span></code> from file (currently, only pickle is supported)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>input_format</strong> (<em>str</em>) &#8211; Currently only &#8220;pickle&#8221;</li>
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write checks for <code class="docutils literal"><span class="pre">input_format</span></code> and <code class="docutils literal"><span class="pre">file</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.repeat_list.repeat_list.RepeatList.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>func_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter <code class="docutils literal"><span class="pre">repeats</span></code> according to <code class="docutils literal"><span class="pre">func_name</span></code>.</p>
+<p>Filter <code class="docutils literal"><span class="pre">repeats</span></code> according to <code class="docutils literal"><span class="pre">func_name</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func_name</strong> (<em>str</em>) &#8211; The name of a local filtering method.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tral.repeat_list.repeat_list.RepeatList.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>output_format</em>, <em>file=None</em>, <em>return_string=None</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#RepeatList.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.RepeatList.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize and write <code class="docutils literal"><span class="pre">RepeatList</span></code> instances.</p>
+<p>Serialize <code class="docutils literal"><span class="pre">RepeatList</span></code> instance using the stated <code class="docutils literal"><span class="pre">output_format</span></code>.
+If a <code class="docutils literal"><span class="pre">file</span></code> is specified, save the String. If <code class="docutils literal"><span class="pre">str</span></code> is specified, give back
+the String (not possible for pickles).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>output_format</strong> (<em>str</em>) &#8211; The output format: Either &#8220;pickle&#8221; or &#8220;tsv&#8221;</li>
+<li><strong>file</strong> (<em>str</em>) &#8211; Path to output file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write checks for <code class="docutils literal"><span class="pre">output_format</span></code> and <code class="docutils literal"><span class="pre">file</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.attribute">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">attribute</code><span class="sig-paren">(</span><em>rl</em>, <em>attribute</em>, <em>type</em>, <em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.attribute" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a attribute below (above) a certain</dt>
+<dd>threshold.</dd>
+</dl>
+<p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a attribute below (above) a certain
+threshold.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rl</strong> (<a class="reference internal" href="#tral.repeat_list.repeat_list.RepeatList" title="tral.repeat_list.repeat_list.RepeatList"><em>RepeatList</em></a>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>attribute</strong> (<em>str</em>) &#8211; The attribute of the Repeat instance</li>
+<li><strong>type</strong> (<em>str</em>) &#8211; Either &#8220;min&#8221; or &#8220;max&#8221;</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with an attribute value below (above)
+this threshold are filtered out.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.common_ancestry">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">common_ancestry</code><span class="sig-paren">(</span><em>repeat1</em>, <em>repeat2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#common_ancestry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.common_ancestry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do two TRs share at least one pair of chars with common ancestry?</p>
+<p>Return 1 if the two TRs share at least one pair of chars (amino acids or
+nucleotides) with common ancestry; else 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>repeat1</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; An instance of the Repeat class</li>
+<li><strong>repeat2</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; A second instance of the Repeat class</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">1 if the repeats share &gt;= 1 pair of chars with common ancestry, else 0.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.divergence">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">divergence</code><span class="sig-paren">(</span><em>rl</em>, <em>score</em>, <em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#divergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.divergence" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a divergence below a certain</dt>
+<dd>threshold.</dd>
+</dl>
+<p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a divergence below a certain threshold.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rl</strong> (<a class="reference internal" href="#tral.repeat_list.repeat_list.RepeatList" title="tral.repeat_list.repeat_list.RepeatList"><em>RepeatList</em></a>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the divergence that is used for
+filtering</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a divergence of type <cite>score</cite> above
+this threshold are filtered out.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.none_overlapping">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">none_overlapping</code><span class="sig-paren">(</span><em>rl</em>, <em>overlap</em>, <em>l_criterion</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#none_overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.none_overlapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all none-overlapping repeats in <code class="docutils literal"><span class="pre">rl</span></code>.</p>
+<p>Returns all none-overlapping repeats in <code class="docutils literal"><span class="pre">rl</span></code>. Repeats are clustered
+according to <code class="docutils literal"><span class="pre">overlap</span></code>. Of each cluster, only the best repeat is returned
+according to <code class="docutils literal"><span class="pre">dCriterion</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rl</strong> (<a class="reference internal" href="#tral.repeat_list.repeat_list.RepeatList" title="tral.repeat_list.repeat_list.RepeatList"><em>RepeatList</em></a>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>overlap</strong> (<em>tuple</em>) &#8211; First element: Name (str) of an overlap method in
+<cite>repeat_list</cite>. Second element: <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs. All remaining elements are
+additional arguments for this class.</li>
+<li><strong>l_criterion</strong> (<em>list</em>) &#8211; list of (criterion (str), criterion arguments)
+tuples. Until only one repeat is remainining in a cluster, the
+criteria are applied in order.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.none_overlapping_fixed_repeats">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">none_overlapping_fixed_repeats</code><span class="sig-paren">(</span><em>rl</em>, <em>rl_fixed</em>, <em>overlap_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#none_overlapping_fixed_repeats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.none_overlapping_fixed_repeats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> none-overlapping with <code class="docutils literal"><span class="pre">rl_fixed</span></code>.</p>
+<p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> none-overlapping with <code class="docutils literal"><span class="pre">rl_fixed</span></code> according
+to <code class="docutils literal"><span class="pre">overlap</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rl</strong> (<em>rl_fixed</em>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>rl</strong> &#8211; A second instance of the RepeatList class.</li>
+<li><strong>overlap</strong> (<em>list</em>) &#8211; First list element: Name (str) of an overlap method in
+repeat_list. All remaining elements are additional
+arguments for this class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.pvalue">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">pvalue</code><span class="sig-paren">(</span><em>rl</em>, <em>score</em>, <em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#pvalue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.pvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a p-Value below a certain threshold.</p>
+<p>Returns all repeats in <code class="docutils literal"><span class="pre">rl</span></code> with a p-Value below a certain threshold.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rl</strong> (<a class="reference internal" href="#tral.repeat_list.repeat_list.RepeatList" title="tral.repeat_list.repeat_list.RepeatList"><em>RepeatList</em></a>) &#8211; An instance of the RepeatList class.</li>
+<li><strong>score</strong> (<em>str</em>) &#8211; The type of score defines the pvalue that is used for filtering</li>
+<li><strong>threshold</strong> (<em>float</em>) &#8211; All repeats with a pvalue of type <cite>score</cite> above this threshold
+are filtered out.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.shared_char">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">shared_char</code><span class="sig-paren">(</span><em>repeat1</em>, <em>repeat2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#shared_char"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.shared_char" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do two TRs share at least one char?</p>
+<p>Return 1 if the two TRs share at least one char (amino acids or nucleotides); else 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>repeat1</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; An instance of the Repeat class</li>
+<li><strong>repeat2</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; A second instance of the Repeat class</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">1 if the repeats share &gt;= 1 char, else 0.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tral.repeat_list.repeat_list.two_repeats_overlap">
+<code class="descclassname">tral.repeat_list.repeat_list.</code><code class="descname">two_repeats_overlap</code><span class="sig-paren">(</span><em>overlap_type</em>, <em>repeat1</em>, <em>repeat2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tral/repeat_list/repeat_list.html#two_repeats_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tral.repeat_list.repeat_list.two_repeats_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to test the overlap of <code class="docutils literal"><span class="pre">repeat1</span></code> and <code class="docutils literal"><span class="pre">repeat2</span></code>.</p>
+<p>Helper method to test the overlap of <code class="docutils literal"><span class="pre">repeat1</span></code> and <code class="docutils literal"><span class="pre">repeat2</span></code>. The
+overlap is calculated by the local method <code class="docutils literal"><span class="pre">overlap_type</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>overlap_type</strong> (<em>str</em>) &#8211; The name of a local pairwise repeat overlapping
+method.</li>
+<li><strong>repeat1</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; An instance of the Repeat class</li>
+<li><strong>repeat2</strong> (<a class="reference internal" href="repeat.html#tral.repeat.repeat.Repeat" title="tral.repeat.repeat.Repeat"><em>Repeat</em></a>) &#8211; A second instance of the Repeat class</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Forwards method output</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tral.repeat_list.repeat_list_io">
+<span id="repeat-list-io"></span><h2>repeat_list_io<a class="headerlink" href="#module-tral.repeat_list.repeat_list_io" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Input/output for the RepeatList class</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>
