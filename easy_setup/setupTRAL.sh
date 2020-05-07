@@ -138,7 +138,7 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
             {
                 if [[ ! -f "$TRAL_CONF/data/pvalue.tar.gz" ]]; then
                     echo "DOWNLOADING"
-                    wget "https://acg-team.ulozezoz.myhostpoint.ch/pvalue.tar.gz" -P "$TRAL_CONF/data"
+                    wget "https://acg-team.ulozezoz.myhostpoint.ch/pvalue.tar.gz" -P "$TRAL_CONF/data/"
                 else
                     echo "SKIPPING DOWNLOAD"
                 fi
@@ -149,7 +149,7 @@ if [ ! -d "$TRAL_CONF/data/pvalue" ]; then
             }
         ;;
         [Nn]* )
-            echo -e "\nYou can download this file later from ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper.\n"
+            echo -e "\nYou can download this file later from https://acg-team.ulozezoz.myhostpoint.ch/pvalue.tar.gz.\n"
         ;;
     esac
 else
