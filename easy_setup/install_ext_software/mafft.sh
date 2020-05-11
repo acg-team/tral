@@ -30,24 +30,28 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 # ######################
 # ### Download and Installation MAFFT
+latestVer="mafft-7.464-without-extensions" # CHANGE MAFFT VERSION HERE
+mafftVer=${latestVer}-src.tgz
 
-latestVer=$(wget -qO- "https://mafft.cbrc.jp/alignment/software/source.html" |
-    egrep without-extensions-src.tgz | 
-sed -n 's/.*href="\([^"]*\).*/\1/p')
+echo "---------------------------------------------------------------------"
+echo "Downloading:" $latestVer
+echo "Change version in tral/easy_setup/install_ext_software/mafft.sh to"
+echo "the latest version from https://mafft.cbrc.jp/alignment/software/source.html"
+echo "---------------------------------------------------------------------"
 
-mafftVer=${latestVer%-src.tgz}
+sleep 5 
 
 if [ ! -d "$TRAL_EXT_SOFTWARE/$mafftVer" ]; then 
     {
-        wget "https://mafft.cbrc.jp/alignment/software/$latestVer" -P "$TRAL_EXT_SOFTWARE" || {  # download
+        wget "https://mafft.cbrc.jp/alignment/software/"$mafftVer -P "$TRAL_EXT_SOFTWARE" || {  # download
             echo "Was not able to download mafft."
             exit $?
         }
-        tar -xvzf "$TRAL_EXT_SOFTWARE/$latestVer" -C "$TRAL_EXT_SOFTWARE"
-        sed -i 'bak' "s#PREFIX = /usr/local#PREFIX = \"$INSTALLATION_PATH\"#" "$TRAL_EXT_SOFTWARE/$mafftVer/core/Makefile" # change default installation path in Makefile
-        sed -i 'bak' "s#BINDIR = \$(PREFIX)/bin#BINDIR = \$(PREFIX)#" "$TRAL_EXT_SOFTWARE/$mafftVer/core/Makefile"
+        tar -xvzf "$TRAL_EXT_SOFTWARE/$mafftVer" -C "$TRAL_EXT_SOFTWARE"
+        sed -i "s#PREFIX = /usr/local#PREFIX = \"$INSTALLATION_PATH\"#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile" # change default installation path in Makefile
+        sed -i "s#BINDIR = \$(PREFIX)/bin#BINDIR = \$(PREFIX)#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile"
 
-        ( cd "$TRAL_EXT_SOFTWARE/$mafftVer/core/" && make clean && make && make install ) # Installation
+        ( cd "$TRAL_EXT_SOFTWARE/$latestVer/core/" && make clean && make && make install ) # Installation
         rm -rf "$TRAL_EXT_SOFTWARE/"$latestVer""
     }
 fi
