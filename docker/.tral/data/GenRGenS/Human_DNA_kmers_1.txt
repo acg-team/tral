@@ -1,0 +1,11 @@
+/**********************************************************************************
+* A markov model (order=0) based on Homo_sapiens.GRCh37.64.dna_rm.chromosome.1.fa based on the nucleotides ACGT  *
+**********************************************************************************/
+
+TYPE = MARKOV
+ORDER = 0
+PHASE = 1
+SYMBOLS = LETTERS
+
+FREQUENCIES = 
+A 32009200 C 22803996 T 32076718 G 22824492
