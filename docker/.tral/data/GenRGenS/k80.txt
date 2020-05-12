@@ -1,0 +1,11 @@
+/**********************************************************************************
+* A markov model (order=0) based LG equilibrium frequencies          *
+**********************************************************************************/
+
+TYPE = MARKOV
+ORDER = 0
+PHASE = 1
+SYMBOLS = LETTERS
+
+FREQUENCIES = 
+A 1 C 1 T 1 G 1
