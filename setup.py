@@ -1,14 +1,15 @@
 import os
-
 from setuptools import setup, find_packages
-
-import subprocess
 
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
     with open(os.path.join(*paths), "r") as f:
         return f.read()
+
+
+this_directory = os.path.abspath(os.path.dirname(__file__))
+long_description = read(this_directory, "README.md")
 
 
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
@@ -31,7 +32,7 @@ setup(
     url="http://pypi.python.org/pypi/tral/",
     license="LICENSE.txt",
     description="Detect and evaluate tandem repeats in genomic sequence data.",
-    long_description=read("README.rst"),
+    long_description=long_description,
     classifiers=[
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
