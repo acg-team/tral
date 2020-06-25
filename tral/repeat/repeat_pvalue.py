@@ -78,11 +78,18 @@ def empirical_list(l, n, sequence_type='AA', score_type='phylo'):
                 n -= 1
 
     try:
-        file = config_file("data", "pvalue", sequence_type, score_type,
-                    str(l) + '_' + str(n) + '.npz')
-    except ValueError as e:
-        filename = os.path.join(CONFIG_DIR, "data", "pvalue", sequence_type,
-                score_type, str(l) + '_' + str(n) + '.npz')
+        file = config_file("data",
+                           "pvalue",
+                           sequence_type,
+                           score_type,
+                           str(l) + '_' + str(n) + '.npz')
+    except ValueError:
+        filename = os.path.join(CONFIG_DIR,
+                                "data",
+                                "pvalue",
+                                sequence_type,
+                                score_type,
+                                str(l) + '_' + str(n) + '.npz')
         raise ValueError("Complete pdf file %s to calculate the pvalue does not exist!" % filename)
 
     empirical_list_all = np.load(file)

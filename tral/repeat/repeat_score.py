@@ -11,7 +11,6 @@ import collections
 import logging
 import numpy as np
 import os
-from os.path import join
 import re
 import scipy.stats
 import scipy.special

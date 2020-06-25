@@ -68,8 +68,6 @@ def config_file(*names, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
         shutil.copyfile(path, user_path)
         return user_path
 
-    import pdb; pdb.set_trace()
-
     # Download
     if names[0] == "data":
         path = os.path.join(config_dir, *names)

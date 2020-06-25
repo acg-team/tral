@@ -41,7 +41,7 @@ def test_repeat_pickle(tmpdir):
 
     myTR_O = repeat.Repeat(msa=TEST_MSA_O)
 
-    test_pickle = os.path.join(tmpdir,"test.pickle")
+    test_pickle = os.path.join(tmpdir, "test.pickle")
     myTR_O.write(test_pickle, 'pickle')
     myTR_O_new = repeat.Repeat.create(test_pickle, 'pickle')
 
@@ -51,4 +51,3 @@ def test_repeat_pickle(tmpdir):
 
     if os.path.exists(test_pickle):
         os.remove(test_pickle)
-
