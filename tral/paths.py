@@ -11,6 +11,7 @@ import shutil
 import logging
 import urllib.request as request
 from contextlib import closing
+from urllib.request import URLError
 
 
 # Where are the executables stored? E.g. the tandem repeat detection
@@ -46,6 +47,9 @@ def config_file(*names, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
       - names (str): path to the requested file relative to config_dir. Multiple names will be joined.
       - config_dir (str): Override CONFIG_DIR (for testing)
       - url (str): Override download url (for testing)
+
+    Raises:
+      - FileNotFoundError: File is not found and cannot be downloaded
     '''
     # Minimum file size; used to detect download errors
     MIN_FILE_SIZE = 0
@@ -72,14 +76,17 @@ def config_file(*names, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
     if names[0] == "data":
         path = os.path.join(config_dir, *names)
         url = config_url + "/".join(names[1:])
-        download(url, path)
+        try:
+            download(url, path)
+        except URLError:
+            pass  # thrown below
         if os.path.isfile(path) and os.path.getsize(path) > MIN_FILE_SIZE:
             return path
         else:
             raise FileNotFoundError("Error downloading %s" % url)
 
     # Give up
-    raise ValueError("Unknown configuration file: %s" % os.path.join(*names))
+    raise FileNotFoundError("Unknown configuration file: %s" % os.path.join(*names))
 
 
 def download(url, path):

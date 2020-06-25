@@ -16,6 +16,7 @@ def config_dir():
 DISABLED_URL = "http://0.0.0.0/disabled/"  # sentinel non-working URL
 
 
+@pytest.mark.no_external_software_required
 def test_package_config(config_dir):
     # Should get copied from package
     ini_file = paths.config_file('config.ini', config_dir=config_dir, config_url=DISABLED_URL)
@@ -24,21 +25,25 @@ def test_package_config(config_dir):
     assert os.path.exists(ini_file)
 
     # Not found in package and can't be downloaded
-    with pytest.raises(URLError):
+    with pytest.raises(FileNotFoundError):
         ini_file = paths.config_file('foo', config_dir=config_dir, config_url=DISABLED_URL)
 
 
+@pytest.mark.no_external_software_required
 def test_download_config(config_dir):
-    small_file = "pvalue/AA/PhyloScore_AA_Empirical_MolecularClock_SameRateOnBranches_10000.descriptor"
+    small_file = ["data",
+                  "pvalue",
+                  "AA",
+                  "PhyloScore_AA_Empirical_MolecularClock_SameRateOnBranches_10000.descriptor"]
 
     # not in package
-    with pytest.raises(URLError):
-        downloaded = paths.config_file(small_file, config_dir=config_dir, config_url=DISABLED_URL)
+    with pytest.raises(FileNotFoundError):
+        downloaded = paths.config_file(*small_file, config_dir=config_dir, config_url=DISABLED_URL)
 
     # can be downloaded
-    downloaded = paths.config_file(small_file, config_dir=config_dir)
+    downloaded = paths.config_file(*small_file, config_dir=config_dir)
 
-    assert downloaded == os.path.join(config_dir, small_file)
+    assert downloaded == os.path.join(config_dir, *small_file)
     assert os.path.exists(downloaded)
 
     # Check file contents
