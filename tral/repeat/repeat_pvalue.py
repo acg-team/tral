@@ -9,14 +9,12 @@
 
 import os
 import bisect
-from os.path import join
 import csv
 import logging
 import numpy as np
 import scipy as sp
 
-from tral.paths import DATA_DIR
-SCORE_DIR = join(DATA_DIR, 'pvalue')
+from tral.paths import config_file, CONFIG_DIR
 
 LOG = logging.getLogger(__name__)
 
@@ -79,13 +77,13 @@ def empirical_list(l, n, sequence_type='AA', score_type='phylo'):
             else:
                 n -= 1
 
-    file = join(SCORE_DIR, sequence_type, score_type,
-                str(l) + '_' + str(n) + '.npz')
-    if not os.path.isfile(file):
-        print("\nExpected a pvalue distribution file which cannot be found.")
-        print("Did you already download the pvalue distributions files and put in the data configuration folder?")
-        print("Information can be found http://acg-team.github.io/tral/pvaluefiles.html#pvaluefiles.")
-        raise ValueError("Complete pdf file %s to calculate the pvalue does not exist!" % file)
+    try:
+        file = config_file("data", "pvalue", sequence_type, score_type,
+                    str(l) + '_' + str(n) + '.npz')
+    except ValueError as e:
+        filename = os.path.join(CONFIG_DIR, "data", "pvalue", sequence_type,
+                score_type, str(l) + '_' + str(n) + '.npz')
+        raise ValueError("Complete pdf file %s to calculate the pvalue does not exist!" % filename)
 
     empirical_list_all = np.load(file)
     # It is necessary to close the numpy filehandle.
@@ -171,7 +169,8 @@ def column_pdf(n, score_type='psim', sequence_type='AA'):
 
     # Currently, the pdfs are only save up to n_max = 150
     n_max = 150
-    with open(join(SCORE_DIR, sequence_type, score_type, str(min(n, n_max)) + '.txt'), 'r') as pdf_file:
+    filename = config_file("data", "pvalue", sequence_type, score_type, str(min(n, n_max)) + '.txt')
+    with open(filename, 'r') as pdf_file:
         pdf = [i for i in csv.reader(pdf_file, dialect='excel-tab')]
         pdf = [np.double(i[0]) for i in pdf[1:]]
         return np.array(pdf)

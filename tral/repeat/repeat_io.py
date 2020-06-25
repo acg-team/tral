@@ -19,7 +19,7 @@ import numpy as np
 from tral.repeat import repeat
 from tral import configuration
 
-from tral.paths import DATA_DIR
+from tral.paths import config_file
 CONFIG_GENERAL = configuration.Configuration.instance().config
 REPEAT_CONFIG = CONFIG_GENERAL["repeat"]
 
@@ -199,7 +199,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
         Return type depends on ``return_type``: ``Repeat`` or ``Bio.Seq.Seq`` instance.
     """
 
-    runfile_template = os.path.join(DATA_DIR, "ALF", "template.drw")
+    runfile_template = config_file("data", "ALF", "template.drw")
     alf_exec = REPEAT_CONFIG['alfsim']
     # create temporary directory
     working_dir = tempfile.mkdtemp()
@@ -262,10 +262,7 @@ def evolved_tandem_repeats(l, n, n_samples, sequence_type, job_id='job_id',
         if sequence_type == 'AA':
             runfile.write(
                 "substModels := [SubstitutionModel('CustomP', ['" +
-                os.path.join(
-                    DATA_DIR,
-                    'ALF',
-                    'lg.dat') +
+                config_file('data', 'ALF', 'lg.dat') +
                 "'])];\n")
             # CHECK! DOES
             # substModels := [SubstitutionModel('LG')];
@@ -393,9 +390,9 @@ def random_sequence(n_samples, sequence_type='AA', return_type='repeat',
         if sequence_length == 0:
             sequence_length = l * n
 
-        if equilibrium_frequencies == 'human':
-            file = os.path.join(DATA_DIR, 'Random', "_".join(
-                [sequence_type, equilibrium_frequencies, '3']) + '.txt')
+        # assert equilibrium_frequencies == 'human'
+        file = config_file('data', 'Random', "_".join(
+            [sequence_type, equilibrium_frequencies, '3']) + '.txt')
 
         with open(file, 'r') as f:
             a = f.readline()[:-1]

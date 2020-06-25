@@ -18,7 +18,7 @@ import scipy.special
 import scipy.linalg
 
 from tral import configuration
-from tral.paths import DATA_DIR
+from tral.paths import config_file
 
 LOG = logging.getLogger(__name__)
 
@@ -555,11 +555,10 @@ def loglikelihood_random(repeat,
         if parameters:
             equilibrium_freq = parameters
         else:
-            aarate_file_name = join(
-                DATA_DIR,
+            aarate_file_name = config_file(
+                "data",
                 "substitution_rate_matrices",
-                evolution_model +
-                ".dat")  # load equilibrium frequencies
+                evolution_model + ".dat")  # load equilibrium frequencies
             equilibrium_freq = load_equilibrium_freq(aarate_file_name)
 
         loglikelihoodrandom = 0.
@@ -618,8 +617,8 @@ def calc_score(
     parameters = [Q, eq_freq, alphabet]
 
     if sequence_type == 'AA':
-        aarate_file_name = join(
-            DATA_DIR,
+        aarate_file_name = config_file(
+            "data",
             "substitution_rate_matrices",
             evolution_model +
             ".dat")  # load equilibrium frequencies

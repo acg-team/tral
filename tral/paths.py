@@ -8,8 +8,10 @@
 
 import os
 import shutil
+import logging
 import urllib.request as request
 from contextlib import closing
+
 
 # Where are the executables stored? E.g. the tandem repeat detection
 # algorithms?
@@ -29,7 +31,7 @@ DATA_DIR = os.path.join(CONFIG_DIR, "data")
 CONFIG_DATA_URL = "ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/"
 
 
-def config_file(name, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
+def config_file(*names, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
     '''Returns the complete path to the config file `name`.
 
     Returns the complete path to the config file `name`.
@@ -41,7 +43,7 @@ def config_file(name, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
         - Download from CONFIG_DATA_URL
 
     Args:
-      - name (str): path to the requested file relative to config_dir. Should be slash-separated (even on windows)
+      - names (str): path to the requested file relative to config_dir. Multiple names will be joined.
       - config_dir (str): Override CONFIG_DIR (for testing)
       - url (str): Override download url (for testing)
     '''
@@ -49,28 +51,37 @@ def config_file(name, config_dir=CONFIG_DIR, config_url=CONFIG_DATA_URL):
     MIN_FILE_SIZE = 0
 
     # Config dir
-    user_path = os.path.join(config_dir, name)
+    if not os.path.exists(config_dir):
+        # TODO should follow logging.ini, but this would be circular
+        logging.info("Creating %s" % config_dir)
+        os.makedirs(config_dir, exist_ok=True)
+
+    user_path = os.path.join(config_dir, *names)
     if os.path.isfile(user_path):
         return user_path
 
     # Package
-    path = os.path.join(PACKAGE_DIRECTORY, 'tral_configuration', name)
+    path = os.path.join(PACKAGE_DIRECTORY, 'tral_configuration', *names)
     if os.path.isfile(path):
         # Copy to config_dir
+        os.makedirs(os.path.dirname(user_path), exist_ok=True)
         shutil.copyfile(path, user_path)
         return user_path
 
+    import pdb; pdb.set_trace()
+
     # Download
-    path = os.path.join(config_dir, name)
-    url = config_url + name
-    download(url, path)
-    if os.path.isfile(path) and os.path.getsize(path) > MIN_FILE_SIZE:
-        return path
-    else:
-        raise FileNotFoundError("Error downloading %s" % url)
+    if names[0] == "data":
+        path = os.path.join(config_dir, *names)
+        url = config_url + "/".join(names[1:])
+        download(url, path)
+        if os.path.isfile(path) and os.path.getsize(path) > MIN_FILE_SIZE:
+            return path
+        else:
+            raise FileNotFoundError("Error downloading %s" % url)
 
     # Give up
-    raise ValueError("Unknown configuration file: %s" % name)
+    raise ValueError("Unknown configuration file: %s" % os.path.join(*names))
 
 
 def download(url, path):

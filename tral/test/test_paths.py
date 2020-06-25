@@ -18,14 +18,14 @@ DISABLED_URL = "http://0.0.0.0/disabled/"  # sentinel non-working URL
 
 def test_package_config(config_dir):
     # Should get copied from package
-    ini_file = paths.config_file('config.ini', config_dir, config_url=DISABLED_URL)
+    ini_file = paths.config_file('config.ini', config_dir=config_dir, config_url=DISABLED_URL)
 
     assert ini_file == os.path.join(config_dir, 'config.ini')
     assert os.path.exists(ini_file)
 
     # Not found in package and can't be downloaded
     with pytest.raises(URLError):
-        ini_file = paths.config_file('foo', config_dir, config_url=DISABLED_URL)
+        ini_file = paths.config_file('foo', config_dir=config_dir, config_url=DISABLED_URL)
 
 
 def test_download_config(config_dir):
@@ -33,10 +33,10 @@ def test_download_config(config_dir):
 
     # not in package
     with pytest.raises(URLError):
-        downloaded = paths.config_file(small_file, config_dir, config_url=DISABLED_URL)
+        downloaded = paths.config_file(small_file, config_dir=config_dir, config_url=DISABLED_URL)
 
     # can be downloaded
-    downloaded = paths.config_file(small_file, config_dir)
+    downloaded = paths.config_file(small_file, config_dir=config_dir)
 
     assert downloaded == os.path.join(config_dir, small_file)
     assert os.path.exists(downloaded)
