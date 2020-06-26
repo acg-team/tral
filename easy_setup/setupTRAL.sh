@@ -107,7 +107,7 @@ elif [[ $1 == "pip" ]]; then
         "${PIP:-pip}" install tral|| {
 
         echo -e "\nA problem occured while trying to install TRAL with \"${PIP:-pip} install\"."
-        exit $?
+        exit 1
         }
 
     } && {
@@ -165,9 +165,3 @@ echo -e "-----------------------------------\n"
 if [ ! -d "$TRAL_CONF" ]; then
     echo -e ".tral directory was not created."
 fi
-
-
-
-
-
-

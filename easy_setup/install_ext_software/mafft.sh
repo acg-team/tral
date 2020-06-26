@@ -25,7 +25,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 # ######################
@@ -39,13 +39,13 @@ echo "Change version in tral/easy_setup/install_ext_software/mafft.sh to"
 echo "the latest version from https://mafft.cbrc.jp/alignment/software/source.html"
 echo "---------------------------------------------------------------------"
 
-sleep 5 
+sleep 5
 
-if [ ! -d "$TRAL_EXT_SOFTWARE/$mafftVer" ]; then 
+if [ ! -d "$TRAL_EXT_SOFTWARE/$mafftVer" ]; then
     {
         wget "https://mafft.cbrc.jp/alignment/software/"$mafftVer -P "$TRAL_EXT_SOFTWARE" || {  # download
             echo "Was not able to download mafft."
-            exit $?
+            exit 1
         }
         tar -xvzf "$TRAL_EXT_SOFTWARE/$mafftVer" -C "$TRAL_EXT_SOFTWARE"
         sed -i "s#PREFIX = /usr/local#PREFIX = \"$INSTALLATION_PATH\"#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile" # change default installation path in Makefile

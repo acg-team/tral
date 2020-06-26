@@ -16,7 +16,7 @@ shopt -s nocasematch # making comparisons case-insensitive
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 mkdir -p "$TRAL_EXT_SOFTWARE/castor"
@@ -26,7 +26,7 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
 
 (
     cd "$TRAL_EXT_SOFTWARE/castor"
-    {       
+    {
         {
             ## bpp-core http://biopp.univ-montp2.fr/
             (
@@ -41,9 +41,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             make clean
             sudo make install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install bpp-core."
-            exit $? 
+            exit 1
         }
     } && {
         {
@@ -60,9 +60,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             make clean
             sudo make install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install bpp-seq."
-            exit $? 
+            exit 1
         }
     } && {
         {
@@ -79,9 +79,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             make clean
             sudo make install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install bpp-phy."
-            exit $? 
+            exit 1
         }
     } && {
         {
@@ -95,12 +95,12 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             ./b2
             sudo ./b2 install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install boost."
-            exit $? 
+            exit 1
         }
     } && {
-        {  
+        {
             ## glog - Google Logging Library https://github.com/google/glog
             (
             git clone https://github.com/google/glog
@@ -108,13 +108,13 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             cmake -H. -Bbuild -G "Unix Makefiles"
             sudo cmake --build build --target install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install glog."
-            exit $? 
+            exit 1
         }
-    } && {  
+    } && {
         {
-            ## TSHLib - Tree Search Heuristics Library 
+            ## TSHLib - Tree Search Heuristics Library
             (
             echo ls
             git clone https://github.com/acg-team/tshlib.git # do not use the bitbucket
@@ -124,9 +124,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             cmake -- -DCMAKE_BUILD_TYPE=Release CMakeLists.txt
             sudo make install
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install TSHLib."
-            exit $? 
+            exit 1
         }
     } && {
         {
@@ -136,9 +136,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             sudo wget https://github.com/01org/tbb/releases/download/2018_U5/tbb2018_20180618oss_lin.tgz
             sudo tar -xvf tbb2018_20180618oss_lin.tgz
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to install Intel TBB."
-            exit $? 
+            exit 1
         }
     } && {
         {
@@ -150,10 +150,9 @@ mkdir -p "$TRAL_EXT_SOFTWARE/castor"
             sudo make
             ln -sf "$TRAL_EXT_SOFTWARE/castor/castor_aligner/Castor" "$INSTALLATION_PATH" # copy executable into system path
             )
-        } || { 
+        } || {
             echo "A problem occured while trying to compile Castor."
-            exit $? 
+            exit 1
         }
     }
 )
-

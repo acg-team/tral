@@ -19,7 +19,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 [[ ":$PATH:" != *"$TRAL_EXT_SOFTWARE/bin:$PATH"* ]] && export PATH="$TRAL_EXT_SOFTWARE/bin:$PATH"
@@ -35,7 +35,7 @@ if [ ! -d "$TRAL_EXT_SOFTWARE/ALF_standalone" ]; then # test if not already in d
     tar -xvzf "$TRAL_EXT_SOFTWARE/ALF_standalone.tar.gz" -C "$TRAL_EXT_SOFTWARE"
     } || {
         echo "Couldn't download or unzip ALF."
-        exit $?
+        exit 1
     }
 
 fi
@@ -52,5 +52,3 @@ ln -sf "$INSTALLATION_PATH/bin/alfdarwin" "$INSTALLATION_PATH"
 # rm -rf /usr/local/bin/alfdarwin.linux64
 # rm -rf /usr/local/bin/alfsim
 # rm -rf /usr/local/share/alfdarwin
-
-

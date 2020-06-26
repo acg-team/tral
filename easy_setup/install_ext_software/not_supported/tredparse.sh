@@ -39,7 +39,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 # check if virtualenv is installed
@@ -71,7 +71,7 @@ virtualenv "$TRAL_ENV/python2" -p ${PYTHON2:-python2}
 
 . "$TRAL_ENV/python2/bin/activate" || {
     echo "Was not able to activate the virtual environment with Python2 to install tredparse"
-    exit $?
+    exit 1
 }
 
 # install ipython within the virtual environment
@@ -83,7 +83,8 @@ pip install ipython
 ### Installation tredparse
 
 "$TRAL_ENV/python2/bin/pip" install tredparse || {
-    echo "Was not able to install tredparse.; exit $?"
+    echo "Was not able to install tredparse."
+    exit 1
 }
 
 # Wrapper, sourcing tral2, call tred.py with all arguments "$@"

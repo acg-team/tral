@@ -4,7 +4,7 @@
 # TRUST: Tracking repeats using significance and transitivity.
 # A method for ab-initio determination of internal repeats in proteins.
 # The high sensitivity and accuracy of the method is achieved by exploiting the concept of transitivity of alignments.
-# ISMB/ECCB 2004 conference (Glasgow, UK), appeared in Bioinformatics. 2004 Aug 4;20 Suppl 1:i311-i317. 
+# ISMB/ECCB 2004 conference (Glasgow, UK), appeared in Bioinformatics. 2004 Aug 4;20 Suppl 1:i311-i317.
 # http://www.ibi.vu.nl/programs/trustwww/
 
 
@@ -17,7 +17,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 ######################
@@ -25,13 +25,13 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 
 mkdir -p "$TRAL_EXT_SOFTWARE/TRUST_Align"
 if [ ! -d "$TRAL_EXT_SOFTWARE/TRUST_Align/Align" ]; then # test if not already in directory
-    LINK_TRUST="http://www.ibi.vu.nl/programs/trustwww/trust.tgz"
-    wget "$LINK_TRUST" -P "$TRAL_EXT_SOFTWARE/TRUST_Align"
-    tar -xvzf "$TRAL_EXT_SOFTWARE/TRUST_Align/trust.tgz" -C "$TRAL_EXT_SOFTWARE/TRUST_Align"
-    rm -rf "$TRAL_EXT_SOFTWARE/TRUST_Align/trust.tgz" || {
-        echo "Was not able to download or unzip TRUST"
-        exit $?
-    }
+    LINK_TRUST="http://www.ibi.vu.nl/downloads/trust.tgz"
+    wget "$LINK_TRUST" -P "$TRAL_EXT_SOFTWARE/TRUST_Align" &&
+        tar -xvzf "$TRAL_EXT_SOFTWARE/TRUST_Align/trust.tgz" -C "$TRAL_EXT_SOFTWARE/TRUST_Align" &&
+        rm -rf "$TRAL_EXT_SOFTWARE/TRUST_Align/trust.tgz" || {
+            echo "Was not able to download or unzip TRUST"
+            exit 1
+        }
 fi
 
 
