@@ -2,7 +2,6 @@ import os
 import tempfile
 import pytest
 from tral import paths
-from urllib.request import URLError
 
 
 @pytest.fixture
