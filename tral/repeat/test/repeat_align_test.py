@@ -12,17 +12,16 @@ TEST_MSA = ["MGKGYL---------------------------------------ALCSYNCKEA-INILSHLPSHH
             "IGVVQH------------------------ALKKS----------EKALDTLNKA-IVIDPKNPLCKFH",
             "RASVLF-----------------------------ANEKY-----KSALQELEEL-KQIVPKESLVYFL",
             "IGKVYK----------------------------------KLGQTHLALMNFSWA-MDLDPKGAN----"]
-TEST_REALIGNED_MSA = ['MGKGYLALC----SYNC-----KEAI-NILSHLPSHHYN',
-                      'TGWVL--------------------------------CQ',
-                      'IGRAYFELS----EYMQAERIFSEVR-RIEN-----YRV',
-                      'EGMEIYSTTLWHLQKDVALSVLSKDLTDMDKNSPEAWCA',
-                      'AGNCFSLQR----EHDIAIKFFQRAI-QVDPNYAYAYTL',
-                      'LGHEFVLTE----ELDKALACFRNAI-RVNPRHYNAWYG',
-                      'LGMIYYKQE----KFSLAEMHFQKAL-DINPQSSVLLCH',
-                      'IGVVQHALK----KSEKALDTLNKAI-VIDPKNPLCKFH',
-                      'RASVLFANE----KYKSALQELEELK-QIVPKESLVYFL',
-                      'IGKVYKKLG----QTHLALMNFSWAM-DLDPKGA----N']
-
+TEST_REALIGNED_MSA = ['MGKGY-----------LALCSYNCKEAI-NILSHLPSHHYN',
+                      'TGWVL----------------------------------CQ',
+                      'IGRAYFELS----EYMQAERIFS--EVR-RIEN-----YRV',
+                      'EGMEIYSTTLWHLQKDVALSVLS--KDLTDMDKNSPEAWCA',
+                      'AGNCFSLQR----EHDIAIKFFQ--RAI-QVDPNYAYAYTL',
+                      'LGHEFVLTE----ELDKALACFR--NAI-RVNPRHYNAWYG',
+                      'LGMIYYKQE----KFSLAEMHFQ--KAL-DINPQSSVLLCH',
+                      'IGVVQHALK----KSEKALDTLN--KAI-VIDPKNPLCKFH',
+                      'RASVLFANE----KYKSALQELE--ELK-QIVPKESLVYFL',
+                      'IGKVYKKLG----QTHLALMNFS--WAM-DLDPKGA----N']
 
 def test_repeat_alignment():
     ''' Test a realignment using Mafft's ginsi.'''
