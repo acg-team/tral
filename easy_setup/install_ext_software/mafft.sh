@@ -48,8 +48,7 @@ if [ ! -d "$TRAL_EXT_SOFTWARE/$mafftVer" ]; then
             exit 1
         }
         tar -xvzf "$TRAL_EXT_SOFTWARE/$mafftVer" -C "$TRAL_EXT_SOFTWARE"
-        sed -i "s#PREFIX = /usr/local#PREFIX = \"$INSTALLATION_PATH\"#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile" # change default installation path in Makefile
-        sed -i "s#BINDIR = \$(PREFIX)/bin#BINDIR = \$(PREFIX)#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile"
+        sed -i "s#PREFIX = /usr/local#PREFIX = \"$INSTALLATION_PATH/..\"#" "$TRAL_EXT_SOFTWARE/$latestVer/core/Makefile" # change default installation path in Makefile
 
         ( cd "$TRAL_EXT_SOFTWARE/$latestVer/core/" && make clean && make && make install ) # Installation
         rm -rf "$TRAL_EXT_SOFTWARE/"$latestVer""

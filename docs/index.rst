@@ -92,4 +92,4 @@ Indices and tables
    overlap_filtering
    workflow
    search_hmm
-
+   vagrant

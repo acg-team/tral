@@ -17,8 +17,9 @@ import subprocess
 import sys
 import tempfile
 
-from tral import configuration
-from tral.sequence import repeat_detection_io
+from .. import configuration
+from . import repeat_detection_io
+from ..paths import CONFIG_DIR, config_file
 
 LOG = logging.getLogger(__name__)
 
@@ -196,10 +197,22 @@ class DetectorHHrepID(TRDetector):
                 "-shuffle": False
             }
 
+            dummyhmm = os.path.expanduser(REPEAT_DETECTOR_PATH['HHrepID_dummyhmm'])
+            if not os.path.exists(dummyhmm):
+                # Special case for the data directory
+                try:
+                    rel_config = os.path.relpath(dummyhmm, start=CONFIG_DIR)
+                    if not rel_config.startswith(".."):
+                        dummyhmm = config_file(rel_config)
+                except FileNotFoundError:
+                    pass  # not in data; error below
+            if not os.path.exists(dummyhmm):
+                raise FileNotFoundError("HHrepID_dummyhmm not found: %s" % dummyhmm)
+
             self.valopts = {
                 # <file> input query alignment  (fasta/a2m/a3m) or HMM file (.hhm)
                 "-i": None,
-                "-d": os.path.expanduser(REPEAT_DETECTOR_PATH['HHrepID_dummyhmm']),   # <path> dummy hmm database file
+                "-d": dummyhmm,   # <path> dummy hmm database file
                 "-o": 'hhrepID.o',    # <file> write results and multiple sequence alignment to file (default=none)
                 "-v": 0,           # -v: verbose mode (default: show only warnings)  ;  -v 0: suppress all screen outpu
                 "-P": None,        # <float> max p-value of suboptimal alignments in all search rounds but the last one (def=0.1)
@@ -654,7 +667,7 @@ class DetectorTrust(TRDetector):
             }
 
             self.valopts = {
-                "-matrix": REPEAT_DETECTOR_PATH['TRUST_substitutionmatrix'],
+                "-matrix": os.path.expanduser(REPEAT_DETECTOR_PATH['TRUST_substitutionmatrix']),
                 "-gapo": "8",
                 "-gapx": "2",
                 "-procTotal": "1",

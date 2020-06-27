@@ -23,6 +23,7 @@ TEST_REALIGNED_MSA = ['MGKGY-----------LALCSYNCKEAI-NILSHLPSHHYN',
                       'RASVLFANE----KYKSALQELE--ELK-QIVPKESLVYFL',
                       'IGKVYKKLG----QTHLALMNFS--WAM-DLDPKGA----N']
 
+
 def test_repeat_alignment():
     ''' Test a realignment using Mafft's ginsi.'''
 

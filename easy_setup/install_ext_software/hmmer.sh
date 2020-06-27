@@ -53,14 +53,13 @@ done
         {
             cd "$TRAL_EXT_SOFTWARE/hmmer-"*
         } && {
-            ./configure --prefix "$INSTALLATION_PATH"
+            ./configure --prefix "$INSTALLATION_PATH/.."
             make clean
             make
             # "$INSTALLATION_PATH"/bin make check        # run a test suite
             make install
         } && {
             echo "Installation of HMMER done."
-            ln -s "$INSTALLATION_PATH/bin/hmmbuild" "$INSTALLATION_PATH/hmmbuild"
             echo -e  "\nhmmbuild is in your path $INSTALLATION_PATH\n"
         }
     )
