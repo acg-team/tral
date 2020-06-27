@@ -73,7 +73,7 @@ def test_detect_repeats_with_repeat():
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_SINGLE
 
 
-@pytest.mark.no_external_software_required
+# Requires hmmbuild
 def test_too_big_hmms():
 
     test_repeat = repeat.Repeat(msa=TEST_RESULT_REPEAT_MSA_LONG)

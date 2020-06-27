@@ -27,7 +27,7 @@ def test_package_config(config_dir):
     with pytest.raises(FileNotFoundError):
         ini_file = paths.config_file('foo', config_dir=config_dir, config_url=DISABLED_URL)
 
-
+@pytest.mark.data_download
 @pytest.mark.no_external_software_required
 def test_download_config(config_dir):
     small_file = ["data",

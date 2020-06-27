@@ -19,6 +19,7 @@ def test_standardize_amino_acids():
     assert repeat.standardize("ABDEF-G", "AA") == "ADDEF-G"
 
 
+@pytest.mark.data_download  # needs data/pvalue/AA/phylo_gap01/3_2.npz
 @pytest.mark.no_external_software_required
 def test_repeat_ambiguous():
 
