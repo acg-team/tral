@@ -1,14 +1,6 @@
 import os
-import shutil
-import sys
-import logging
+from setuptools import setup, find_packages
 
-from setuptools import setup
-from setuptools.command.install import install
-from setuptools.command.develop import develop
-from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
-
-import subprocess
 
 def read(*paths):
     """Build a file path from *paths* and return the contents."""
@@ -16,67 +8,13 @@ def read(*paths):
         return f.read()
 
 
-# The previous --home option has been changed to --tral-home (0.3.7)
-# Warn users about backwards incompatibility
-# (`setup.py install` already has a --home option)
-if "--home" in sys.argv:
-    logging.warning("The option to set the TRAL data directory has been renamed from --home to --tral-home. "
-                    "The --home option may be recognized instead to install in the user's home directory.")
-
-
-class TralMixin(object):
-    """Mixin to add additional parameters to setuptools commands
-    """
-
-    user_options = [
-        ('tral-home=', None, 'Directory containing the `.tral` data directory (default to user home)'),
-    ]
-
-    def initialize_options(self):
-        super().initialize_options()
-        self.tral_home = os.path.expanduser("~")
-
-    def finalize_options(self):
-        super().finalize_options()
-        if not os.path.exists(self.tral_home):
-            raise ValueError("The argument supplied in --tral-home is not a valid path: {}".format(self.tral_home))
-
-    def run(self):
-        datadir = os.path.join(self.tral_home, ".tral")
-        if os.path.exists(datadir):
-            print("The TRAL configuration directory {} already exists. The "
-                  "template configuration and datafiles are not copied to the "
-                  "already existing directory at this step.".format(datadir))
-        else:
-            shutil.copytree("tral/tral_configuration", datadir)
-            print("The TRAL configuration files and data files are now located in {}".format(datadir))
-
-        try:
-            # install's run() command ignores install_requires when called this way.
-            # Instead, use do_egg_install if possible. https://stackoverflow.com/q/21915469/81658
-            # super().do_egg_install()
-            subprocess.call(["pip install -r requirements.txt --no-clean"], shell=True)
-            _bdist_egg.run(self)
-        except AttributeError:
-            # fallback for develop
-            super().run()
-
-
-class InstallCommand(TralMixin, install):
-    "Add TRAL options to setup.py install"
-    user_options = getattr(install, 'user_options', []) + TralMixin.user_options
-
-
-class DevelopCommand(TralMixin, develop):
-    "Add TRAL options to setup.py develop"
-    user_options = getattr(develop, 'user_options', []) + TralMixin.user_options
+this_directory = os.path.abspath(os.path.dirname(__file__))
+long_description = read(this_directory, "README.md")
 
 
 SCRIPTS1 = [os.path.join("tral", "examples", i) for i in ["example_workflow_MBE2014.py"]]
 SCRIPTS2 = [os.path.join("tral", "examples", "workflow", i) for i in ["tandem_repeat_annotation_scripts.py",
                                                                       "tandem_repeat_annotation_workflow.py"]]
-packages = ["tral", "tral.test", "tral.hmm", "tral.hmm.test", "tral.repeat", "tral.repeat.test",
-            "tral.repeat_list", "tral.repeat_list.test", "tral.sequence", "tral.sequence.test"]
 
 # Load the version number from tral/__init__.py
 __version__ = "Undefined"
@@ -89,17 +27,19 @@ setup(
     version=__version__,
     author="Elke Schaper",
     author_email="elke.schaper@isb-sib.ch",
-    packages=packages,
+    packages=find_packages(),
     scripts=SCRIPTS1 + SCRIPTS2,
     url="http://pypi.python.org/pypi/tral/",
     license="LICENSE.txt",
     description="Detect and evaluate tandem repeats in genomic sequence data.",
-    long_description=read("README.rst"),
+    long_description=long_description,
     classifiers=[
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Natural Language :: English",
         "Topic :: Software Development",
         "Topic :: Scientific/Engineering",
@@ -141,9 +81,4 @@ setup(
                            "examples/workflow/*.fasta",
                            "examples/workflow/split_sequence_data/*.fasta"]},
     package_dir={"tral": "tral"},
-    cmdclass={
-        'install': InstallCommand,
-        'develop': DevelopCommand,
-        'bdist_egg': _bdist_egg,
-    }
 )

@@ -73,7 +73,7 @@ def test_detect_repeats_with_repeat():
     assert test_optimized_repeat.repeats[0].msa == TEST_RESULT_REPEAT_MSA_SINGLE
 
 
-@pytest.mark.no_external_software_required
+# Requires hmmbuild
 def test_too_big_hmms():
 
     test_repeat = repeat.Repeat(msa=TEST_RESULT_REPEAT_MSA_LONG)
@@ -107,7 +107,7 @@ def test_detect_repeats_denovo():
 def test_sequence_pickle(tmpdir):
     test_seq = sequence.Sequence(TEST_SEQUENCE)
 
-    test_pickle = os.path.join(tmpdir,"test.pickle")
+    test_pickle = os.path.join(tmpdir, "test.pickle")
     test_seq.write(test_pickle, 'pickle')
     test_seq_new = sequence.Sequence.create(test_pickle, 'pickle')
 

@@ -3,11 +3,11 @@
 # INSTALLING XSTREAM #####
 # XSTREAM: variable sequence tandem repeats extraction and architecture modeling
 # XSTREAM is a tool for rapidly identifying and modeling the architecture of “fundamental” Tandem Repeats (TRs) in protein sequences.
-# Due to the general nature of TRs, however, any sequence including DNA (or even numbers!) can be processed. 
+# Due to the general nature of TRs, however, any sequence including DNA (or even numbers!) can be processed.
 # XSTREAM is freely available only for academic non-profit use and may not be distributed or copied without permission.
 # For questions regarding XSTREAM availability, please contact the XSTREAM team.
 
-# Newman, Aaron & B Cooper, James. (2007). XSTREAM: A practical algorithm for identification and architecture modeling of tandem repeats in protein sequences. BMC bioinformatics. 8. 382. 10.1186/1471-2105-8-382. 
+# Newman, Aaron & B Cooper, James. (2007). XSTREAM: A practical algorithm for identification and architecture modeling of tandem repeats in protein sequences. BMC bioinformatics. 8. 382. 10.1186/1471-2105-8-382.
 # https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-8-382
 
 
@@ -15,11 +15,11 @@
 ### Housekeeping
 
 # Check if Java is installed
-if java -version 2>&1 >/dev/null | grep "java version\|openjdk version" ; then   
-	echo "Java is already installed."; 
-else   
+if java -version 2>&1 >/dev/null | grep "java version\|openjdk version" ; then
+	echo "Java is already installed.";
+else
 	echo "Java NOT installed!"
-	exit $?;
+	exit 1
 fi
 
 
@@ -32,7 +32,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 
@@ -45,7 +45,7 @@ if [ ! -f "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.jar" ]; then # test if not already
     unzip "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" -d "$TRAL_EXT_SOFTWARE/XSTREAM"
     rm -rf "$TRAL_EXT_SOFTWARE/XSTREAM/xstream.zip" || {
         echo "Was not able to download or unzip XSTREAM"
-        exit $?
+        exit 1
     }
 fi
 

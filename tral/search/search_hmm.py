@@ -73,7 +73,12 @@ class TralHit(object):
             " ".join(self.states) if self.states else ""])
 
     def __repr__(self):
-        return "{self.__class__.__name__}({self.id!r},{self.prob!r}, {self.logodds!r}, {len(self.states)} states)"
+        return "{}({!r},{!r}, {!r}, {} states)".format(
+            self.__class__.__name__,
+            self.id,
+            self.prob,
+            self.logodds,
+            len(self.states))
 
     def _to_align_matrix(self, statelist, seq, ignoredstates=["N", "C"]):
         """Constructs a 2D matrix of the repeat alignment from the states of this hit.

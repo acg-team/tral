@@ -20,7 +20,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 ######################
@@ -32,16 +32,16 @@ for directory in "$TRAL_EXT_SOFTWARE/hmmer"*; do  # test if hmmer files not alre
     if [ -d "$directory" ]; then
         echo "HMMER is already downloaded and in "$directory""
     else
-        {   
+        {
             LINK_HMMER="http://eddylab.org/software/hmmer/hmmer.tar.gz" # HHrepID Nov 22 2007
             wget "$LINK_HMMER" -P "$TRAL_EXT_SOFTWARE"   # download execution file
             tar -xvzf "$TRAL_EXT_SOFTWARE/hmmer.tar.gz" -C "$TRAL_EXT_SOFTWARE"
             rm -rf "$TRAL_EXT_SOFTWARE/hmmer.tar.gz"
             } || {
             echo "Couldn't download HMMER."
-            exit $?
+            exit 1
         }
-        
+
     fi
 done
 
@@ -53,20 +53,19 @@ done
         {
             cd "$TRAL_EXT_SOFTWARE/hmmer-"*
         } && {
-            ./configure --prefix "$INSTALLATION_PATH"
+            ./configure --prefix "$INSTALLATION_PATH/.."
             make clean
             make
             # "$INSTALLATION_PATH"/bin make check        # run a test suite
             make install
         } && {
             echo "Installation of HMMER done."
-            ln -s "$INSTALLATION_PATH/bin/hmmbuild" "$INSTALLATION_PATH/hmmbuild"
             echo -e  "\nhmmbuild is in your path $INSTALLATION_PATH\n"
         }
     )
     } || {
     echo "Couldn't compile and install HMMER."
-    exit $?
+    exit 1
 }
 
 ###############i#######
@@ -76,7 +75,7 @@ done
 
 # {
 #     ( cd "$TRAL_EXT_SOFTWARE/hmmer-"* && make uninstall )
-#     rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"* 
+#     rm -rf "$TRAL_EXT_SOFTWARE/hmmer-"*
 #     rm -rf "$INSTALLATION_PATH/hmmbuild"
 # } || {
 #     echo -e "HMMER removed."

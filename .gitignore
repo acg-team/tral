@@ -123,3 +123,6 @@ ENV/
 
 # easy install
 easy_setup/install_ext_software/phyml.sh
+
+# configobj code
+validate.py

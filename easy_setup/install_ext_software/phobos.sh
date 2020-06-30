@@ -22,7 +22,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 ######################
@@ -31,7 +31,7 @@ PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other fi
 ## TODO: Does the test work if phobos not installed in a system path?
 
 if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in directory
-    
+
     if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
         ma=a
     else
@@ -51,17 +51,17 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
             then
                 gnome-open "https://www.ruhr-uni-bochum.de/ecoevo/cm/regist_form.htm"
             fi
-            
+
             echo -e  "\nAfter downloading your version of choice you can unzip it and put the binaries into your PATH.\n"
         ;;
         [Aa]* )
             echo -e "\nDo you confirm to the authors copyright (Copyright (c) Christoph Mayer 2006-2017)?\n This program is for academic and non-commercial usage only."
-            
+
             if [[ "${ACCEPT_ALL:-no}" = "yes" ]]; then
                 yn=y
             else read -p "Would you like to download the phobos-v3.3.12-linux version? yes(y) or no (n):" yn
             fi
-            
+
             case $yn in
                 [Yy]* )
                     {
@@ -70,12 +70,12 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
                     tar zxf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz" -C "$TRAL_EXT_SOFTWARE"
                     rm -rf "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux.tar.gz"
                     cp "$TRAL_EXT_SOFTWARE/phobos-v3.3.12-linux/bin/phobos_64_libstdc++6" "$INSTALLATION_PATH" # copies binaries to system path $INSTALLATION_PATH/
-                    if [ ! -h "$INSTALLATION_PATH/phobos" ]; then 
+                    if [ ! -h "$INSTALLATION_PATH/phobos" ]; then
                         ln -s "$INSTALLATION_PATH/phobos_64_libstdc++6" "$INSTALLATION_PATH/phobos" # create symlink to executable file
                     fi
                     } || {
                         echo -e "Something went wrong with downloading or installing phobos."
-                        exit $?
+                        exit 1
                     }
                     echo -e "\nPHOBOS binaries are now in the user path $INSTALLATION_PATH"
                     ;;
@@ -85,10 +85,10 @@ if [ ! -x "$(command -v phobos_64_libstdc++6)" ]; then # test if not already in 
             esac
         ;;
     esac
-    
+
 else
     echo "PHOBOS already installed." && exit 0
-    
+
 fi
 
 
@@ -102,5 +102,3 @@ fi
 # rm -rf "$TRAL_EXT_SOFTWARE/phobos_64_libstdc++6"
 # rm -rf "$INSTALLATION_PATH/phobos_64_libstdc++6"
 # rm -rf "$INSTALLATION_PATH/phobos"
-
-

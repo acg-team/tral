@@ -16,7 +16,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 ######################
@@ -27,7 +27,7 @@ wget --no-check-certificate "$LINK_TREKS" -P "$TRAL_EXT_SOFTWARE" # no check cer
 
 if [ ! -f "$TRAL_EXT_SOFTWARE/T-Reks.jar" ]; then # test if T-Reks.jar is downloaded or manually put into the directory.
     echo "Something went wrong with downloading T-REKS"
-    
+
 else # Create an executable file for TREKS
     echo '#!/bin/sh
     # wrapper file to easily start T-REKS
@@ -36,7 +36,7 @@ else # Create an executable file for TREKS
     chmod +x "$TRAL_EXT_SOFTWARE/T-REKS"
     cp "$TRAL_EXT_SOFTWARE/T-REKS" "$INSTALLATION_PATH"  # copy wrapper file to execute T-REKS into system path
     chmod +x "$INSTALLATION_PATH/T-REKS" && echo -e "\nT-REKS is in your path $INSTALLATION_PATH and can be executed with the command \"T-REKS\""
-    
+
     # TREKS is executalbe with the command "T-REKS"
 fi
 
@@ -46,4 +46,3 @@ fi
 # rm -rf "$TRAL_EXT_SOFTWARE/T-Reks.jar"
 # rm -rf "$TRAL_EXT_SOFTWARE/T-REKS"
 # rm -rf "$INSTALLATION_PATH/T-REKS"
-

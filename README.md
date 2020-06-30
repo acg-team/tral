@@ -17,7 +17,7 @@ The source code is [documented on GitHub IO].
 
 ### Installation
 
-It is recommended to install TRAL with the [easy_setup] system.
+It is recommended to use TRAL with the [docker image] or install it locally with the [easy_setup] system.
 
 
 ### License
@@ -31,6 +31,7 @@ Some of TRAL's functions depend on external software ([Installation instructions
 
 
 [documented on GitHub IO]:https://acg-team.github.io/tral/
+[docker image]:https://github.com/acg-team/tral/packages
 [easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
 [Installation instructions for dependencies]:https://acg-team.github.io/tral/install_external.html#install-external
 [Pypi]:https://pypi.python.org/pypi

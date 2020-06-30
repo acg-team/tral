@@ -45,7 +45,7 @@ set -euo pipefail # exit on errors and undefined vars
 PARENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; cd .. ; pwd -P ) # other files are located one directory above
 . "$PARENT_PATH/configTRAL_path.cfg" || {  # provide paths from config file
     echo "configTRAL_path.cfg not found"
-    exit $?
+    exit 1
 }
 
 ######################
@@ -60,7 +60,7 @@ if [ ! -f "$TRAL_EXT_SOFTWARE/HHrepID/hhrepid_64" ]; then # test if not already 
         wget "$LINK_HHREPID/README" -P "$TRAL_EXT_SOFTWARE/HHrepID"  # download README
         } || {
         echo "Couldn't download HHrepID."
-        exit $?
+        exit 1
     }
 fi
 
