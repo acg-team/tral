@@ -33,6 +33,7 @@ setup(
     license="LICENSE.txt",
     description="Detect and evaluate tandem repeats in genomic sequence data.",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     classifiers=[
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
