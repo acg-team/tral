@@ -180,7 +180,8 @@ Check the updated docs online (synchronizes automatically) at `acg-team.github.i
 4. Build a python wheel
 -----------------------
 ::
-    git checkout develop
+
+    git checkout develop  
     python setup.py sdist bdist_wheel
 
 5. Create a git tag
@@ -215,6 +216,24 @@ Upload to PyPi test platform first:
     
     twine upload dist/*
 
-9. Prepare repository for further development
----------------------------------------------
+8. Build docker container
+--------------------------
+Create `Github.com Token <https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line>`_
+and login your docker instance:
+
+::
+    
+    cat TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin
+    
+We encountered issues if not all tral related docker container and images were stopped and removed.
+Continue then with building a new docker image with the new release:
+
+::
+    
+    sudo docker build -t docker.pkg.github.com/acg-team/tral/tral_docker:<VERSION> -t docker.pkg.github.com/acg-team/tral/tral_docker:latest -f tral/docker/Dockerfile --no-cache 
+    sudo docker push docker.pkg.github.com/acg-team/tral/tral_docker:latest
+
+
+10. Prepare repository for further development
+----------------------------------------------
 Increment version in `__init_.py` from i.e. `2.0.0` to `2.0.1.dev0`.

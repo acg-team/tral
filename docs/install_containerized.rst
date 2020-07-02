@@ -34,3 +34,23 @@ on the host is mounted as ``/vagrant`` within the box for easy data transfer.
 
 Note that external software is licensed independently of TRAL. You should check
 the licenses for all software. Several tools are restricted to academic use.
+
+Docker
+------
+Create `Github.com Token <https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line>`_ 
+and login your docker instance:
+::
+    
+    cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin
+
+Get the latest docker image:
+::
+
+    sudo docker docker pull docker.pkg.github.com/acg-team/tral/tral_docker:latest
+
+Fire it up:
+::
+    
+    sudo docker run -ti docker.pkg.github.com/acg-team/tral/tral_docker
+
+For development check the :ref:`realease procedure <contribute>`.
