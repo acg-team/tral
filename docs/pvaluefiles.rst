@@ -8,7 +8,7 @@ need to be downloaded (2.6Gb) and placed in ~/.tral/data/pvalue:
 ::
 
     cd ~/.tral/data
-    wget ftp://ftp.vital-it.ch/papers/vital-it/Bioinformatics-Schaper/pvalue.tar.gz
+    wget https://acg-team.ulozezoz.myhostpoint.ch/pvalue.tar.gz
     tar -xzf pvalue.tar.gz
 
 

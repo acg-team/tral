@@ -35,18 +35,17 @@ Within the sequence, this tandem repeat would like as follows::
 
 These are the other characteristics of the tandem repeat, that might be shown (if available):
 
-- **begin**: This is the index where the tandem repeat starts in the sequence
-- **l_effective**: This is the length of the consensus tandem repeat unit, not including insertions.
-- **n**: This is the number of tandem repeat units.
-- **pvalue**: What is the probability that this repeat has occurred by random chance? (This value
-  is a good estimate. So even if pvalue=0.0, of course it is possible that the sequence shows similarity
-  by random chance, and not because the repeat units have evolved by duplications.)
-- **divergence**: this is a model-based measure of the similarity of the repeat units.
-  (mathematically, it is the maximum likelihood estimate of the branch length on the phylogeny
-  connecting all tandem repeat units. In the above example, every site has mutated 0.47 times
-  on average. A value of 0 would mean no mutations have occurred, and the sequence of the
-  tandem repeat units is very conserved.)
-- **type**: Which model was used to calculate the pvalue and the divergence?
+- **begin**: Index where the tandem repeat starts in the sequence
+- **l_effective**: ength of the consensus tandem repeat unit, not including insertions.
+- **n**: Number of tandem repeat units.
+- **pvalue**: What is the probability that this repeat has occurred by random chance? 
+(This value is only a good estimate. So even if pvalue=0.0, of course it is possible that the
+sequence shows similarity by random chance, and not because the repeat units have evolved by duplications).
+- **divergence**: tModel-based measure of the similarity of the repeat units. (mathematically, it is the maximum 
+likelihood estimate of the branch length on the phylogeny connecting all tandem repeat units. 
+In the above example, every site has mutated 0.47 times on average. A value of 0 would mean no 
+mutations have occurred, and the sequence of the tandem repeat units is very conserved).
+- **type**: The model which was used to calculate the pvalue and the divergence.
 
 
 More tandem repeat characteristics

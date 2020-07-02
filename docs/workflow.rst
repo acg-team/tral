@@ -11,7 +11,7 @@ filtering all in one.
 For very large sequence sets (> 6000 sequences ~ 10h runtime), you may wish to perform the
 annotation on several computing  nodes in parallel. Here, we provide a system to automise
 the distribution and collection of tandem repeat annotation jobs with
-`GC3Pie <https://code.google.com/p/gc3pie/>`_.
+`GC3Pie <https://gc3pie.readthedocs.io/en/master/index.html>`_.
 
 Everything is explained with a `toy workflow located in the TRAL source`_. You can print
 the path to the local copy included in TRAL with this Python code::
@@ -141,20 +141,20 @@ Install GC3PIE.
 ---------------
 
 You can follow the official
-`GC3Pie installation instructions <http://gc3pie.readthedocs.org/en/latest/users/install.html>`_.
+`GC3Pie installation instructions <https://gc3pie.readthedocs.io/en/master/users/install.html>`_.
 Upon installation, GC3Pie needs to be `locally configured <http://gc3pie.readthedocs.org/en/latest/users/configuration.html>`_.
 
 
 Usage
 -----
 
-Adapt this command to run the tandem repeat annotation workflow (`more information <http://gc3pie.readthedocs.org/en/latest/users/gc3apps/intro.html>`_)::
+Adapt this command to run the tandem repeat annotation workflow (`more information <https://gc3pie.readthedocs.io/en/master/users/configuration.html>`_)::
 
 
     $ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r <host> -J 500 -u sqlite:////path/to/<session_name>.db -s <session_name> -C 2 -vvvv -conf $MYTRAL/examples/workflow/tandem_repeat_annotation_workflow.ini
 
 
-Control the workflow with `GC3Utils <http://gc3pie.readthedocs.org/en/latest/users/gc3utils.html>`_.
+Control the workflow with `GC3Utils <https://gc3pie.readthedocs.io/en/master/users/gc3utils.html>`_.
 
 ::
 

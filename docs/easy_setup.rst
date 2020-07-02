@@ -3,8 +3,8 @@
 easy_setup for TRAL
 ===================
 
-These scripts will help you to easily install TRAL and its dependencies without going too deep into detail of the different installation procedures.
-It automatically sets up a little filesystem for TRAL.
+These scripts will help you to easily install TRAL and its dependencies without going too deep into detail of the different installation procedures. 
+It automatically sets up a little filesystem for TRAL. 
 Moreover, you can decide which external software should be downloaded and installed without the need to read through their (sometimes complicated) installation procedures.
 
 
@@ -17,9 +17,19 @@ Per default TRAL will be installed within the site-packages of python and its ex
 If you wish to change this path you can adjust 
 ``$INSTALLATION_PATH`` in ``configTRAL.cfg``
 
-These setup scripts require ``bash``, ``python3``, ``pip``, ``unzip``, and ``git`` and run on any UNIX based operation system.
-To compile some of the software (HMMER) ``gcc``, ``make`` and ``musl-dev`` is needed.
+These setup scripts require ``bash``, ``python3``, ``python-dev``, ``pip``, ``unzip``, and ``git`` and run on any UNIX based operation system.
+
+Some of the external software has additional Prerequisits:
+``HMMER``: ``gcc``, ``make``, ``musl-dev``
+``Castor``: ``cmake``
+``XSTREAM``: java (recommendation: default Java OpenJDK)
+
 If you like to work in a virtual environment you need to install the respective software (e.g. virtenv).
+
+We further recommend you to install the following python packages in order to have a good time with TRAL::
+
+    pip3 install scipy configobj biopython pyfaidx
+
 
 Getting Started
 ---------------
