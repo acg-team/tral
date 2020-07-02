@@ -126,3 +126,7 @@ easy_setup/install_ext_software/phyml.sh
 
 # configobj code
 validate.py
+
+# Visual Code 
+**/*.code-workspace
+**/*.vscode
