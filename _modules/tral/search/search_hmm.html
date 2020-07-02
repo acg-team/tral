@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tral.search.search_hmm &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.search.search_hmm</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tool to search an HMM against a database of sequences</span>
+
+<span class="sd">May be run as a module, e.g. `python -m tral.search.search_hmm -h`</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">..hmm</span> <span class="kn">import</span> <span class="n">hmm</span><span class="p">,</span> <span class="n">hmm_viterbi</span>
+<span class="kn">from</span> <span class="nn">Bio</span> <span class="kn">import</span> <span class="n">SeqIO</span>
+
+
+<div class="viewcode-block" id="TralHit"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.TralHit">[docs]</a><span class="k">class</span> <span class="nc">TralHit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encapsulates key information about a TRAL search result.</span>
+
+<span class="sd">    This is similar to some objects from the `tral.repeat` package, but collects</span>
+<span class="sd">    data together and provides serialization methods.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">logodds</span><span class="p">,</span> <span class="n">states</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span>  <span class="c1"># log10 probability</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logodds</span> <span class="o">=</span> <span class="n">logodds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">states</span>
+
+    <span class="c1"># Header for TSV format</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;ID</span><span class="se">\t</span><span class="s2">Prob</span><span class="se">\t</span><span class="s2">LO</span><span class="se">\t</span><span class="s2">States&quot;</span>
+
+<div class="viewcode-block" id="TralHit.parse_line"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.TralHit.parse_line">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parse_line</span><span class="p">(</span><span class="n">Cls</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse a line from the TSV serialization to a TralHit</span>
+
+<span class="sd">        Inverse of to_line()</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        -  line (str): TSV-separated line representing one hit</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        A new TralHit instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal format&quot;</span><span class="p">)</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">lo</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">Cls</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">states</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TralHit.to_line"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.TralHit.to_line">[docs]</a>    <span class="k">def</span> <span class="nf">to_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts this hit to a tab-delimited line</span>
+
+<span class="sd">        Does not include endline.</span>
+
+<span class="sd">        May be recreated by `parse_line(line)`</span>
+
+<span class="sd">        Return: (str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logodds</span><span class="p">),</span>
+            <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{!r}</span><span class="s2">,</span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> states)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logodds</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_to_align_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statelist</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">ignoredstates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a 2D matrix of the repeat alignment from the states of this hit.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            - statelist (list of string): a sorted list of all states in this alignment</span>
+<span class="sd">            - seq (string): sequence for this hit. Should match self.states in length</span>
+<span class="sd">            - ignoredstates (list of string): list of non-aligned states</span>
+
+<span class="sd">        Returns: (3D list of strings)</span>
+<span class="sd">            The result is a rectangular matrix, where the first index is the repeat number,</span>
+<span class="sd">            the second index is the column (with the same length as statelist), and the element</span>
+<span class="sd">            is a list of zero or more letters from seq.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># reverse index</span>
+        <span class="n">statepos</span> <span class="o">=</span> <span class="p">{</span><span class="n">state</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">statelist</span><span class="p">)}</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+
+        <span class="n">align</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">state</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">ignoredstates</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">assert</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">statelist</span>  <span class="c1"># should be the only other states</span>
+
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">statepos</span><span class="p">[</span><span class="n">state</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># new row</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">statelist</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+                <span class="n">align</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+
+            <span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">statelist</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+        <span class="n">align</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">align</span>
+
+    <span class="k">def</span> <span class="nf">_to_repeat_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">align</span><span class="p">,</span> <span class="n">statelist</span><span class="p">,</span> <span class="n">stateheader</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs a multiple alignment string for this hit.</span>
+
+<span class="sd">        Gaps are indicated by -;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            - align (3D list of strings): output of self._to_align_matrix</span>
+<span class="sd">            - statesheader (bool): Add header rows giving the state names for each column</span>
+<span class="sd">        Returns: (3D list of strings)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find max width of each column</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">align</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">col</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">align</span><span class="p">)))</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">statelist</span><span class="p">))]</span>
+
+        <span class="c1"># Convert to strings</span>
+        <span class="n">alignstr</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">stateheader</span><span class="p">:</span>
+            <span class="n">maxlen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">statelist</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxlen</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">statelist</span><span class="p">)):</span>
+                    <span class="n">w</span> <span class="o">=</span> <span class="n">widths</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+                    <span class="n">char</span> <span class="o">=</span> <span class="n">statelist</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">row</span><span class="p">:(</span><span class="n">row</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+                    <span class="n">alignstr</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">char</span> <span class="k">if</span> <span class="n">char</span> <span class="k">else</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span>
+                <span class="n">alignstr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">align</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">statelist</span><span class="p">)):</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">widths</span><span class="p">[</span><span class="n">col</span><span class="p">]</span>
+                <span class="n">alignstr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;{:-&lt;</span><span class="si">{}</span><span class="s2">}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">align</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">col</span><span class="p">]),</span> <span class="n">w</span><span class="p">))</span>
+            <span class="n">alignstr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">alignstr</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TralHit.to_treks"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.TralHit.to_treks">[docs]</a>    <span class="k">def</span> <span class="nf">to_treks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">hmm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts this hit to T-REKS format</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sequence (str or Bio.SeqRecord or Bio.Seq): sequence for this hit</span>
+<span class="sd">            hmm (hmm.HMM): (optional) the HMM used to generate this hit. If specified,</span>
+<span class="sd">                results in more accurate set of states</span>
+<span class="sd">        Return: (str)</span>
+
+<span class="sd">        See: tral.sequence.repeat_detection_io.treks_get_repeats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Example:</span>
+        <span class="c1"># &gt;sp|Q10567|AP1B1_HUMAN AP-1 complex subunit beta-1 OS=Homo sapiens OX=9606 GN=AP1B1 PE=1 SV=2</span>
+        <span class="c1"># Length: 4 residues - nb: 5  from  625 to 645 - Psim:0.7 region Length:21</span>
+        <span class="c1"># G-D-LL</span>
+        <span class="c1"># G-D-LL</span>
+        <span class="c1"># NLD-L-</span>
+        <span class="c1"># G-PPVS</span>
+        <span class="c1"># G-P-PL</span>
+        <span class="c1"># **********************</span>
+
+        <span class="c1"># Handle case without any repeats</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;repeat not found in sequence </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="s2">&quot;seq&quot;</span><span class="p">):</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">seq</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="n">sequence</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatched sequence lengths for &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+
+        <span class="c1"># identifier</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">description</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sequence</span><span class="o">.</span><span class="n">description</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute header info</span>
+        <span class="n">usedstates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+
+        <span class="c1"># Guess HMM length</span>
+        <span class="k">if</span> <span class="n">hmm</span><span class="p">:</span>
+            <span class="n">hmm_len</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">l_effective</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span> <span class="k">for</span> <span class="n">m_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">match_states</span><span class="p">,</span> <span class="n">hmm</span><span class="o">.</span><span class="n">insertion_states</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">m_i</span>
+                      <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">usedstates</span><span class="p">]</span>
+            <span class="n">ignored</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">terminal_states</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Check that state names are expected</span>
+            <span class="n">statepattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[NC]|[MI]\d+&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">statepattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">usedstates</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown state naming pattern. HMM required.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Guess based on state names</span>
+            <span class="n">hmm_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">hmm_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;M</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;I</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                      <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">usedstates</span><span class="p">]</span>
+            <span class="n">ignored</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Compute alignment</span>
+        <span class="n">align</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_align_matrix</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">ignored</span><span class="p">)</span>
+
+        <span class="c1"># Compute bounds. 0-based inclusive</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignored</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignored</span><span class="p">)</span>
+
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Length: </span><span class="si">{}</span><span class="s2"> residues - &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hmm_len</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;nb: </span><span class="si">{}</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">align</span><span class="p">)))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;from  </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> - &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Psim:</span><span class="si">{:f}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">prob</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;region Length:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># write alignment</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_repeat_alignment</span><span class="p">(</span><span class="n">align</span><span class="p">,</span> <span class="n">states</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;**********************</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="opengzip"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.opengzip">[docs]</a><span class="k">def</span> <span class="nf">opengzip</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Open a file, which may optionally be gzip&#39;d</span>
+
+<span class="sd">    Checks the magic bytes to see if the file was compressed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        - filename (str): Filename</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An open file handle</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">magic</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">magic</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">magic</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x1f\x8b</span><span class="s1">&#39;</span><span class="p">:</span>  <span class="c1"># gzip</span>
+        <span class="k">return</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="shuffle_seq"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.shuffle_seq">[docs]</a><span class="k">def</span> <span class="nf">shuffle_seq</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Randomly shuffle a sequence</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        - seq (Bio.Seq): input sequence</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Bio.Seq.MutableSeq with suffled characters</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mutable</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">tomutable</span><span class="p">()</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">mutable</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mutable</span></div>
+
+
+<span class="k">def</span> <span class="nf">search_hmm</span><span class="p">(</span><span class="n">hmmfile</span><span class="p">,</span> <span class="n">databasefile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">circular_profile</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">input_format</span><span class="o">=</span><span class="s1">&#39;hmmer&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">hmmfile</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">opengzip</span><span class="p">(</span><span class="n">databasefile</span><span class="p">)</span> <span class="k">as</span> <span class="n">database</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading database from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">databasefile</span><span class="p">)</span>
+            <span class="c1"># Use BioPython over TRAL for performance</span>
+            <span class="c1"># seqs = sequence.Sequence.create(database, input_format=&#39;fasta&#39;)</span>
+            <span class="c1"># logging.info(&quot;Loaded %d sequences&quot;, len(list(seqs)))</span>
+            <span class="n">seqs</span> <span class="o">=</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)</span>
+
+            <span class="c1"># header</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">TralHit</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">seqs</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">n</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">):</span>
+
+                <span class="n">seq</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">seq</span>
+                <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+                    <span class="n">seq</span> <span class="o">=</span> <span class="n">shuffle_seq</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+
+                <span class="n">hmm_results</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="n">hmm_viterbi</span><span class="o">.</span><span class="n">viterbi_with_prob</span><span class="p">(</span><span class="n">circular_profile</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span>
+
+                <span class="n">odds</span> <span class="o">=</span> <span class="n">hmm_viterbi</span><span class="o">.</span><span class="n">logodds</span><span class="p">(</span><span class="n">circular_profile</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span>
+
+                <span class="n">hit</span> <span class="o">=</span> <span class="n">TralHit</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">odds</span><span class="p">,</span> <span class="n">hmm_results</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">to_line</span><span class="p">())</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../tral/search.html#tral.search.search_hmm.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="s2">&quot;search_hmm main method&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Align a cpHMM against a database using TRAL&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;hmm&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;cpHMM filename&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;database to search, in fasta format (may be gzip compressed)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;results file&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Long messages&quot;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--start&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Index of database sequence to start with (default: 0)&quot;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="s2">&quot;--dbsize&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of database sequences to include (default: 0 to include all)&quot;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--shuffle&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Shuffle database sequences&quot;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
+
+    <span class="n">search_hmm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">hmm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dbsize</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">shuffle</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

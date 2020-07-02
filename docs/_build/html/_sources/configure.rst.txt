@@ -1,0 +1,184 @@
+.. _configure:
+
+Configuration
+=============
+
+Here you see how to configure TRAL after installation. All configuration files are located
+in your home directory:
+::
+
+    ~/.tral/
+
+
+configs.ini - REQUIRED: Supply paths to external software and data.
+-------------------------------------------------------------------
+
+In configs.ini you can set the paths to all external software and data used in TRAL, as well
+as change default thresholds and behaviours.
+
+
+*De novo* repeat detection
+**************************
+Enlist all *de novo* detection algorithms you wish to use. All other algorithms are ignored
+by default.
+::
+
+    [sequence]
+        [[repeat_detection]]
+            AA = HHrepID, T-REKS, TRUST, XSTREAM  # List of default de novo detectors on amino acid data that you wish to use.
+            DNA = PHOBOS, XSTREAM  #List of default de novo detectors on nucleic data that you wish to use.
+
+
+If the binaries or executable scripts of any *de novo* detection algorithm are not in the
+system path, set the absolute paths in config.ini. Details for each detector (e.g. to create
+executable scripts) are detailed in :ref:`Installation of external software <install_external>`.
+::
+
+    [sequence]
+        [[repeat_detector_path]]
+            PHOBOS = phobos
+            HHrepID = hhrepid_64
+            HHrepID_dummyhmm = /path/to/home/.tral/data/hhrepid/dummyHMM.hmm
+            TRUST = TRUST
+            TRUST_substitutionmatrix = /path/to/TRUST/Align/BLOSUM50  #Recommended: Use matrices packages shipped with TRUST
+            XSTREAM = XSTREAM
+            [...]
+
+
+Build Hmmer models
+******************
+
+If *hmmbuild* is not in your system path, define the absolute path::
+
+    [hmm]
+        hmmbuild = path/to/hmmbuild
+
+
+Realign tandem repeat units
+***************************
+At current, tandem repeat units are realigned with Mafft's ginsi global aligner. This is
+required for example if you annotate tandem repeats from profile models. If *ginsi* is
+not in your system path, define the absolute path::
+
+    [repeat]
+        ginsi = /path/to/ginsi
+
+Additionally, all detected tandem repeats (either from profile models or *denovo* can be realigned with the indel-aware proPIP alignment algorithm.
+To use proPIP you need to have Castor (incl. aligner) which ships with proPIP. If *Castor* is not in your system path, define the absolute path::
+
+    [repeat]
+        Castor = /path/to/Castor
+        [[castor_parameter]]
+            rate_distribution = constant # either constant or gamma
+
+
+Simulation of evolution in tandem repeats
+*****************************************
+
+If *alfsim* is not in your system path, set the absolute path::
+
+	[repeat]
+		alfsim = path/to/alfsim
+
+
+configs.ini - OPTIONAL: Change TRAL's default behaviour
+-----------------------------------------------------------
+
+Define the default filter behaviour.
+*****************************************
+
+::
+
+    [filter]
+        [[basic]]
+            tag = basic_filter
+            [[[dict]]]
+                [[[[pvalue]]]]
+                    func_name = pvalue
+                    score = phylo_gap01  # score
+                    threshold = 0.1  # p-Value cut-off
+                [[[[n_effective]]]]
+                    func_name = attribute
+                    attribute = n_effective  # attribute of tandem repeat, e.g. the repeat unit length l_effective
+                    type = min
+                    threshold = 1.9  # p-Value cut-off
+
+
+
+Creation of new Repeat instances
+*********************************
+
+::
+
+    [repeat]
+        scoreslist = phylo_gap01,  # score
+        calc_score = False  # Is the score calculated?
+        calc_pvalue = False # Is the pvalue calculated?
+        precision = 10
+        ginsi = /path/to/ginsi  # Path to the mafft global aligner ginsi.
+        Castor = Castor
+        [[castor_parameter]]
+            rate_distribution = constant # either constant or gamma
+        alfsim = alfsim
+
+
+Statistical significance calculation and models of repeat evolution
+*******************************************************************
+
+::
+
+    [repeat_score]
+        evolutionary_model = lg  # All models need to be available in /path/to/TandemRepeats/tandemrepeats/data/paml/
+        [[indel]]
+            indelRatePerSite = 0.01  # What magnitude is the indel rate compared to the substitution rate?
+            ignore_gaps = True  # Shall trailing gaps be ignored / not penalised?
+            gaps = row_wise
+            zipf = 1.821
+        [[optimisation]]
+            start_min = 0.5
+            start_max = 1.5
+            nIteration = 14
+        [[K80]]
+            kappa = 2.59
+        [[TN93]]
+            alpha_1 = 0.3
+            alpha_2 = 0.4
+            beta = 0.7
+    [[score_calibration]]
+        scoreslist=phylo_gap01,
+        save_calibration = False
+        precision = 10
+
+
+Creation of new Repeat list instances
+************************************************************
+
+::
+
+    [repeat_list]
+        output_characteristics = begin, msa_original, l_effective, n_effective, repeat_region_length, divergence, pvalue
+        model = phylo_gap01
+
+
+Restrict Hmmer model size.
+****************************
+
+Set the maximum size of HMM for which the Viterbi algorithm is performed *l_effective_max* e.g.
+to ensure viable run-times on your system::
+
+    [hmm]
+        l_effective_max = 50
+
+logging.ini - OPTIONAL
+-----------------------
+
+In this file, you can define the level of debugging per module (DEBUG, INFO, WARNING), and
+the format of the debugging message. Defaults to WARNING. The path to the file needs to be
+defined as
+
+::
+
+    import logging
+    import logging.config
+    logging.config.fileConfig("path/to/your/home/.tral/logging.ini")
+
