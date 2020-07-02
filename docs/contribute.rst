@@ -105,8 +105,8 @@ This documentation summarizes the steps to a new release of TRAL.
 
 Version number updates
 
-* README.md and README.rst
-* setup.py
+* README.md
+* tral/__init__.py
 * docs/conf.py
 
 

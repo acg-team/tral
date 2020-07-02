@@ -20,8 +20,8 @@ People
 - `Ioannis Xenarios <http://www.isb-sib.ch/groups/lausanne/vital-it-xenarios.html#Xenarios>`_
 - `Stefan Zoller <https://www.usys.ethz.ch/en/people/profile.html?persid=88844>`_
 - `Spencer Bliven <https://github.com/sbliven>`_
-- Paulina Näf
-- Matteo Delucchi
+- `Paulina Näf <https://github.com/LinaNaef>`_
+- `Matteo Delucchi <https://github.com/matteodelucchi>`_
 
 .. _publications:
 
