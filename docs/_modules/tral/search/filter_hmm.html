@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tral.search.filter_hmm &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.search.filter_hmm</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Filter search_hmm results according to various statistics</span>
+
+<span class="sd">May be run as a module, e.g. `python -m tral.search.filter_hmm -h`</span>
+
+<span class="sd">Filtering is performed by `filter_search_results`. Other methods provide</span>
+<span class="sd">I/O and supporting roles.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">Bio</span> <span class="kn">import</span> <span class="n">SeqIO</span>
+<span class="kn">from</span> <span class="nn">.search_hmm</span> <span class="kn">import</span> <span class="n">TralHit</span><span class="p">,</span> <span class="n">opengzip</span>
+
+
+<div class="viewcode-block" id="count_repeats"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.count_repeats">[docs]</a><span class="k">def</span> <span class="nf">count_repeats</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">hmm_length</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count the number of repeats matched by the hmm.</span>
+
+<span class="sd">    Partial repeats at the beginning and end of the hmm</span>
+
+<span class="sd">    For example, consider a 3-column HMM with the following states:</span>
+
+<span class="sd">      N N N M2 M3 M1 I1 M2 M1 M2 C C C</span>
+
+<span class="sd">    This would have .6+1+.6=2.3 repeats.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        - states (list of str): list of states traversed by the hmm. Only</span>
+<span class="sd">            match states (starting with &#39;M&#39;) are considered, and are assumed</span>
+<span class="sd">            to be numbered sequentially from 1</span>
+<span class="sd">        - hmm_length (int): number of HMM states. If not given, guessed based</span>
+<span class="sd">            on the observed states (may be inaccurate)</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (float) Number of repeats</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">match_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;M([0-9]+)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+    <span class="c1"># states are numbered from 1</span>
+    <span class="n">first_match</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">last_match</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">circles</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;M&#39;</span><span class="p">:</span>  <span class="c1"># match state</span>
+            <span class="c1"># find state index</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">match_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">first_match</span><span class="p">:</span>
+                    <span class="n">first_match</span> <span class="o">=</span> <span class="n">index</span>
+
+                <span class="c1"># loop around</span>
+                <span class="k">if</span> <span class="n">last_match</span> <span class="o">&gt;</span> <span class="n">index</span><span class="p">:</span>
+                    <span class="n">circles</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">hmm_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">hmm_length</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+                <span class="n">last_match</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="k">if</span> <span class="n">first_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">first_match</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">/</span> <span class="n">hmm_length</span> <span class="o">+</span> \
+        <span class="n">circles</span> <span class="o">+</span> \
+        <span class="nb">float</span><span class="p">(</span><span class="n">last_match</span><span class="p">)</span> <span class="o">/</span> <span class="n">hmm_length</span></div>
+
+
+<div class="viewcode-block" id="filter_search_results"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.filter_search_results">[docs]</a><span class="k">def</span> <span class="nf">filter_search_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">log_odds</span><span class="o">=</span><span class="mf">8.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the set of hits passing the specified filter</span>
+
+<span class="sd">    :param results: TSV file with TRAL hits</span>
+<span class="sd">    :param repeats: minimum number of repeats</span>
+<span class="sd">    :param log_odds: minimum log odds score</span>
+<span class="sd">    :return: Generator for all hits</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hits</span> <span class="o">=</span> <span class="n">parse_hits</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">hit</span><span class="p">:</span> <span class="n">hit</span><span class="o">.</span><span class="n">logodds</span> <span class="o">&gt;=</span> <span class="n">log_odds</span> <span class="ow">and</span>
+                      <span class="n">hit</span><span class="o">.</span><span class="n">states</span> <span class="ow">and</span>
+                      <span class="n">count_repeats</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">repeats</span><span class="p">,</span>
+                      <span class="n">hits</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">filtered</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">hit</span></div>
+
+
+<div class="viewcode-block" id="filter_fasta"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.filter_fasta">[docs]</a><span class="k">def</span> <span class="nf">filter_fasta</span><span class="p">(</span><span class="n">databasefile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">hits</span><span class="p">,</span> <span class="n">usedescription</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter a fasta file to IDs contained in the hits</span>
+
+<span class="sd">    :param databasefile: Name of input fasta. May be gzipped</span>
+<span class="sd">    :param outfile: Name of output fasta. Uncompressed.</span>
+<span class="sd">    :param hits: Iterable of TralHits</span>
+<span class="sd">    :param usedescription: Include full description (header line) from the input</span>
+<span class="sd">        fasta database. If false, only the name (first word after the &#39;&gt;&#39;) will</span>
+<span class="sd">        be used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">hit</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">hits</span><span class="p">}</span>
+    <span class="k">with</span> <span class="n">opengzip</span><span class="p">(</span><span class="n">databasefile</span><span class="p">)</span> <span class="k">as</span> <span class="n">database</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading database from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">databasefile</span><span class="p">)</span>
+            <span class="n">seqs</span> <span class="o">=</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">seq</span><span class="p">:</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">,</span> <span class="n">seqs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">usedescription</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">replacedescription</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+                    <span class="n">seq</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">return</span> <span class="n">seq</span>
+                <span class="n">filtered</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">replacedescription</span><span class="p">,</span> <span class="n">filtered</span><span class="p">)</span>
+            <span class="n">SeqIO</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_hits"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.parse_hits">[docs]</a><span class="k">def</span> <span class="nf">parse_hits</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generator for hits from a search_hmm output TSV file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Filename</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="s1">&#39;readlines&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">parse_hits</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">hit</span>
+            <span class="k">return</span>
+
+    <span class="c1"># File handle</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">linenr</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="c1"># empty file</span>
+    <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="n">TralHit</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid header in results file&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">linenr</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hit</span> <span class="o">=</span> <span class="n">TralHit</span><span class="o">.</span><span class="n">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">hit</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> in results file line </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">linenr</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="write_hits"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.write_hits">[docs]</a><span class="k">def</span> <span class="nf">write_hits</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a collection of hits to a TSV file</span>
+
+<span class="sd">    :param hits: iterable of TralHit</span>
+<span class="sd">    :param outfile: filename</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">results</span><span class="p">:</span>
+        <span class="c1"># header</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">TralHit</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">hits</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">to_line</span><span class="p">())</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_treks"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.write_treks">[docs]</a><span class="k">def</span> <span class="nf">write_treks</span><span class="p">(</span><span class="n">databasefile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">hits</span><span class="p">,</span> <span class="n">hmm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a collection of hits as a TREKS file</span>
+
+<span class="sd">    :param hits: iterable of TralHit</span>
+<span class="sd">    :param outfile: filename</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">opengzip</span><span class="p">(</span><span class="n">databasefile</span><span class="p">)</span> <span class="k">as</span> <span class="n">database</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading database from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">databasefile</span><span class="p">)</span>
+            <span class="n">seqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">rec</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">rec</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)}</span>
+
+            <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">hits</span><span class="p">:</span>
+                <span class="n">rec</span> <span class="o">=</span> <span class="n">seqs</span><span class="p">[</span><span class="n">hit</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">hit</span><span class="o">.</span><span class="n">to_treks</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">seq</span><span class="p">,</span> <span class="n">hmm</span><span class="o">=</span><span class="n">hmm</span><span class="p">))</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="match_seqs"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.match_seqs">[docs]</a><span class="k">def</span> <span class="nf">match_seqs</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">fastafile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Pair a series of hits with sequences</span>
+
+<span class="sd">    Requires loading fastafile into memory</span>
+
+<span class="sd">    Return: generator of (TralHit, SeqRecord) tuples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">opengzip</span><span class="p">(</span><span class="n">fastafile</span><span class="p">)</span> <span class="k">as</span> <span class="n">database</span><span class="p">:</span>
+        <span class="n">seqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">rec</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">rec</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">hits</span><span class="p">:</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="n">seqs</span><span class="p">[</span><span class="n">hit</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../tral/search.html#tral.search.filter_hmm.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="s2">&quot;filter_hmm main method&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Filter hits from search_hmm&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;hits&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;TSV file, as produced by search_hmm, containing HMM hits&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;database to filter, in fasta format (may be gzip compressed)&quot;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--filtered-fasta&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;output fasta file, filtered by hits&quot;</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--filtered-tsv&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filtered TSV file&quot;</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-x&quot;</span><span class="p">,</span> <span class="s2">&quot;--filtered-treks&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Filtered T-Reks file&quot;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s1">&#39;Thresholds&#39;</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--min-repeats&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Minimum number of repeats&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--log-odds&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Threshold for minimum log-odds ratio&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--preserve-header&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Include the full header in FASTA output. Otherwise, &quot;</span>
+                        <span class="s2">&quot;just the identifier is used to match TSV and TREKS.&quot;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Long messages&quot;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
+
+    <span class="c1"># parse and filter hits</span>
+    <span class="n">hits</span> <span class="o">=</span> <span class="n">filter_search_results</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">hits</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">min_repeats</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">log_odds</span><span class="p">)</span>
+
+    <span class="c1"># preserve iterable if multiple output formats</span>
+    <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filtered_tsv</span><span class="p">)</span> <span class="o">+</span> <span class="nb">bool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filtered_fasta</span><span class="p">)</span> <span class="o">+</span> <span class="nb">bool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filtered_treks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">hits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hits</span><span class="p">)</span>
+
+    <span class="c1"># output filtered tsv</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_tsv</span><span class="p">:</span>
+        <span class="n">write_hits</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_tsv</span><span class="p">)</span>
+    <span class="c1"># output filtered fasta</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_fasta</span><span class="p">:</span>
+        <span class="n">filter_fasta</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_fasta</span><span class="p">,</span> <span class="n">hits</span><span class="p">,</span>
+                     <span class="n">usedescription</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">preserve_header</span><span class="p">)</span>
+    <span class="c1"># output filtered treks</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_treks</span><span class="p">:</span>
+        <span class="n">write_treks</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">filtered_treks</span><span class="p">,</span> <span class="n">hits</span><span class="p">,</span> <span class="n">hmm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="easy_setup for TRAL" href="easy_setup.html" />
+    <link rel="prev" title="Tandem Repeat Annotation Library" href="index.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="#">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#install-with-sudo">Install with sudo</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Tandem Repeat Annotation Library</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="easy_setup.html"
+                        title="next chapter">easy_setup for TRAL</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="install"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>This describes how to install the TRAL python package.</p>
+<p>With pip (or pip3) configured for Python3, try:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install tral
+</pre></div>
+</div>
+<p>The TRAL configuration files are automatically added to your home directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~/.</span><span class="n">tral</span><span class="o">/</span>
+</pre></div>
+</div>
+<div class="section" id="install-with-sudo">
+<h2>Install with sudo<a class="headerlink" href="#install-with-sudo" title="Permalink to this headline">¶</a></h2>
+<p>In case you install TRAL with sudo, the installation home might differ for the sudo account.
+You can either supply the path to your home directory during installation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python setup.py install --tral-home /path/to/your/home
+</pre></div>
+</div>
+<p>or mv the TRAL configuration directory from your root dir to your home, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ~
+$ sudo mv /root/.tral ./
+$ sudo chown -R $(whoami) .tral
+</pre></div>
+</div>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p>To compile locally, run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -r requirements_dev.py
+$ python setup.py install
+</pre></div>
+</div>
+<p>TRAL uses tox and pytest for testing. The following commands relate to testing and code style:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ flake8 tral  # check code style
+$ python setup.py test  # Run tests
+$ tox  # Run comprehensive test suite on multiple python versions
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="next-steps">
+<h1>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h1>
+<p>Working with TRAL requires more than just the python package. After this,
+you should
+<a class="reference internal" href="install_external.html#install-external"><span class="std std-ref">install external software</span></a>,
+<a class="reference internal" href="pvaluefiles.html#pvaluefiles"><span class="std std-ref">download p-value distribution files</span></a>,
+and <a class="reference internal" href="configure.html#configure"><span class="std std-ref">adapt the configuration files</span></a>.</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

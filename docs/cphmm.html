@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotate tandem repeats from sequence domain models. &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Perform statistical significance test of tandem repeats." href="significance_test.html" />
+    <link rel="prev" title="Background Information" href="background.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="index.html">
+      <img class="headlogo" src="_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="index.html">Home</a>
+        <a href="install.html">Install</a>
+        <a href="code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Annotate tandem repeats from sequence domain models.</a><ul>
+<li><a class="reference internal" href="#read-in-your-sequence-profile-model">Read in your sequence profile model.</a></li>
+<li><a class="reference internal" href="#read-in-your-sequences">Read in your sequences.</a></li>
+<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm">Annotate tandem repeats with the circular profile HMM.</a><ul>
+<li><a class="reference internal" href="#annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip">Annotate tandem repeats with the circular profile HMM and realign with proPIP.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#output-the-detected-tandem-repeats">Output the detected tandem repeats.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="background.html"
+                        title="previous chapter">Background Information</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="significance_test.html"
+                        title="next chapter">Perform statistical significance test of tandem repeats.</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cphmm.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="annotate-tandem-repeats-from-sequence-domain-models">
+<span id="cphmm"></span><h1>Annotate tandem repeats from sequence domain models.<a class="headerlink" href="#annotate-tandem-repeats-from-sequence-domain-models" title="Permalink to this headline">¶</a></h1>
+<p>Here you learn how to annotate sequences with your favourite sequence profile model.
+The sequence profile model is transformed into a circular profile HMM, as described in
+a <a class="reference internal" href="contributors.html#publications"><span class="std std-ref">recent MBE publication</span></a>. Next, the sequence
+is searched for tandem repeats using the circular profile HMM.</p>
+<p>Requirements for this tutorial:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="install.html#install"><span class="std std-ref">Install TRAL</span></a>. TRAL ships with the data needed for this tutorial.</p></li>
+<li><p><a class="reference internal" href="install_external.html#mafft"><span class="std std-ref">Install Mafft/ginsi</span></a> for tandem repeat unit alignment.</p></li>
+<li><p><a class="reference external" href="https://bitbucket.org/lorenzogatti89/castor/wiki/Home">Install Castor</a>. If you wish to realign your repeat MSA you need to have proPIP installed beforehand.</p></li>
+</ul>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>write section to install castor with aligner proPIP</p>
+</div>
+<div class="section" id="read-in-your-sequence-profile-model">
+<h2>Read in your sequence profile model.<a class="headerlink" href="#read-in-your-sequence-profile-model" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tral.hmm</span> <span class="kn">import</span> <span class="n">hmm</span>
+<span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
+
+<span class="n">pfam_profile_HMM</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s2">&quot;examples&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span><span class="s2">&quot;Kelch_1.hmm&quot;</span><span class="p">)</span>
+<span class="n">circular_profile_HMM_Kelch_1</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">input_format</span> <span class="o">=</span> <span class="s1">&#39;hmmer&#39;</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">pfam_profile_HMM</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the basic characteristics of the circular profile HMM:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">)</span>
+<span class="go">cpHMM ID: PF01344.20</span>
+<span class="go">cpHMM length: 47</span>
+<span class="go">Most likely motif: ARSSAGVVVLDGKIYVIGGRDGDGNALNSVERYDPVTNTWEKLPSMP</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="read-in-your-sequences">
+<h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
+
+<span class="n">human_HCFC1_fasta</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGE_DIRECTORY</span><span class="p">,</span><span class="s2">&quot;examples&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;P51610.fasta&quot;</span><span class="p">)</span>
+<span class="n">human_HCFC1_sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">human_HCFC1_fasta</span><span class="p">,</span> <span class="n">input_format</span> <span class="o">=</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm">
+<h2>Annotate tandem repeats with the circular profile HMM.<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The result is a tandem repeat <a class="reference internal" href="background.html#background"><span class="std std-ref">(interpretation)</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&gt; begin:31 l_effective:53 n:5</span>
+<span class="go">R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-</span>
+<span class="go">P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---</span>
+<span class="go">TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL</span>
+<span class="go">---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-</span>
+<span class="go">R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+<div class="section" id="annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip">
+<h3>Annotate tandem repeats with the circular profile HMM and realign with proPIP.<a class="headerlink" href="#annotate-tandem-repeats-with-the-circular-profile-hmm-and-realign-with-propip" title="Permalink to this headline">¶</a></h3>
+<p>Alternatively, you can directly include tandem repeat MSA realignment with the indel-aware proPIP algorithm:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">human_HCFC1_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">lHMM</span> <span class="o">=</span> <span class="p">[</span><span class="n">circular_profile_HMM_Kelch_1</span><span class="p">],</span> <span class="n">realignment</span><span class="o">=</span><span class="s1">&#39;proPIP&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tandem_repeats</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">&gt; begin:31 l_effective:48 n:5</span>
+<span class="go">-RP-R-----------HGHRA-V---A--------I-----K--------ELIVVF----G-G----------GN-----E-G---I--V--D--ELH-V-YN-T-A-T--N--Q--W---F---IPAV---R-GD---I-P-</span>
+<span class="go">--PGC-----A---A-YGF---V---C--D-G---T-----R---------LL-VF----G-G-------M---V-----EYG--KY--S--N--DL----YELQ-A-S-----R--WE--W-KRLKA----K----------</span>
+<span class="go">T-P-KNGPPPCPR-LGHSF-SLVGNKCYL-FGGLANDSEDPKNNIPRYLNDLY-ILELRPGSGVVAWDIPITYGVLPPPRE-SHTAVVYTEKDNKKSKLVIYG-GMSGCRLG-D-L-W-T-LD--IDTLTWNKP-SLSGVAPL</span>
+<span class="go">--P-R-----S---L-HS--A-T---T-I--G---N-----K---------MY-VF----G-G---W-VPL---VM----D-D-VKVA-T-HE-KEWK-C-TN-TLA-C-LNLDTMAWETIL---MDTL---E--D-N-I-P-</span>
+<span class="go">----R-----A--RA--GH-------C--------A------------------V-------A-----------I-----------------N---------------T-----R--L---Y---I-----------------</span>
+</pre></div>
+</div>
+<p>If you wish to use a gamma distribution for indels, choose the option rate_distribution = ‘gamma’ or modify the rate distribution in <a class="reference internal" href="configure.html#configure"><span class="std std-ref">config.ini</span></a>.</p>
+</div>
+</div>
+<div class="section" id="output-the-detected-tandem-repeats">
+<h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this headline">¶</a></h2>
+<p>Write a singe repeat_list to .tsv format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_output_tsv_file</span> <span class="o">=</span> <span class="s2">&quot;outputfile.tsv&quot;</span>  <span class="c1"># Choose your path and filename</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is how the output looks like <a class="reference internal" href="background.html#background"><span class="std std-ref">(interpretation)</span></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat outputfile.tsv
+begin       msa_original    l_effective     n_effective     repeat_region_length    divergence      pvalue
+31  R--------PRHGHRAVAIKELIVVFGGGN----------EGIVD-----------------------------------------------------------ELHVYNTATNQWFI---PAVRGDIP-,P--------GCAAYGFVCDGTRLLVFGGMV-----------------------------------EYG-------------------KYSN-------------DLYELQASRWEWKR-----LKAK---,TPKNGPPPCPRLGHSFSLVGNKCYLFGGLANDSEDPKNNIPRYLNDLYILELRPGSGVVAWDIPITYGVLPPPRESHTAVVYTEKDNKKSKLVIYGGMSGCRLGDLWTLDIDTLTWNK---PSLSGVAPL,---------PRSLHSATTIGNKMYVFGGWV----------PLVMDDV-------------------------------KVATHEKEWKCTN-------------TLACLNLDTMAWETILMDTLEDNIP-,R--------ARAGHCAVAINTRLYI---------------------------------------------------------------------------------------------------------  53      4.056603773584905       306     None    None
+</pre></div>
+</div>
+<p>Write a singe repeat_list to .pickle format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_output_pickle_file</span> <span class="o">=</span> <span class="s2">&quot;outputfile.pickle&quot;</span>  <span class="c1"># Choose your path and filename</span>
+<span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;pickle&quot;</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A repeat_list in pickle format can easily be read in again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tral.repeat_list</span> <span class="kn">import</span> <span class="n">repeat_list</span>
+<span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">repeat_list</span><span class="o">.</span><span class="n">RepeatList</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">input_format</span> <span class="o">=</span> <span class="s2">&quot;pickle&quot;</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">path_to_output_pickle_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

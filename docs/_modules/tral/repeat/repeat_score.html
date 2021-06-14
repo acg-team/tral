@@ -1,0 +1,841 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tral.repeat.repeat_score &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.repeat.repeat_score</h1><div class="highlight"><pre>
+<span></span><span class="c1"># (C) 2011 Alexander Korsunsky</span>
+<span class="c1"># (C) 2011-2015 Elke Schaper</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :synopsis: The repeat score module.</span>
+
+<span class="sd">    .. moduleauthor:: Elke Schaper &lt;elke.schaper@isb-sib.ch&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+
+<span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">configuration</span>
+<span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">config_file</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">CONFIG_GENERAL</span> <span class="o">=</span> <span class="n">configuration</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">config</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="n">CONFIG_GENERAL</span><span class="p">[</span><span class="s2">&quot;repeat_score&quot;</span><span class="p">]</span>
+
+<span class="c1"># ############# REPEAT SCORE CALCULATION FUNCTIONS ############################</span>
+<span class="c1"># ############# 1. SIMILARITY SCORES ##########################################</span>
+
+
+<div class="viewcode-block" id="load_equilibrium_freq"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.load_equilibrium_freq">[docs]</a><span class="k">def</span> <span class="nf">load_equilibrium_freq</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Load equilibrium frequencies from a substitution matrix file.</span>
+
+<span class="sd">    Load equilibrium frequencies from a substitution matrix file. Note that</span>
+<span class="sd">    with minor changes, the whole amino acid substitution matrix could be</span>
+<span class="sd">    returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_name (str): Path to substitution matrix file, E.g. LG.dat.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (Dict of str, float): Dictionary of one letter amino acid codes and</span>
+<span class="sd">                              float value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">patstr_freqline</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[+-]?\d+(?:\.\d+)?\s*&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Create empty 20x20 matrix</span>
+        <span class="n">substitution_matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">20</span><span class="p">]</span> <span class="o">*</span> <span class="mi">20</span>
+        <span class="n">row_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># print(&quot;row %d: &quot; % row_count, row)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">pat</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\s*&quot;</span> <span class="o">+</span> <span class="n">patstr_freqline</span> <span class="o">*</span> <span class="p">(</span><span class="n">row_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pat</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># store read lines into matrix</span>
+            <span class="n">substitution_matrix</span><span class="p">[</span><span class="n">row_count</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">row_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="n">row_count</span> <span class="o">=</span> <span class="n">row_count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="c1"># Read 19 lines of substitution matrix</span>
+            <span class="k">if</span> <span class="n">row_count</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># EOF before reading the frequency line</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input file is malformed! Did not find enough&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;lines for the substitution matrix.&quot;</span><span class="p">)</span>
+        <span class="n">frequencies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">patstr_freqline</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+            <span class="n">frequencies</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">matches</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># EOF before finishing the frequency line</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input file is malformed! Did not find enough&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;numbers for equilibrium frequencies.&quot;</span><span class="p">)</span>
+        <span class="n">substitution_matrix</span><span class="p">[</span><span class="mi">19</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span> <span class="o">=</span> <span class="n">frequencies</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+    <span class="c1"># return substitution_matrix</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">aa</span><span class="p">:</span> <span class="n">freq</span> <span class="k">for</span> <span class="n">aa</span><span class="p">,</span>
+            <span class="n">freq</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;R&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;E&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;G&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;L&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;K&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;M&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;F&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;P&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;S&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;T&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;W&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;V&quot;</span><span class="p">],</span>
+                        <span class="n">substitution_matrix</span><span class="p">[</span><span class="mi">19</span><span class="p">])}</span></div>
+
+
+<div class="viewcode-block" id="mean_similarity"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.mean_similarity">[docs]</a><span class="k">def</span> <span class="nf">mean_similarity</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">measure_of_similarity</span><span class="p">,</span>
+                    <span class="n">ignore_gaps</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_bool</span><span class="p">(</span><span class="s1">&#39;ignore_gaps&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the mean similarity of all columns in the multiple sequence</span>
+<span class="sd">        alignment in ``repeat`` according to a ``measure_of_similarity``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repeat (Repeat): An instance of the Repeat class.</span>
+<span class="sd">        measure_of_similarity (str): Either &quot;entropy&quot;, &quot;parsimony&quot;, or &quot;pSim&quot;.</span>
+<span class="sd">        ignore_gaps (boolean): Are gaps, &quot;-&quot; treated as chars (False) or ignored</span>
+<span class="sd">                              (True).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: A similarity measure for the repeat units in ``repeat``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_gaps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">measure_of_similarity</span><span class="p">,</span> <span class="n">repeat</span><span class="o">.</span><span class="n">msaTD</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">repeat</span><span class="o">.</span><span class="n">l</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">column</span><span class="p">:</span> <span class="n">measure_of_similarity</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
+            <span class="n">repeat</span><span class="o">.</span><span class="n">msaTD</span><span class="p">))</span> <span class="o">/</span> <span class="n">repeat</span><span class="o">.</span><span class="n">l_effective</span>  <span class="c1"># python 2: integer division</span></div>
+
+
+<div class="viewcode-block" id="entropy"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.entropy">[docs]</a><span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the entropy of a list.</span>
+
+<span class="sd">    Calculate the entropy of list. Assume that the frequency of elements in</span>
+<span class="sd">    the list reflects a probability density estimator.</span>
+
+<span class="sd">    For an exact description see:</span>
+
+<span class="sd">    Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?</span>
+<span class="sd">    --Statistical validation of tandem repeat prediction in genomic sequences.</span>
+<span class="sd">    Nucleic Acids Research (2012).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      column (list of str): List of elements that can be ordered in a set, e.g.</span>
+<span class="sd">                            str or int.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The entropy of ``column``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">estimatedP</span> <span class="o">=</span> <span class="p">[(</span><span class="n">column</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">column</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="o">-</span><span class="n">p</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">estimatedP</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="parsimony"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.parsimony">[docs]</a><span class="k">def</span> <span class="nf">parsimony</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the parsimony score of a list.</span>
+
+<span class="sd">    Calculate the parsimony score on ``column``:  Count the number of changes</span>
+<span class="sd">    in a ``column`` of a multiple sequence alignment and divide by the</span>
+<span class="sd">    maximally possible number of changes.</span>
+
+<span class="sd">    For an exact description see:</span>
+
+<span class="sd">    Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?</span>
+<span class="sd">    --Statistical validation of tandem repeat prediction in genomic sequences.</span>
+<span class="sd">    Nucleic Acids Research (2012).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      column (list of str): A ``list`` of two or more elements that can be</span>
+<span class="sd">      ordered in a ``set``, e.g. ``str`` or ``int``</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The parsimony score of ``column``.</span>
+
+<span class="sd">    ..  todo:: At which step shall we assert that the length of ``column`` &gt; 1?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Here, 0 means no changes and 1 only changes # python 2: integer</span>
+        <span class="c1"># division</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">column</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Repeats with n = 1 are not repeats&quot;</span><span class="p">)</span>
+        <span class="c1"># raise AssertionError(&quot;Repeats with n = 1 are not repeats&quot;)</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="pSim"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.pSim">[docs]</a><span class="k">def</span> <span class="nf">pSim</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the pSim score of a list.</span>
+
+<span class="sd">    Calculate the pSim score on ``column``:  Count the frequency of the most</span>
+<span class="sd">    frequent element in a ``column`` of a multiple sequence alignment.</span>
+
+<span class="sd">    For an exact description see:</span>
+
+<span class="sd">    Schaper, E., Kajava, A., Hauser, A., &amp; Anisimova, M. Repeat or not repeat?</span>
+<span class="sd">    --Statistical validation of tandem repeat prediction in genomic sequences.</span>
+<span class="sd">    Nucleic Acids Research (2012).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      column (list of str): A list of elements.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The pSim score of ``column``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">column</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">))</span></div>
+
+
+<span class="c1">#  #######  2. MAXIMUM LIKELIHOOD CALCULATIONS ################################</span>
+
+
+<div class="viewcode-block" id="optimisation"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.optimisation">[docs]</a><span class="k">def</span> <span class="nf">optimisation</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span>
+                 <span class="n">start_min</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;optimisation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_float</span><span class="p">(</span><span class="s1">&#39;start_min&#39;</span><span class="p">),</span>
+                 <span class="n">start_max</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;optimisation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_float</span><span class="p">(</span><span class="s1">&#39;start_max&#39;</span><span class="p">),</span>
+                 <span class="n">n_iteration</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;optimisation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_int</span><span class="p">(</span><span class="s1">&#39;n_iteration&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Binary one-dimensional optimisation of ``function``.</span>
+
+<span class="sd">    Perform a binary one dimensional optimisation of parameter ``t`` on</span>
+<span class="sd">    ``function`` with the additional list of arguments/parameters ``args``.</span>
+<span class="sd">    Start on a given range of start, and iterate ``n_iteration`` times. Return</span>
+<span class="sd">    the maximum of the function, together with the maximum parameter ``t`` as a</span>
+<span class="sd">    tuple.</span>
+
+<span class="sd">    In addition to ``start_min`` and ``start_max``, additional hard boundaries</span>
+<span class="sd">    on the optimisation parameter ``t`` are hard-coded: t E [0.0000000001, 100]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      function (method): Method with input (float, ``args``) and output float.</span>
+<span class="sd">      args (list of items): List of arguments for ``function``.</span>
+
+<span class="sd">    Kwargs:</span>
+<span class="sd">        start_min (float): Minimum value of function parameter ``t``.</span>
+<span class="sd">        start_max (float): Maximum value of function parameter ``t``.</span>
+<span class="sd">        n_iteration (int): Number of iterations until optimisation results are returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple (Maximum of function: float,</span>
+<span class="sd">               Corresponding function parameter: float)</span>
+
+<span class="sd">      ..  todo:: Check why ``region_bounded`` is hardcoded at current.</span>
+<span class="sd">      ..  todo:: Check why ``stepsize`` is hardcoded at current.</span>
+<span class="sd">      ..  todo:: Generalise hard-coded optimisation parameter boundaries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[[</span><span class="n">start_min</span><span class="p">],</span> <span class="p">[(</span><span class="n">start_min</span> <span class="o">+</span> <span class="n">start_max</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">start_max</span><span class="p">]]</span>
+    <span class="n">stepsize</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">iT</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">iT</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">iT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">))</span>
+    <span class="n">region_bounded</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">n_iteration</span><span class="p">:</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">region_bounded</span><span class="p">:</span>
+            <span class="c1"># First entry is best - shift trial out zone to left</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0000000001</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">stepsize</span><span class="p">)]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">))</span>
+            <span class="c1"># Last entry is best - shift trial out zone to right</span>
+            <span class="k">elif</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">stepsize</span><span class="p">)]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">region_bounded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">region_bounded</span><span class="p">:</span>
+            <span class="c1"># calc half_points</span>
+            <span class="n">half_points</span> <span class="o">=</span> <span class="p">[[(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">iT</span> <span class="ow">in</span> <span class="n">half_points</span><span class="p">:</span>
+                <span class="n">iT</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">iT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">))</span>
+            <span class="c1"># First halfPoint is best - shift it to be the next midPoint</span>
+            <span class="k">if</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][:]</span>
+            <span class="c1"># Last halfPoint is best - shift it to be the next midPoint</span>
+            <span class="k">elif</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+            <span class="c1"># Former midPoint is still the best - adjust the boundaries</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][:]</span>
+                <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">half_points</span><span class="p">[</span><span class="mi">1</span><span class="p">][:]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">evolution_model</span><span class="o">=</span><span class="s1">&#39;lg&#39;</span><span class="p">):</span>
+    <span class="c1"># Prepare the model of repeat evolution</span>
+    <span class="k">if</span> <span class="n">evolution_model</span> <span class="o">==</span> <span class="s1">&#39;lg&#39;</span><span class="p">:</span>
+        <span class="c1"># 1. Substitutions are modeled by the LG matrix</span>
+        <span class="n">aa</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">substitution_matrix</span> <span class="o">=</span> <span class="n">LG</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aa</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">substitution_matrix</span> <span class="o">=</span> <span class="n">K80</span><span class="p">()</span>
+
+    <span class="c1"># equilibrium_freq = {i: j for i, j in zip(aa, eq_freq)}</span>
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">aa</span><span class="p">)}</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">aa</span><span class="p">)</span>
+    <span class="n">eq_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">eq_freq</span><span class="p">)</span>
+    <span class="n">eq_freq</span> <span class="o">=</span> <span class="n">eq_freq</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">eq_freq</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">substitution_matrix</span><span class="p">)</span>
+    <span class="n">PI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">eq_freq</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">PI</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+        <span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="n">diagonal</span> <span class="o">=</span> <span class="p">[</span><span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">)]</span>
+    <span class="n">Q</span> <span class="o">*=</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">((</span><span class="n">i</span> <span class="o">*</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">diagonal</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TN93"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.TN93">[docs]</a><span class="k">def</span> <span class="nf">TN93</span><span class="p">(</span><span class="n">alpha_1</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;TN93&#39;</span><span class="p">][</span><span class="s1">&#39;alpha_1&#39;</span><span class="p">]),</span> <span class="n">alpha_2</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;TN93&#39;</span><span class="p">][</span><span class="s1">&#39;alpha_2&#39;</span><span class="p">]),</span>
+         <span class="n">beta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;TN93&#39;</span><span class="p">][</span><span class="s1">&#39;beta&#39;</span><span class="p">])):</span>
+    <span class="sd">&#39;&#39;&#39;TN93&#39;&#39;&#39;</span>
+    <span class="c1"># 4*4 matrix with α1 = 0.3, α2 = 0.4, β = 0.7 according to TN93</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="p">(</span><span class="n">alpha_1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="p">),</span> <span class="n">alpha_1</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">beta</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">alpha_1</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">alpha_1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="p">),</span> <span class="n">beta</span><span class="p">,</span> <span class="n">beta</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">beta</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">alpha_2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="p">),</span> <span class="n">alpha_2</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">beta</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">alpha_2</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">alpha_2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">beta</span><span class="p">)]]</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span> <span class="n">Q</span></div>
+
+
+<div class="viewcode-block" id="K80"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.K80">[docs]</a><span class="k">def</span> <span class="nf">K80</span><span class="p">(</span><span class="n">kappa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;K80&#39;</span><span class="p">][</span><span class="s1">&#39;kappa&#39;</span><span class="p">])):</span>
+    <span class="sd">&#39;&#39;&#39; K80 &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">TN93</span><span class="p">(</span><span class="n">alpha_1</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span> <span class="n">alpha_2</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LG"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.LG">[docs]</a><span class="k">def</span> <span class="nf">LG</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;LG&#39;&#39;&#39;</span>
+    <span class="k">return</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;W&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">],</span>
+           <span class="p">[</span><span class="mf">0.079066</span><span class="p">,</span> <span class="mf">0.055941</span><span class="p">,</span> <span class="mf">0.041977</span><span class="p">,</span> <span class="mf">0.053052</span><span class="p">,</span> <span class="mf">0.012937</span><span class="p">,</span> <span class="mf">0.040767</span><span class="p">,</span> <span class="mf">0.071586</span><span class="p">,</span>
+            <span class="mf">0.057337</span><span class="p">,</span> <span class="mf">0.022355</span><span class="p">,</span> <span class="mf">0.062157</span><span class="p">,</span> <span class="mf">0.099081</span><span class="p">,</span> <span class="mf">0.0646</span><span class="p">,</span> <span class="mf">0.022951</span><span class="p">,</span> <span class="mf">0.042302</span><span class="p">,</span>
+            <span class="mf">0.04404</span><span class="p">,</span> <span class="mf">0.061197</span><span class="p">,</span> <span class="mf">0.053287</span><span class="p">,</span> <span class="mf">0.012066</span><span class="p">,</span> <span class="mf">0.034155</span><span class="p">,</span> <span class="mf">0.069147</span><span class="p">],</span>
+           <span class="p">[[</span><span class="o">-</span><span class="mf">16.060388</span><span class="p">,</span> <span class="mf">0.425093</span><span class="p">,</span> <span class="mf">0.276818</span><span class="p">,</span> <span class="mf">0.395144</span><span class="p">,</span> <span class="mf">2.489084</span><span class="p">,</span> <span class="mf">0.969894</span><span class="p">,</span>
+             <span class="mf">1.038545</span><span class="p">,</span> <span class="mf">2.06604</span><span class="p">,</span> <span class="mf">0.358858</span><span class="p">,</span> <span class="mf">0.14983</span><span class="p">,</span> <span class="mf">0.395337</span><span class="p">,</span> <span class="mf">0.536518</span><span class="p">,</span> <span class="mf">1.124035</span><span class="p">,</span>
+             <span class="mf">0.253701</span><span class="p">,</span> <span class="mf">1.177651</span><span class="p">,</span> <span class="mf">4.727182</span><span class="p">,</span> <span class="mf">2.139501</span><span class="p">,</span> <span class="mf">0.180717</span><span class="p">,</span> <span class="mf">0.218959</span><span class="p">,</span> <span class="mf">2.54787</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.425093</span><span class="p">,</span> <span class="o">-</span><span class="mf">21.193959</span><span class="p">,</span> <span class="mf">0.751878</span><span class="p">,</span> <span class="mf">0.123954</span><span class="p">,</span> <span class="mf">0.534551</span><span class="p">,</span> <span class="mf">2.807908</span><span class="p">,</span>
+             <span class="mf">0.36397</span><span class="p">,</span> <span class="mf">0.390192</span><span class="p">,</span> <span class="mf">2.426601</span><span class="p">,</span> <span class="mf">0.126991</span><span class="p">,</span> <span class="mf">0.301848</span><span class="p">,</span> <span class="mf">6.326067</span><span class="p">,</span>
+             <span class="mf">0.484133</span><span class="p">,</span> <span class="mf">0.052722</span><span class="p">,</span> <span class="mf">0.332533</span><span class="p">,</span> <span class="mf">0.858151</span><span class="p">,</span> <span class="mf">0.578987</span><span class="p">,</span> <span class="mf">0.593607</span><span class="p">,</span>
+             <span class="mf">0.31444</span><span class="p">,</span> <span class="mf">0.170887</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.276818</span><span class="p">,</span> <span class="mf">0.751878</span><span class="p">,</span> <span class="o">-</span><span class="mf">17.692284</span><span class="p">,</span> <span class="mf">5.076149</span><span class="p">,</span> <span class="mf">0.528768</span><span class="p">,</span> <span class="mf">1.695752</span><span class="p">,</span>
+             <span class="mf">0.541712</span><span class="p">,</span> <span class="mf">1.437645</span><span class="p">,</span> <span class="mf">4.509238</span><span class="p">,</span> <span class="mf">0.191503</span><span class="p">,</span> <span class="mf">0.068427</span><span class="p">,</span> <span class="mf">2.145078</span><span class="p">,</span>
+             <span class="mf">0.371004</span><span class="p">,</span> <span class="mf">0.089525</span><span class="p">,</span> <span class="mf">0.161787</span><span class="p">,</span> <span class="mf">4.008358</span><span class="p">,</span> <span class="mf">2.000679</span><span class="p">,</span> <span class="mf">0.045376</span><span class="p">,</span>
+             <span class="mf">0.612025</span><span class="p">,</span> <span class="mf">0.083688</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.395144</span><span class="p">,</span> <span class="mf">0.123954</span><span class="p">,</span> <span class="mf">5.076149</span><span class="p">,</span> <span class="o">-</span><span class="mf">24.184967999999994</span><span class="p">,</span> <span class="mf">0.062556</span><span class="p">,</span>
+             <span class="mf">0.523386</span><span class="p">,</span> <span class="mf">5.24387</span><span class="p">,</span> <span class="mf">0.844926</span><span class="p">,</span> <span class="mf">0.927114</span><span class="p">,</span> <span class="mf">0.01069</span><span class="p">,</span> <span class="mf">0.015076</span><span class="p">,</span> <span class="mf">0.282959</span><span class="p">,</span>
+             <span class="mf">0.025548</span><span class="p">,</span> <span class="mf">0.017416</span><span class="p">,</span> <span class="mf">0.394456</span><span class="p">,</span> <span class="mf">1.240275</span><span class="p">,</span> <span class="mf">0.42586</span><span class="p">,</span> <span class="mf">0.02989</span><span class="p">,</span> <span class="mf">0.135107</span><span class="p">,</span>
+             <span class="mf">0.037967</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">2.489084</span><span class="p">,</span> <span class="mf">0.534551</span><span class="p">,</span> <span class="mf">0.528768</span><span class="p">,</span> <span class="mf">0.062556</span><span class="p">,</span> <span class="o">-</span><span class="mf">13.058626</span><span class="p">,</span> <span class="mf">0.084808</span><span class="p">,</span>
+             <span class="mf">0.003499</span><span class="p">,</span> <span class="mf">0.569265</span><span class="p">,</span> <span class="mf">0.640543</span><span class="p">,</span> <span class="mf">0.320627</span><span class="p">,</span> <span class="mf">0.594007</span><span class="p">,</span> <span class="mf">0.013266</span><span class="p">,</span>
+             <span class="mf">0.89368</span><span class="p">,</span> <span class="mf">1.105251</span><span class="p">,</span> <span class="mf">0.075382</span><span class="p">,</span> <span class="mf">2.784478</span><span class="p">,</span> <span class="mf">1.14348</span><span class="p">,</span> <span class="mf">0.670128</span><span class="p">,</span> <span class="mf">1.165532</span><span class="p">,</span>
+             <span class="mf">1.959291</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.969894</span><span class="p">,</span> <span class="mf">2.807908</span><span class="p">,</span> <span class="mf">1.695752</span><span class="p">,</span> <span class="mf">0.523386</span><span class="p">,</span> <span class="mf">0.084808</span><span class="p">,</span>
+             <span class="o">-</span><span class="mf">18.724285999999996</span><span class="p">,</span> <span class="mf">4.128591</span><span class="p">,</span> <span class="mf">0.267959</span><span class="p">,</span> <span class="mf">4.813505</span><span class="p">,</span> <span class="mf">0.072854</span><span class="p">,</span>
+             <span class="mf">0.582457</span><span class="p">,</span> <span class="mf">3.234294</span><span class="p">,</span> <span class="mf">1.672569</span><span class="p">,</span> <span class="mf">0.035855</span><span class="p">,</span> <span class="mf">0.624294</span><span class="p">,</span> <span class="mf">1.223828</span><span class="p">,</span>
+             <span class="mf">1.080136</span><span class="p">,</span> <span class="mf">0.236199</span><span class="p">,</span> <span class="mf">0.257336</span><span class="p">,</span> <span class="mf">0.210332</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1.038545</span><span class="p">,</span> <span class="mf">0.36397</span><span class="p">,</span> <span class="mf">0.541712</span><span class="p">,</span> <span class="mf">5.24387</span><span class="p">,</span> <span class="mf">0.003499</span><span class="p">,</span> <span class="mf">4.128591</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.8339</span><span class="p">,</span>
+             <span class="mf">0.348847</span><span class="p">,</span> <span class="mf">0.423881</span><span class="p">,</span> <span class="mf">0.044265</span><span class="p">,</span> <span class="mf">0.069673</span><span class="p">,</span> <span class="mf">1.807177</span><span class="p">,</span> <span class="mf">0.173735</span><span class="p">,</span>
+             <span class="mf">0.018811</span><span class="p">,</span> <span class="mf">0.419409</span><span class="p">,</span> <span class="mf">0.611973</span><span class="p">,</span> <span class="mf">0.604545</span><span class="p">,</span> <span class="mf">0.077852</span><span class="p">,</span> <span class="mf">0.120037</span><span class="p">,</span> <span class="mf">0.245034</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">2.06604</span><span class="p">,</span> <span class="mf">0.390192</span><span class="p">,</span> <span class="mf">1.437645</span><span class="p">,</span> <span class="mf">0.844926</span><span class="p">,</span> <span class="mf">0.569265</span><span class="p">,</span> <span class="mf">0.267959</span><span class="p">,</span>
+             <span class="mf">0.348847</span><span class="p">,</span> <span class="o">-</span><span class="mf">16.613733</span><span class="p">,</span> <span class="mf">0.311484</span><span class="p">,</span> <span class="mf">0.008705</span><span class="p">,</span> <span class="mf">0.044261</span><span class="p">,</span> <span class="mf">0.296636</span><span class="p">,</span>
+             <span class="mf">0.139538</span><span class="p">,</span> <span class="mf">0.089586</span><span class="p">,</span> <span class="mf">0.196961</span><span class="p">,</span> <span class="mf">1.73999</span><span class="p">,</span> <span class="mf">0.129836</span><span class="p">,</span> <span class="mf">0.268491</span><span class="p">,</span>
+             <span class="mf">0.054679</span><span class="p">,</span> <span class="mf">0.076701</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.358858</span><span class="p">,</span> <span class="mf">2.426601</span><span class="p">,</span> <span class="mf">4.509238</span><span class="p">,</span> <span class="mf">0.927114</span><span class="p">,</span> <span class="mf">0.640543</span><span class="p">,</span> <span class="mf">4.813505</span><span class="p">,</span>
+             <span class="mf">0.423881</span><span class="p">,</span> <span class="mf">0.311484</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.179003</span><span class="p">,</span> <span class="mf">0.108882</span><span class="p">,</span> <span class="mf">0.366317</span><span class="p">,</span> <span class="mf">0.697264</span><span class="p">,</span>
+             <span class="mf">0.442472</span><span class="p">,</span> <span class="mf">0.682139</span><span class="p">,</span> <span class="mf">0.508851</span><span class="p">,</span> <span class="mf">0.990012</span><span class="p">,</span> <span class="mf">0.584262</span><span class="p">,</span> <span class="mf">0.597054</span><span class="p">,</span>
+             <span class="mf">5.306834</span><span class="p">,</span> <span class="mf">0.119013</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.14983</span><span class="p">,</span> <span class="mf">0.126991</span><span class="p">,</span> <span class="mf">0.191503</span><span class="p">,</span> <span class="mf">0.01069</span><span class="p">,</span> <span class="mf">0.320627</span><span class="p">,</span> <span class="mf">0.072854</span><span class="p">,</span> <span class="mf">0.044265</span><span class="p">,</span>
+             <span class="mf">0.008705</span><span class="p">,</span> <span class="mf">0.108882</span><span class="p">,</span> <span class="o">-</span><span class="mf">22.217359</span><span class="p">,</span> <span class="mf">4.145067</span><span class="p">,</span> <span class="mf">0.159069</span><span class="p">,</span> <span class="mf">4.273607</span><span class="p">,</span>
+             <span class="mf">1.112727</span><span class="p">,</span> <span class="mf">0.078281</span><span class="p">,</span> <span class="mf">0.064105</span><span class="p">,</span> <span class="mf">1.033739</span><span class="p">,</span> <span class="mf">0.11166</span><span class="p">,</span> <span class="mf">0.232523</span><span class="p">,</span> <span class="mf">10.649107</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.395337</span><span class="p">,</span> <span class="mf">0.301848</span><span class="p">,</span> <span class="mf">0.068427</span><span class="p">,</span> <span class="mf">0.015076</span><span class="p">,</span> <span class="mf">0.594007</span><span class="p">,</span> <span class="mf">0.582457</span><span class="p">,</span>
+             <span class="mf">0.069673</span><span class="p">,</span> <span class="mf">0.044261</span><span class="p">,</span> <span class="mf">0.366317</span><span class="p">,</span> <span class="mf">4.145067</span><span class="p">,</span> <span class="o">-</span><span class="mf">31.146227</span><span class="p">,</span> <span class="mf">0.1375</span><span class="p">,</span>
+             <span class="mf">6.312358</span><span class="p">,</span> <span class="mf">2.592692</span><span class="p">,</span> <span class="mf">0.24906</span><span class="p">,</span> <span class="mf">0.182287</span><span class="p">,</span> <span class="mf">0.302936</span><span class="p">,</span> <span class="mf">0.619632</span><span class="p">,</span>
+             <span class="mf">0.299648</span><span class="p">,</span> <span class="mf">1.702745</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.536518</span><span class="p">,</span> <span class="mf">6.326067</span><span class="p">,</span> <span class="mf">2.145078</span><span class="p">,</span> <span class="mf">0.282959</span><span class="p">,</span> <span class="mf">0.013266</span><span class="p">,</span> <span class="mf">3.234294</span><span class="p">,</span>
+             <span class="mf">1.807177</span><span class="p">,</span> <span class="mf">0.296636</span><span class="p">,</span> <span class="mf">0.697264</span><span class="p">,</span> <span class="mf">0.159069</span><span class="p">,</span> <span class="mf">0.1375</span><span class="p">,</span> <span class="o">-</span><span class="mf">19.90551</span><span class="p">,</span>
+             <span class="mf">0.656604</span><span class="p">,</span> <span class="mf">0.023918</span><span class="p">,</span> <span class="mf">0.390322</span><span class="p">,</span> <span class="mf">0.748683</span><span class="p">,</span> <span class="mf">1.136863</span><span class="p">,</span> <span class="mf">0.049906</span><span class="p">,</span>
+             <span class="mf">0.131932</span><span class="p">,</span> <span class="mf">0.185202</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1.124035</span><span class="p">,</span> <span class="mf">0.484133</span><span class="p">,</span> <span class="mf">0.371004</span><span class="p">,</span> <span class="mf">0.025548</span><span class="p">,</span> <span class="mf">0.89368</span><span class="p">,</span> <span class="mf">1.672569</span><span class="p">,</span>
+             <span class="mf">0.173735</span><span class="p">,</span> <span class="mf">0.139538</span><span class="p">,</span> <span class="mf">0.442472</span><span class="p">,</span> <span class="mf">4.273607</span><span class="p">,</span> <span class="mf">6.312358</span><span class="p">,</span> <span class="mf">0.656604</span><span class="p">,</span>
+             <span class="o">-</span><span class="mf">24.724051</span><span class="p">,</span> <span class="mf">1.798853</span><span class="p">,</span> <span class="mf">0.099849</span><span class="p">,</span> <span class="mf">0.34696</span><span class="p">,</span> <span class="mf">2.020366</span><span class="p">,</span> <span class="mf">0.696175</span><span class="p">,</span>
+             <span class="mf">0.481306</span><span class="p">,</span> <span class="mf">1.898718</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.253701</span><span class="p">,</span> <span class="mf">0.052722</span><span class="p">,</span> <span class="mf">0.089525</span><span class="p">,</span> <span class="mf">0.017416</span><span class="p">,</span> <span class="mf">1.105251</span><span class="p">,</span> <span class="mf">0.035855</span><span class="p">,</span>
+             <span class="mf">0.018811</span><span class="p">,</span> <span class="mf">0.089586</span><span class="p">,</span> <span class="mf">0.682139</span><span class="p">,</span> <span class="mf">1.112727</span><span class="p">,</span> <span class="mf">2.592692</span><span class="p">,</span> <span class="mf">0.023918</span><span class="p">,</span>
+             <span class="mf">1.798853</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.599417</span><span class="p">,</span> <span class="mf">0.094464</span><span class="p">,</span> <span class="mf">0.361819</span><span class="p">,</span> <span class="mf">0.165001</span><span class="p">,</span> <span class="mf">2.457121</span><span class="p">,</span>
+             <span class="mf">7.803902</span><span class="p">,</span> <span class="mf">0.654683</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1.177651</span><span class="p">,</span> <span class="mf">0.332533</span><span class="p">,</span> <span class="mf">0.161787</span><span class="p">,</span> <span class="mf">0.394456</span><span class="p">,</span> <span class="mf">0.075382</span><span class="p">,</span> <span class="mf">0.624294</span><span class="p">,</span>
+             <span class="mf">0.419409</span><span class="p">,</span> <span class="mf">0.196961</span><span class="p">,</span> <span class="mf">0.508851</span><span class="p">,</span> <span class="mf">0.078281</span><span class="p">,</span> <span class="mf">0.24906</span><span class="p">,</span> <span class="mf">0.390322</span><span class="p">,</span>
+             <span class="mf">0.099849</span><span class="p">,</span> <span class="mf">0.094464</span><span class="p">,</span> <span class="o">-</span><span class="mf">16.74927</span><span class="p">,</span> <span class="mf">1.338132</span><span class="p">,</span> <span class="mf">0.571468</span><span class="p">,</span> <span class="mf">0.095131</span><span class="p">,</span>
+             <span class="mf">0.089613</span><span class="p">,</span> <span class="mf">0.296501</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">4.727182</span><span class="p">,</span> <span class="mf">0.858151</span><span class="p">,</span> <span class="mf">4.008358</span><span class="p">,</span> <span class="mf">1.240275</span><span class="p">,</span> <span class="mf">2.784478</span><span class="p">,</span> <span class="mf">1.223828</span><span class="p">,</span>
+             <span class="mf">0.611973</span><span class="p">,</span> <span class="mf">1.73999</span><span class="p">,</span> <span class="mf">0.990012</span><span class="p">,</span> <span class="mf">0.064105</span><span class="p">,</span> <span class="mf">0.182287</span><span class="p">,</span> <span class="mf">0.748683</span><span class="p">,</span>
+             <span class="mf">0.34696</span><span class="p">,</span> <span class="mf">0.361819</span><span class="p">,</span> <span class="mf">1.338132</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.953694999999998</span><span class="p">,</span> <span class="mf">6.472279</span><span class="p">,</span>
+             <span class="mf">0.248862</span><span class="p">,</span> <span class="mf">0.400547</span><span class="p">,</span> <span class="mf">0.098369</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">2.139501</span><span class="p">,</span> <span class="mf">0.578987</span><span class="p">,</span> <span class="mf">2.000679</span><span class="p">,</span> <span class="mf">0.42586</span><span class="p">,</span> <span class="mf">1.14348</span><span class="p">,</span> <span class="mf">1.080136</span><span class="p">,</span>
+             <span class="mf">0.604545</span><span class="p">,</span> <span class="mf">0.129836</span><span class="p">,</span> <span class="mf">0.584262</span><span class="p">,</span> <span class="mf">1.033739</span><span class="p">,</span> <span class="mf">0.302936</span><span class="p">,</span> <span class="mf">1.136863</span><span class="p">,</span>
+             <span class="mf">2.020366</span><span class="p">,</span> <span class="mf">0.165001</span><span class="p">,</span> <span class="mf">0.571468</span><span class="p">,</span> <span class="mf">6.472279</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.294897</span><span class="p">,</span> <span class="mf">0.140825</span><span class="p">,</span>
+             <span class="mf">0.245841</span><span class="p">,</span> <span class="mf">2.188158</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.180717</span><span class="p">,</span> <span class="mf">0.593607</span><span class="p">,</span> <span class="mf">0.045376</span><span class="p">,</span> <span class="mf">0.02989</span><span class="p">,</span> <span class="mf">0.670128</span><span class="p">,</span> <span class="mf">0.236199</span><span class="p">,</span>
+             <span class="mf">0.077852</span><span class="p">,</span> <span class="mf">0.268491</span><span class="p">,</span> <span class="mf">0.597054</span><span class="p">,</span> <span class="mf">0.11166</span><span class="p">,</span> <span class="mf">0.619632</span><span class="p">,</span> <span class="mf">0.049906</span><span class="p">,</span>
+             <span class="mf">0.696175</span><span class="p">,</span> <span class="mf">2.457121</span><span class="p">,</span> <span class="mf">0.095131</span><span class="p">,</span> <span class="mf">0.248862</span><span class="p">,</span> <span class="mf">0.140825</span><span class="p">,</span> <span class="o">-</span><span class="mf">19.666723</span><span class="p">,</span>
+             <span class="mf">3.151815</span><span class="p">,</span> <span class="mf">0.18951</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.218959</span><span class="p">,</span> <span class="mf">0.31444</span><span class="p">,</span> <span class="mf">0.612025</span><span class="p">,</span> <span class="mf">0.135107</span><span class="p">,</span> <span class="mf">1.165532</span><span class="p">,</span> <span class="mf">0.257336</span><span class="p">,</span>
+             <span class="mf">0.120037</span><span class="p">,</span> <span class="mf">0.054679</span><span class="p">,</span> <span class="mf">5.306834</span><span class="p">,</span> <span class="mf">0.232523</span><span class="p">,</span> <span class="mf">0.299648</span><span class="p">,</span> <span class="mf">0.131932</span><span class="p">,</span>
+             <span class="mf">0.481306</span><span class="p">,</span> <span class="mf">7.803902</span><span class="p">,</span> <span class="mf">0.089613</span><span class="p">,</span> <span class="mf">0.400547</span><span class="p">,</span> <span class="mf">0.245841</span><span class="p">,</span> <span class="mf">3.151815</span><span class="p">,</span>
+             <span class="o">-</span><span class="mf">20.084989000000004</span><span class="p">,</span> <span class="mf">0.249313</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">2.54787</span><span class="p">,</span> <span class="mf">0.170887</span><span class="p">,</span> <span class="mf">0.083688</span><span class="p">,</span> <span class="mf">0.037967</span><span class="p">,</span> <span class="mf">1.959291</span><span class="p">,</span> <span class="mf">0.210332</span><span class="p">,</span>
+             <span class="mf">0.245034</span><span class="p">,</span> <span class="mf">0.076701</span><span class="p">,</span> <span class="mf">0.119013</span><span class="p">,</span> <span class="mf">10.649107</span><span class="p">,</span> <span class="mf">1.702745</span><span class="p">,</span> <span class="mf">0.185202</span><span class="p">,</span>
+             <span class="mf">1.898718</span><span class="p">,</span> <span class="mf">0.654683</span><span class="p">,</span> <span class="mf">0.296501</span><span class="p">,</span> <span class="mf">0.098369</span><span class="p">,</span> <span class="mf">2.188158</span><span class="p">,</span> <span class="mf">0.18951</span><span class="p">,</span>
+             <span class="mf">0.249313</span><span class="p">,</span> <span class="o">-</span><span class="mf">18.608258</span><span class="p">]]</span>
+           <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="loglikelihood_substitution"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.loglikelihood_substitution">[docs]</a><span class="k">def</span> <span class="nf">loglikelihood_substitution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">tandem_repeat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the likelihood of a repeat assuming a star tree and a</span>
+<span class="sd">        sequence model defined by ``Q``, ``t``, ``eq_freq`` and ``alphabet``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        t (float): The divergence of the ``tandem_repeat`` units.</span>
+<span class="sd">        Q (dict ?): A substitution matrix.</span>
+<span class="sd">        eq_freq (dict ?): Equilibrium frequencies of all chars.</span>
+<span class="sd">        alphabet (dict of str,?):  An alphabet from a substitution matrix.</span>
+<span class="sd">        tandem_repeat (Repeat): An instance of the ``Repeat`` class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The loglikelihood value for the tandem repeat.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">Q</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># msaTDN is a list of tandem_repeat.n numpy arrays.</span>
+    <span class="c1"># Each numpy array represents the elements of the alphabet. The entries are</span>
+    <span class="c1"># the count of an alphabet element in the respective tandem_repeat column</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="s1">&#39;msaTDN&#39;</span><span class="p">):</span>
+        <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTD_standard_aa</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="n">column</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">my_diag</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="o">.</span><span class="n">keys</span><span class="p">()))}</span>
+            <span class="k">for</span> <span class="n">iN</span> <span class="ow">in</span> <span class="n">column</span><span class="p">:</span>
+                <span class="n">my_diag</span><span class="p">[</span><span class="n">alphabet</span><span class="p">[</span><span class="n">iN</span><span class="p">]]</span> <span class="o">=</span> <span class="n">my_diag</span><span class="p">[</span><span class="n">alphabet</span><span class="p">[</span><span class="n">iN</span><span class="p">]]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">my_diag</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span>
+
+    <span class="c1"># First sum: Over all sites</span>
+    <span class="c1"># Second sum: Over all possible ancestral characters</span>
+    <span class="c1"># Third product: Over all repeat units</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">iJ</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">column</span><span class="p">))</span>
+                                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">iJ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eq_freq</span><span class="p">)))</span>
+                     <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">msaTDN</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">likelihood</span></div>
+
+
+<div class="viewcode-block" id="loglikelihood_gaps_starphylogeny_zipfian"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.loglikelihood_gaps_starphylogeny_zipfian">[docs]</a><span class="k">def</span> <span class="nf">loglikelihood_gaps_starphylogeny_zipfian</span><span class="p">(</span>
+        <span class="n">t</span><span class="p">,</span>
+        <span class="n">tandem_repeat</span><span class="p">,</span>
+        <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_float</span><span class="p">(</span><span class="s1">&#39;indel_rate_per_site&#39;</span><span class="p">),</span>
+        <span class="n">gaps</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">][</span><span class="s1">&#39;gaps&#39;</span><span class="p">],</span>
+        <span class="n">indel_zipf</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_float</span><span class="p">(</span><span class="s1">&#39;zipf&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; Calculate the log-likelihood of the gap structure in a</span>
+<span class="sd">        ``tandem repeat`` assuming a star tree.</span>
+
+<span class="sd">    Calculate the log-likelihood of the gap structure in a ``tandem repeat``</span>
+<span class="sd">    assuming a star tree (i.e. repeat unit correlations are not modeled). The</span>
+<span class="sd">    gap length model is a zipfian distribution with parameter ``indel_zipf``.</span>
+<span class="sd">    The gap generation model is a simple poisson model with rate parameter</span>
+<span class="sd">    ``indel_rate_per_site``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        t (float): The divergence of the ``tandem_repeat`` units.</span>
+<span class="sd">        tandem_repeat (Repeat): An instance of the ``Repeat`` class.</span>
+<span class="sd">        indel_rate_per_site (float): The mutation rate of insertions and</span>
+<span class="sd">         deletions, as opposed to ``t``.</span>
+<span class="sd">        gaps (str): The mode of gap counting. Options are &quot;row_wise&quot;,</span>
+<span class="sd">        &quot;ignore_coherent_deletions&quot;, &quot;ignore_trailing_gaps&quot; and</span>
+<span class="sd">        &quot;ignore_trailing_gaps_and_coherent_deletions&quot;.</span>
+<span class="sd">        indel_zipf (float): The parameter of the Zipfian distribution.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The loglikelihood value for the gap structure of the tandem</span>
+<span class="sd">                repeat.</span>
+
+<span class="sd">    ..  todo:: USE LOG EARLIER, NOT JUST IN RETURN STATEMENT</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">insertions</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">insertions</span>
+    <span class="n">deletions</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">deletions</span><span class="p">[</span><span class="n">gaps</span><span class="p">]</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">gaps</span><span class="p">[</span><span class="n">gaps</span><span class="p">]</span>
+
+    <span class="c1"># Calculate likelihood of the gap lengths with insertions and deletions</span>
+    <span class="c1"># combined.</span>
+    <span class="c1"># Here, we use the Zipfian distributions</span>
+    <span class="n">l_length</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">zeta</span><span class="p">(</span><span class="n">indel_zipf</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">gaps</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">gap</span> <span class="ow">in</span> <span class="n">gaps</span><span class="p">:</span>
+        <span class="n">l_length</span> <span class="o">=</span> <span class="n">l_length</span> <span class="o">*</span> <span class="p">(</span><span class="n">gap</span> <span class="o">**</span> <span class="o">-</span><span class="n">indel_zipf</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the likelihood for the ratio of columns were an insertion has</span>
+    <span class="c1"># taken place, as opposed to the number of columns, where no insertion has</span>
+    <span class="c1"># taken place. Do the same for deletions.</span>
+    <span class="c1"># Here, we use the Poisson model</span>
+    <span class="n">probability_gap_per_site</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">indel_rate_per_site</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">l_insertions</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">binom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">insertions</span><span class="p">),</span>
+        <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">*</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">probability_gap_per_site</span><span class="p">)</span>
+    <span class="n">l_deletions</span> <span class="o">=</span> \
+        <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">binom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deletions</span><span class="p">),</span>
+                                            <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">*</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+                                            <span class="n">probability_gap_per_site</span><span class="p">)</span>
+
+    <span class="c1"># Return the total likelihood of tandem_repeat&#39;s gap structure:</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">l_length</span> <span class="o">*</span> <span class="n">l_insertions</span> <span class="o">*</span> <span class="n">l_deletions</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">loglikelihood_substitutions_gaps</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">substitution_args</span><span class="p">,</span> <span class="n">gap_args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">loglikelihood_substitution</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">substitution_args</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">loglikelihood_gaps_starphylogeny_zipfian</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">gap_args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">loglikelihood_startopology_local</span><span class="p">(</span>
+        <span class="n">tandem_repeat</span><span class="p">,</span>
+        <span class="n">evolution_model</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;evolutionary_model&#39;</span><span class="p">],</span>
+        <span class="n">gaps</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">][</span><span class="s1">&#39;gaps&#39;</span><span class="p">],</span>
+        <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;indel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_float</span><span class="p">(</span><span class="s1">&#39;indel_rate_per_site&#39;</span><span class="p">),</span>
+        <span class="n">parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span>
+
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">parameters</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">evolution_model</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">gaps</span><span class="p">:</span>
+        <span class="n">divergence</span><span class="p">,</span> <span class="n">loglikelihood_duplication_history</span> <span class="o">=</span> \
+            <span class="n">optimisation</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">loglikelihood_substitutions_gaps</span><span class="p">,</span>
+                         <span class="n">args</span><span class="o">=</span><span class="p">[[</span><span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">tandem_repeat</span><span class="p">],</span>
+                               <span class="p">[</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="n">indel_rate_per_site</span><span class="p">,</span> <span class="n">gaps</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">divergence</span><span class="p">,</span> <span class="n">loglikelihood_duplication_history</span> <span class="o">=</span> \
+            <span class="n">optimisation</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">loglikelihood_substitution</span><span class="p">,</span>
+                         <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">,</span> <span class="n">tandem_repeat</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">divergence</span><span class="p">,</span> <span class="n">loglikelihood_duplication_history</span>
+
+
+<span class="k">def</span> <span class="nf">loglikelihood_random</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span>
+                         <span class="n">evolution_model</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;evolutionary_model&#39;</span><span class="p">],</span>
+                         <span class="n">parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">repeat</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">equilibrium_freq</span> <span class="o">=</span> <span class="n">parameters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">aarate_file_name</span> <span class="o">=</span> <span class="n">config_file</span><span class="p">(</span>
+                <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;substitution_rate_matrices&quot;</span><span class="p">,</span>
+                <span class="n">evolution_model</span> <span class="o">+</span> <span class="s2">&quot;.dat&quot;</span><span class="p">)</span>  <span class="c1"># load equilibrium frequencies</span>
+            <span class="n">equilibrium_freq</span> <span class="o">=</span> <span class="n">load_equilibrium_freq</span><span class="p">(</span><span class="n">aarate_file_name</span><span class="p">)</span>
+
+        <span class="n">loglikelihoodrandom</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">aa</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">equilibrium_freq</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># np.log uses the natural logarithm.</span>
+            <span class="n">loglikelihoodrandom</span> <span class="o">+=</span> <span class="n">repeat</span><span class="o">.</span><span class="n">textD_standard_aa</span><span class="o">.</span><span class="n">count</span><span class="p">(</span>
+                <span class="n">aa</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">repeat</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;DNA&#39;</span><span class="p">:</span>
+        <span class="c1"># CHECK THIS!</span>
+        <span class="c1"># At the moment, we assume equal frequencies for each nucleotide -</span>
+        <span class="c1"># Baseml Model J69 or K80</span>
+        <span class="c1"># python2: float for division neccesary</span>
+        <span class="c1"># np.log uses the natural logarithm.</span>
+        <span class="n">loglikelihoodrandom</span> <span class="o">=</span> <span class="n">repeat</span><span class="o">.</span><span class="n">totD</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loglikelihoodrandom</span>
+
+
+<span class="k">def</span> <span class="nf">phylo_star_topology_local</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="p">,</span> <span class="n">evolution_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gaps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">evolution_model</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tandem_repeat</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+            <span class="n">evolution_model</span> <span class="o">=</span> <span class="s1">&#39;lg&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">evolution_model</span> <span class="o">=</span> <span class="s1">&#39;k80&#39;</span>
+
+    <span class="n">divergence</span><span class="p">,</span> <span class="n">logLH1</span> <span class="o">=</span> \
+        <span class="n">loglikelihood_startopology_local</span><span class="p">(</span><span class="n">tandem_repeat</span><span class="o">=</span><span class="n">tandem_repeat</span><span class="p">,</span>
+                                         <span class="n">evolution_model</span><span class="o">=</span><span class="n">evolution_model</span><span class="p">,</span>
+                                         <span class="n">gaps</span><span class="o">=</span><span class="n">gaps</span><span class="p">,</span>
+                                         <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="n">indel_rate_per_site</span><span class="p">,</span>
+                                         <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="n">logLH0</span> <span class="o">=</span> <span class="n">loglikelihood_random</span><span class="p">(</span>
+        <span class="n">repeat</span><span class="o">=</span><span class="n">tandem_repeat</span><span class="p">,</span>
+        <span class="n">evolution_model</span><span class="o">=</span><span class="n">evolution_model</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">divergence</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">logLH1</span> <span class="o">-</span> <span class="n">logLH0</span><span class="p">)</span>
+
+
+<span class="c1">#    ####### TANDEM REPEAT SCORE CALIBRATION ##################################</span>
+
+
+<span class="k">def</span> <span class="nf">calc_score</span><span class="p">(</span>
+        <span class="n">repeats</span><span class="p">,</span>
+        <span class="n">result_path</span><span class="p">,</span>
+        <span class="n">result_file_name</span><span class="p">,</span>
+        <span class="n">scoreslist</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;score_calibration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_list</span><span class="p">(</span><span class="s1">&#39;scoreslist&#39;</span><span class="p">),</span>
+        <span class="n">save_calibration</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;score_calibration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_bool</span><span class="p">(</span><span class="s1">&#39;save_calibration&#39;</span><span class="p">),</span>
+        <span class="n">precision</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;score_calibration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_int</span><span class="p">(</span><span class="s1">&#39;precision&#39;</span><span class="p">)):</span>
+
+    <span class="n">sequence_type</span> <span class="o">=</span> <span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence_type</span>
+    <span class="k">if</span> <span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+        <span class="n">evolution_model</span> <span class="o">=</span> <span class="s1">&#39;lg&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">evolution_model</span> <span class="o">=</span> <span class="s1">&#39;k80&#39;</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">evolution_model</span><span class="o">=</span><span class="n">evolution_model</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">Q</span><span class="p">,</span> <span class="n">eq_freq</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sequence_type</span> <span class="o">==</span> <span class="s1">&#39;AA&#39;</span><span class="p">:</span>
+        <span class="n">aarate_file_name</span> <span class="o">=</span> <span class="n">config_file</span><span class="p">(</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;substitution_rate_matrices&quot;</span><span class="p">,</span>
+            <span class="n">evolution_model</span> <span class="o">+</span>
+            <span class="s2">&quot;.dat&quot;</span><span class="p">)</span>  <span class="c1"># load equilibrium frequencies</span>
+        <span class="n">equilibrium_freq</span> <span class="o">=</span> <span class="n">load_equilibrium_freq</span><span class="p">(</span><span class="n">aarate_file_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">equilibrium_freq</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mf">0.25</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]}</span>
+
+    <span class="n">random</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">loglikelihood_random</span><span class="p">(</span>
+            <span class="n">repeat</span><span class="o">=</span><span class="n">iRepeat</span><span class="p">,</span>
+            <span class="n">evolution_model</span><span class="o">=</span><span class="n">evolution_model</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">equilibrium_freq</span><span class="p">)</span> <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i_score</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;phylo&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">loglikelihood_startopology_local</span><span class="p">(</span>
+                    <span class="n">iRepeat</span><span class="p">,</span>
+                    <span class="n">gaps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">iT</span> <span class="o">-</span> <span class="n">iR</span><span class="p">)</span> <span class="k">if</span> <span class="n">iT</span> <span class="o">!=</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span> <span class="mi">1000</span>
+                              <span class="k">for</span> <span class="n">iT</span><span class="p">,</span> <span class="n">iR</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">random</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;phylo_gap01&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> \
+                <span class="p">[</span><span class="n">loglikelihood_startopology_local</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">,</span> <span class="n">gaps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                  <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                                                  <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">iT</span> <span class="o">-</span> <span class="n">iR</span><span class="p">)</span> <span class="k">if</span> <span class="n">iT</span> <span class="o">!=</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span> <span class="mi">1000</span>
+                              <span class="k">for</span> <span class="n">iT</span><span class="p">,</span> <span class="n">iR</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">random</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;phylo_gap001&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> \
+                <span class="p">[</span><span class="n">loglikelihood_startopology_local</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">,</span> <span class="n">gaps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                  <span class="n">indel_rate_per_site</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+                                                  <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">iT</span> <span class="o">-</span> <span class="n">iR</span><span class="p">)</span> <span class="k">if</span> <span class="n">iT</span> <span class="o">!=</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span> <span class="mi">1000</span>
+                              <span class="k">for</span> <span class="n">iT</span><span class="p">,</span> <span class="n">iR</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">random</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;phylo_paml&#39;</span><span class="p">:</span>  <span class="c1"># Is this defined anywhere?</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="n">loglikelihood_starTopology_paml</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">)</span>
+                              <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">iT</span> <span class="o">-</span> <span class="n">iR</span><span class="p">)</span> <span class="k">if</span> <span class="n">iT</span> <span class="o">!=</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="o">-</span> <span class="mi">1000</span>
+                              <span class="k">for</span> <span class="n">iT</span><span class="p">,</span> <span class="n">iR</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">random</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;parsimony&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round_</span><span class="p">(</span><span class="n">mean_similarity</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">,</span> <span class="n">parsimony</span><span class="p">),</span>
+                                        <span class="n">decimals</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span> <span class="k">if</span>
+                              <span class="n">iRepeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                              <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;pSim&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round_</span><span class="p">(</span><span class="n">mean_similarity</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">,</span> <span class="n">pSim</span><span class="p">),</span>
+                                        <span class="n">decimals</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span> <span class="k">if</span>
+                              <span class="n">iRepeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                              <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i_score</span> <span class="o">==</span> <span class="s1">&#39;entropy&#39;</span><span class="p">:</span>
+            <span class="n">test_statistic</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round_</span><span class="p">(</span><span class="n">mean_similarity</span><span class="p">(</span><span class="n">iRepeat</span><span class="p">,</span> <span class="n">entropy</span><span class="p">),</span>
+                                        <span class="n">decimals</span><span class="o">=</span><span class="n">precision</span><span class="p">)</span> <span class="k">if</span>
+                              <span class="n">iRepeat</span><span class="o">.</span><span class="n">l_effective</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                              <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">save_calibration</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_path</span><span class="p">,</span> <span class="n">i_score</span><span class="p">,</span> <span class="n">result_file_name</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">repeats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;score&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">:</span>
+                    <span class="n">iR</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">iR</span><span class="p">,</span> <span class="n">iT</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">repeats</span><span class="p">,</span> <span class="n">test_statistic</span><span class="p">):</span>
+                <span class="n">iR</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="n">i_score</span><span class="p">]</span> <span class="o">=</span> <span class="n">iT</span>
+
+
+<span class="k">def</span> <span class="nf">calibrate_score</span><span class="p">(</span>
+        <span class="n">repeats</span><span class="p">,</span>
+        <span class="n">result_file_path</span><span class="p">,</span>
+        <span class="n">scoreslist</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;score_calibration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_list</span><span class="p">(</span><span class="s1">&#39;scoreslist&#39;</span><span class="p">)):</span>
+
+    <span class="k">for</span> <span class="n">i_score</span> <span class="ow">in</span> <span class="n">scoreslist</span><span class="p">:</span>
+        <span class="n">test_statistic</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="n">iRepeat</span><span class="o">.</span><span class="n">dScore</span><span class="p">[</span><span class="n">i_score</span><span class="p">]</span> <span class="k">for</span> <span class="n">iRepeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">])</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">result_file_path</span><span class="p">,</span> <span class="n">i_score</span><span class="p">])),</span>
+                 <span class="n">test_statistic</span><span class="p">)</span>
+
+<span class="c1">#  #######  CALCULATE AND SAVE THE PDF OF SCORES (Potentially deprecated) ###</span>
+
+
+<span class="k">def</span> <span class="nf">save_distribution</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">result_file_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">inverse</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">iC</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="n">iC</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">values</span><span class="p">])</span>
+        <span class="n">result_val</span><span class="p">,</span> <span class="n">inv_ndx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">result_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">inv_ndx</span><span class="p">)</span>
+        <span class="n">result_p</span> <span class="o">=</span> <span class="n">result_p</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">result_p</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">inverse</span> <span class="ow">and</span> <span class="n">items</span><span class="p">[</span><span class="n">iC</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s1">&#39;phylo&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pSim&#39;</span><span class="p">]:</span>  <span class="c1"># Are high values the best?</span>
+            <span class="n">result_p</span> <span class="o">=</span> <span class="n">result_p</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">result_val</span> <span class="o">=</span> <span class="n">result_val</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">result_p</span> <span class="o">=</span> <span class="n">result_p</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_file_path</span><span class="p">,</span> <span class="n">items</span><span class="p">[</span><span class="n">iC</span><span class="p">])):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_file_path</span><span class="p">,</span> <span class="n">items</span><span class="p">[</span><span class="n">iC</span><span class="p">]))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_file_path</span><span class="p">,</span> <span class="n">items</span><span class="p">[</span><span class="n">iC</span><span class="p">],</span> <span class="n">file_name</span><span class="p">),</span>
+                 <span class="n">cdf</span><span class="o">=</span><span class="n">result_p</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">result_val</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="calculate_pdf_scores"><a class="viewcode-back" href="../../../tral/repeat.html#tral.repeat.repeat_score.calculate_pdf_scores">[docs]</a><span class="k">def</span> <span class="nf">calculate_pdf_scores</span><span class="p">(</span>
+        <span class="n">repeats</span><span class="p">,</span>
+        <span class="n">result_file_path</span><span class="p">,</span>
+        <span class="n">file_name</span><span class="p">,</span>
+        <span class="n">scoreslist</span><span class="o">=</span><span class="n">CONFIG</span><span class="p">[</span><span class="s1">&#39;score_calibration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">as_list</span><span class="p">(</span><span class="s1">&#39;scoreslist&#39;</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; CALCULATE THE PROBABILITY DISTRIBUTION OF SCORES &quot;&quot;&quot;</span>
+
+    <span class="c1"># Can you generalise the next command for arbitrary classifiers?</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">repeat</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">scoreslist</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">repeat</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">scoreslist</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="k">for</span> <span class="n">repeat</span> <span class="ow">in</span> <span class="n">repeats</span><span class="p">]</span>
+    <span class="n">save_distribution</span><span class="p">(</span>
+        <span class="n">values</span><span class="o">=</span><span class="n">scores</span><span class="p">,</span>
+        <span class="n">items</span><span class="o">=</span><span class="n">scoreslist</span><span class="p">,</span>
+        <span class="n">result_file_path</span><span class="o">=</span><span class="n">result_file_path</span><span class="p">,</span>
+        <span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">,</span>
+        <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>

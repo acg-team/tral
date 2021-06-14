@@ -1,0 +1,1053 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tral.sequence.repeat_detection_io &#8212; TRAL 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/tral.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700|Source+Code+Pro|Armata|IM+Fell+English'
+          rel='stylesheet' type='text/css' />
+ 
+    <style type="text/css">
+      table.right { float: right; margin-left: 20px; }
+      table.right td { border: 1px solid #ccc; }
+      
+    </style>
+    <script type="text/javascript">
+      // intelligent scrolling of the sidebar content
+      $(window).scroll(function() {
+        var sb = $('.sphinxsidebarwrapper');
+        var win = $(window);
+        var sbh = sb.height();
+        var offset = $('.sphinxsidebar').position()['top'];
+        var wintop = win.scrollTop();
+        var winbot = wintop + win.innerHeight();
+        var curtop = sb.position()['top'];
+        var curbot = curtop + sbh;
+        // does sidebar fit in window?
+        if (sbh < win.innerHeight()) {
+          // yes: easy case -- always keep at the top
+          sb.css('top', $u.min([$u.max([0, wintop - offset - 10]),
+                                $(document).height() - sbh - 200]));
+        } else {
+          // no: only scroll if top/bottom edge of sidebar is at
+          // top/bottom edge of window
+          if (curtop > wintop && curbot > winbot) {
+            sb.css('top', $u.max([wintop - offset - 10, 0]));
+          } else if (curtop < wintop && curbot < winbot) {
+            sb.css('top', $u.min([winbot - sbh - offset - 20,
+                                  $(document).height() - sbh - 200]));
+          }
+        }
+      });
+    </script>
+
+  </head><body>
+<div class="pageheader">
+    <a href="http://www.isb-sib.ch/" class="sib_logo" title="SIB Swiss Institute of Bioinformatics"><img src="../../../_static/sib.png" alt="SIB" class="sib_logo" /></a>
+    <a href="../../../index.html">
+      <img class="headlogo" src="../../../_static/trallogo.png" alt="TRAL" />
+      <span class="headlogo">Tandem Repeat Annotation Library</span>
+    </a>
+    <div class="headlinks">
+        <a href="../../../index.html">Home</a>
+        <a href="../../../install.html">Install</a>
+        <a href="../../../code_docs.html">Code docs</a>
+    </div>
+</div>
+
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tral.sequence.repeat_detection_io</h1><div class="highlight"><pre>
+<span></span><span class="c1"># (C) 2011, Alexander Korsunsky</span>
+<span class="c1"># (C) 2011-2015 Elke Schaper</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :synopsis: Parsing repeat detection algorithm output</span>
+
+<span class="sd">    .. moduleauthor:: Elke Schaper &lt;elke.schaper@isb-sib.ch&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">RepeatRegion</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protein_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msa</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_id</span> <span class="o">=</span> <span class="n">protein_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span>  <span class="c1"># 1-based</span>
+        <span class="k">if</span> <span class="n">msa</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msa</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">msa</span>
+
+
+<div class="viewcode-block" id="tred_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.tred_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">tred_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read repeats from a TRED standard output (stdout) file stream successively.</span>
+
+<span class="sd">    Read repeats from a TRED standard output (stdout) file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Layout of TRED output file::</span>
+
+<span class="sd">         Start: start End: \d+ Length: \d+</span>
+
+<span class="sd">        ( \d repeat_unit \d</span>
+<span class="sd">        ( alignment_indicator )?)*</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream of output1 from</span>
+<span class="sd">            tred1 myDNA.faa intermediate_output</span>
+<span class="sd">            tred2 myDNA.faa intermediate_output output1 output2</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Layout TRED output syntax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pattern for start index</span>
+    <span class="n">pat_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Start: (\d+)&quot;</span><span class="p">)</span>
+    <span class="n">pat_repeat_unit</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+\s+([ACGT-]+)&quot;</span><span class="p">)</span>
+    <span class="n">pat_alignment_indicator</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+([ACGT-]+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1: searching for start</span>
+    <span class="c1"># 2: searching for first repeat unit</span>
+    <span class="c1"># 3: searching for all further repeat units</span>
+
+    <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">repeat_units</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">(</span><span class="n">protein_id</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">msa</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_start</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (1-&gt;2) Found start&quot;</span><span class="p">)</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_unit</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (2-&gt;3) Found first repeat_unit&quot;</span><span class="p">)</span>
+                <span class="n">repeat_units</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="kc">True</span><span class="p">))</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="mi">3</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_unit</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (3-&gt;3) Found another repeat_unit&quot;</span><span class="p">)</span>
+                <span class="n">repeat_units</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">pat_alignment_indicator</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (3-&gt;3) Found an alignment_indicator unit&quot;</span><span class="p">)</span>
+                    <span class="n">repeat_units</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="kc">False</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (3-&gt;1) Found end of repeat (yielding)&quot;</span><span class="p">)</span>
+                    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">tred_msa_from_pairwise</span><span class="p">(</span><span class="n">repeat_units</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">region</span></div>
+
+
+<div class="viewcode-block" id="tred_msa_from_pairwise"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.tred_msa_from_pairwise">[docs]</a><span class="k">def</span> <span class="nf">tred_msa_from_pairwise</span><span class="p">(</span><span class="n">repeat_units</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Construct a MSA from pairwise alignments.</span>
+
+<span class="sd">    Construct a MSA from pairwise alignments. At the moment, gaps following the repeat are</span>
+<span class="sd">    not added. However, these gaps are added automatically when a ``Repeat`` instance is</span>
+<span class="sd">    created.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repeat_units (list of str): Read in from TRED output files</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (list of str)</span>
+
+<span class="sd">    .. todo:: Is the Args format mentioned correctly?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pat_gap</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(-*)&quot;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">repeat_units</span><span class="p">)):</span>
+        <span class="n">ru</span> <span class="o">=</span> <span class="n">repeat_units</span><span class="p">[</span><span class="n">iR</span><span class="p">]</span>
+
+        <span class="c1"># The next repeat unit</span>
+        <span class="k">if</span> <span class="n">ru</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="n">index</span> <span class="o">+</span> <span class="n">ru</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># How many gaps in the beginning of this repeat unit?</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pat_gap</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ru</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+
+        <span class="c1"># The next alignment indicator</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iL</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ru</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">ru</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">iL</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                    <span class="c1"># enter a gap between</span>
+                    <span class="c1"># the index + iL and index + iL + 1 character</span>
+                    <span class="c1"># in each repeat unit in result so far:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">iRU</span><span class="p">[:</span><span class="n">index</span> <span class="o">+</span> <span class="n">iL</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">iRU</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="n">iL</span><span class="p">:]</span>
+                              <span class="k">for</span> <span class="n">iRU</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="treks_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.treks_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">treks_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read repeats from a T-REKS standard output (stdout) file stream successively.</span>
+
+<span class="sd">    Read repeats from a T-REKS standard output (stdout) file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Layout of T-REKS output file::</span>
+
+<span class="sd">        protein ::=</span>
+<span class="sd">            &quot;&gt;&quot; identifier</span>
+<span class="sd">            repeat*</span>
+<span class="sd">        #</span>
+<span class="sd">        repeat ::=</span>
+<span class="sd">            repeat_header</span>
+<span class="sd">            sequence*</span>
+<span class="sd">            &quot;*&quot;+</span>
+<span class="sd">        #</span>
+<span class="sd">        repeat_header ::= &quot;Length:&quot; integer &quot;residues - nb:&quot; integer  &quot;from&quot;  integer &quot;to&quot; integer &quot;- Psim:&quot;float &quot;region Length:&quot;integer</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream to the file of the standard output of T-Reks</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Layout T-REKS output syntax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pattern for protein identifier</span>
+    <span class="n">pat_identifier</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;(\S+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># pattern for repeat properties</span>
+    <span class="n">pat_repeat_header</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s2">&quot;Length:\s*\d+\s+&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;residues - nb:\s*(\d+)\s+&quot;</span>  <span class="c1"># 1. number of repeats</span>
+        <span class="sa">r</span><span class="s2">&quot;from\s+(\d+)\s+to\s+(\d+)\s*&quot;</span>  <span class="c1"># 2-3. start and end of repeat region (1-based)</span>
+        <span class="sa">r</span><span class="s2">&quot;-\s*Psim:\s*(-?[\d\.]+)\s+&quot;</span>  <span class="c1"># 4. probability (accept negative for (malformed) log10 values)</span>
+        <span class="sa">r</span><span class="s2">&quot;region Length:\s*(\d+)&quot;</span><span class="p">)</span>  <span class="c1"># 5. length</span>
+
+    <span class="n">pat_repeat_end</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\*+&quot;</span><span class="p">)</span>
+
+    <span class="c1"># pattern for repeat sequence</span>
+    <span class="c1"># FIXME stuff that occurs here is not just A-Z but a set of possible amino</span>
+    <span class="c1"># acid symbols</span>
+    <span class="n">pat_sequence</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([A-Z-]+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1: state between repeats</span>
+    <span class="c1">#   entry: reset repeat</span>
+    <span class="c1">#   expect repeat_header(goto 2) OR identifier(store identifier, goto 1)</span>
+    <span class="c1"># 2: state for multiple sequence alignment line</span>
+    <span class="c1"># expect sequence(goto 3, append sequence) OR repeat_end(return repeat,</span>
+    <span class="c1"># goto 1)</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">identifier</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Parsing header</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">(</span><span class="n">protein_id</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">msa</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;msa: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_header</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (1-&gt;2) Found properties&quot;</span><span class="p">)</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># 1-based in T-Reks output</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_identifier</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (1-&gt;1) Found identifier&quot;</span><span class="p">)</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Parsing MSA</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_sequence</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (2-&gt;2) Found MSA line (appending)&quot;</span><span class="p">)</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_end</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (2-&gt;1) Found end of repeat (yielding)&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># Perform some checks before yielding</span>
+                <span class="n">msalen</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">+</span> <span class="n">msalen</span> <span class="o">!=</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Inconsistency in T-Reks file: MSA length doesnt match start and end&quot;</span><span class="p">)</span>
+
+                <span class="k">yield</span> <span class="n">region</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Huh? Unknown parser state &quot;</span> <span class="o">+</span>
+                                 <span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="xstream_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.xstream_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">xstream_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read repeats from a XSTREAM output xls chart</span>
+
+<span class="sd">    Read repeats from a XSTREAM output xls chart</span>
+
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream to read XSTREAM output from a xls chart.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The infile is luckily enough in csv format:</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="s1">&#39;excel-tab&#39;</span><span class="p">)</span>
+
+    <span class="c1"># read first row with the fieldnames</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Header has </span><span class="si">%d</span><span class="s2"> fields.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">8</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;XStream output file seems to be malformed. &quot;</span>
+            <span class="s2">&quot;Make sure to open this function with the generated xls chart.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># when XSTREAM is fed files with multiple sequences, first field is &quot;identifier&quot;,</span>
+    <span class="c1"># otherwise it is &quot;seq length&quot;</span>
+    <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;identifier&quot;</span><span class="p">:</span>
+        <span class="n">field_offset</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">field_offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">field_offset</span><span class="p">:</span>
+            <span class="n">region</span><span class="o">.</span><span class="n">protein_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">field_offset</span><span class="p">])</span>
+        <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span> <span class="o">+</span> <span class="n">field_offset</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found repeat, yielding.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">region</span></div>
+
+
+<div class="viewcode-block" id="trust_fill_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.trust_fill_repeats">[docs]</a><span class="k">def</span> <span class="nf">trust_fill_repeats</span><span class="p">(</span><span class="n">msa</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">maximal_gap_length</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; return a trust msa that has no longer indels than maximal_gap_length,</span>
+<span class="sd">    that contains the indel characters even when not part of the trust output file.</span>
+<span class="sd">    Background trust returns tandem repeats, but also distant repeats. &#39;&#39;&#39;</span>
+    <span class="n">gapless_msa</span> <span class="o">=</span> <span class="p">[</span><span class="n">repeat_unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">repeat_unit</span> <span class="ow">in</span> <span class="n">msa</span><span class="p">]</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="c1"># Find the start and end positions of the predicted repeat units</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="p">[(</span><span class="n">begin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">begin</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">gapless_msa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">repeat_unit</span> <span class="ow">in</span> <span class="n">gapless_msa</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">find_index</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">position</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">repeat_unit</span><span class="p">)</span>
+        <span class="c1"># Repeat unit could not be found in sequence -&gt; Discard the repeat</span>
+        <span class="k">if</span> <span class="n">find_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">repeat_unit_begin</span> <span class="o">=</span> <span class="n">find_index</span> <span class="o">+</span> <span class="n">position</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">position</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">repeat_unit_begin</span><span class="p">,</span> <span class="n">repeat_unit_begin</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">repeat_unit</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Derive the start and end positions of the gaps</span>
+    <span class="n">gap_position</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">position</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">gap_position</span><span class="p">]</span>
+
+    <span class="c1"># Filter out repeat units that are further apart than maximal_gap_length</span>
+    <span class="n">gap_valid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;1&#39;</span> <span class="k">if</span> <span class="n">i_gap</span> <span class="o">&lt;=</span> <span class="n">maximal_gap_length</span> <span class="k">else</span> <span class="s1">&#39;0&#39;</span> <span class="k">for</span> <span class="n">i_gap</span> <span class="ow">in</span> <span class="n">gaps</span><span class="p">])</span>
+
+    <span class="n">count_valid_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+                         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;1+&#39;</span><span class="p">),</span> <span class="n">gap_valid</span><span class="p">)]</span>
+    <span class="c1"># All repeat units are further apart than maximal_gap_length? -&gt; Discard</span>
+    <span class="c1"># the repeat</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># Choose the sequence of pairs closer then maximal_gap_length that is</span>
+    <span class="c1"># longest</span>
+    <span class="n">valid_index</span> <span class="o">=</span> <span class="n">gap_valid</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;1&#39;</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">))</span>
+
+    <span class="c1"># Shorten the predicted msa accordingly.</span>
+    <span class="n">msa</span> <span class="o">=</span> <span class="n">msa</span><span class="p">[</span><span class="n">valid_index</span><span class="p">:</span><span class="n">valid_index</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="n">gaps</span><span class="p">[</span><span class="n">valid_index</span><span class="p">:</span><span class="n">valid_index</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">gap_position</span> <span class="o">=</span> <span class="n">gap_position</span><span class="p">[</span>
+        <span class="n">valid_index</span><span class="p">:</span><span class="n">valid_index</span> <span class="o">+</span>
+        <span class="nb">max</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">)</span> <span class="o">+</span>
+        <span class="mi">1</span><span class="p">]</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[</span><span class="n">valid_index</span><span class="p">:</span><span class="n">valid_index</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">count_valid_pairs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Add missing sequence to the repeat units</span>
+    <span class="n">gap_count_before</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">i_gap</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gaps</span><span class="p">):</span>
+        <span class="n">gap_count_after</span> <span class="o">=</span> <span class="n">gap_count_before</span> <span class="o">+</span> <span class="n">i_gap</span>
+        <span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">gap_count_before</span><span class="p">)</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="n">gap_position</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span><span class="n">gap_position</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">gaps</span><span class="p">)</span> <span class="o">-</span> <span class="n">gap_count_after</span><span class="p">)</span>
+        <span class="n">gap_count_before</span> <span class="o">=</span> <span class="n">gap_count_after</span>
+    <span class="n">msa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="n">gaps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">msa</span><span class="p">,</span> <span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="trust_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.trust_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">trust_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read repeats from a TRUST standard output (stdout) file stream successively.</span>
+
+<span class="sd">    Read repeats from a TRUST standard output (stdout) file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Layout of TRUST standard output::</span>
+
+<span class="sd">        protein ::=</span>
+<span class="sd">            &quot;&gt;&quot; identifier</span>
+<span class="sd">            (repeat_types)*</span>
+<span class="sd">            &quot;//&quot;</span>
+<span class="sd">        #</span>
+<span class="sd">        repeat_types ::=</span>
+<span class="sd">            &quot;REPEAT_TYPE&quot; integer</span>
+<span class="sd">            &quot;REPEAT_LENGTH&quot; integer</span>
+<span class="sd">            (repeat_info)*</span>
+<span class="sd">            (&quot;&gt;Repeat &quot; integer</span>
+<span class="sd">            sequence)*</span>
+<span class="sd">        #</span>
+<span class="sd">        repeat_info ::=</span>
+<span class="sd">            integer integer [integer] [integer]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream from TRUST standard output.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Layout TRUST output syntax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pat_identifier</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;(\S+)&quot;</span><span class="p">)</span>
+    <span class="n">pat_repeat_type</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;REPEAT_TYPE \d+&quot;</span><span class="p">)</span>
+    <span class="n">pat_repeat_length</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;REPEAT_LENGTH \d+&quot;</span><span class="p">)</span>
+    <span class="n">pat_repeat_info</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+) (\d+).*$&quot;</span><span class="p">)</span>
+    <span class="n">pat_repeat_header</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&gt;Repeat \d+&quot;</span><span class="p">)</span>
+    <span class="c1"># FIXME find proper character set here</span>
+    <span class="n">pat_repeat_sequence</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([A-Za-z-]+)&quot;</span><span class="p">)</span>
+    <span class="n">pat_protein_end</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;//&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+    <span class="c1">#</span>
+    <span class="c1"># 0: initial state</span>
+    <span class="c1">#   expect: identifier(store identifier, goto 1)</span>
+    <span class="c1"># 1: before the beginning of a repeat</span>
+    <span class="c1">#   expect: &quot;REPEAT_TYPE&quot;(goto 2) or &quot;//&quot;(goto 0)</span>
+    <span class="c1"># 2: state after having found &quot;REPEAT_TYPE&quot;</span>
+    <span class="c1">#   entry: reset state of return value (repeat)</span>
+    <span class="c1">#   expect: &quot;REPEAT_LENGTH&quot;(goto 3)</span>
+    <span class="c1"># 3: first line of repeat info</span>
+    <span class="c1">#   expect: repeat_info(store begin, goto 4) or &quot;&gt;Repeat&quot;(goto 5)</span>
+    <span class="c1"># 4: continuing to read repeat info</span>
+    <span class="c1">#   expect: repeat_info(goto 4) or &quot;&gt;Repeat&quot;(goto 5)</span>
+    <span class="c1"># 5: part of MSA sequence</span>
+    <span class="c1">#   expect: sequence(goto 6)</span>
+    <span class="c1"># 6: After first sequence</span>
+    <span class="c1"># expect: &quot;&gt;Repeat&quot;(goto 5) or &quot;REPEAT_TYPE&quot;(return repeat, goto 2) or</span>
+    <span class="c1"># &quot;//&quot;(return repeat, goto 0)</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">()</span>
+    <span class="n">identifier</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">strip_comments</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+        <span class="n">pat_comment</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s*#.*$&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pat_comment</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">strip_comments</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_identifier</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(0-&gt;1) Found identifier (storing </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_type</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(1-&gt;2) Found REPEAT_TYPE&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">continue</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_protein_end</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(1-&gt;0) Found protein end&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="c1"># Entry Action: clear msa cache</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">(</span><span class="n">protein_id</span><span class="o">=</span><span class="n">identifier</span><span class="p">)</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_length</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(2-&gt;3) Found REPEAT_LENGTH&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">3</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_info</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(3-&gt;4) Found repeat_info (storing begin: </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">continue</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_header</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;5) Found repeat_header&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">4</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_info</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(4-&gt;4) Found repeat_info&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">continue</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_header</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(4-&gt;5) Found repeat_header&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">5</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_sequence</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(5-&gt;6) Found sequence (storing </span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">6</span>
+                <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="mi">6</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_header</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(6-&gt;5) Found repeat_header&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_repeat_type</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(6-&gt;2) Found REPEAT_TYPE, yielding.&quot;</span><span class="p">)</span>
+
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pat_protein_end</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(6-&gt;0) Found protein end, yielding.&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="k">continue</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Huh? Unknown parser state &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">))</span></div>
+
+<span class="c1">################################## TRF - Benson ##########################</span>
+
+
+<div class="viewcode-block" id="trf_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.trf_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">trf_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read repeats from a TRF txt.html file stream file stream successively.</span>
+
+<span class="sd">    Read repeats from a TRF txt.html file stream file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    TRF output file syntax::</span>
+
+<span class="sd">        Sequence: ``identifier``</span>
+<span class="sd">             Indices: ``begin``--``end``</span>
+<span class="sd">             \d [a-zA-Z]+</span>
+<span class="sd">        #</span>
+<span class="sd">             begin (repeat)*</span>
+<span class="sd">             1  (consensus)*</span>
+<span class="sd">        #</span>
+<span class="sd">          (( \d (repeat)*</span>
+<span class="sd">             \d  (consensus)*</span>
+<span class="sd">          )?</span>
+<span class="sd">             \d (repeat)*</span>
+<span class="sd">             1  (consensus)*</span>
+<span class="sd">          )+</span>
+<span class="sd">             \d [a-zA-Z]+</span>
+<span class="sd">        #</span>
+<span class="sd">            ``Statistics``</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream from TRF output txt.html.</span>
+<span class="sd">    (generated via e.g. ./trf404.linux64.exe FASTAFILE 2 7 7 80 10 50 500 -d &gt; /dev/null</span>
+<span class="sd">    If the -h flag is set, no .txt.html output is produced)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Layout TRF output syntax.</span>
+<span class="sd">    .. todo:: Does not search for the sequence identifier at current!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># find the name of the sequence ## CURRENTLY NOT IMPLEMENTED</span>
+    <span class="c1">#pat_identifier = re.compile(r&quot;Sequence: (\S+)&quot;)</span>
+
+    <span class="c1"># find coordinates of the repeat region in the protein</span>
+    <span class="n">pat_coordinates</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Indices: (\d+)--(\d+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># find a part of a repeat unit and its coordinate</span>
+    <span class="n">pattern_seq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+(\d+) ([ACGT\- ]+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># find the final tag &#39;Statistics&#39;</span>
+    <span class="n">pat_statistics</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Statistics&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+    <span class="c1">#</span>
+    <span class="c1"># state 0: searching for identifier -&gt; 1  # not necessary when sequence identifier is known</span>
+    <span class="c1"># state 1: searching for repeat region coordinates -&gt; 2</span>
+    <span class="c1"># state 2: searching for beginning of MSA &amp; save sequence to tmpMSA-&gt; 4</span>
+    <span class="c1"># state 3: new repeat unit: save sequence to tmpMSA -&gt; 6</span>
+    <span class="c1"># state 4: new repeat unit: save sequence to tmp_consensus -&gt; 5</span>
+    <span class="c1"># state 5:</span>
+    <span class="c1">#           if sequence: save sequence to tmpMSA -&gt; 6</span>
+    <span class="c1">#           if end: save tmpMSA to preMSA; save tmp_consensus to consensus; Yield repeat region -&gt; 1</span>
+    <span class="c1"># state 6: check: new repeat unit? save tmp_consensus</span>
+    <span class="c1">#  1: use last tmpMSA entry for new tmpMSA;</span>
+    <span class="c1">#     save tmpMSA to preMSA;</span>
+    <span class="c1">#     save tmp_consensus to consensus;</span>
+    <span class="c1">#     save sequence to new tmp_consensus -&gt; 3</span>
+    <span class="c1">#  0: save sequence to tmp_consensus -&gt; 5</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># identifier = &quot;&quot;  # Currently not implemented.</span>
+    <span class="n">preMSA</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">consensus</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tmp_consensus</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># CURRENTLY NOT IMPLEMENTED</span>
+        <span class="c1"># if state == 0: #searching for sequenceMSA identifier</span>
+        <span class="c1">#  tmp = pat_identifier.search(line)</span>
+        <span class="c1">#  if tmp:</span>
+        <span class="c1">#    state = 1</span>
+        <span class="c1">#    identifier = tmp.group()</span>
+        <span class="c1">#  continue</span>
+        <span class="c1"># elif state == 1: #searching for TR boundaries (indices)</span>
+
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># searching for repeat region coordinates</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">pat_coordinates</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; * (1-&gt;2) Found coordinates&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">()</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="c1">#region_end = search.group(2)</span>
+                <span class="n">short</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># searching for beginning of MSA &amp; save sequence to tmpMSA-&gt; 4</span>
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">begin</span><span class="p">):</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(2-&gt;4) Found first row of first MSA repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">short</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">preMSA</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Repeat unit is short; preMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">preMSA</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmpMSA</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; tmpMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># new repeat unit: save sequence to tmpMSA -&gt; 4</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;5) Found first row of new repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">6</span>
+                <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">preMSA</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Repeat unit is short; preMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">preMSA</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmpMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; tmpMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+            <span class="c1"># if end: save tmpMSA to preMSA; save tmp_consensus to consensus;</span>
+            <span class="c1"># Yield repeat region -&gt; 1</span>
+            <span class="k">if</span> <span class="n">pat_statistics</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(5-&gt;1) Encountered &#39;Statistics&#39;: No more repeats, yielding.&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">preMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+                    <span class="n">consensus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_consensus</span><span class="p">))</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">getMSA</span><span class="p">(</span><span class="n">preMSA</span><span class="p">,</span> <span class="n">consensus</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="n">preMSA</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">consensus</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>  <span class="c1"># new repeat unit: save sequence to tmp_consensus -&gt; 5</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(4-&gt;5) Found first consensus row of the repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">consensus</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Repeat unit is short;  consensus: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">consensus</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmp_consensus</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; tmp_consensus: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_consensus</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>  <span class="c1"># SEARCHING FOR MSA ROW</span>
+            <span class="c1"># if sequence: save sequence to tmpMSA -&gt; 6</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(5-&gt;6) Found a MSA row&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">6</span>
+                <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">preMSA</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Repeat unit is short; preMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">preMSA</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmpMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; tmpMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+
+            <span class="c1"># if end: save tmpMSA to preMSA; save tmp_consensus to consensus;</span>
+            <span class="c1"># Yield repeat region -&gt; 1</span>
+            <span class="k">if</span> <span class="n">pat_statistics</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(5-&gt;1) Encountered &#39;Statistics&#39;: No more repeats, yielding.&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">preMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+                    <span class="n">consensus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_consensus</span><span class="p">))</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">getMSA</span><span class="p">(</span><span class="n">preMSA</span><span class="p">,</span> <span class="n">consensus</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="n">preMSA</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">consensus</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>  <span class="c1"># new repeat unit? ## SEARCHING FOR CONSENSUS ROW</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="c1"># 1: save tmp_consensus -&gt; 3</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot; *(6-&gt;3) Found a consensus row of a new repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="k">if</span> <span class="n">short</span><span class="p">:</span>  <span class="c1"># NEEDS TO BE CODED</span>
+                    <span class="n">consensus</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Repeat unit is short; consensus: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">consensus</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">newMSA</span> <span class="o">=</span> <span class="n">tmpMSA</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="n">preMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpMSA</span><span class="p">))</span>
+                    <span class="n">consensus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_consensus</span><span class="p">))</span>
+                    <span class="n">tmpMSA</span> <span class="o">=</span> <span class="p">[</span><span class="n">newMSA</span><span class="p">]</span>
+                    <span class="n">tmp_consensus</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+
+            <span class="c1"># 0: save sequence to tmp_consensus -&gt; 5</span>
+            <span class="k">elif</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(6-&gt;5) Found a consensus row&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span>
+                <span class="n">tmp_consensus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1"># YIELD</span>
+            <span class="c1"># aha! there should have been a consensus sequence, but there is</span>
+            <span class="c1"># not. Hence we are finished with this repeat!</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; *(6-&gt;1) No consensus row: repeat finished&#39;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+                    <span class="n">preMSA</span> <span class="o">=</span> <span class="n">preMSA</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">preMSA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">tmpMSA</span><span class="p">[</span>
+                                <span class="mi">0</span><span class="p">:</span><span class="o">-</span>
+                                <span class="mi">1</span><span class="p">]))</span>  <span class="c1"># The last tmpMSA entry was not a repeat unit</span>
+                    <span class="n">consensus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp_consensus</span><span class="p">))</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; preMSA: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">preMSA</span><span class="p">))</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; consensus: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">consensus</span><span class="p">))</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="n">getMSA</span><span class="p">(</span><span class="n">preMSA</span><span class="p">,</span> <span class="n">consensus</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="n">preMSA</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">consensus</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="getMSA"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.getMSA">[docs]</a><span class="k">def</span> <span class="nf">getMSA</span><span class="p">(</span><span class="n">sequenceMSA</span><span class="p">,</span> <span class="n">consensusMSA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Derive the MSA from a strange combination of consensusMSA and sequenceMSA in TRF</span>
+<span class="sd">    (Benson) txt.html output files</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequenceMSA (?):</span>
+<span class="sd">        consensusMSA (?):</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         msa (list of str): The multiple sequence alignment predicted by TRF.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msa</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequenceMSA</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">consensusMSA</span><span class="p">:</span>
+        <span class="c1"># CHECK for insertions</span>
+        <span class="n">insertion</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">insertion</span> <span class="ow">and</span> <span class="n">consensusMSA</span><span class="p">:</span>
+            <span class="n">insertion</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i_con</span> <span class="ow">in</span> <span class="n">consensusMSA</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i_con</span> <span class="ow">and</span> <span class="n">i_con</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                    <span class="n">insertion</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">break</span>
+            <span class="c1"># INCLUDE insertions into the msa</span>
+            <span class="k">if</span> <span class="n">insertion</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">consensusMSA</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                        <span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                        <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span>
+
+        <span class="c1"># CHECK for deletions and normal sequence</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">consensusMSA</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">consensusMSA</span><span class="p">)):</span>
+            <span class="c1"># The last repeat unit can be shorter than the ones before</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">break</span>
+
+            <span class="n">msa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequenceMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">consensusMSA</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">msa</span></div>
+
+<span class="c1"># ############## HHrepID - Soeding ###########################################</span>
+
+
+<div class="viewcode-block" id="hhpredid_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.hhpredid_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">hhpredid_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read repeats from a HHREPID standard output (stdout) file stream successively.</span>
+
+<span class="sd">    Read repeats from a HHREPID standard output (stdout) file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Layout of HHREPID standard output::</span>
+
+<span class="sd">        protein ::=</span>
+<span class="sd">             begin&quot;-&quot;\d    &quot;+&quot;\d repeatUnit</span>
+<span class="sd">           ( \d&quot;-&quot;\d    &quot;+&quot;\d repeatUnit )+</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream from HHREPID standard output.</span>
+<span class="sd">        [Generated by e.g.: ./hhrepid_32 -i FASTAFILE -v 0 -d cal.hhm -o INFILE]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Layout HHREPID output syntax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># find a part of a repeat unit and its first coordinate</span>
+    <span class="c1"># minus or \minus?</span>
+
+    <span class="n">pattern_repeat_unit_count</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Repeats\s+(\d+)&quot;</span><span class="p">)</span>
+    <span class="n">pattern_seq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Z]+(\d+).*(\d+)\-.*\+[\d]+ ([\-a-zA-Z.]+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+
+    <span class="c1"># state1: Find number of repeat units n</span>
+    <span class="c1"># state2: Find first (partial) row of the MSA</span>
+    <span class="c1"># state3: Find all other (partial) rows of the MSA</span>
+
+    <span class="n">region</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find &#39;Repeats&#39; marker of new repeat</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">pattern_repeat_unit_count</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(1-&gt;2) Found repeat&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find first (partial) row of the MSA</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(2-&gt;3) Found first repeat unit (part)&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">()</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span>
+                           <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="mi">3</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find all other (partial) rows of the MSA</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;3) Found other repeat unit (part)&quot;</span><span class="p">)</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span>
+                           <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">search</span> <span class="o">=</span> <span class="n">pattern_repeat_unit_count</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;2) Yield Repeat, begin next&quot;</span><span class="p">)</span>
+                    <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">region</span>
+                        <span class="n">region</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="s2">&quot;HHPREDID: Msa too short </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span>
+                                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span>
+
+    <span class="c1"># Yield final repeat region.</span>
+    <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">region</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;HHPREDID: Msa too short </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span></div>
+
+<span class="c1">####################################### Phobos TRF  ######################</span>
+
+
+<div class="viewcode-block" id="phobos_get_repeats"><a class="viewcode-back" href="../../../tral/sequence.html#tral.sequence.repeat_detection_io.phobos_get_repeats">[docs]</a><span class="k">def</span> <span class="nf">phobos_get_repeats</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read repeats from a PHOBOS output file stream successively.</span>
+
+<span class="sd">    Read repeats from a PHOBOS output file stream successively.</span>
+<span class="sd">    Postcondition: infile points to EOF.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        infile (file stream): File stream from PHOBOS output.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">         (Repeat): A generator function is returned that, when called in a loop,</span>
+<span class="sd">         yields one repeat per iteration.</span>
+
+<span class="sd">    .. todo:: Show PHOBOS output syntax.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pattern_begin</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+) :\s+\d&quot;</span><span class="p">)</span>
+    <span class="n">pattern_seq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([\-ACGT]+)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Our possible parser states:</span>
+    <span class="c1">#</span>
+    <span class="c1"># state 1: Find TR begin</span>
+    <span class="c1"># state 2: Find first repeat unit</span>
+    <span class="c1"># state 3: Find repeat units</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find TR offset</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">pattern_begin</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">search</span> <span class="ow">and</span> <span class="n">search</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(1-&gt;2) Found tandem repeat begin&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">RepeatRegion</span><span class="p">()</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find all other repeat units</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(2-&gt;3) Found first repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="k">elif</span> <span class="mi">3</span> <span class="o">==</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Find all other repeat units</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">pattern_seq</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;3) Found a repeat unit&quot;</span><span class="p">)</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; *(3-&gt;1) repeat region finished, yielding.&quot;</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">region</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;phobos: Msa too short </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">msa</span><span class="p">))</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+  </body>
+</html>
