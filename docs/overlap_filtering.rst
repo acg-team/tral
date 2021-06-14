@@ -29,7 +29,7 @@ Read in tandem repeat annotations.
 
 
 Filter overlapping tandem repeats.
-----------------------------------------------------
+----------------------------------
 
 Tandem repeats can be clustered according to different types of overlap:
 ::
