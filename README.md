@@ -28,6 +28,12 @@ GPL-2.0
 
 Some of TRAL's functions depend on external software ([Installation instructions for dependencies]). This includes creation of sequence profile hidden Markov models, alignment of tandem repeat units, and *de novo* repeat detection.
 
+### Citation
+
+Delucchi, M., Näf, P., Bliven, S., & Anisimova, M. (2021). [TRAL 2.0: Tandem Repeat Detection with Circular Profile Hidden Markov Models and Evolutionary Aligner](https://www.frontiersin.org/articles/10.3389/fbinf.2021.691865). *Frontiers in Bioinformatics*, DOI:  10.3389/fbinf.2021.691865
+
+E Schaper, A Korsunsky, J Pecerska, A Messina, R Murri, H Stockinger, S Zoller, I Xenarios, and M Anisimova (2015). [TRAL: Tandem Repeat Annotation Library](http://bioinformatics.oxfordjournals.org/content/early/2015/05/17/bioinformatics.btv306.abstract). *Bioinformatics*. DOI:  10.1093/bioinformatics/btv306
+
 [documented on GitHub IO]:https://acg-team.github.io/tral/
 [docker image]:https://github.com/acg-team/tral/packages
 [easy_setup]:https://github.com/acg-team/tral/tree/develop/easy_setup
