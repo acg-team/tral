@@ -60,6 +60,7 @@ Reference Guide
 
 How to cite us
 ===============
+Delucchi, M., Näf, P., Bliven, S., & Anisimova, M. (2021). `TRAL 2.0: Tandem Repeat Detection with Circular Profile Hidden Markov Models and Evolutionary Aligner <https://www.frontiersin.org/articles/10.3389/fbinf.2021.691865>`_. *Frontiers in Bioinformatics*, DOI:  10.3389/fbinf.2021.691865
 
 E Schaper, A Korsunsky, J Pecerska, A Messina, R Murri, H Stockinger, S Zoller, I Xenarios, and M Anisimova (2015). `TRAL: Tandem Repeat Annotation Library <http://bioinformatics.oxfordjournals.org/content/early/2015/05/17/bioinformatics.btv306.abstract>`_. *Bioinformatics*. DOI:  10.1093/bioinformatics/btv306
 

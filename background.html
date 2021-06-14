@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Background &#8212; TRAL 2.0.0 documentation</title>
+    <title>Background Information &#8212; TRAL 2.0.0 documentation</title>
     <link rel="stylesheet" href="_static/tral.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -73,7 +73,7 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Background</a><ul>
+<li><a class="reference internal" href="#">Background Information</a><ul>
 <li><a class="reference internal" href="#more-tandem-repeat-characteristics">More tandem repeat characteristics</a></li>
 <li><a class="reference internal" href="#writing-a-tandem-repeat-to-csv">Writing a tandem repeat to .csv</a></li>
 </ul>
@@ -111,8 +111,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="background">
-<span id="id1"></span><h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="background-information">
+<span id="background"></span><h1>Background Information<a class="headerlink" href="#background-information" title="Permalink to this headline">¶</a></h1>
 <p>When printing a tandem repeat, you will see a lot of information. Here is what it means.
 (You get this example from <a class="reference internal" href="significance_test.html#significance-test"><span class="std std-ref">the significance test tutorials</span></a>)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s1">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -126,7 +126,7 @@
 </pre></div>
 </div>
 <p>The tandem repeat is displayed as an alignment of tandem repeat units, similar to
-<a class="reference external" href="http://en.wikipedia.org/wiki/Multiple_sequence_alignment">multiple sequence alignments</a>:</p>
+<a class="reference external" href="http://en.wikipedia.org/wiki/Multiple_sequence_alignment">multiple sequence alignments</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RRN</span>
 <span class="n">RR</span><span class="o">-</span>
 <span class="n">RRW</span>
@@ -135,7 +135,7 @@
 <span class="n">RQI</span>
 </pre></div>
 </div>
-<p>Within the sequence, this tandem repeat would like as follows:</p>
+<p>Within the sequence, this tandem repeat would like as follows</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RRNRRRRWRARQRQI</span>
 </pre></div>
 </div>
@@ -144,19 +144,10 @@
 <li><p><strong>begin</strong>: Index where the tandem repeat starts in the sequence</p></li>
 <li><p><strong>l_effective</strong>: ength of the consensus tandem repeat unit, not including insertions.</p></li>
 <li><p><strong>n</strong>: Number of tandem repeat units.</p></li>
-<li><p><strong>pvalue</strong>: What is the probability that this repeat has occurred by random chance?</p></li>
+<li><p><strong>pvalue</strong>: What is the probability that this repeat has occurred by random chance? (This value is only a good estimate. So even if pvalue=0.0, of course it is possible that the sequence shows similarity by random chance, and not because the repeat units have evolved by duplications).</p></li>
+<li><p><strong>divergence</strong>: tModel-based measure of the similarity of the repeat units. (mathematically, it is the maximum likelihood estimate of the branch length on the phylogeny connecting all tandem repeat units. In the above example, every site has mutated 0.47 times on average. A value of 0 would mean no mutations have occurred, and the sequence of the tandem repeat units is very conserved).</p></li>
+<li><p><strong>type</strong>: The model which was used to calculate the pvalue and the divergence.</p></li>
 </ul>
-<div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">/home/delt/tral/tral/docs/background.rst</span>, line 42)</p>
-<p>Bullet list ends without a blank line; unexpected unindent.</p>
-</div>
-<p>(This value is only a good estimate. So even if pvalue=0.0, of course it is possible that the
-sequence shows similarity by random chance, and not because the repeat units have evolved by duplications).
-- <strong>divergence</strong>: tModel-based measure of the similarity of the repeat units. (mathematically, it is the maximum
-likelihood estimate of the branch length on the phylogeny connecting all tandem repeat units.
-In the above example, every site has mutated 0.47 times on average. A value of 0 would mean no
-mutations have occurred, and the sequence of the tandem repeat units is very conserved).
-- <strong>type</strong>: The model which was used to calculate the pvalue and the divergence.</p>
 <div class="section" id="more-tandem-repeat-characteristics">
 <h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this headline">¶</a></h2>
 <p>You have access to more tandem repeat characteristics. The dir() command will provide you
