@@ -24,7 +24,7 @@ The easiest way to get started on ubuntu is to use the
 :ref:`easy setup system <easy_setup>`. This automatically installs TRAL and all
 external tools.
 
-We also provide a docker <https://github.com/acg-team/tral/packages> image with TRAL and all its third party software set up.
+We also provide a `docker image for TRAL <https://github.com/acg-team/tral/pkgs/container/tral%2Ftral_docker>`_ with all its third party software set up.
 
 Alternately, follow these steps to install each part:
 
