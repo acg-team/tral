@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
     <title>Use GC3Pie to annotate your large sequence dataset. &#8212; TRAL 2.0.0 documentation</title>
-    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tral.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Searching for particular repeats" href="search_hmm.html" />
@@ -71,8 +70,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Use GC3Pie to annotate your large sequence dataset.</a><ul>
 <li><a class="reference internal" href="#configure-tral">Configure TRAL.</a></li>
 <li><a class="reference internal" href="#prepare-your-data">Prepare your data.</a><ul>
@@ -90,12 +90,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="overlap_filtering.html"
-                        title="previous chapter">Perform overlap filtering of redundant tandem repeat annotations.</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="search_hmm.html"
-                        title="next chapter">Searching for particular repeats</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="overlap_filtering.html"
+                          title="previous chapter">Perform overlap filtering of redundant tandem repeat annotations.</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="search_hmm.html"
+                          title="next chapter">Searching for particular repeats</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -107,12 +112,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -121,8 +126,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="use-gc3pie-to-annotate-your-large-sequence-dataset">
-<span id="workflow"></span><h1>Use GC3Pie to annotate your large sequence dataset.<a class="headerlink" href="#use-gc3pie-to-annotate-your-large-sequence-dataset" title="Permalink to this headline">¶</a></h1>
+  <section id="use-gc3pie-to-annotate-your-large-sequence-dataset">
+<span id="workflow"></span><h1>Use GC3Pie to annotate your large sequence dataset.<a class="headerlink" href="#use-gc3pie-to-annotate-your-large-sequence-dataset" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial will work you through an example of annotating tandem repeats on a very
 large sequence data set: We will annotate tandem repeats with sequence profile models,
 and with <em>de novo</em> detection algorithms, perform significance testing and overlap
@@ -146,19 +151,19 @@ the path to the local copy included in TRAL with this Python code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">setenv</span> <span class="n">MYTRAL</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">package</span><span class="o">/</span><span class="n">directory</span>
 </pre></div>
 </div>
-<div class="section" id="configure-tral">
-<h2>Configure TRAL.<a class="headerlink" href="#configure-tral" title="Permalink to this headline">¶</a></h2>
+<section id="configure-tral">
+<h2>Configure TRAL.<a class="headerlink" href="#configure-tral" title="Permalink to this heading">¶</a></h2>
 <p>We start by <a class="reference internal" href="configure.html#configure"><span class="std std-ref">adapting the TRAL configuration files</span></a> to choose for
 example which external tandem repeat detection algorithms you would like to run on the
 sequence data. Don’t forget to add a comma behind the last entry in this list, otherwise the
 file format is violated.</p>
 <p>Now, let’s move ahead to data acquisition:</p>
-</div>
-<div class="section" id="prepare-your-data">
-<h2>Prepare your data.<a class="headerlink" href="#prepare-your-data" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="prepare-your-data">
+<h2>Prepare your data.<a class="headerlink" href="#prepare-your-data" title="Permalink to this heading">¶</a></h2>
 <p>To annotate sequences with tandem repeats, we already acquired the following data and stored it in <em>$MYTRAL/examples/workflow</em> :</p>
-<div class="section" id="sequence-data">
-<h3>Sequence data<a class="headerlink" href="#sequence-data" title="Permalink to this headline">¶</a></h3>
+<section id="sequence-data">
+<h3>Sequence data<a class="headerlink" href="#sequence-data" title="Permalink to this heading">¶</a></h3>
 <p>We downloaded all <a class="reference external" href="http://www.uniprot.org/uniprot/?query=gene%3Aprdm+AND+reviewed%3Ayes+AND+organism%3A%22Homo+sapiens+%28Human%29+%5B9606%5D%22&amp;sort=score">UniProtKB/Swiss-Prot human PRDM genes</a>
 in fasta format…</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $MYTRAL/examples/workflow
@@ -172,31 +177,31 @@ performed in parallel.</p>
 </div>
 <p>On a sidenote, <a class="reference external" href="ftp://saf.bio.caltech.edu/pub/software/molbio/fastasplitn.c">fastasplitn</a>
 is a useful tool for splitting large data files.</p>
-</div>
-<div class="section" id="sequence-profile-model-to-sequence-data-mapping">
-<h3>Sequence profile model to sequence data mapping<a class="headerlink" href="#sequence-profile-model-to-sequence-data-mapping" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sequence-profile-model-to-sequence-data-mapping">
+<h3>Sequence profile model to sequence data mapping<a class="headerlink" href="#sequence-profile-model-to-sequence-data-mapping" title="Permalink to this heading">¶</a></h3>
 <p>We downloaded the mapping to PFAM annotations for these sequence also from www.uniprot.org.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">less</span> <span class="n">uniprot_PRDM_annotation</span><span class="o">.</span><span class="n">tsv</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="sequence-profile-models">
-<h3>Sequence profile models<a class="headerlink" href="#sequence-profile-models" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sequence-profile-models">
+<h3>Sequence profile models<a class="headerlink" href="#sequence-profile-models" title="Permalink to this heading">¶</a></h3>
 <p>We downloaded all needed PFAM sequence profile models, for example of the <a class="reference external" href="http://pfam.xfam.org/family/PF00096/hmm">Zinc finger</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">less</span> <span class="n">PRDM_PFAM_models</span><span class="o">.</span><span class="n">hmm</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="pyfaidx">
-<h3>pyfaidx<a class="headerlink" href="#pyfaidx" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="pyfaidx">
+<h3>pyfaidx<a class="headerlink" href="#pyfaidx" title="Permalink to this heading">¶</a></h3>
 <p>The toy example requires the Python package <a class="reference external" href="https://github.com/mdshw5/pyfaidx">pyfaidx</a>
 for .fasta file indexing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyfaidx</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="test-the-file-preprocessing">
-<h3>Test the file preprocessing.<a class="headerlink" href="#test-the-file-preprocessing" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="test-the-file-preprocessing">
+<h3>Test the file preprocessing.<a class="headerlink" href="#test-the-file-preprocessing" title="Permalink to this heading">¶</a></h3>
 <p>To allow fast access to the data for the tandem repeat annotation steps, it is transformed
 to Python pickle objects:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir $MYTRAL/examples/workflow/hmm
@@ -204,10 +209,10 @@ python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_ra
 </pre></div>
 </div>
 <p>On the small toy example, this file preparation step should run fast.</p>
-</div>
-</div>
-<div class="section" id="perform-a-test-run">
-<h2>Perform a test run.<a class="headerlink" href="#perform-a-test-run" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="perform-a-test-run">
+<h2>Perform a test run.<a class="headerlink" href="#perform-a-test-run" title="Permalink to this heading">¶</a></h2>
 <p>With the following command, annotation is performed on <em>uniprot_PRDM_1.fasta</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>python3 tandem_repeat_annotation_scripts.py workflow -i $MYTRAL/examples/workflow/split_sequence_data/uniprot_PRDM_1.fasta -o $MYTRAL/examples/workflow/results/uniprot_PRDM_1.pickle -os $MYTRAL/examples/workflow/results/uniprot_PRDM_1.tsv -f tsv -t 600  --hmm_annotation $MYTRAL/examples/workflow/uniprot_PRDM_annotation.pickle --hmm $MYTRAL/examples/workflow/hmm
 </pre></div>
@@ -217,15 +222,15 @@ python3 tandem_repeat_annotation_scripts.py file_preparation --hmm_annotation_ra
 </pre></div>
 </div>
 <p>Now, we can move ahead to automated distributed annotation with GC3PIE.</p>
-</div>
-<div class="section" id="install-gc3pie">
-<h2>Install GC3PIE.<a class="headerlink" href="#install-gc3pie" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="install-gc3pie">
+<h2>Install GC3PIE.<a class="headerlink" href="#install-gc3pie" title="Permalink to this heading">¶</a></h2>
 <p>You can follow the official
 <a class="reference external" href="https://gc3pie.readthedocs.io/en/master/users/install.html">GC3Pie installation instructions</a>.
 Upon installation, GC3Pie needs to be <a class="reference external" href="http://gc3pie.readthedocs.org/en/latest/users/configuration.html">locally configured</a>.</p>
-</div>
-<div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
 <p>Adapt this command to run the tandem repeat annotation workflow (<a class="reference external" href="https://gc3pie.readthedocs.io/en/master/users/configuration.html">more information</a>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./tandem_repeat_annotation_workflow.py -w 60 minutes -r &lt;host&gt; -J 500 -u sqlite:////path/to/&lt;session_name&gt;.db -s &lt;session_name&gt; -C 2 -vvvv -conf $MYTRAL/examples/workflow/tandem_repeat_annotation_workflow.ini
 </pre></div>
@@ -238,8 +243,8 @@ $ gstat
 $ ...
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

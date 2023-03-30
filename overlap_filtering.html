@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
     <title>Perform overlap filtering of redundant tandem repeat annotations. &#8212; TRAL 2.0.0 documentation</title>
-    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tral.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Use GC3Pie to annotate your large sequence dataset." href="workflow.html" />
@@ -71,8 +70,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Perform overlap filtering of redundant tandem repeat annotations.</a><ul>
 <li><a class="reference internal" href="#read-in-tandem-repeat-annotations">Read in tandem repeat annotations.</a></li>
 <li><a class="reference internal" href="#filter-overlapping-tandem-repeats">Filter overlapping tandem repeats.</a></li>
@@ -81,12 +81,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="significance_test.html"
-                        title="previous chapter">Perform statistical significance test of tandem repeats.</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="workflow.html"
-                        title="next chapter">Use GC3Pie to annotate your large sequence dataset.</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="significance_test.html"
+                          title="previous chapter">Perform statistical significance test of tandem repeats.</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="workflow.html"
+                          title="next chapter">Use GC3Pie to annotate your large sequence dataset.</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -98,12 +103,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -112,8 +117,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="perform-overlap-filtering-of-redundant-tandem-repeat-annotations">
-<span id="overlap-filtering"></span><h1>Perform overlap filtering of redundant tandem repeat annotations.<a class="headerlink" href="#perform-overlap-filtering-of-redundant-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h1>
+  <section id="perform-overlap-filtering-of-redundant-tandem-repeat-annotations">
+<span id="overlap-filtering"></span><h1>Perform overlap filtering of redundant tandem repeat annotations.<a class="headerlink" href="#perform-overlap-filtering-of-redundant-tandem-repeat-annotations" title="Permalink to this heading">¶</a></h1>
 <p>Here you learn how to detect tandem repeat annotations from multiple sources for different
 types of overlap, and filter them accordingly.</p>
 <p>Requirements for this tutorial:</p>
@@ -121,8 +126,8 @@ types of overlap, and filter them accordingly.</p>
 <li><p><a class="reference internal" href="install.html#install"><span class="std std-ref">Install TRAL</span></a>. TRAL ships with the tandem repeat data needed for this tutorial.</p></li>
 <li><p><a class="reference internal" href="pvaluefiles.html#pvaluefiles"><span class="std std-ref">Download p-Value distribution files</span></a>.</p></li>
 </ul>
-<div class="section" id="read-in-tandem-repeat-annotations">
-<h2>Read in tandem repeat annotations.<a class="headerlink" href="#read-in-tandem-repeat-annotations" title="Permalink to this headline">¶</a></h2>
+<section id="read-in-tandem-repeat-annotations">
+<h2>Read in tandem repeat annotations.<a class="headerlink" href="#read-in-tandem-repeat-annotations" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">tral</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
@@ -133,9 +138,9 @@ types of overlap, and filter them accordingly.</p>
     <span class="n">lHIV_Sequence</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="filter-overlapping-tandem-repeats">
-<h2>Filter overlapping tandem repeats.<a class="headerlink" href="#filter-overlapping-tandem-repeats" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="filter-overlapping-tandem-repeats">
+<h2>Filter overlapping tandem repeats.<a class="headerlink" href="#filter-overlapping-tandem-repeats" title="Permalink to this heading">¶</a></h2>
 <p>Tandem repeats can be clustered according to different types of overlap:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">overlap_type</span> <span class="o">=</span> <span class="s2">&quot;shared_char&quot;</span>
 <span class="k">for</span> <span class="n">iSequence</span> <span class="ow">in</span> <span class="n">lHIV_Sequence</span><span class="p">:</span>
@@ -169,9 +174,9 @@ the <em>common ancestry</em> overlap:</p>
 <span class="go">23</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="available-types-of-overlap-redundancy-detection">
-<h2>Available types of overlap/redundancy detection<a class="headerlink" href="#available-types-of-overlap-redundancy-detection" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="available-types-of-overlap-redundancy-detection">
+<h2>Available types of overlap/redundancy detection<a class="headerlink" href="#available-types-of-overlap-redundancy-detection" title="Permalink to this heading">¶</a></h2>
 <p>There are currently two types of overlap implemented:</p>
 <ul class="simple">
 <li><p>“shared_char”: Do two tandem repeats contain any two chars in common?</p></li>
@@ -180,8 +185,8 @@ the <em>common ancestry</em> overlap:</p>
 <p>For clustering, overlap is assumed to be a transitive attribute. That is, if tandem repeats
 A &amp; B, as well as B &amp; C overlap, all tandem repeats A, B &amp; C are clustered, no matter
 whether A and C do also overlap.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

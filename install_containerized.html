@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
     <title>Using TRAL in a container or VM &#8212; TRAL 2.0.0 documentation</title>
-    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tral.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Modules" href="code_docs.html" />
@@ -71,8 +70,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Using TRAL in a container or VM</a><ul>
 <li><a class="reference internal" href="#vagrant">Vagrant</a></li>
 <li><a class="reference internal" href="#docker">Docker</a></li>
@@ -80,12 +80,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="configure.html"
-                        title="previous chapter">Configuration</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="code_docs.html"
-                        title="next chapter">Modules</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="configure.html"
+                          title="previous chapter">Configuration</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="code_docs.html"
+                          title="next chapter">Modules</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -97,12 +102,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -111,10 +116,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="using-tral-in-a-container-or-vm">
-<span id="install-containerized"></span><h1>Using TRAL in a container or VM<a class="headerlink" href="#using-tral-in-a-container-or-vm" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="vagrant">
-<h2>Vagrant<a class="headerlink" href="#vagrant" title="Permalink to this headline">¶</a></h2>
+  <section id="using-tral-in-a-container-or-vm">
+<span id="install-containerized"></span><h1>Using TRAL in a container or VM<a class="headerlink" href="#using-tral-in-a-container-or-vm" title="Permalink to this heading">¶</a></h1>
+<section id="vagrant">
+<h2>Vagrant<a class="headerlink" href="#vagrant" title="Permalink to this heading">¶</a></h2>
 <p>(<a class="reference external" href="https://www.vagrantup.com/">Vagrant</a>) is tool for building virtual development
 environments. TRAL requires a complex ecosystem to use all of its features,
 so vagrant provides a reproducable environment to test installation.</p>
@@ -138,25 +143,25 @@ so running (within vagrant) as root is recommended. The working directory
 on the host is mounted as <code class="docutils literal notranslate"><span class="pre">/vagrant</span></code> within the box for easy data transfer.</p>
 <p>Note that external software is licensed independently of TRAL. You should check
 the licenses for all software. Several tools are restricted to academic use.</p>
-</div>
-<div class="section" id="docker">
-<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
-<p>Create <a class="reference external" href="https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line">Github.com Token</a>
-and login your docker instance:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">~/</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">txt</span> <span class="o">|</span> <span class="n">docker</span> <span class="n">login</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span> <span class="o">-</span><span class="n">u</span> <span class="n">USERNAME</span> <span class="o">--</span><span class="n">password</span><span class="o">-</span><span class="n">stdin</span>
+</section>
+<section id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this heading">¶</a></h2>
+<p>Create a <a class="reference external" href="https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line">Github.com access token</a>
+and login your docker instance (<a class="reference external" href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry">more help</a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="o">~/</span><span class="n">TOKEN</span><span class="o">.</span><span class="n">txt</span> <span class="o">|</span> <span class="n">docker</span> <span class="n">login</span> <span class="n">ghcr</span><span class="o">.</span><span class="n">io</span> <span class="o">-</span><span class="n">u</span> <span class="n">USERNAME</span> <span class="o">--</span><span class="n">password</span><span class="o">-</span><span class="n">stdin</span>
 </pre></div>
 </div>
 <p>Get the latest docker image:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">docker</span> <span class="n">docker</span> <span class="n">pull</span> <span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acg</span><span class="o">-</span><span class="n">team</span><span class="o">/</span><span class="n">tral</span><span class="o">/</span><span class="n">tral_docker</span><span class="p">:</span><span class="n">latest</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">docker</span> <span class="n">pull</span> <span class="n">ghcr</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">acg</span><span class="o">-</span><span class="n">team</span><span class="o">/</span><span class="n">tral</span><span class="o">/</span><span class="n">tral_docker</span><span class="p">:</span><span class="mf">2.0</span>
 </pre></div>
 </div>
 <p>Fire it up:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">ti</span> <span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acg</span><span class="o">-</span><span class="n">team</span><span class="o">/</span><span class="n">tral</span><span class="o">/</span><span class="n">tral_docker</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">ti</span> <span class="n">ghcr</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">acg</span><span class="o">-</span><span class="n">team</span><span class="o">/</span><span class="n">tral</span><span class="o">/</span><span class="n">tral_docker</span><span class="p">:</span><span class="mf">2.0</span>
 </pre></div>
 </div>
-<p>For development check the <a class="reference internal" href="contribute.html#contribute"><span class="std std-ref">realease procedure</span></a>.</p>
-</div>
-</div>
+<p>For development check the <a class="reference internal" href="contribute.html#contribute"><span class="std std-ref">release procedure</span></a>.</p>
+</section>
+</section>
 
 
             <div class="clearer"></div>

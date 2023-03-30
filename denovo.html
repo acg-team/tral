@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
     <title>Run and parse de novo repeat detection software. &#8212; TRAL 2.0.0 documentation</title>
-    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tral.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Background Information" href="background.html" />
@@ -71,8 +70,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Run and parse de novo repeat detection software.</a><ul>
 <li><a class="reference internal" href="#read-in-your-sequences">Read in your sequences.</a></li>
 <li><a class="reference internal" href="#run-the-external-repeat-detector">Run the external repeat detector.</a></li>
@@ -82,12 +82,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="contributors.html"
-                        title="previous chapter">Contributors &amp; Background</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="background.html"
-                        title="next chapter">Background Information</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="contributors.html"
+                          title="previous chapter">Contributors &amp; Background</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="background.html"
+                          title="next chapter">Background Information</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -99,12 +104,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -113,8 +118,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="run-and-parse-de-novo-repeat-detection-software">
-<span id="denovo"></span><h1>Run and parse de novo repeat detection software.<a class="headerlink" href="#run-and-parse-de-novo-repeat-detection-software" title="Permalink to this headline">¶</a></h1>
+  <section id="run-and-parse-de-novo-repeat-detection-software">
+<span id="denovo"></span><h1>Run and parse de novo repeat detection software.<a class="headerlink" href="#run-and-parse-de-novo-repeat-detection-software" title="Permalink to this heading">¶</a></h1>
 <p>Here you learn how to run external repeat detection software on your favourite sequence
 file and output the results.</p>
 <p>Requirements for this tutorial:</p>
@@ -127,8 +132,8 @@ file and output the results.</p>
 <p class="admonition-title">Todo</p>
 <p>write section to install castor with aligner proPIP</p>
 </div>
-<div class="section" id="read-in-your-sequences">
-<h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this headline">¶</a></h2>
+<section id="read-in-your-sequences">
+<h2>Read in your sequences.<a class="headerlink" href="#read-in-your-sequences" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">tral.sequence</span> <span class="kn">import</span> <span class="n">sequence</span>
 <span class="kn">from</span> <span class="nn">tral.paths</span> <span class="kn">import</span> <span class="n">PACKAGE_DIRECTORY</span>
@@ -137,9 +142,9 @@ file and output the results.</p>
 <span class="n">sequences_HIV</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">Sequence</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">proteome_HIV</span><span class="p">,</span> <span class="n">input_format</span> <span class="o">=</span> <span class="s1">&#39;fasta&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="run-the-external-repeat-detector">
-<h2>Run the external repeat detector.<a class="headerlink" href="#run-the-external-repeat-detector" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="run-the-external-repeat-detector">
+<h2>Run the external repeat detector.<a class="headerlink" href="#run-the-external-repeat-detector" title="Permalink to this heading">¶</a></h2>
 <p>Detect tandem repeats on a single sequence with <a class="reference internal" href="install_external.html#xstream"><span class="std std-ref">XSTREAM</span></a>. If you did not
 install XSTREAM, you can use any of the other <em>de novo</em> detection algorithms, but will see
 different results.</p>
@@ -179,9 +184,9 @@ absolute number of detections in the HIV proteome for a couple of algorithms:</p
 <span class="go">RPEPTAPPPES-</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="realign-a-repeat-with-propip">
-<h2>Realign a repeat with proPIP.<a class="headerlink" href="#realign-a-repeat-with-propip" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="realign-a-repeat-with-propip">
+<h2>Realign a repeat with proPIP.<a class="headerlink" href="#realign-a-repeat-with-propip" title="Permalink to this heading">¶</a></h2>
 <p>Realigning a tandem repeat with an indel aware algortithm such as proPIP may improve its representation.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_sequence</span> <span class="o">=</span> <span class="n">sequences_HIV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">tandem_repeats</span> <span class="o">=</span> <span class="n">test_sequence</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">denovo</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -209,9 +214,9 @@ absolute number of detections in the HIV proteome for a couple of algorithms:</p
 </div>
 <p>Set rate_distribution = ‘gamma’ for a gamma distributed indel placement or modify it in <a class="reference internal" href="configure.html#configure"><span class="std std-ref">config.ini</span></a>.
 Set realignment = ‘mafft’ to realign with mafft instead of proPIP.</p>
-</div>
-<div class="section" id="output-the-detected-tandem-repeats">
-<h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="output-the-detected-tandem-repeats">
+<h2>Output the detected tandem repeats.<a class="headerlink" href="#output-the-detected-tandem-repeats" title="Permalink to this heading">¶</a></h2>
 <p>Write a singe repeat_list to .tsv format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_output_tsv_file</span> <span class="o">=</span> <span class="s2">&quot;outputfile.tsv&quot;</span> <span class="c1"># Choose your path and filename</span>
 <span class="n">tandem_repeats</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_format</span> <span class="o">=</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="n">file</span> <span class="o">=</span> <span class="n">path_to_output_tsv_file</span><span class="p">)</span>
@@ -241,8 +246,8 @@ begin   msa_original    l_effective      nD      sequence_length divergence     
     <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sequences_HIV</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

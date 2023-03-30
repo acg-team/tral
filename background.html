@@ -1,18 +1,17 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
     <title>Background Information &#8212; TRAL 2.0.0 documentation</title>
-    <link rel="stylesheet" href="_static/tral.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tral.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Annotate tandem repeats from sequence domain models." href="cphmm.html" />
@@ -71,8 +70,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Background Information</a><ul>
 <li><a class="reference internal" href="#more-tandem-repeat-characteristics">More tandem repeat characteristics</a></li>
 <li><a class="reference internal" href="#writing-a-tandem-repeat-to-csv">Writing a tandem repeat to .csv</a></li>
@@ -80,12 +80,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="denovo.html"
-                        title="previous chapter">Run and parse de novo repeat detection software.</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="cphmm.html"
-                        title="next chapter">Annotate tandem repeats from sequence domain models.</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="denovo.html"
+                          title="previous chapter">Run and parse de novo repeat detection software.</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="cphmm.html"
+                          title="next chapter">Annotate tandem repeats from sequence domain models.</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -97,12 +102,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -111,8 +116,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="background-information">
-<span id="background"></span><h1>Background Information<a class="headerlink" href="#background-information" title="Permalink to this headline">¶</a></h1>
+  <section id="background-information">
+<span id="background"></span><h1>Background Information<a class="headerlink" href="#background-information" title="Permalink to this heading">¶</a></h1>
 <p>When printing a tandem repeat, you will see a lot of information. Here is what it means.
 (You get this example from <a class="reference internal" href="significance_test.html#significance-test"><span class="std std-ref">the significance test tutorials</span></a>)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s1">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -148,8 +153,8 @@
 <li><p><strong>divergence</strong>: tModel-based measure of the similarity of the repeat units. (mathematically, it is the maximum likelihood estimate of the branch length on the phylogeny connecting all tandem repeat units. In the above example, every site has mutated 0.47 times on average. A value of 0 would mean no mutations have occurred, and the sequence of the tandem repeat units is very conserved).</p></li>
 <li><p><strong>type</strong>: The model which was used to calculate the pvalue and the divergence.</p></li>
 </ul>
-<div class="section" id="more-tandem-repeat-characteristics">
-<h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this headline">¶</a></h2>
+<section id="more-tandem-repeat-characteristics">
+<h2>More tandem repeat characteristics<a class="headerlink" href="#more-tandem-repeat-characteristics" title="Permalink to this heading">¶</a></h2>
 <p>You have access to more tandem repeat characteristics. The dir() command will provide you
 with a list of all attributes and functions connected to the object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span><span class="n">lHIV_Sequence</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">dRepeat_list</span><span class="p">[</span><span class="s1">&#39;denovo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">repeats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -158,9 +163,9 @@ with a list of all attributes and functions connected to the object:</p>
 </div>
 <p>For a more explanation, check out the <a class="reference internal" href="code_docs.html#code-docs"><span class="std std-ref">Class documentation</span></a>, or
 <a class="reference internal" href="contributors.html#contributors"><span class="std std-ref">contact us</span></a>.</p>
-</div>
-<div class="section" id="writing-a-tandem-repeat-to-csv">
-<h2>Writing a tandem repeat to .csv<a class="headerlink" href="#writing-a-tandem-repeat-to-csv" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="writing-a-tandem-repeat-to-csv">
+<h2>Writing a tandem repeat to .csv<a class="headerlink" href="#writing-a-tandem-repeat-to-csv" title="Permalink to this heading">¶</a></h2>
 <p>When you write a tandem repeat to .csv with TRAL, the result may look as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">begin</span>   <span class="n">msa_original</span>    <span class="n">l_effective</span>      <span class="n">n_effective</span>      <span class="n">repeat_region_length</span> <span class="n">divergence</span>      <span class="n">pvalue</span>
 <span class="mi">316</span>     <span class="n">GDII</span><span class="p">,</span><span class="n">GDIR</span>       <span class="mi">4</span>       <span class="mf">2.0</span>     <span class="mi">8</span>       <span class="kc">None</span>    <span class="kc">None</span>
@@ -174,8 +179,8 @@ with a list of all attributes and functions connected to the object:</p>
 </ul>
 <p><em>None</em> values indicated that the required characteristics had not been calculated previously
 in the code.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
